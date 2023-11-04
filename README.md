@@ -1,1 +1,1 @@
-# ThesisManagement-Group13
+# Initial template ThesisManagement
