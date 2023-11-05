@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
 import ErrorAlert from "./components/ErrorAlert";
 import HomePage from "./components/HomePage";
+import UserApplication from "./components/UserApplication"
 import "./style.css";
 import { Button, Container } from "react-bootstrap";
 
@@ -39,7 +40,7 @@ function App() {
               )
             }
           />
-          {/*Others route here */}
+          <Route path='/user/application/:id' element={<UserApplication loading={loading}/>}></Route>
           {/*Leave DefaultRoute as last route */}
           <Route path="/*" element={<DefaultRoute />} />
         </Routes>
