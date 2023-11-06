@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
 import ErrorAlert from "./components/ErrorAlert";
 import HomePage from "./components/HomePage";
+import TeacherPage from "./components/TeacherPage";
+import NewProposal from "./components/NewProposal";
 import "./style.css";
 import { Button, Container } from "react-bootstrap";
 
@@ -40,6 +42,36 @@ function App() {
             }
           />
           {/*Others route here */}
+          <Route
+            path="/teacher"
+            element={
+              !error ? (
+                <TeacherPage
+                  loading={loading}
+                  setLoading={setLoading}
+                  error={error}
+                  setError={setError}
+                />
+              ) : (
+                <ErrorAlert />
+              )
+            }
+          />
+          <Route
+            path="/newproposal"
+            element={
+              !error ? (
+                <NewProposal
+                  loading={loading}
+                  setLoading={setLoading}
+                  error={error}
+                  setError={setError}
+                />
+              ) : (
+                <ErrorAlert />
+              )
+            }
+          />
           {/*Leave DefaultRoute as last route */}
           <Route path="/*" element={<DefaultRoute />} />
         </Routes>
