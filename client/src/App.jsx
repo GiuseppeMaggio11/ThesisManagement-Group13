@@ -40,7 +40,7 @@ function App() {
               )
             }
           />
-          <Route path='/user/application/:id' element={<UserApplication loading={loading}/>}></Route>
+          <Route path='/application/:id' element={<UserApplication loading={loading}/>}></Route>
           {/*Leave DefaultRoute as last route */}
           <Route path="/*" element={<DefaultRoute />} />
         </Routes>
