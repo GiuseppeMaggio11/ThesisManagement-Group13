@@ -15,6 +15,7 @@
         "is_archived": ,  boolean
         "keywords" : ["",""],
         "cod_group" : ""
+        "cosupervisors": ["", ""]
     }
 
   - Returns {
