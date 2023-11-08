@@ -3,26 +3,52 @@ import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
 import ErrorAlert from "./components/ErrorAlert";
 import HomePage from "./components/HomePage";
+import LoginForm from "./components/LoginForm";
 import "./style.css";
 import { Button, Container } from "react-bootstrap";
+import Header from "./components/Header";
+import API from "./API";
+import VirtualClock from "./components/VirtualClock";
 
 function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [user, setUser] = useState(undefined);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [virtualClock, setVirtualClock] = useState(new Date());
 
   useEffect(() => {
-    try {
-      /*API calls here*/
-      setLoading(false);
-    } catch (err) {
-      console.log(err);
-      setError(true);
-    }
+    const checkAuth = async () => {
+      try {
+        const user = await API.getUserInfo();
+        setLoggedIn(true);
+        setUser(user);
+      } catch (err) {
+        if (error.response && error.response.status !== 401) {
+          console.log(err);
+          setError(true);
+        }
+      }
+    };
+    checkAuth();
+    setLoading(false);
   }, []);
+
+  const loginSuccessful = (user) => {
+    setUser(user);
+    setLoggedIn(true);
+    setLoading(false);
+  };
+  const logOut = async () => {
+    await API.logOut();
+    setLoggedIn(false);
+    setUser(undefined);
+  };
 
   return (
     <BrowserRouter>
       <div className="wrapper">
+        <Header user={user} logout={logOut} />
         <Routes>
           <Route
             path="/"
@@ -37,6 +63,30 @@ function App() {
               ) : (
                 <ErrorAlert />
               )
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              loggedIn ? (
+                <Navigate replace to="/" />
+              ) : (
+                <LoginForm
+                  loginSuccessful={loginSuccessful}
+                  logOut={logOut}
+                  loading={loading}
+                  setLoading={setLoading}
+                />
+              )
+            }
+          />
+          <Route
+            path="/virtualclock"
+            element={
+              <VirtualClock
+                virtualClock={virtualClock}
+                setVirtualClock={setVirtualClock}
+              />
             }
           />
           {/*Others route here */}
