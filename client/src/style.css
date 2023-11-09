@@ -24,7 +24,7 @@
 }
 
 /*Virtual clock*/
-.custom-virtual-clock {
+.custom-virtual-clock{
   font-size: 1.5rem;
   font-weight: bold;
   color: #333;
@@ -33,7 +33,7 @@
   border: 1px solid #ccc;
   border-radius: 5px;
   display: inline-block;
-
+}
     /*Loading*/
     .loader-container{
       position: fixed;
@@ -56,5 +56,11 @@
 .footer_application{
   background-color: #003576;
   color: white;
-
 }
+
+.margin_left_accordition{
+  margin-left: 2rem;
+}
+ .button-apply{
+  text-align: end;
+ }
