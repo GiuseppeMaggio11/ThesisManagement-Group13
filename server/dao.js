@@ -132,7 +132,7 @@ exports.newApply = async (studentID, ThesisID) => {
     console.log('existing', existing)
 
     const sql =
-      "INSERT INTO application (student_id, thesis_id, status, application_date) VALUES (?, ?, ?, ?)";
+      "INSERT INTO application_table (student_id, thesis_id, status, application_date) VALUES (?, ?, ?, ?)";
     if (isValid && !existing)
       reject(new Error("You have already applied to this thesis."));
     return new Promise((resolve, reject) => {

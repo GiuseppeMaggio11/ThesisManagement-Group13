@@ -10,6 +10,8 @@ const multer = require('multer');
 const LocalStrategy = require("passport-local").Strategy;
 const session = require("express-session");
 const fs=require('fs')
+const zipdir = require('zip-dir');
+
 
 const app = express();
 const port = 3001;
@@ -148,8 +150,7 @@ app.get("/api/session/userinfo", (req, res) => {
     res.status(200).json(req.user);
   } else res.status(401).json({ error: "Unauthenticated user!" });
 });
-
-//body => thesis_id
+/***API***/
 app.post('/api/newApplication/:thesis_id', isStudent, async (req, res) => {
   const thesis_id = req.params.thesis_id; // Extract thesis_id from the URL
   console.log('thesis_id ' + thesis_id);
@@ -170,7 +171,7 @@ app.post('/api/newApplication/:thesis_id', isStudent, async (req, res) => {
 });
 
 
-app.post('/api/newFiles', async(req, res)=>{
+app.post('/api/newFiles', isStudent, async(req, res)=>{
   upload.array('file', 10)(req, res, (err) => {
     if (err instanceof multer.MulterError) {
       res.status(500).send('Multer error');
@@ -182,7 +183,61 @@ app.post('/api/newFiles', async(req, res)=>{
     }
   })
 })
-/***API***/
+
+
+app.get('/api/getAllFiles/:student_id', isProfessor, async (req, res) => {
+  try {
+    const studentID = req.params.student_id;
+    const userFolderPath = `studentsFiles/${studentID}`;
+
+    zipdir(userFolderPath, { saveTo: `studentsFiles/student_files_${studentID}.zip` }, function (err, buffer) {
+      if (err) {
+        res.status(500).send('An error occurred while creating the zip archive.');
+      } else {
+        res.download(`studentsFiles/student_files_${studentID}.zip`);
+      }
+    });
+  } catch (error) {
+    res.status(500).send('An unexpected error occurred');
+  }
+});
+
+
+app.get('/api/getStudentFilesList/:student_id', isProfessor, async (req, res) => {
+  try {
+    const studentID = req.params.student_id;
+    const userFolderPath = `studentsFiles/${studentID}`;
+
+    fs.readdir(userFolderPath, (err, files) => {
+      if (err) {
+        res.status(500).send('An error occurred while reading files.');
+      } else {
+        const fileNames = files.map(file => file);
+        res.status(200).json(fileNames);
+      }
+    });
+  } catch (error) {
+    res.status(500).send('An unexpected error occurred');
+  }
+});
+
+app.get('/api/getFile/:student_id/:file_name', isProfessor, async (req, res) => {
+  try {
+    const studentID = req.params.student_id;
+    const fileName = req.params.file_name;
+    const filePath = `studentsFiles/${studentID}/${fileName}`;
+
+    fs.access(filePath, fs.constants.F_OK, (err) => {
+      if (err) {
+        res.status(404).send('File not found');
+      } else {
+        res.download(filePath, fileName);
+      }
+    });
+  } catch (error) {
+    res.status(500).send('An unexpected error occurred');
+  }
+});
 
 // Activate the server
 app.listen(port, () => {
