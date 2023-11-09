@@ -20,6 +20,7 @@
   .custom-navdropdown {
     max-width: 30%;
   }
+
 }
 
 /*Virtual clock*/
@@ -32,4 +33,28 @@
   border: 1px solid #ccc;
   border-radius: 5px;
   display: inline-block;
+
+    /*Loading*/
+    .loader-container{
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+    }
+  
+.head_tableApplication{
+  text-align: center;
+}
+.navbarMargin{
+  margin-top: 1rem;
+}
+.colorStyle{
+  background-color: #003576;
+  color: white;
+}
+.footer_application{
+  background-color: #003576;
+  color: white;
+
 }
