@@ -42,6 +42,7 @@ exports.getUser = (email, password) => {
   });
 };
 
+
 exports.getUserByEmail = (email) => {
   return new Promise((resolve, reject) => {
     const sql = "SELECT * FROM users WHERE email = ?";
@@ -63,6 +64,7 @@ exports.getUserByEmail = (email) => {
   });
 };
 
+//retrive the UserID from teh username
 exports.getUserID = (username) => {
   return new Promise((resolve, reject) => {
     if (!username) {
@@ -83,6 +85,7 @@ exports.getUserID = (username) => {
   });
 };
 
+//returns true if the thesis is not expired or archived, otherwise true
 const isThesisValid = async (thesisID) => {
   if (!thesisID) {
     throw { error: "parameter is missing" };
@@ -103,6 +106,7 @@ const isThesisValid = async (thesisID) => {
   }
 };
 
+//returns false is the student is not already applied for a thesis,  otherwise true
 const isAlreadyExisting = async (studentID, thesisID) => {
   if (!thesisID || !studentID) {
     throw { error: "parameter is missing" };
