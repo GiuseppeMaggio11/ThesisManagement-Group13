@@ -9,7 +9,7 @@ const cors = require("cors");
 const multer = require('multer');
 const LocalStrategy = require("passport-local").Strategy;
 const session = require("express-session");
-
+const fs=require('fs')
 
 const app = express();
 const port = 3001;
@@ -58,13 +58,32 @@ passport.deserializeUser((username, done) => {
     });
 });
 
-
 const storage = multer.diskStorage({
-  destination: 'curricula/',
+  destination: async (req, file, cb) => {
+    try{
+    const userID = await dao.getUserID(req.user.username);
+    console.log(userID)
+    const userFolderPath = `studentsFiles/${userID}`;
+    console.log(userFolderPath)
+    fs.mkdirSync(userFolderPath, { recursive: true });
+
+    cb(null, userFolderPath);
+  }
+    catch(error){
+      throw new Error(error)
+    }
+  },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9); //change this with studentidname_curricula
-    const extension = file.originalname.split('.').pop(); // Get the file extension
-    const filename = `${uniqueSuffix}.${extension}`;
+    const uniqueSuffix = file.originalname
+    let filename;
+    if(uniqueSuffix.endsWith('.pdf')){
+      filename=uniqueSuffix
+    }
+    else {
+      filename = uniqueSuffix+'.pdf'
+    }
+    filename=filename.replace(/\s/g, "_");
+    console.log(filename)
     cb(null, filename);
   }
 });
@@ -72,7 +91,7 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage: storage,
   fileFilter: (req, file, cb) => {
-    const filetypes = /pdf/; // Allow only PDF files
+    const filetypes = /pdf/;
     const mimetype = filetypes.test(file.mimetype);
     if (mimetype) {
       return cb(null, true);
@@ -131,18 +150,38 @@ app.get("/api/session/userinfo", (req, res) => {
 });
 
 //body => thesis_id
-app.post('/api/newApply', isStudent, [check('airplane_id').isInt()], upload.single('file'), async (req, res) => {
-  const thesis_id = req.body.thesis_id
+app.post('/api/newApplication/:thesis_id', isStudent, async (req, res) => {
+  const thesis_id = req.params.thesis_id; // Extract thesis_id from the URL
+  console.log('thesis_id ' + thesis_id);
+
   try {
-    const userID = await dao.getUserID(req.user.username); // await the Promise to resolve
-    console.log(userID)
+    if (!Number.isInteger(Number(thesis_id))) {
+      throw new Error('Thesis ID must be an integer');
+    }
+
+    const userID = await dao.getUserID(req.user.username);
+    console.log(userID);
     const result = await dao.newApply(userID, thesis_id);
-    res.status(200).send('Application created successfully'); // Send a success response
+
+    res.status(200).send('Application created successfully');
   } catch (error) {
-    res.status(500).send(error+' '); // Send an error response with status code 500
+    res.status(500).send(error.message + ' ');
   }
 });
 
+
+app.post('/api/newFiles', async(req, res)=>{
+  upload.array('file', 10)(req, res, (err) => {
+    if (err instanceof multer.MulterError) {
+      res.status(500).send('Multer error');
+    } else if (err) {
+      res.status(500).send('An unexpected error occurred');
+    }
+    else{
+      res.status(200).send('files uploaded correctly')
+    }
+  })
+})
 /***API***/
 
 // Activate the server
