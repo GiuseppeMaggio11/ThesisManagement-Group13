@@ -1,5 +1,7 @@
 import { Container, Table, Accordion, Button, Modal} from "react-bootstrap";
 import { useEffect, useState } from "react";
+import 'bootstrap-icons/font/bootstrap-icons.css';
+
 import Loading from "./Loading";
 
 function UserApplication(props) {
@@ -17,6 +19,23 @@ function UserApplication(props) {
         level: "Bachelor"
     })
     const [openPanel, setOpenPanel] = useState(false)
+    const [selectedFiles, setSelectedFiles] = useState([]);
+
+    const handleFileChange = (e) => {
+        const newFiles = Array.from(e.target.files);
+
+        // Filter only pdf's files
+        const pdfFiles = newFiles.filter(file => file.type === 'application/pdf');
+
+        // Add the new file
+        setSelectedFiles(prevFiles => [...prevFiles, ...pdfFiles]);
+    };
+
+    const handleRemoveFile = (index) => {
+        const newFiles = [...selectedFiles];
+        newFiles.splice(index, 1);
+        setSelectedFiles(newFiles);
+    };
 
     useEffect(()=>{
         const init = async() => {
@@ -139,10 +158,33 @@ function UserApplication(props) {
         </Container>
         <Modal show={openPanel}>
             <Modal.Header>
-            <Modal.Title>Application confirm</Modal.Title>
+                <Modal.Title>Application confirm</Modal.Title>
             </Modal.Header>
-            <Modal.Body>Are you sure to enroll your application for {pageData.title} thesis?</Modal.Body>
+            <Modal.Body>
+            <div>
+                <label htmlFor="fileInput">Select PDF files that supervisor has to considering in your application:</label>
+                <input
+                type="file"
+                id="fileInput"
+                accept=".pdf"
+                onChange={handleFileChange}
+                multiple 
+                />
+            </div>
+            <div>
+                {selectedFiles.map((file, index) => (
+                <div key={index}>
+                    {file.name}
+                    <Button variant="outline-danger"onClick={() => handleRemoveFile(index)}>
+                        <i class="bi bi-x-circle"></i>
+                    </Button>
+                </div>
+                ))}
+            </div>
+            </Modal.Body>
             <Modal.Footer>
+                <div className="confirmation_application_div">Confirm application for {pageData.title} thesis?</div>
+            
             <Button variant="danger" onClick={()=>setOpenPanel(false)}>
                 Cancel
             </Button>
