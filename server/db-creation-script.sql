@@ -40,20 +40,15 @@ CREATE TABLE IF NOT EXISTS degree_table (
     title_degree VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS course (
-    cod_course VARCHAR(10) PRIMARY KEY,
-    title_course VARCHAR(100) NOT NULL,
-    cfu INT NOT NULL
-);
-
 CREATE TABLE IF NOT EXISTS career (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id VARCHAR(7) NOT NULL,
     cod_course VARCHAR(10) NOT NULL,
-    student_id VARCHAR(7) NOT NULL,
+    title_course VARCHAR(50) NOT NULL,
+    cfu INT NOT NULL,
     grade DECIMAL(3, 0) NOT NULL,
     date DATE NOT NULL,
-    FOREIGN KEY (cod_course) REFERENCES course(cod_course),
-    FOREIGN KEY (student_id) REFERENCES student(id)
+    PRIMARY KEY (id, cod_course),
+    FOREIGN KEY (id) REFERENCES student(id)
 );
 
 CREATE TABLE IF NOT EXISTS group_table(
@@ -62,9 +57,10 @@ CREATE TABLE IF NOT EXISTS group_table(
 );
 
 CREATE TABLE IF NOT EXISTS department(
-    cod_department VARCHAR(10) PRIMARY KEY,
+    cod_department VARCHAR(10) NOT NULL,
     department_name VARCHAR(50) NOT NULL,
     cod_group VARCHAR(10) NOT NULL,
+    PRIMARY KEY (cod_department, cod_group),
     FOREIGN KEY (cod_group) REFERENCES group_table(cod_group)
 );
 
@@ -74,13 +70,13 @@ CREATE TABLE IF NOT EXISTS external_supervisor(
     name VARCHAR(50) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS keyword(
-    name VARCHAR(50) PRIMARY KEY
-);
+-- CREATE TABLE IF NOT EXISTS keyword(
+--     name VARCHAR(50) PRIMARY KEY
+-- );
 
-CREATE TABLE IF NOT EXISTS type_table(
-    name VARCHAR(50) PRIMARY KEY
-);
+-- CREATE TABLE IF NOT EXISTS type_table(
+--     name VARCHAR(50) PRIMARY KEY
+-- );
 
 CREATE TABLE IF NOT EXISTS thesis(
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -88,22 +84,15 @@ CREATE TABLE IF NOT EXISTS thesis(
     description TEXT NOT NULL,
     supervisor_id VARCHAR(7) NOT NULL,
     thesis_level VARCHAR(20) NOT NULL,
-    type_name VARCHAR(50) NOT NULL,
+    thesis_type VARCHAR(50) NOT NULL,
     required_knowledge TEXT NOT NULL,
     notes TEXT NOT NULL,
     expiration DATETIME NOT NULL,
     cod_degree VARCHAR(10) NOT NULL,
+    keywords TEXT,
     is_archived BOOLEAN NOT NULL,
-    FOREIGN KEY (type_name) REFERENCES type_table(name),
-    FOREIGN KEY (cod_degree) REFERENCES degree_table(cod_degree)
-);
-
-CREATE TABLE IF NOT EXISTS thesis_keyword(
-    thesis_id INT NOT NULL,
-    keyword_name VARCHAR(50) NOT NULL,
-    PRIMARY KEY (thesis_id, keyword_name),
-    FOREIGN KEY (thesis_id) REFERENCES thesis(id),
-    FOREIGN KEY (keyword_name) REFERENCES keyword(name)
+    FOREIGN KEY (cod_degree) REFERENCES degree_table(cod_degree),
+    FOREIGN KEY (supervisor_id) REFERENCES teacher(id)
 );
 
 CREATE TABLE IF NOT EXISTS thesis_group(
@@ -114,12 +103,19 @@ CREATE TABLE IF NOT EXISTS thesis_group(
     FOREIGN KEY (group_id) REFERENCES group_table(cod_group)
 );
 
-CREATE TABLE IF NOT EXISTS thesis_cosupervisor(
+CREATE TABLE IF NOT EXISTS thesis_cosupervisor_teacher(
+    thesis_id INT NOT NULL,
+    cosupevisor_id VARCHAR(7) NOT NULL,
+    PRIMARY KEY (thesis_id, cosupevisor_id),
+    FOREIGN KEY (thesis_id) REFERENCES thesis(id),
+    FOREIGN KEY (cosupevisor_id) REFERENCES teacher(id)
+);
+
+CREATE TABLE IF NOT EXISTS thesis_cosupervisor_external(
     thesis_id INT NOT NULL,
     cosupevisor_id VARCHAR(255) NOT NULL,
     PRIMARY KEY (thesis_id, cosupevisor_id),
     FOREIGN KEY (thesis_id) REFERENCES thesis(id),
-    FOREIGN KEY (cosupevisor_id) REFERENCES teacher(id),
     FOREIGN KEY (cosupevisor_id) REFERENCES external_supervisor(email)
 );
 
@@ -159,17 +155,16 @@ VALUES
 INSERT INTO degree_table (cod_degree, title_degree) 
 VALUES
     ('DEGR01', 'Computer engineering Master Degree'),
-    ('DEGR02', 'Electronic engineering Master Degree');
-INSERT INTO course (cod_course, title_course, cfu) 
-    VALUES
-    ('COU01', 'Web Applications 1', 6),
-    ('COU02', 'System and device programming', 10);
-INSERT INTO career (cod_course, student_id, grade, date) 
+    ('DEGR02', 'Electronic engineering Master Degree'),
+    ('DEGR03', 'Electrical engineering Master Degree'),
+    ('DEGR04', 'Data science Master Degree'),
+    ('DEGR05', 'Mechanical engineering Master Degree');
+INSERT INTO career (id, cod_course, title_course, cfu,grade, date) 
 VALUES
-    ('COU01', 'S123456', 30, '2023-01-15'),
-    ('COU02', 'S123456', 18, '2023-02-20'),
-    ('COU01', 'S654321', 25, '2023-01-15'),
-    ('COU02', 'S654321', 20, '2023-02-20');
+    ('S123456','COU01','Software Engineering 2' ,6,30, '2023-01-15'),
+    ('S123456','COU02', 'Sicurezza dei sistemi informativi' ,12,18, '2023-02-20'),
+    ('S654321','COU01','Data science',9,25, '2023-01-15'),
+    ('S654321','COU02', 'Software Engineering 1',9,20, '2023-02-20');
 INSERT INTO group_table (cod_group, group_name)
 VALUES
     ('GRP01', 'Computer group'),
@@ -184,40 +179,14 @@ INSERT INTO external_supervisor (email, surname, name)
     ('maria.gentile@email.net', 'Gentile', 'Maria'),
     ('antonio.bruno@email.org', 'Bruno', 'Antonio'),
     ('elena.conti@email.net', 'Conti', 'Elena');
-INSERT INTO keyword (name) 
-    VALUES
-    ('Web development'),
-    ('Cybersecurity'),
-    ('IoT'),
-    ('Home Automation'),
-    ('Network Security'),
-    ('Data Visualization'),
-    ('Machine Learning'),
-    ('Embedded Systems');
-INSERT INTO type_table (name) VALUES
-    ('Sperimental'),
-    ('Company'),
-    ('Abroad');
-INSERT INTO thesis (title, description, supervisor_id, thesis_level, type_name, required_knowledge, notes, expiration, cod_degree, is_archived)
+INSERT INTO thesis (title, description, supervisor_id, thesis_level, thesis_type, required_knowledge, notes, expiration, cod_degree, keywords, is_archived)
 VALUES
-    ('Development of a Secure Web Application', 'Creating a web application with a focus on security features.', 'P123456', 'Master', 'Sperimental', 'Strong knowledge of web security and programming.', 'None', '2023-05-15 23:59:59', 'DEGR01', 0),
-    ('IoT-Based Smart Home Automation', 'Designing an IoT system for smart home automation.', 'P654321', 'Master', 'Company', 'Experience with IoT protocols and devices.', 'The thesis must be completed within 6 months.', '2023-08-30 23:59:59', 'DEGR02', 0),
-    ('Network Traffic Analysis', 'Analyzing network traffic for security and optimization purposes.', 'P123456', 'Master', 'Sperimental', 'Background in network security and data analysis.', 'None', '2023-07-30 23:59:59', 'DEGR01', 0),
-    ('Data Visualization Tool', 'Developing a tool for visualizing complex data sets.', 'P654321', 'Master', 'Company', 'Strong knowledge of data visualization techniques.', 'The thesis must be completed within 5 months.', '2023-09-30 23:59:59' ,'DEGR02', 0),
-    ('Machine Learning for Image Recognition', 'Implementing machine learning for image recognition tasks.', 'P123456', 'Master', 'Sperimental', 'Proficiency in machine learning and computer vision.', 'None', '2023-09-30 23:59:59', 'DEGR01', 0),
-    ('Embedded Systems Programming', 'Developing software for embedded systems in IoT devices.', 'P654321', 'Master', 'Abroad', 'Experience with embedded systems and low-level programming.', 'The thesis must be completed within 7 months.', '2023-05-15 23:59:59' ,'DEGR02', 0);
-INSERT INTO thesis_keyword (thesis_id, keyword_name)
-VALUES
-    (1, 'Web development'),
-    (1, 'Cybersecurity'),
-    (2, 'IoT'),
-    (2, 'Home Automation'),
-    (3, 'Network Security'),
-    (4, 'Data Visualization'),
-    (4, 'Web development'),
-    (5, 'Machine Learning'),
-    (6, 'Embedded Systems'),
-    (6, 'IoT');
+    ('Development of a Secure Web Application', 'Creating a web application with a focus on security features.', 'P123456', 'Master', 'Sperimental', 'Strong knowledge of web security and programming.', 'None', '2023-05-15 23:59:59', 'DEGR01','AUTOMATATION, HUMAN COMPUTER INTERACTION',0),
+    ('IoT-Based Smart Home Automation', 'Designing an IoT system for smart home automation.', 'P654321', 'Master', 'Company', 'Experience with IoT protocols and devices.', 'The thesis must be completed within 6 months.', '2023-08-30 23:59:59', 'DEGR02','USER EXPERIENCE, AUTOMATATION, MACHINE LEARNING', 0),
+    ('Network Traffic Analysis', 'Analyzing network traffic for security and optimization purposes.', 'P123456', 'Master', 'Sperimental', 'Background in network security and data analysis.', 'None', '2023-07-30 23:59:59', 'DEGR01',null,0),
+    ('Data Visualization Tool', 'Developing a tool for visualizing complex data sets.', 'P654321', 'Master', 'Company', 'Strong knowledge of data visualization techniques.', 'The thesis must be completed within 5 months.', '2023-09-30 23:59:59' ,'DEGR02','SOFTWARE QUALITY',0),
+    ('Machine Learning for Image Recognition', 'Implementing machine learning for image recognition tasks.', 'P123456', 'Master', 'Sperimental', 'Proficiency in machine learning and computer vision.', 'None', '2023-09-30 23:59:59', 'DEGR01',null ,0),
+    ('Embedded Systems Programming', 'Developing software for embedded systems in IoT devices.', 'P654321', 'Master', 'Abroad', 'Experience with embedded systems and low-level programming.', 'The thesis must be completed within 7 months.', '2023-05-15 23:59:59' ,'DEGR02','DATA ANALYSIS, AUTOMATATION',0);
 INSERT INTO thesis_group (thesis_id, group_id)
 VALUES
     (1, 'GRP01'),
@@ -233,4 +202,15 @@ VALUES
     ('S654321', 3, 'Pending', '2023-05-02 16:15:00'),
     ('S654321', 4, 'Approved', '2023-06-12 09:00:00'),
     ('S123456', 5, 'Pending', '2023-07-10 11:30:00'),
-    ('S654321', 6, 'Approved', '2023-02-28 13:15:00');
+    ('S654321', 6, 'Approved', '2023-02-28 13:15:00')
+;
+INSERT INTO thesis_cosupervisor_teacher (thesis_id, cosupevisor_id)
+VALUES 
+    (1, 'P654321'),
+    (6, 'P123456');
+INSERT INTO thesis_cosupervisor_external (thesis_id, cosupevisor_id)
+VALUES 
+    (3, 'elena.conti@email.net'),
+    (4, 'maria.gentile@email.net'),
+    (4, 'antonio.bruno@email.org'),
+    (6, 'andrea.ferrari@email.com');
