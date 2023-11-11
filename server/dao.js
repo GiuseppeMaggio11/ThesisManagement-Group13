@@ -70,97 +70,14 @@ process.on("exit", () => {
 // Creates a new thesis row in thesis table, must receive every data of thesis, returns newly created row, including autoicremented id ( used to add new rows in successive tables)
 exports.createThesis = (thesis) => {
   return new Promise((resolve, reject) => {
-    const sql = 'INSERT INTO thesis (title, description, supervisor_id, thesis_level, type_name, required_knowledge, notes, expiration, cod_degree, is_archived) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?); ';
+    const sql = 'INSERT INTO thesis (title, description, supervisor_id, thesis_level, thesis_type, required_knowledge, notes, expiration, cod_degree, is_archived, keywords) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?); ';
     connection.query(sql, [thesis.title, thesis.description, thesis.supervisor_id, thesis.thesis_level, thesis.type_name, 
-                  thesis.required_knowledge, thesis.notes, thesis.expiration, thesis.cod_degree, thesis.is_archived], function (err, rows) {
+                  thesis.required_knowledge, thesis.notes, thesis.expiration, thesis.cod_degree, thesis.is_archived, thesis.keywords], function (err, rows) {
       if (err) {
         reject(err);
       }
       const thesisrow = { id: rows.insertId, ...thesis}
       resolve(thesisrow);
-    });
-  });
-};
-
-// Inserts new row in type_table, must receive type not currently present in table, returns newly inserted type
-exports.createThesis_type = (type) => {
-  return new Promise((resolve, reject) => {
-    const sql = 'INSERT INTO type_table (name) VALUES (?)';
-    connection.query(sql, [type], function (err) {
-      if (err) {
-        reject(err);
-      }
-      resolve(type);
-    });
-  });
-};
-
-// Selects every row from type_table, returns array of every type stored in table
-exports.getThesis_types = () => {
-  return new Promise((resolve, reject) => {
-    const sql =
-      `SELECT * FROM type_table`;
-      connection.query(sql, [], (err, rows) => {
-      if (err) {
-        reject(err);
-      }
-      else {
-        const types = [];
-        rows.map((e) =>{
-          types.push(e.name);
-        })        
-        resolve(types);
-      };
-    });
-  });
-};
-
-// Selects every row from keyword table, returns array of all keywords stored in table
-exports.getKeywords = () => {
-  return new Promise((resolve, reject) => {
-    const sql =
-      `SELECT * FROM keyword`;
-      connection.query(sql, [], (err, rows) => {
-      if (err) {
-        reject(err);
-      }
-      else {
-        const keywords = [];
-        rows.map((e) =>{
-          keywords.push(e.name);
-        })
-        resolve(keywords);
-      };
-    });
-  });
-};
-
-// Inserts new row  in keyword table, must receive a new keyword not already present in table, returns newly inserted row
-exports.createKeyword = (keyword) => {
-  return new Promise((resolve, reject) => {
-    const sql = 'INSERT INTO keyword (name) VALUES (?)';
-    connection.query(sql, [keyword], function (err) {
-      if (err) {
-        reject(err);
-      }
-      resolve(keyword);
-    });
-  });
-};
-
-// Inserts in thesis_keyword table a new row, must receive thesis id and keyword, returns inserted row
-exports.createThesis_keyword = (thesis_id, keyword) => {
-  return new Promise((resolve, reject) => {
-    const sql = 'INSERT INTO thesis_keyword (thesis_id, keyword_name) VALUES (?,?)';
-    connection.query(sql, [thesis_id, keyword], function (err) {
-      if (err) {
-        reject(err);
-      }
-      const thesis_keyword = {
-        thesis_id: thesis_id,
-        keyword: keyword
-      }
-      resolve(thesis_keyword);
     });
   });
 };
@@ -243,24 +160,65 @@ exports.createThesis_group = (thesis_id ,group_id) => {
 };
 
 // Insert new row in thesis_cosupervisor table, must receive thesis id and cosupervisor id
-exports.createThesis_cosupervisor = (thesis_id ,cosupervisor_id) => {
+exports.createThesis_cosupervisor_teacher = (thesis_id ,professor_id) => {
   return new Promise((resolve, reject) => {
-    const sql = 'INSERT INTO thesis_cosupervisor (thesis_id, cosupevisor_id) VALUES (?,?)';
-    connection.query(sql, [thesis_id, cosupervisor_id], function (err) {
+    const sql = 'INSERT INTO thesis_cosupervisor_teacher (thesis_id, cosupevisor_id) VALUES (?,?)';
+    connection.query(sql, [thesis_id, professor_id], function (err) {
       if (err) {
         reject(err);
       }
       const thesis_cosupervisor ={ 
         thesis_id: thesis_id,
-        thesis_cosupervisor: cosupervisor_id
+        thesis_cosupervisor: professor_id
       }
       resolve(thesis_cosupervisor);
     });
   });
 };
 
-// Selects every email from external_supervisor table, returns array of email
+// Insert new row in thesis_cosupervisor_external table, must receive thesis id and email
+exports.createThesis_cosupervisor_external = (thesis_id ,email) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'INSERT INTO thesis_cosupervisor_external (thesis_id, cosupevisor_id) VALUES (?,?)';
+    connection.query(sql, [thesis_id, email], function (err) {
+      if (err) {
+        reject(err);
+      }
+      const thesis_cosupervisor ={ 
+        thesis_id: thesis_id,
+        thesis_cosupervisor: email
+      }
+      resolve(thesis_cosupervisor);
+    });
+  });
+};
+
+// Selects every external supervisor from external_supervisor table, returns array of external cosupervisors
 exports.getExternal_cosupervisors = () => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `SELECT * FROM external_supervisor`;
+      connection.query(sql, [], (err, rows) => {
+      if (err) {
+        reject(err);
+      }
+      else {
+        const external_supervisors = [];
+        rows.map((e) =>{
+          const external_supervisor = {
+            name: e.name,
+            surname: e.surname,
+            email: e.email
+          }
+          external_supervisors.push(external_supervisor);
+        })
+        resolve(external_supervisors);
+      };
+    });
+  });
+};
+
+exports.getExternal_cosupervisors_emails = () => {
   return new Promise((resolve, reject) => {
     const sql =
       `SELECT email FROM external_supervisor`;
@@ -269,12 +227,25 @@ exports.getExternal_cosupervisors = () => {
         reject(err);
       }
       else {
-        const external_supervisor_codes = [];
+        const external_cosupervisor_emails = [];
         rows.map((e) =>{
-          external_supervisor_codes.push(e.email);
+
+          external_cosupervisor_emails.push(e.email);
         })
-        resolve(external_supervisor_codes);
+        resolve(external_cosupervisor_emails);
       };
+    });
+  });
+};
+
+exports.create_external_cosupervisor = (external_cosupervisor) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'INSERT INTO external_supervisor (email, surname, name) VALUES (?,?,?)';
+    connection.query(sql, [external_cosupervisor.email, external_cosupervisor.surname, external_cosupervisor.name], function (err) {
+      if (err) {
+        reject(err);
+      }
+      resolve(external_cosupervisor);
     });
   });
 };
