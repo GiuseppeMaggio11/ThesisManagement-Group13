@@ -28,7 +28,7 @@ Maggio Giuseppe 313346
         * [Check if user is logged in Client](#check-if-user-is-logged-in-client)
         * [Logout Client](#logout-client)
     + [Other APIs](#other-apis-client)
-        * [OTHER 1 Client](#other-1-client)
+        * [getThesisProposals](#getThesisProposals)
         * [OTHER 2 Client](#other-2-client)
         * [OTHER 3 Client](#other-3-client)
 - [Database Tables](#database-tables)
@@ -39,6 +39,11 @@ Maggio Giuseppe 313346
 
 ## React Client Application Routes
 
+- Route `/`: Initial route. Unauthenticated users will not see anything in it.
+Authenticated users will see buttons to access the various routes
+- Route `/login`: Route containing the login form
+- Route `/proposals`: Route containing the list of all thesis proposals. It is accessible only to authenticated users and shows only basic information (title, supervisor and expiration date).
+It is possible to filter thesis proposals based on the content of a text field form
 
 
 ## API Server
@@ -73,7 +78,47 @@ Maggio Giuseppe 313346
 
 ### Other APIs Client
 
-#### OTHER 1 Client
+#### getThesisProposals
+
+- Description: Asks the server for the list of all thesis proposals
+- API server called: GET `/api/proposals`
+- Input: _None_
+- Output: A vector containing detailed information on all thesis proposals
+
+```
+[
+    {
+        id: id,
+        title: "title",
+        description: "description",
+        supervisor: "supervisor",
+        level: "level",
+        type: "type",
+        required_knowledge: "required_knowledge",
+        notes: "notes",
+        expiration: expiration,
+        keywords: [
+            "keyword 1",
+            "keyword 2",
+            "keyword 3",
+            ...
+        ],
+        group: "group",
+        department: "department",
+        co_supervisors: [
+            "co supervisor 1",
+            "co supervisor 2",
+            "co supervisor 3",
+            "co supervisor 4",
+            ...
+        ]
+    },
+    {
+        ...
+    },
+    ...
+]
+```
 
 #### OTHER 2 Client
 
@@ -87,6 +132,7 @@ Maggio Giuseppe 313346
 
 ## Main React Components
 
-
+- `SearchProposalComponent` (inside `SearchProposal.jsx`): It's a component that appears in the `/proposals` route.
+Starting from the list of thesis proposals obtained from the server, it builds a filtered list. The filter is a string that can be set in a special form on the same page. If the filtered list is empty, it shows a message, otherwise it builds a table containing a row for each thesis proposal. The table rows are constructed using the `ProposalTableRow` component present in the same file and contain only the basic information of a thesis proposals (title, supervisor and expiration date). To access all the data of a specific thesis proposal, the user need to click on its title.
 
 ## Users Credentials

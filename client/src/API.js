@@ -40,7 +40,7 @@ async function getUserInfo() {
 }
 
 async function getThesisProposals () {
-  const response = await fetch(URL + "/thesis_proposal", {
+  const response = await fetch(URL + "/proposals", {
     credentials: "include",
   });
   const proposals = await response.json();
