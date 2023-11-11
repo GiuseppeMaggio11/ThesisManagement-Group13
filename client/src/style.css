@@ -33,3 +33,18 @@
   border-radius: 5px;
   display: inline-block;
 }
+
+/* Margin for tables and alerts */
+.margin-custom {
+  margin: 1rem;
+}
+
+/* Margin for Titles */
+.margin-titles-custom {
+  margin-bottom: 2rem;
+}
+
+/* Margin for Buttons */
+.margin-buttons-custom {
+  margin-left: 1rem;
+}
