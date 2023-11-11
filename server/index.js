@@ -11,6 +11,37 @@ const LocalStrategy = require("passport-local").Strategy;
 const session = require("express-session");
 const fs=require('fs')
 const zipdir = require('zip-dir');
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
+const session = require("express-session");
+
+passport.use(
+  new LocalStrategy(function (username, password, done) {
+    dao.getUser(username, password).then((user) => {
+      if (!user)
+        return done(null, false, {
+          message: "Incorrect username and/or password.",
+        });
+
+      return done(null, user);
+    });
+  })
+);
+
+passport.serializeUser((user, done) => {
+  done(null, user.username);
+});
+
+passport.deserializeUser((username, done) => {
+  dao
+    .getUserByEmail(username)
+    .then((user) => {
+      done(null, user);
+    })
+    .catch((err) => {
+      done(err, null);
+    });
+});
 
 
 const app = express();
@@ -118,9 +149,20 @@ const isStudent = (req, res, next) => {
   return res.status(401).json({ error: "Not student" });
 };
 
+
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use(
+  session({
+    secret: "hjsojsdjndhirheish",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 /***USER - API***/
 // login
@@ -144,6 +186,14 @@ app.delete("/api/session/logout", (req, res) => {
     res.end();
   });
 });
+
+
+app.get("/api/session/userinfo", (req, res) => {
+  if (req.isAuthenticated()) {
+    res.status(200).json(req.user);
+  } else res.status(401).json({ error: "Unauthenticated user!" });
+});
+
 
 app.get("/api/session/userinfo", (req, res) => {
   if (req.isAuthenticated()) {

@@ -1,6 +1,6 @@
 "use strict";
 
-//const crypto = require("crypto");
+const crypto = require("crypto");
 const mysql = require("mysql2");
 const crypto = require("crypto");
 
@@ -41,7 +41,6 @@ exports.getUser = (email, password) => {
     });
   });
 };
-
 
 exports.getUserByEmail = (email) => {
   return new Promise((resolve, reject) => {
@@ -156,7 +155,6 @@ exports.newApply = async (studentID, ThesisID) => {
     throw error;
   }
 };
-
 
 process.on("exit", () => {
   console.log("Closing db connection");
