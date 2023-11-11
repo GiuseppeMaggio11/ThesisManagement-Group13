@@ -8,9 +8,14 @@ function HomePage(props) {
       {props.loading ? <Loading /> : ""}
       <Container className="margin-custom">
         <h1 className="margin-titles-custom">HomePage</h1>
-        <Link to="/proposals" className="m-1">
-          <Button className="margin-buttons-custom">Search Thesis Proposal</Button>
-        </Link>
+        {
+          props.user ?
+            <Link to="/proposals" className="m-1">
+              <Button className="margin-buttons-custom">Search Thesis Proposal</Button>
+            </Link>
+            : ""
+        }
+        
       </Container>
     </>
   );

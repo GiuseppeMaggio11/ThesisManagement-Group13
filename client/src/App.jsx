@@ -74,6 +74,7 @@ function App() {
                   setLoading={setLoading}
                   error={error}
                   setError={setError}
+                  user={user}
                 />
               ) : (
                 <ErrorAlert />
