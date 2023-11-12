@@ -105,6 +105,15 @@ app.get("/api/session/userinfo", (req, res) => {
 });
 
 /***API***/
+app.get("/api/proposals", async (req, res) => {
+  try{
+    const proposals = await dao.getProposals();
+    res.status(200).json(proposals);
+  }catch(err){
+    res.status(500).json({ error: ` error: ${err} ` });
+  }
+});
+
 
 // Activate the server
 app.listen(port, () => {
