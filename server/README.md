@@ -1,5 +1,5 @@
 ## API Server
-
+- OLD VERSION, DO NOT USE
 - POST `/api/newThesis`
   - Receives
     {   
