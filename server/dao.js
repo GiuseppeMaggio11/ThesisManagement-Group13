@@ -1,6 +1,6 @@
 "use strict";
 
-const crypto = require("crypto");
+//const crypto = require("crypto");
 const mysql = require("mysql2");
 const crypto = require("crypto");
 
@@ -41,6 +41,7 @@ exports.getUser = (email, password) => {
     });
   });
 };
+
 
 exports.getUserByEmail = (email) => {
   return new Promise((resolve, reject) => {
@@ -85,7 +86,7 @@ exports.getUserID = (username) => {
 };
 
 //returns true if the thesis is not expired or archived, otherwise true
-const isThesisValid = async (thesisID) => {
+exports.isThesisValid = async (thesisID) => {
   if (!thesisID) {
     throw { error: "parameter is missing" };
   }
@@ -106,7 +107,7 @@ const isThesisValid = async (thesisID) => {
 };
 
 //returns false is the student is not already applied for a thesis,  otherwise true
-const isAlreadyExisting = async (studentID, thesisID) => {
+exports.isAlreadyExisting = async (studentID, thesisID) => {
   if (!thesisID || !studentID) {
     throw { error: "parameter is missing" };
   }
@@ -130,19 +131,14 @@ exports.newApply = async (studentID, ThesisID) => {
   const status = "pending";
 
   try {
-    const isValid = await isThesisValid(ThesisID);
-    const existing = await isAlreadyExisting(studentID, ThesisID);
-    console.log('existing', existing)
-
     const sql =
-      "INSERT INTO application_table (student_id, thesis_id, status, application_date) VALUES (?, ?, ?, ?)";
-    if (isValid && !existing)
-      reject(new Error("You have already applied to this thesis."));
+      "INSERT INTO application (student_id, thesis_id, status, application_date) VALUES (?, ?, ?, ?)";
+
     return new Promise((resolve, reject) => {
       connection.query(sql, [studentID, ThesisID, status, new Date()], function (err, rows, fields) {
         if (err) {
           if (err.code === "ER_DUP_ENTRY") {
-            reject(new Error("You have already applied to this thesis."));
+            reject("You have already applied to this thesis.");
           } else {
             reject(err);
           }
@@ -155,6 +151,7 @@ exports.newApply = async (studentID, ThesisID) => {
     throw error;
   }
 };
+
 
 process.on("exit", () => {
   console.log("Closing db connection");

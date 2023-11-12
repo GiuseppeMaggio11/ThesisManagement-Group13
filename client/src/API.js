@@ -39,5 +39,21 @@ async function getUserInfo() {
   }
 }
 
-const API = { logIn, logOut, getUserInfo };
+async function applicationThesis (thesis_id) {
+  const response = await fetch(URL + `/newApplication/${thesis_id}`, {
+    method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    credentials: "include"
+  });
+
+  if(response.ok){
+    return ;
+  } else {
+    throw  response.errDetail;
+  }
+}
+
+const API = { logIn, logOut, getUserInfo, applicationThesis};
 export default API;

@@ -96,7 +96,12 @@ function App() {
           />
           {/*Others route here */}
 
-          <Route path='/application/:id' element={<UserApplication loading={loading}/>}></Route>
+          <Route path='/application/:id' element={ loggedIn ? <UserApplication loading={loading}/> :  <LoginForm
+                  loginSuccessful={loginSuccessful}
+                  logOut={logOut}
+                  loading={loading}
+                  setLoading={setLoading}
+                />}></Route>
 
           {/*Leave DefaultRoute as last route */}
           <Route path="/*" element={<DefaultRoute />} />

@@ -1,11 +1,13 @@
-import { Container, Table, Accordion, Button, Modal} from "react-bootstrap";
+import { Container, Table, Accordion, Button, Modal, Form} from "react-bootstrap";
 import { useEffect, useState } from "react";
+import API from '../API';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import Loading from "./Loading";
 
 function UserApplication(props) {
     const [pageData, setPageData] = useState({
+        id: "6",
         title:"TITOLO TESI",
         supervisor:"LUCA POLLONI",
         coSupervisor: ["Muro Loii", "Adato Gooli", "Laura Poll"],
@@ -51,9 +53,14 @@ function UserApplication(props) {
     
     const handleApplication = (event) => {
         event.preventDefault();
-        //API calls to send data
+        submitApplication(pageData.id);
     }
 
+    const submitApplication = (idThesis) => {
+        API.applicationThesis(idThesis).then(
+            ()=>{console.log("tutto ok")}
+        ).catch((err)=>{console.log(err)});
+    }
     return (
       <>
         {props.loading ? <Loading /> : ""}
@@ -184,13 +191,14 @@ function UserApplication(props) {
             </Modal.Body>
             <Modal.Footer>
                 <div className="confirmation_application_div">Confirm application for {pageData.title} thesis?</div>
-            
-            <Button variant="danger" onClick={()=>setOpenPanel(false)}>
-                Cancel
-            </Button>
-            <Button variant="primary" onClick={()=>handleApplication()}>
-                Apply
-            </Button>
+            <Form onSubmit={handleApplication}>
+                <Button variant="danger" onClick={()=>setOpenPanel(false)}>
+                    Cancel
+                </Button>
+                <Button variant="primary" type="submit">
+                    Apply
+                </Button>
+            </Form>
             </Modal.Footer>
         </Modal>
         

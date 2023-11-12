@@ -11,37 +11,6 @@ const LocalStrategy = require("passport-local").Strategy;
 const session = require("express-session");
 const fs=require('fs')
 const zipdir = require('zip-dir');
-const passport = require("passport");
-const LocalStrategy = require("passport-local").Strategy;
-const session = require("express-session");
-
-passport.use(
-  new LocalStrategy(function (username, password, done) {
-    dao.getUser(username, password).then((user) => {
-      if (!user)
-        return done(null, false, {
-          message: "Incorrect username and/or password.",
-        });
-
-      return done(null, user);
-    });
-  })
-);
-
-passport.serializeUser((user, done) => {
-  done(null, user.username);
-});
-
-passport.deserializeUser((username, done) => {
-  dao
-    .getUserByEmail(username)
-    .then((user) => {
-      done(null, user);
-    })
-    .catch((err) => {
-      done(err, null);
-    });
-});
 
 
 const app = express();
@@ -149,20 +118,9 @@ const isStudent = (req, res, next) => {
   return res.status(401).json({ error: "Not student" });
 };
 
-
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(
-  session({
-    secret: "hjsojsdjndhirheish",
-    resave: false,
-    saveUninitialized: false,
-  })
-);
-
-app.use(passport.initialize());
-app.use(passport.session());
 
 /***USER - API***/
 // login
@@ -187,14 +145,6 @@ app.delete("/api/session/logout", (req, res) => {
   });
 });
 
-
-app.get("/api/session/userinfo", (req, res) => {
-  if (req.isAuthenticated()) {
-    res.status(200).json(req.user);
-  } else res.status(401).json({ error: "Unauthenticated user!" });
-});
-
-
 app.get("/api/session/userinfo", (req, res) => {
   if (req.isAuthenticated()) {
     res.status(200).json(req.user);
@@ -209,9 +159,15 @@ app.post('/api/newApplication/:thesis_id', isStudent, async (req, res) => {
     if (!Number.isInteger(Number(thesis_id))) {
       throw new Error('Thesis ID must be an integer');
     }
-
     const userID = await dao.getUserID(req.user.username);
-    console.log(userID);
+    const isValid = await dao.isThesisValid(thesis_id);
+      if(!isValid){
+        return res.status(422).json("This thesis is not valid")
+      }
+    const existing = await dao.isAlreadyExisting(userID, thesis_id);
+      if(existing){
+        return res.status(422).json("You are already applied for this thesis")
+      }
     const result = await dao.newApply(userID, thesis_id);
 
     res.status(200).send('Application created successfully');
