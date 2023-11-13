@@ -1,13 +1,15 @@
 import { Container, Table, Accordion, Button, Modal, Form} from "react-bootstrap";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useParams} from 'react-router-dom';
 import API from '../API';
+import MessageContext from '../messageCtx'
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import Loading from "./Loading";
 
 function ThesisPage(props) {
     const params = useParams();
+    const {handleErrors} = useContext(MessageContext)
     const [pageData, setPageData] = useState({})
     const [openPanel, setOpenPanel] = useState(false)
     const [selectedFiles, setSelectedFiles] = useState([]);
@@ -57,13 +59,15 @@ function ThesisPage(props) {
     
     const handleApplication = (event) => {
         event.preventDefault();
-        submitApplication(pageData.id);
+        submitApplication(params.id);
     }
 
     const submitApplication = (idThesis) => {
         API.applicationThesis(idThesis).then(
             ()=>{console.log("tutto ok")}
-        ).catch((err)=>{console.log(err)});
+        ).catch((err)=>{
+            handleErrors(err)}
+        );
     }
     return (
       <>

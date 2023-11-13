@@ -10,30 +10,26 @@ import SearchProposalRoute from "./components/SearchProposal";
 import ThesisPage from "./components/ThesisPage"
 
 import "./style.css";
-import { Button, Container } from "react-bootstrap";
+import { Button, Container, ToastContainer, Toast} from "react-bootstrap";
 import Header from "./components/Header";
 import API from "./API";
 import VirtualClock from "./components/VirtualClock";
+import MessageContext from './messageCtx';
 
 function App() {
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
   const [user, setUser] = useState(undefined);
   const [loggedIn, setLoggedIn] = useState(false);
   const [virtualClock, setVirtualClock] = useState(new Date());
+  const [message, setMessage] = useState('');
 
-  function handleError(err) { //TO BE MODIFIED
-    console.log('err: '+JSON.stringify(err));  // Only for debug
-    let errMsg = 'Unkwnown error';
-    if (err.errors) {
-      if (err.errors[0])
-        if (err.errors[0].msg)
-          errMsg = err.errors[0].msg;
-    } else if (err.error) {
-      errMsg = err.error;
-    }
-
-    setError(errMsg);
+   // If an error occurs, the error message will be shown in a toast.
+   const handleErrors = (err) => {
+    let msg = '';
+    if (err.error) msg = err.error;
+    else if (typeof(err) === 'string') msg = String(err);
+    else msg = 'Unknown Error';
+    setMessage(msg); 
   }
 
   useEffect(() => {
@@ -66,72 +62,71 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="wrapper">
-        <Header user={user} logout={logOut} />
-        <Routes>
-          <Route
-            path="/"
-            element={
-              !error ? (
-                <HomePage
-                  loading={loading}
-                  setLoading={setLoading}
-                  error={error}
-                  setError={setError}
-                  user={user}
+      <MessageContext.Provider value={{ handleErrors }}>
+        <ToastContainer className='below-nav' position='top-center'>
+            <Toast  show={message !== ''} onClose={() => setMessage('')} delay={4000} autohide={true} bg='danger'>
+              <Toast.Body >{message}</Toast.Body>
+            </Toast>
+        </ToastContainer>
+        <div className="wrapper">
+          <Header user={user} logout={logOut} />
+          <Routes>
+            <Route
+              path="/"
+              element={
+                  <HomePage
+                    loading={loading}
+                    setLoading={setLoading}
+                    user={user}
+                  />
+              }
+            />
+
+            <Route
+              path="/login"
+              element={
+                loggedIn ? (
+                  <Navigate replace to="/" />
+                ) : (
+                  <LoginForm
+                    loginSuccessful={loginSuccessful}
+                    logOut={logOut}
+                    loading={loading}
+                    setLoading={setLoading}
+                  />
+                )
+              }
+            />
+            <Route
+              path="/virtualclock"
+              element={
+                <VirtualClock
+                  virtualClock={virtualClock}
+                  setVirtualClock={setVirtualClock}
                 />
-              ) : (
-                <ErrorAlert />
-              )
-            }
-          />
-
-          <Route
-            path="/login"
-            element={
-              loggedIn ? (
-                <Navigate replace to="/" />
-              ) : (
-                <LoginForm
-                  loginSuccessful={loginSuccessful}
-                  logOut={logOut}
-                  loading={loading}
-                  setLoading={setLoading}
+              }
+            />
+            <Route
+              path="/proposals"
+              element={<SearchProposalRoute 
+               loading={loading}
                 />
-              )
-            }
-          />
-          <Route
-            path="/virtualclock"
-            element={
-              <VirtualClock
-                virtualClock={virtualClock}
-                setVirtualClock={setVirtualClock}
-              />
-            }
-          />
-          <Route
-            path="/proposals"
-            element={<SearchProposalRoute 
-              error={error} 
-              resetError={() => setError("")} 
-              handleError={handleError} loading={loading}
-              />
-            }
-          />
-          {/*Others route here */}
+              }
+            />
+            {/*Others route here */}
 
-          <Route path='/proposals/:id' element={ loggedIn ? <ThesisPage loading={loading}/> :  <LoginForm
-                  loginSuccessful={loginSuccessful}
-                  logOut={logOut}
-                  loading={loading}
-                  setLoading={setLoading}
-                />}></Route>
+            <Route path='/proposals/:id' element={ loggedIn ? <ThesisPage loading={loading}/> :  <LoginForm
+                    loginSuccessful={loginSuccessful}
+                    logOut={logOut}
+                    loading={loading}
+                    setLoading={setLoading}
+                  />}></Route>
 
-          {/*Leave DefaultRoute as last route */}
-          <Route path="/*" element={<DefaultRoute />} />
-        </Routes>
-      </div>
+            {/*Leave DefaultRoute as last route */}
+            <Route path="/*" element={<DefaultRoute />} />
+          </Routes>
+        </div>
+      </MessageContext.Provider>
     </BrowserRouter>
   );
 }
