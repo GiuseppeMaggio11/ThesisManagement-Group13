@@ -90,28 +90,28 @@ function UserApplication(props) {
                     <tbody>
                         {pageData.supervisor && (
                             <tr>
-                                <td colSpan="2" className="leftText"> Supervisor</td>
+                                <td colSpan="2"  className="leftText customLeftColumn"> Supervisor</td>
                                 <td className="rightText">{pageData.supervisor}</td>
                             </tr>
                         )}
 
                         {pageData.coSupervisor.length > 1 && (
                             <tr>
-                                <td colSpan="2" className="leftText">Co-Supervisors</td>
+                                <td colSpan="2"  className="leftText customLeftColumn">Co-Supervisors</td>
                                 <td className="rightText">{pageData.coSupervisor.join(', ')}</td>
                             </tr>
                         )}
 
                         {pageData.coSupervisor.lengt == 1 && (
                             <tr>
-                                <td colSpan="2" className="leftText">Co-Supervisor</td>
+                                <td colSpan="2"  className="leftText customLeftColumn">Co-Supervisor</td>
                                 <td className="rightText">{pageData.coSupervisor.join(', ')}</td>
                             </tr>
                         )}
 
                         {pageData.keywords && (
                             <tr>
-                                <td colSpan="2" className="leftText">Keywords</td>
+                                <td colSpan="2" className="leftText customLeftColumn">Keywords</td>
                                 <td className="rightText">
                                     {pageData.keywords.map((element, index) => (
                                         <React.Fragment key={index}>
@@ -124,19 +124,19 @@ function UserApplication(props) {
                         )}
 
                         <tr>
-                            <td colSpan="2" className="leftText">Type</td>
+                            <td colSpan="2"  className="leftText customLeftColumn">Type</td>
                             <td className="rightText">{pageData.type}</td>
                         </tr>
 
                         {pageData.groups && (
                             <tr>
-                                <td colSpan="2" className="leftText">Groups</td>
+                                <td colSpan="2"  className="leftText customLeftColumn">Groups</td>
                                 <td className="rightText">{pageData.groups.join(', ')}</td>
                             </tr>
                         )}
                         {!isMobile && pageData.description && (
                             <tr>
-                                <td colSpan="2" className="leftText">Description</td>
+                                <td colSpan="2"  className="leftText customLeftColumn">Description</td>
                                 <td className="rightText">{pageData.description}</td>
                             </tr>
                         )}
@@ -158,21 +158,21 @@ function UserApplication(props) {
 
                         {pageData.requiredKnowledge && (
                             <tr>
-                                <td colSpan="2" className="leftText">Required Knowledge</td>
+                                <td colSpan="2"  className="leftText customLeftColumn">Required Knowledge</td>
                                 <td className="rightText">{pageData.requiredKnowledge.join(', ')}</td>
                             </tr>
                         )}
 
                         {!isMobile && pageData.notes && (
                             <tr>
-                                <td colSpan="2" className="leftText">Notes</td>
+                                <td colSpan="2"  className="leftText customLeftColumn">Notes</td>
                                 <td className="rightText">{pageData.notes}</td>
                             </tr>
                         )}
                         {isMobile && pageData.notes && (
                             <tr>
                                 <td colSpan="3" className="accordion-td">
-                                    <Accordion defaultActiveKey="0">
+                                    <Accordion defaultActiveKey="1">
                                         <Accordion.Item eventKey="0">
                                             <Accordion.Header>Notes</Accordion.Header>
                                             <Accordion.Body>

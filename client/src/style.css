@@ -127,16 +127,32 @@ table.table-rounded thead tr {
   vertical-align: middle;
 }
 
-.accordion-button:hover,
-.accordion-button:focus
-.accordion-button:not(:collapsed) {
-    background-color: white;
-    border-color: white; 
-    box-shadow: white;
-}
 .bold{
   font-weight:680;
 }
+
+
+.accordion-button:hover
+.accordion-button:focus{
+  box-shadow: white !important;
+  border-color: white !important; 
+}
+
+.accordion-button:not(.collapsed){
+    background-color: white !important;
+    border-color: white !important; 
+    box-shadow: none !important;
+    color: rgb(0, 0, 0) !important;
+}
+
+
+
+
+.customLeftColumn {
+  width: 15%; /* Adjust the width as needed */
+}
+
+
 
 @media (min-width: 765px) {
   .title-mediumScreen {
