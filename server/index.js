@@ -115,7 +115,7 @@ app.post('/api/newThesis', isProfessor, [
   // Various checks of syntax of given data
   check('title').isLength({ min: 1, max: 100 }),
   check('supervisor_id').isLength({ min: 1, max: 7 }),
-  check('thesis_level').isIn(['bachelor', 'master']),
+  check('thesis_level').isIn(['Bachelor', 'Master']),
   check('type_name').isLength({ min: 1, max: 50 }),
   check('expiration').isISO8601().toDate().withMessage("Date time must be in format YYYY-MM-DD HH:MM:SS"), // TODO check if given date is NOT earlier than today
   check('cod_degree').isLength({ min: 1, max: 10 }),

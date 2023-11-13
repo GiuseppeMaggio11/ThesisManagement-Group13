@@ -70,16 +70,21 @@ function App() {
           <Route
             path="/login"
             element={
-              loggedIn ? (
-                <Navigate replace to="/" />
+              loggedIn && user.user_type === "PROF" ? (
+                <Navigate replace to="/teacher" />
+              ) : (
+                loggedIn ? (
+                  <Navigate replace to="/" />
               ) : (
                 <LoginForm
-                  loginSuccessful={loginSuccessful}
-                  logOut={logOut}
-                  loading={loading}
-                  setLoading={setLoading}
-                />
-              )
+                 loginSuccessful={loginSuccessful}
+                 logOut={logOut}
+                 loading={loading}
+                 setLoading={setLoading}
+               />
+             )
+
+              ) 
             }
           />
           <Route
@@ -91,11 +96,10 @@ function App() {
               />
             }
           />
-          {/*Others route here */}
           <Route
             path="/teacher"
             element={
-              !error ? (
+              loggedIn && user.user_type === "PROF" ? (
                 <TeacherPage
                   loading={loading}
                   setLoading={setLoading}
@@ -103,14 +107,14 @@ function App() {
                   setError={setError}
                 />
               ) : (
-                <ErrorAlert />
-              )
+                <Navigate replace to="/login" />
+              ) 
             }
           />
           <Route
             path="/newproposal"
             element={
-              !error ? (
+              loggedIn && user.user_type === "PROF" ? (
                 <NewProposal
                   loading={loading}
                   setLoading={setLoading}
