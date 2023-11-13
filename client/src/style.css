@@ -43,19 +43,15 @@
       z-index: 9999;
     }
   
-.head_tableApplication{
-  text-align: center;
-}
 .navbarMargin{
   margin-top: 1rem;
 }
 .colorStyle{
-  background-color: #003576;
   color: white;
 }
 .footer_application{
-  background-color: #003576;
-  color: white;
+  color: black;
+  justify-content: space-between;
 }
 
 .margin_left_accordition{
@@ -63,7 +59,31 @@
 }
  .button-apply{
   text-align: end;
+  margin-right: 2em;
  }
 .confirmation_application_div{
   width: 100%;
+}
+table.table-rounded {
+  border-radius: 30px; 
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); 
+}
+table.table-rounded thead tr {
+  background-color:  #4682B4 !important;
+  text-align: center;
+  color: #fff; /* Specify your custom text color if needed */
+}
+
+.leftText{
+  padding-inline-start: 0.8rem;
+  font-weight: 680;
+}
+
+.rightText{
+  text-align: center;
+}
+
+.button-style{
+  background-color: #4169E1;
 }

@@ -1,21 +1,21 @@
-import { Container, Table, Accordion, Button, Modal, Form} from "react-bootstrap";
-import { useEffect, useState } from "react";
+import { Container, Table, Accordion, Button, Modal, Form, Row, Col } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
 import API from '../API';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-
+import '../style.css'
 import Loading from "./Loading";
 
 function UserApplication(props) {
     const [pageData, setPageData] = useState({
         id: "6",
-        title:"TITOLO TESI",
-        supervisor:"LUCA POLLONI",
+        title: "TITOLO TESI",
+        supervisor: "LUCA POLLONI",
         coSupervisor: ["Muro Loii", "Adato Gooli", "Laura Poll"],
-        keywords : ["AUTOMATATION", "RESOLT"],
-        type : "Sperimentale",
-        groups : ["Gruppo 1", "Gruppo2"],
-        requiredKnowledge : ["Python", "Java"],
-        description : "Questa è la descrizione",
+        keywords: ["AUTOMATATION", "RESOLT"],
+        type: "Sperimentale",
+        groups: ["Gruppo 1", "Gruppo2"],
+        requiredKnowledge: ["Python", "Java"],
+        description: "Questa è la descrizione",
         notes: "Queste sono le note",
         expired: "2023/11/11",
         level: "Bachelor"
@@ -39,171 +39,183 @@ function UserApplication(props) {
         setSelectedFiles(newFiles);
     };
 
-    useEffect(()=>{
-        const init = async() => {
-            try{
+    useEffect(() => {
+        const init = async () => {
+            try {
                 //API TO RECEIVE DATA
-            } catch (error){
-                
+            } catch (error) {
+
             }
         }
         init()
         // setLoading(false)
-    },[])
-    
+    }, [])
+
     const handleApplication = (event) => {
         event.preventDefault();
         submitApplication(pageData.id);
+        handleUpload();
     }
+
+    const handleUpload = () => {
+        const formData = new FormData();
+        for (let i = 0; i < selectedFiles.length; i++) {
+            formData.append(`file${i + 1}`, selectedFiles[i]);
+        }
+        API.sendFiles(formData).then(
+            () => { console.log("tutto ok") }
+        ).catch((err) => { console.log(err) });
+    }
+
+
 
     const submitApplication = (idThesis) => {
         API.applicationThesis(idThesis).then(
-            ()=>{console.log("tutto ok")}
-        ).catch((err)=>{console.log(err)});
+            () => { console.log("tutto ok") }
+        ).catch((err) => { console.log(err) });
     }
     return (
-      <>
-        {props.loading ? <Loading /> : ""}
-        <Container>
-            <Table striped className="navbarMargin">
-                <thead class="head_tableApplication">
-                    <tr class="colorStyle">
-                        {pageData.title}
-                    </tr>
-                </thead>
-                <tbody>
-                   <tr>
-                    <Accordion defaultActiveKey={['0','3','5','6']} alwaysOpen>
-                       
-                        <Accordion.Item eventKey="0">
-                            <Accordion.Header>SUPERVISOR</Accordion.Header>
-                            <Accordion.Body className="margin_left_accordition">
-                                {pageData.supervisor}
-                            </Accordion.Body>
-                        </Accordion.Item>
-                        
-                        { pageData.coSupervisor && 
-                        <Accordion.Item eventKey="1">
-                            <Accordion.Header>CO-SUPERVISOR</Accordion.Header>
-                            <Accordion.Body className="margin_left_accordition">
-                                {pageData.coSupervisor.map((name, index)=>{
-                                    if(index === pageData.coSupervisor.length -1){
-                                        return name.toUpperCase()
-                                    }
-                                    return name.toUpperCase().concat(", ")})}
-                            </Accordion.Body>
-                        </Accordion.Item>
-                        }
-                        { pageData.keywords && 
-                        <Accordion.Item eventKey="2">
-                            <Accordion.Header>KEY WORDS</Accordion.Header>
-                            <Accordion.Body className="margin_left_accordition">
-                                {pageData.keywords.map((element, index) => {
-                                    if(index === pageData.keywords.length -1) {
-                                        return <u key={index}> {element.toUpperCase()} </u>
-                                    }
-                                    return <u key={index}> {element.toUpperCase().concat(", ")} </u>})}
-                            </Accordion.Body>
-                        </Accordion.Item>
-                        }
-                        <Accordion.Item eventKey="3">
-                            <Accordion.Header>TYPE</Accordion.Header>
-                            <Accordion.Body className="margin_left_accordition">
-                                {pageData.type}
-                            </Accordion.Body>
-                        </Accordion.Item>
-                        {pageData.groups && 
-                            <Accordion.Item eventKey="4">
-                                <Accordion.Header>GROUPS</Accordion.Header>
-                                <Accordion.Body className="margin_left_accordition">
-                                    {pageData.groups.map((name, index)=>{
-                                        if(index === pageData.groups.length -1){
-                                            return name.toUpperCase()
-                                        }
-                                        return name.toUpperCase().concat(", ")})}
-                                </Accordion.Body>
-                            </Accordion.Item> 
-                        }
-                        <Accordion.Item eventKey="5">
-                            <Accordion.Header>DESCRIPTION</Accordion.Header>
-                            <Accordion.Body className="margin_left_accordition">
-                                {pageData.description}
-                            </Accordion.Body>
-                        </Accordion.Item>
-                        {pageData.requiredKnowledge && 
-                            <Accordion.Item eventKey="6">
-                                <Accordion.Header>REQUIRED KNOWLEDGE</Accordion.Header>
-                                <Accordion.Body className="margin_left_accordition">
-                                    {pageData.requiredKnowledge.map((name, index)=>{
-                                        if(index === pageData.groups.length -1){
-                                            return name.toUpperCase()
-                                        }
-                                        return name.toUpperCase().concat(", ")})}
-                                </Accordion.Body>
-                            </Accordion.Item> 
-                        }
-                        {pageData.notes && 
-                            <Accordion.Item eventKey="7">
-                                <Accordion.Header>NOTES</Accordion.Header>
-                                <Accordion.Body className="margin_left_accordition">
-                                    {pageData.notes}
-                                </Accordion.Body>
-                            </Accordion.Item> 
-                        }
-                    </Accordion>
-                   </tr>
-                    <tr class="footer_application">
-                        Experation: {pageData.expired} Level: {pageData.level}
-                    </tr>
-                    <td>
-                        <div className="button-apply">
-                            <Button variant="success" onClick={()=>setOpenPanel(true)}>APPLY</Button>
-                        </div>
-                    </td>
-                </tbody>
-            </Table>
-        </Container>
-        <Modal show={openPanel}>
-            <Modal.Header>
-                <Modal.Title>Application confirm</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-            <div>
-                <label htmlFor="fileInput">Select PDF files that supervisor has to considering in your application:</label>
-                <input
-                type="file"
-                id="fileInput"
-                accept=".pdf"
-                onChange={handleFileChange}
-                multiple 
-                />
-            </div>
-            <div>
-                {selectedFiles.map((file, index) => (
-                <div key={index}>
-                    {file.name}
-                    <Button variant="outline-danger"onClick={() => handleRemoveFile(index)}>
-                        <i class="bi bi-x-circle"></i>
-                    </Button>
-                </div>
-                ))}
-            </div>
-            </Modal.Body>
-            <Modal.Footer>
-                <div className="confirmation_application_div">Confirm application for {pageData.title} thesis?</div>
-            <Form onSubmit={handleApplication}>
-                <Button variant="danger" onClick={()=>setOpenPanel(false)}>
-                    Cancel
-                </Button>
-                <Button variant="primary" type="submit">
-                    Apply
-                </Button>
-            </Form>
-            </Modal.Footer>
-        </Modal>
-        
-      </>
-    );
-  }
+        <>
+            {props.loading ? <Loading /> : ""}
+            <Container className="navbarMargin">
+                <Table className="table-rounded">
+                    <thead>
+                        <tr>
+                            <th colSpan="6">{pageData.title}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {pageData.supervisor && (
+                            <tr>
+                                <td className="leftText"> Supervisor</td>
+                                <td className="rightText">{pageData.supervisor}</td>
+                            </tr>
+                        )}
 
-  export default UserApplication;
+                        {pageData.coSupervisor.length > 1 && (
+                            <tr>
+                                <td className="leftText">Co-Supervisors</td>
+                                <td className="rightText">{pageData.coSupervisor.join(', ')}</td>
+                            </tr>
+                        )}
+
+                        {pageData.coSupervisor.lengt == 1 && (
+                            <tr>
+                                <td className="leftText">Co-Supervisor</td>
+                                <td className="rightText">{pageData.coSupervisor.join(', ')}</td>
+                            </tr>
+                        )}
+
+                        {pageData.keywords && (
+                            <tr>
+                                <td className="leftText">Keywords</td>
+                                <td className="rightText">
+                                    {pageData.keywords.map((element, index) => (
+                                        <React.Fragment key={index}>
+                                            {index !== 0 && <span>, </span>}
+                                            <u>{element}</u>
+                                        </React.Fragment>
+                                    ))}
+                                </td>
+                            </tr>
+                        )}
+
+                        <tr>
+                            <td className="leftText">Type</td>
+                            <td className="rightText">{pageData.type}</td>
+                        </tr>
+
+                        {pageData.groups && (
+                            <tr>
+                                <td className="leftText">Groups</td>
+                                <td className="rightText">{pageData.groups.join(', ')}</td>
+                            </tr>
+                        )}
+
+                        <tr>
+                            <td className="leftText">Description</td>
+                            <td className="rightText">{pageData.description}</td>
+                        </tr>
+
+                        {pageData.requiredKnowledge && (
+                            <tr>
+                                <td className="leftText">Required Knowledge</td>
+                                <td className="rightText">{pageData.requiredKnowledge.join(', ')}</td>
+                            </tr>
+                        )}
+
+                        {pageData.notes && (
+                            <tr>
+                                <td className="leftText">Notes</td>
+                                <td className="rightText">{pageData.notes}</td>
+                            </tr>
+                        )}
+                        <tr>
+                            <td colSpan="2">
+                                <Row className="d-flex justify-content-between">
+                                    <Col>
+                                        <div style={{ textAlign: 'left', fontSize: 13 }}>
+                                            <span>{pageData.level} thesis</span>
+                                        </div>
+                                        <div style={{ textAlign: 'left', fontSize: 13 }}>
+                                            <span>Valid until {pageData.expired}</span>
+                                        </div>
+                                    </Col>
+                                    <Col xs={12} className="text-center">
+                                        <div className="button-apply">
+                                            <Button className="button-style" onClick={() => setOpenPanel(true)}>
+                                                APPLY
+                                            </Button>
+                                        </div>
+                                    </Col>
+                                </Row>
+
+                            </td>
+                        </tr>
+                    </tbody>
+                </Table>
+            </Container>
+            <Modal show={openPanel}>
+                <Modal.Header>
+                    <Modal.Title>Application confirm</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div>
+                        <label htmlFor="fileInput">Select PDF files that supervisor has to considering in your application:</label>
+                        <input
+                            type="file"
+                            id="fileInput"
+                            accept=".pdf"
+                            onChange={handleFileChange}
+                            multiple
+                        />
+                    </div>
+                    <div>
+                        {selectedFiles.map((file, index) => (
+                            <div key={index}>
+                                {file.name}
+                                <Button variant="outline-danger" onClick={() => handleRemoveFile(index)}>
+                                    <i class="bi bi-x-circle"></i>
+                                </Button>
+                            </div>
+                        ))}
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <div className="confirmation_application_div">Confirm application for {pageData.title} thesis?</div>
+                    <Form onSubmit={handleApplication}>
+                        <Button variant="danger" onClick={() => setOpenPanel(false)}>
+                            Cancel
+                        </Button>
+                        <Button variant="primary" type="submit">
+                            Apply
+                        </Button>
+                    </Form>
+                </Modal.Footer>
+            </Modal>
+
+        </>
+    );
+}
+
+export default UserApplication;

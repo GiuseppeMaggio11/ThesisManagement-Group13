@@ -55,5 +55,21 @@ async function applicationThesis (thesis_id) {
   }
 }
 
+async function sendFiles (formData) {
+  const response = await fetch(URL + `/newFiles`, formData, {
+    method: 'POST',
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    credentials: "include"
+  });
+
+  if(response.ok){
+    return ;
+  } else {
+    throw  response.errDetail;
+  }
+}
+
 const API = { logIn, logOut, getUserInfo, applicationThesis};
 export default API;
