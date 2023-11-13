@@ -152,7 +152,38 @@ table.table-rounded thead tr {
   width: 15%; /* Adjust the width as needed */
 }
 
+.btn-outline-danger{
+border-color: white !important;
+}
 
+
+.file-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 8px;
+  background-color: #fff;
+}
+
+.file-item span {
+  margin-right: 8px;
+}
+
+.file-name {
+  flex-grow: 1;
+}
+
+.drop-area {
+  border: 2px dashed #ccc;
+  border-radius: 4px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.drop-area:hover {
+  background-color: #f0f0f0;
+}
 
 @media (min-width: 765px) {
   .title-mediumScreen {

@@ -5,6 +5,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../style.css'
 import { useMediaQuery } from 'react-responsive';
 import Loading from "./Loading";
+import FileDropModal from './FileModal';
 
 function UserApplication(props) {
     const [pageData, setPageData] = useState({
@@ -55,9 +56,10 @@ function UserApplication(props) {
     }, [])
 
     const handleApplication = (event) => {
-        event.preventDefault();
-        submitApplication(pageData.id);
-        handleUpload();
+        //event.preventDefault();
+        //submitApplication(pageData.id);
+        //handleUpload();
+        console.log(selectedFiles)
     }
 
     const handleUpload = () => {
@@ -70,6 +72,10 @@ function UserApplication(props) {
         ).catch((err) => { console.log(err) });
     }
 
+        const closeModal=()=>{
+            setOpenPanel(false)
+            setSelectedFiles([])
+        }
 
 
     const submitApplication = (idThesis) => {
@@ -90,21 +96,21 @@ function UserApplication(props) {
                     <tbody>
                         {pageData.supervisor && (
                             <tr>
-                                <td colSpan="2"  className="leftText customLeftColumn"> Supervisor</td>
+                                <td colSpan="2" className="leftText customLeftColumn"> Supervisor</td>
                                 <td className="rightText">{pageData.supervisor}</td>
                             </tr>
                         )}
 
                         {pageData.coSupervisor.length > 1 && (
                             <tr>
-                                <td colSpan="2"  className="leftText customLeftColumn">Co-Supervisors</td>
+                                <td colSpan="2" className="leftText customLeftColumn">Co-Supervisors</td>
                                 <td className="rightText">{pageData.coSupervisor.join(', ')}</td>
                             </tr>
                         )}
 
                         {pageData.coSupervisor.lengt == 1 && (
                             <tr>
-                                <td colSpan="2"  className="leftText customLeftColumn">Co-Supervisor</td>
+                                <td colSpan="2" className="leftText customLeftColumn">Co-Supervisor</td>
                                 <td className="rightText">{pageData.coSupervisor.join(', ')}</td>
                             </tr>
                         )}
@@ -124,19 +130,19 @@ function UserApplication(props) {
                         )}
 
                         <tr>
-                            <td colSpan="2"  className="leftText customLeftColumn">Type</td>
+                            <td colSpan="2" className="leftText customLeftColumn">Type</td>
                             <td className="rightText">{pageData.type}</td>
                         </tr>
 
                         {pageData.groups && (
                             <tr>
-                                <td colSpan="2"  className="leftText customLeftColumn">Groups</td>
+                                <td colSpan="2" className="leftText customLeftColumn">Groups</td>
                                 <td className="rightText">{pageData.groups.join(', ')}</td>
                             </tr>
                         )}
                         {!isMobile && pageData.description && (
                             <tr>
-                                <td colSpan="2"  className="leftText customLeftColumn">Description</td>
+                                <td colSpan="2" className="leftText customLeftColumn">Description</td>
                                 <td className="rightText">{pageData.description}</td>
                             </tr>
                         )}
@@ -158,14 +164,14 @@ function UserApplication(props) {
 
                         {pageData.requiredKnowledge && (
                             <tr>
-                                <td colSpan="2"  className="leftText customLeftColumn">Required Knowledge</td>
+                                <td colSpan="2" className="leftText customLeftColumn">Required Knowledge</td>
                                 <td className="rightText">{pageData.requiredKnowledge.join(', ')}</td>
                             </tr>
                         )}
 
                         {!isMobile && pageData.notes && (
                             <tr>
-                                <td colSpan="2"  className="leftText customLeftColumn">Notes</td>
+                                <td colSpan="2" className="leftText customLeftColumn">Notes</td>
                                 <td className="rightText">{pageData.notes}</td>
                             </tr>
                         )}
@@ -210,13 +216,17 @@ function UserApplication(props) {
 
                 </Table>
             </Container>
-            <Modal show={openPanel}>
+
+            {/* <Modal show={openPanel}>
                 <Modal.Header>
-                    <Modal.Title>Application confirm</Modal.Title>
+                    <Modal.Title style={{fontSize:20}}>
+                        {pageData.title}
+                        </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div>
-                        <label htmlFor="fileInput">Select PDF files that supervisor has to considering in your application:</label>
+
+                        <label htmlFor="fileInput">Here you can add some usefull pdf file:</label>
                         <input
                             type="file"
                             id="fileInput"
@@ -237,7 +247,7 @@ function UserApplication(props) {
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <div className="confirmation_application_div">Confirm application for {pageData.title} thesis?</div>
+
                     <Form onSubmit={handleApplication}>
                         <Button variant="danger" onClick={() => setOpenPanel(false)}>
                             Cancel
@@ -247,7 +257,18 @@ function UserApplication(props) {
                         </Button>
                     </Form>
                 </Modal.Footer>
-            </Modal>
+            </Modal> */}
+             
+                <FileDropModal
+                    showModal={openPanel}
+                    closeModal={closeModal}
+                    handleSave={() => {
+                        handleApplication();
+                    }}
+                    setSelectedFiles={setSelectedFiles}
+                    selectedFiles={selectedFiles}
+                />
+          
 
         </>
     );
