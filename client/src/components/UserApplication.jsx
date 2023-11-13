@@ -24,31 +24,13 @@ function UserApplication(props) {
     })
     const [openPanel, setOpenPanel] = useState(false)
     const [selectedFiles, setSelectedFiles] = useState([]);
-
-    const handleFileChange = (e) => {
-        const newFiles = Array.from(e.target.files);
-
-        // Filter only pdf's files
-        const pdfFiles = newFiles.filter(file => file.type === 'application/pdf');
-
-        // Add the new file
-        setSelectedFiles(prevFiles => [...prevFiles, ...pdfFiles]);
-    };
     const isMobile = useMediaQuery({ maxWidth: 767 });
-
-
-    const handleRemoveFile = (index) => {
-        const newFiles = [...selectedFiles];
-        newFiles.splice(index, 1);
-        setSelectedFiles(newFiles);
-    };
-
     useEffect(() => {
         const init = async () => {
             try {
                 //API TO RECEIVE DATA
             } catch (error) {
-
+              //ERROR
             }
         }
         init()
@@ -56,10 +38,10 @@ function UserApplication(props) {
     }, [])
 
     const handleApplication = (event) => {
-        //event.preventDefault();
-        //submitApplication(pageData.id);
-        //handleUpload();
-        console.log(selectedFiles)
+        event.preventDefault();
+        submitApplication(pageData.id);
+        handleUpload();
+       
     }
 
     const handleUpload = () => {
@@ -216,48 +198,6 @@ function UserApplication(props) {
 
                 </Table>
             </Container>
-
-            {/* <Modal show={openPanel}>
-                <Modal.Header>
-                    <Modal.Title style={{fontSize:20}}>
-                        {pageData.title}
-                        </Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <div>
-
-                        <label htmlFor="fileInput">Here you can add some usefull pdf file:</label>
-                        <input
-                            type="file"
-                            id="fileInput"
-                            accept=".pdf"
-                            onChange={handleFileChange}
-                            multiple
-                        />
-                    </div>
-                    <div>
-                        {selectedFiles.map((file, index) => (
-                            <div key={index}>
-                                {file.name}
-                                <Button variant="outline-danger" onClick={() => handleRemoveFile(index)}>
-                                    <i class="bi bi-x-circle"></i>
-                                </Button>
-                            </div>
-                        ))}
-                    </div>
-                </Modal.Body>
-                <Modal.Footer>
-
-                    <Form onSubmit={handleApplication}>
-                        <Button variant="danger" onClick={() => setOpenPanel(false)}>
-                            Cancel
-                        </Button>
-                        <Button variant="primary" type="submit">
-                            Apply
-                        </Button>
-                    </Form>
-                </Modal.Footer>
-            </Modal> */}
              
                 <FileDropModal
                     showModal={openPanel}
