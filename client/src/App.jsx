@@ -5,6 +5,7 @@ import ErrorAlert from "./components/ErrorAlert";
 import HomePage from "./components/HomePage";
 
 import LoginForm from "./components/LoginForm";
+import SearchProposalRoute from "./components/SearchProposal";
 
 import UserApplication from "./components/UserApplication"
 
@@ -20,6 +21,20 @@ function App() {
   const [user, setUser] = useState(undefined);
   const [loggedIn, setLoggedIn] = useState(false);
   const [virtualClock, setVirtualClock] = useState(new Date());
+
+  function handleError(err) { //TO BE MODIFIED
+    console.log('err: '+JSON.stringify(err));  // Only for debug
+    let errMsg = 'Unkwnown error';
+    if (err.errors) {
+      if (err.errors[0])
+        if (err.errors[0].msg)
+          errMsg = err.errors[0].msg;
+    } else if (err.error) {
+      errMsg = err.error;
+    }
+
+    setError(errMsg);
+  }
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -63,6 +78,7 @@ function App() {
                   setLoading={setLoading}
                   error={error}
                   setError={setError}
+                  user={user}
                 />
               ) : (
                 <ErrorAlert />
@@ -91,6 +107,15 @@ function App() {
               <VirtualClock
                 virtualClock={virtualClock}
                 setVirtualClock={setVirtualClock}
+              />
+            }
+          />
+          <Route
+            path="/proposals"
+            element={<SearchProposalRoute 
+              error={error} 
+              resetError={() => setError("")} 
+              handleError={handleError} loading={loading}
               />
             }
           />

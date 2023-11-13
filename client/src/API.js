@@ -55,5 +55,35 @@ async function applicationThesis (thesis_id) {
   }
 }
 
-const API = { logIn, logOut, getUserInfo, applicationThesis};
+async function getThesisProposals () {
+  const response = await fetch(URL + "/proposals", {
+    credentials: "include",
+  });
+  const proposals = await response.json();
+  if (response.ok) {
+      return proposals.map ( 
+          (element) => (
+              {
+                  id: element.id, 
+                  title: element.title, 
+                  description: element.description,
+                  supervisor: element.supervisor, 
+                  level: element.level, 
+                  type: element.type, 
+                  required_knowledge: element.required_knowledge, 
+                  notes: element.notes,
+                  expiration: element.expiration ? dayjs(element.expiration) : "",
+                  keywords: element.keywords,
+                  group: element.group,
+                  department: element.department,
+                  co_supervisors: element.co_supervisors
+              })
+          )
+  }
+  else {
+      throw proposals;
+  }
+}
+
+const API = { logIn, logOut, getUserInfo, getThesisProposals, applicationThesis };
 export default API;
