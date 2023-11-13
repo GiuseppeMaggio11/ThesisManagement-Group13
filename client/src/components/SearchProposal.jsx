@@ -1,5 +1,6 @@
-import { useNavigate } from "react-router-dom";
-import { Alert, Button, Col, Container, Form, Row, Spinner, Table } from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
+import { useMediaQuery } from "react-responsive";
+import { Accordion, Alert, Button, Col, Container, Form, Row, Spinner, Table } from "react-bootstrap";
 import { useState, useEffect } from "react";
 
 import dayjs from "dayjs";
@@ -12,13 +13,13 @@ function SearchProposalRoute(props) {
     const [thesisProposals, setThesisProposals] = useState([]);
     //const [dirtyThesisProposals, setDirtyThesisProposals] = useState(true);
 
-
+    const isMobile = useMediaQuery({ maxWidth: 767 });
 
     useEffect(() => {
         //if (dirtyThesisProposals) {
-          API.getThesisProposals()
-            .then((list) => { 
-                setThesisProposals(list); 
+        API.getThesisProposals()
+            .then((list) => {
+                setThesisProposals(list);
                 //setDirtyThesisProposals(false);
             })
             .catch((err) => props.handleError(err))
@@ -32,7 +33,7 @@ function SearchProposalRoute(props) {
             {props.error ? <Alert variant="danger" dismissible className="margin-custom" onClose={props.resetError}>
                 {props.error}</Alert> : null}
             {(props.error || props.loading) ? <Spinner className="m-2" animation="border" role="status" /> :
-                <SearchProposalComponent thesisProposals={thesisProposals} />
+                <SearchProposalComponent thesisProposals={thesisProposals} isMobile={isMobile} />
             }
         </>
     )
@@ -63,7 +64,7 @@ function SearchProposalComponent(props) {
                     if (key === "id") {
                         return false; // Exclude the "id" field
                     }
-                    
+
                     if (Array.isArray(value)) {
                         // If the value is an array, check if the filter is present in at least one of the elements
                         return value.some((item) => {
@@ -93,27 +94,27 @@ function SearchProposalComponent(props) {
                         // If the value is a date handled by dayjs
                         return dayjs(value).format("YYYY-MM-DD").includes(filterLowerCase);
                     }
-                    
+
                     return false;
-                });   
+                });
             })
         );
     }
 
     const handleCancel = () => {
-        setFilter(""); 
+        setFilter("");
         setFilteredThesisProposals([...props.thesisProposals]);
     }
 
 
 
-    return (
-        <Container className="margin-custom">
-            <Row>
-                <Col>
+    return props.isMobile ?
+        (
+            <Container className="margin-custom">
+                <Row>
                     <h1 className="margin-titles-custom">Thesis Proposals</h1>
-                </Col>
-                <Col className="d-flex align-self-center justify-content-end">
+                </Row>
+                <Row>
                     <Form className="d-flex" onSubmit={handleSubmit}>
                         <Form.Group className="mb-3 me-2 d-flex align-items-center">
                             <Form.Label className="me-2 mb-0">Filter: </Form.Label>
@@ -126,44 +127,92 @@ function SearchProposalComponent(props) {
                             Cancel
                         </Button>
                     </Form>
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    {filteredThesisProposals.length == 0 ?
-                        <h2>No proposal found</h2> :
-                        <Table hover>
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                    <th className="d-none d-md-table-cell">Supervisor</th>
-                                    <th className="d-none d-md-table-cell">Expiration Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {
+                </Row>
+                <Row>
+                    <Accordion>
+                        {
+                            [...filteredThesisProposals].map((element) =>
+                                <ProposalAccordion key={element.id} proposal={element} />
+                            )
+                        }
+                    </Accordion>
+                </Row>
+            </Container>
+        )
+        :
+        (
+            <Container className="margin-custom">
+                <Row>
+                    <Col>
+                        <h1 className="margin-titles-custom">Thesis Proposals</h1>
+                    </Col>
+                    <Col className="d-flex align-self-center justify-content-end">
+                        <Form className="d-flex" onSubmit={handleSubmit}>
+                            <Form.Group className="mb-3 me-2 d-flex align-items-center">
+                                <Form.Label className="me-2 mb-0">Filter: </Form.Label>
+                                <Form.Control type="text" placeholder="Insert a filter" value={filter} onChange={(event) => setFilter(event.target.value)} />
+                            </Form.Group>
+                            <Button className="mb-3 margin-buttons-custom" variant="success" type="submit">
+                                Search
+                            </Button>
+                            <Button className="mb-3 margin-buttons-custom" variant="secondary" onClick={handleCancel}>
+                                Cancel
+                            </Button>
+                        </Form>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        {filteredThesisProposals.length == 0 ?
+                            <h2>No proposal found</h2> :
+                            <Table hover>
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Supervisor</th>
+                                        <th>Expiration Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {
 
-                                    [...filteredThesisProposals].map((element) =>
-                                        <ProposalTableRow key={element.id} proposal={element} />
-                                    )
-                                }
-                            </tbody>
-                        </Table>
-                    }
-                </Col>
-            </Row>
-        </Container>
+                                        [...filteredThesisProposals].map((element) =>
+                                            <ProposalTableRow key={element.id} proposal={element} />
+                                        )
+                                    }
+                                </tbody>
+                            </Table>
+                        }
+                    </Col>
+                </Row>
+            </Container>
+        )
+}
+
+function ProposalAccordion(props) {
+    return (
+        <Accordion.Item eventKey={props.proposal.id.toString()}>
+            <Accordion.Header>
+                <span>
+                    <Link to={`/proposals/${props.proposal.id}`}>
+                        {props.proposal.title}
+                    </Link>
+                </span>
+            </Accordion.Header>
+            <Accordion.Body style={{ position: "relative" }}>
+                <p>Supervisor: <b>{props.proposal.supervisor}</b></p>
+                <p>Expiration date: <b>{dayjs(props.proposal.expiration).format("YYYY-MM-DD")}</b></p>
+            </Accordion.Body>
+        </Accordion.Item>
     )
 }
 
 function ProposalTableRow(props) {
-    const navigate = useNavigate();
-
     return (
         <tr>
-            <td><Button variant="link" onClick={() => navigate(`/proposals/${props.proposal.id}`)}>{props.proposal.title}</Button></td>
-            <td className="d-none d-md-table-cell">{props.proposal.supervisor}</td>
-            <td className="d-none d-md-table-cell">{dayjs(props.proposal.expiration).format("YYYY-MM-DD")}</td>
+            <td><Link to={`/proposals/${props.proposal.id}`}>{props.proposal.title}</Link></td>
+            <td>{props.proposal.supervisor}</td>
+            <td>{dayjs(props.proposal.expiration).format("YYYY-MM-DD")}</td>
         </tr>
     )
 }
