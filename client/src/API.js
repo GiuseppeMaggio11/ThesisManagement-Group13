@@ -51,16 +51,16 @@ async function getThesisProposals () {
                   id: element.id, 
                   title: element.title, 
                   description: element.description,
-                  supervisor: element.supervisor, 
-                  level: element.level, 
-                  type: element.type, 
+                  supervisor: element.surname.concat(" ", element.name), 
+                  level: element.thesis_level, 
+                  type: element.thesis_type, 
                   required_knowledge: element.required_knowledge, 
                   notes: element.notes,
-                  expiration: element.expiration ? dayjs(element.expiration) : "",
+                  expiration: element.expiration,
                   keywords: element.keywords,
-                  group: element.group,
-                  department: element.department,
-                  co_supervisors: element.co_supervisors
+                  groups: element.group_name,
+                  department: element.department_name,
+                  cosupervisors: element.cosupervisor
               })
           )
   }

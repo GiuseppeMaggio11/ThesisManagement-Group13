@@ -1,75 +1,31 @@
 import { useNavigate } from "react-router-dom";
 import { Alert, Button, Col, Container, Form, Row, Spinner, Table } from "react-bootstrap";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import dayjs from "dayjs";
+
+import API from "../API";
 
 
 
 function SearchProposalRoute(props) {
-    const [thesisProposals, setThesisProposals] = useState([
-        {
-            id: 1,
-            title: "Ciao",
-            description: "This thesis is about tomatoes",
-            supervisor: "Paolo",
-            level: "2",
-            type: "bho",
-            required_knowledge: "Know what a tomato is",
-            notes: "You will get dirty",
-            expiration: dayjs("2023-09-22"),
-            keywords: [
-                "Green",
-                "Tomatoes",
-                "Biological Agriculture"
-            ],
-            group: "Biological Agriculture Sub-Department",
-            department: "Agriculture Department",
-            co_supervisors: [
-                "Giuseppe",
-                "Matteo",
-                "Sajjad",
-                "Manuel"
-            ]
-        },
-        {
-            id: 2,
-            title: "WWE master level",
-            description: "This thesis is about WWE",
-            supervisor: "Sajjad",
-            level: "2",
-            type: "whatever",
-            required_knowledge: "Know what WWE is",
-            notes: "You will gain muscles",
-            expiration: dayjs("2023-06-09"),
-            keywords: [
-                "Muscle",
-                "Gym",
-                "Motor sciences"
-            ],
-            group: "WWE Sub-Department",
-            department: "Motor Sciences Department",
-            co_supervisors: [
-                "Carla",
-                "Matteo",
-                "Jacopo",
-                "Giuseppe"
-            ]
-        }
-    ]);
-    const [dirtyThesisProposals, setDirtyThesisProposals] = useState(true);
+    const [thesisProposals, setThesisProposals] = useState([]);
+    //const [dirtyThesisProposals, setDirtyThesisProposals] = useState(true);
 
 
 
-    /*useEffect(() => {
-        if (dirtyThesisProposals) {
-          API.getThesisProposals(thesisProposalFilters)
-            .then((list) => setThesisProposals(list))
+    useEffect(() => {
+        //if (dirtyThesisProposals) {
+          API.getThesisProposals()
+            .then((list) => { 
+                setThesisProposals(list); 
+                //setDirtyThesisProposals(false);
+            })
             .catch((err) => props.handleError(err))
-        }
-      }, [dirtyThesisProposals]);*/
+        //}
+    }, [/*dirtyThesisProposals*/]);
 
-
+    console.log(thesisProposals)
 
     return (
         <>
@@ -82,9 +38,17 @@ function SearchProposalRoute(props) {
     )
 }
 
+
+
 function SearchProposalComponent(props) {
     const [filter, setFilter] = useState("");
-    const [filteredThesisProposals, setFilteredThesisProposals] = useState(props.thesisProposals);
+    const [filteredThesisProposals, setFilteredThesisProposals] = useState([...props.thesisProposals]);
+
+
+
+    useEffect(() => {
+        setFilteredThesisProposals([...props.thesisProposals]);
+    }, [props.thesisProposals]);
 
 
 
@@ -103,7 +67,18 @@ function SearchProposalComponent(props) {
                     if (Array.isArray(value)) {
                         // If the value is an array, check if the filter is present in at least one of the elements
                         return value.some((item) => {
-                            if (typeof item === "string" || typeof item === "number") {
+                            if (typeof item === "object" && item !== null) {
+                                // If the item is an object, search within its properties
+                                return Object.values(item).some((nestedValue) => {
+                                    if (typeof nestedValue === "string" || typeof nestedValue === "number") {
+                                        return nestedValue.toString().toLowerCase().includes(filterLowerCase);
+                                    }
+                                    else if (dayjs.isDayjs(nestedValue)) {
+                                        return dayjs(nestedValue).format("YYYY-MM-DD").includes(filterLowerCase);
+                                    }
+                                    return false;
+                                });
+                            } else if (typeof item === "string" || typeof item === "number") {
                                 // If the item is a string or number, handle the normal search
                                 return item.toString().toLowerCase().includes(filterLowerCase);
                             } else if (dayjs.isDayjs(item)) {
@@ -127,7 +102,7 @@ function SearchProposalComponent(props) {
 
     const handleCancel = () => {
         setFilter(""); 
-        setFilteredThesisProposals(props.thesisProposals);
+        setFilteredThesisProposals([...props.thesisProposals]);
     }
 
 
@@ -161,8 +136,8 @@ function SearchProposalComponent(props) {
                             <thead>
                                 <tr>
                                     <th>Title</th>
-                                    <th>Supervisor</th>
-                                    <th>Expiration Date</th>
+                                    <th className="d-none d-md-table-cell">Supervisor</th>
+                                    <th className="d-none d-md-table-cell">Expiration Date</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -187,8 +162,8 @@ function ProposalTableRow(props) {
     return (
         <tr>
             <td><Button variant="link" onClick={() => navigate(`/proposals/${props.proposal.id}`)}>{props.proposal.title}</Button></td>
-            <td>{props.proposal.supervisor}</td>
-            <td>{dayjs(props.proposal.expiration).format("YYYY-MM-DD")}</td>
+            <td className="d-none d-md-table-cell">{props.proposal.supervisor}</td>
+            <td className="d-none d-md-table-cell">{dayjs(props.proposal.expiration).format("YYYY-MM-DD")}</td>
         </tr>
     )
 }
