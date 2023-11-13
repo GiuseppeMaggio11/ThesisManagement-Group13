@@ -80,10 +80,68 @@ table.table-rounded thead tr {
   font-weight: 680;
 }
 
-.rightText{
+
+.table-footer {
+  text-align: left;
+  font-size: 13px;
+  margin-left: 2rem;
+}
+
+.text-center {
   text-align: center;
 }
 
+.button-apply {
+  margin-right: 1em; 
+}
+
+
+.rightText{
+  text-align: center;
+  vertical-align: middle;
+}
+
 .button-style{
-  background-color: #4169E1;
+  background-color: #4682B4;
+  border-color: #4682B4;
+}
+
+.button-style:hover{
+  background-color: #215884;
+  border-color: #215884;
+}
+
+.accordion-button {
+  padding: 0 !important; 
+  vertical-align: middle;
+  font-weight: 680;
+}
+.accordion-item { 
+  border: none;
+}
+
+.accordion-td{
+  vertical-align: middle;
+}
+.accordion-body{
+  vertical-align: middle;
+}
+
+.accordion-button:hover,
+.accordion-button:focus
+.accordion-button:not(:collapsed) {
+    background-color: white;
+    border-color: white; 
+    box-shadow: white;
+}
+.bold{
+  font-weight:680;
+}
+
+@media (min-width: 765px) {
+  .title-mediumScreen {
+    margin-left: 2em;
+    margin-right: 2em;
+    border: 1px solid rgb(254, 252, 252); /* Add a border for testing */
+}
 }

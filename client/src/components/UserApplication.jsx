@@ -3,20 +3,21 @@ import React, { useEffect, useState } from "react";
 import API from '../API';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../style.css'
+import { useMediaQuery } from 'react-responsive';
 import Loading from "./Loading";
 
 function UserApplication(props) {
     const [pageData, setPageData] = useState({
         id: "6",
-        title: "TITOLO TESI",
+        title: "Navigating the Digital Labyrinth: Understanding the Impact of Technological Convergence on Human Cognition",
         supervisor: "LUCA POLLONI",
         coSupervisor: ["Muro Loii", "Adato Gooli", "Laura Poll"],
         keywords: ["AUTOMATATION", "RESOLT"],
         type: "Sperimentale",
         groups: ["Gruppo 1", "Gruppo2"],
         requiredKnowledge: ["Python", "Java"],
-        description: "Questa è la descrizione",
-        notes: "Queste sono le note",
+        description: "This thesis delves into the intricate interplay between rapidly converging technologies and the human mind, exploring the profound implications for cognition in the digital age. By examining the fusion of artificial intelligence, augmented reality, and neurotechnology, the study investigates how these advancements shape cognitive processes, perception, and decision-making. Through a multidisciplinary lens, it aims to uncover the cognitive challenges and opportunities presented by this convergence, shedding light on the complex relationship between humans and emerging technologies. The research combines cognitive science, neuroscience, and technology studies to provide a nuanced understanding of the cognitive landscape in the era of technological convergence.",
+        notes: "This groundbreaking thesis illuminates the intricate dance between evolving technologies and human cognition, unraveling the complexities of our digital future. It offers valuable insights for scholars, policymakers, and technologists seeking to navigate the uncharted terrain of technological convergence. The multidisciplinary approach ensures a comprehensive exploration, encouraging a holistic understanding of the profound impact these advancements have on how we think, perceive, and interact in an increasingly interconnected world.",
         expired: "2023/11/11",
         level: "Bachelor"
     })
@@ -32,6 +33,8 @@ function UserApplication(props) {
         // Add the new file
         setSelectedFiles(prevFiles => [...prevFiles, ...pdfFiles]);
     };
+    const isMobile = useMediaQuery({ maxWidth: 767 });
+
 
     const handleRemoveFile = (index) => {
         const newFiles = [...selectedFiles];
@@ -79,36 +82,36 @@ function UserApplication(props) {
             {props.loading ? <Loading /> : ""}
             <Container className="navbarMargin">
                 <Table className="table-rounded">
-                    <thead>
+                    <thead >
                         <tr>
-                            <th colSpan="6">{pageData.title}</th>
+                            <th colSpan="6" className="title-mediumScreen" >{pageData.title}</th>
                         </tr>
                     </thead>
                     <tbody>
                         {pageData.supervisor && (
                             <tr>
-                                <td className="leftText"> Supervisor</td>
+                                <td colSpan="2" className="leftText"> Supervisor</td>
                                 <td className="rightText">{pageData.supervisor}</td>
                             </tr>
                         )}
 
                         {pageData.coSupervisor.length > 1 && (
                             <tr>
-                                <td className="leftText">Co-Supervisors</td>
+                                <td colSpan="2" className="leftText">Co-Supervisors</td>
                                 <td className="rightText">{pageData.coSupervisor.join(', ')}</td>
                             </tr>
                         )}
 
                         {pageData.coSupervisor.lengt == 1 && (
                             <tr>
-                                <td className="leftText">Co-Supervisor</td>
+                                <td colSpan="2" className="leftText">Co-Supervisor</td>
                                 <td className="rightText">{pageData.coSupervisor.join(', ')}</td>
                             </tr>
                         )}
 
                         {pageData.keywords && (
                             <tr>
-                                <td className="leftText">Keywords</td>
+                                <td colSpan="2" className="leftText">Keywords</td>
                                 <td className="rightText">
                                     {pageData.keywords.map((element, index) => (
                                         <React.Fragment key={index}>
@@ -121,47 +124,79 @@ function UserApplication(props) {
                         )}
 
                         <tr>
-                            <td className="leftText">Type</td>
+                            <td colSpan="2" className="leftText">Type</td>
                             <td className="rightText">{pageData.type}</td>
                         </tr>
 
                         {pageData.groups && (
                             <tr>
-                                <td className="leftText">Groups</td>
+                                <td colSpan="2" className="leftText">Groups</td>
                                 <td className="rightText">{pageData.groups.join(', ')}</td>
                             </tr>
                         )}
+                        {!isMobile && pageData.description && (
+                            <tr>
+                                <td colSpan="2" className="leftText">Description</td>
+                                <td className="rightText">{pageData.description}</td>
+                            </tr>
+                        )}
 
-                        <tr>
-                            <td className="leftText">Description</td>
-                            <td className="rightText">{pageData.description}</td>
-                        </tr>
+                        {isMobile && pageData.description && (
+                            <tr>
+                                <td colSpan="3" className="accordion-td">
+                                    <Accordion defaultActiveKey="1">
+                                        <Accordion.Item eventKey="0">
+                                            <Accordion.Header>Description</Accordion.Header>
+                                            <Accordion.Body>
+                                                {pageData.description}
+                                            </Accordion.Body>
+                                        </Accordion.Item>
+                                    </Accordion>
+                                </td>
+                            </tr>
+                        )}
 
                         {pageData.requiredKnowledge && (
                             <tr>
-                                <td className="leftText">Required Knowledge</td>
+                                <td colSpan="2" className="leftText">Required Knowledge</td>
                                 <td className="rightText">{pageData.requiredKnowledge.join(', ')}</td>
                             </tr>
                         )}
 
-                        {pageData.notes && (
+                        {!isMobile && pageData.notes && (
                             <tr>
-                                <td className="leftText">Notes</td>
+                                <td colSpan="2" className="leftText">Notes</td>
                                 <td className="rightText">{pageData.notes}</td>
                             </tr>
                         )}
+                        {isMobile && pageData.notes && (
+                            <tr>
+                                <td colSpan="3" className="accordion-td">
+                                    <Accordion defaultActiveKey="0">
+                                        <Accordion.Item eventKey="0">
+                                            <Accordion.Header>Notes</Accordion.Header>
+                                            <Accordion.Body>
+                                                {pageData.notes}
+                                            </Accordion.Body>
+                                        </Accordion.Item>
+                                    </Accordion>
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                    <tfoot>
                         <tr>
-                            <td colSpan="2">
-                                <Row className="d-flex justify-content-between">
+                            <td colSpan="3" className="text-center table-footer">
+                                <Row className="justify-content-between">
                                     <Col>
-                                        <div style={{ textAlign: 'left', fontSize: 13 }}>
-                                            <span>{pageData.level} thesis</span>
+                                        <div className="table-footer">
+                                            <span className="bold">{pageData.level}</span><span> thesis</span>
                                         </div>
-                                        <div style={{ textAlign: 'left', fontSize: 13 }}>
-                                            <span>Valid until {pageData.expired}</span>
+                                        <div className="table-footer">
+                                            <span>Valid until</span><span className="bold"> {pageData.expired}</span>
                                         </div>
                                     </Col>
-                                    <Col xs={12} className="text-center">
+                                    <Col>
                                         <div className="button-apply">
                                             <Button className="button-style" onClick={() => setOpenPanel(true)}>
                                                 APPLY
@@ -169,10 +204,10 @@ function UserApplication(props) {
                                         </div>
                                     </Col>
                                 </Row>
-
                             </td>
                         </tr>
-                    </tbody>
+                    </tfoot>
+
                 </Table>
             </Container>
             <Modal show={openPanel}>
