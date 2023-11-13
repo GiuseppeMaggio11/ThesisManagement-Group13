@@ -1,25 +1,14 @@
 import { Container, Table, Accordion, Button, Modal, Form} from "react-bootstrap";
 import { useEffect, useState } from "react";
+import { useParams} from 'react-router-dom';
 import API from '../API';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import Loading from "./Loading";
 
-function UserApplication(props) {
-    const [pageData, setPageData] = useState({
-        id: "6",
-        title:"TITOLO TESI",
-        supervisor:"LUCA POLLONI",
-        coSupervisor: ["Muro Loii", "Adato Gooli", "Laura Poll"],
-        keywords : ["AUTOMATATION", "RESOLT"],
-        type : "Sperimentale",
-        groups : ["Gruppo 1", "Gruppo2"],
-        requiredKnowledge : ["Python", "Java"],
-        description : "Questa è la descrizione",
-        notes: "Queste sono le note",
-        expired: "2023/11/11",
-        level: "Bachelor"
-    })
+function ThesisPage(props) {
+    const params = useParams();
+    const [pageData, setPageData] = useState({})
     const [openPanel, setOpenPanel] = useState(false)
     const [selectedFiles, setSelectedFiles] = useState([]);
 
@@ -42,7 +31,22 @@ function UserApplication(props) {
     useEffect(()=>{
         const init = async() => {
             try{
-                //API TO RECEIVE DATA
+                const thesisData = await API.getThesisProposalsById(params.id);
+                //GESTIRE PROBLEMI
+                setPageData({
+                    title:thesisData.title,
+                    description:thesisData.description,
+                    supervisor:`${thesisData.name} ${thesisData.surname}`,
+                    coSupervisor: thesisData.cosupervisors,
+                    keywords: thesisData.keywords,
+                    type: thesisData.thesis_type,
+                    groups: thesisData.group_name.map((element)=>{return element.group}),
+                    requiredKnowledge: thesisData.requiredKnowledge,
+                    description: thesisData.description,
+                    ...(thesisData.notes !== 'None' && { notes: thesisData.notes }),
+                    expiration: thesisData.expiration,
+                    level: thesisData.thesis_level
+                })
             } catch (error){
                 
             }
@@ -153,7 +157,7 @@ function UserApplication(props) {
                     </Accordion>
                    </tr>
                     <tr class="footer_application">
-                        Experation: {pageData.expired} Level: {pageData.level}
+                        Experation: {pageData.expiration} Level: {pageData.level}
                     </tr>
                     <td>
                         <div className="button-apply">
@@ -206,4 +210,4 @@ function UserApplication(props) {
     );
   }
 
-  export default UserApplication;
+  export default ThesisPage;

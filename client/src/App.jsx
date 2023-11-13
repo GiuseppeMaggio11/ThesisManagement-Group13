@@ -7,7 +7,7 @@ import HomePage from "./components/HomePage";
 import LoginForm from "./components/LoginForm";
 import SearchProposalRoute from "./components/SearchProposal";
 
-import UserApplication from "./components/UserApplication"
+import ThesisPage from "./components/ThesisPage"
 
 import "./style.css";
 import { Button, Container } from "react-bootstrap";
@@ -121,7 +121,7 @@ function App() {
           />
           {/*Others route here */}
 
-          <Route path='/application/:id' element={ loggedIn ? <UserApplication loading={loading}/> :  <LoginForm
+          <Route path='/proposals/:id' element={ loggedIn ? <ThesisPage loading={loading}/> :  <LoginForm
                   loginSuccessful={loginSuccessful}
                   logOut={logOut}
                   loading={loading}

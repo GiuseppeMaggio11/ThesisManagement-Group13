@@ -144,13 +144,15 @@ app.delete("/api/session/logout", (req, res) => {
     res.end();
   });
 });
-
+//Session user info
 app.get("/api/session/userinfo", (req, res) => {
   if (req.isAuthenticated()) {
     res.status(200).json(req.user);
   } else res.status(401).json({ error: "Unauthenticated user!" });
 });
 /***API***/
+
+//GET PROPOSALS
 app.get("/api/proposals", isLoggedIn, async (req, res) => {
   try{
     const proposals = await dao.getProposals(req.user.user_type, req.user.username);
@@ -160,6 +162,7 @@ app.get("/api/proposals", isLoggedIn, async (req, res) => {
   }
 });
 
+//GET PROPOSAL BY ID
 app.get('/api/proposal/:id', isLoggedIn, async (req, res) => {
   const thesis_id = req.params.id; // Extract thesis_id from the URL
   try {
@@ -173,6 +176,7 @@ app.get('/api/proposal/:id', isLoggedIn, async (req, res) => {
     res.status(500).send(error.message + ' ');
   }
 });
+//DO AN APPLICATION FOR A PROPOSAL
 app.post('/api/newApplication/:thesis_id', isStudent, async (req, res) => {
   const thesis_id = req.params.thesis_id; // Extract thesis_id from the URL
   console.log('thesis_id ' + thesis_id);
@@ -198,7 +202,7 @@ app.post('/api/newApplication/:thesis_id', isStudent, async (req, res) => {
   }
 });
 
-
+//ADD NEW FILES
 app.post('/api/newFiles', isStudent, async(req, res)=>{
   upload.array('file', 10)(req, res, (err) => {
     if (err instanceof multer.MulterError) {
@@ -212,7 +216,7 @@ app.post('/api/newFiles', isStudent, async(req, res)=>{
   })
 })
 
-
+//GET ALL FILES FOR A STUDENT ID
 app.get('/api/getAllFiles/:student_id', isProfessor, async (req, res) => {
   try {
     const studentID = req.params.student_id;

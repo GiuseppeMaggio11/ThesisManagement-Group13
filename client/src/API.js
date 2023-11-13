@@ -85,5 +85,18 @@ async function getThesisProposals () {
   }
 }
 
-const API = { logIn, logOut, getUserInfo, getThesisProposals, applicationThesis };
+async function getThesisProposalsById (thesisId) {
+    const response = await fetch(URL + `/proposal/${thesisId}`, {
+    credentials: "include",
+  });
+  const proposal = await response.json();
+  if (response.ok) {
+      return proposal;
+  }
+  else {
+      throw proposals;
+  }
+}
+
+const API = { logIn, logOut, getUserInfo, getThesisProposals, applicationThesis, getThesisProposalsById};
 export default API;
