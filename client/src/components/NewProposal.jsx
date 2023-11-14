@@ -24,25 +24,27 @@ function NewProposal(props) {
     is_archived: false,
   });
 
+  const [errors, setErrors] = useState(null);
+
   const [showForm, setShowForm] = useState(false);
   const [cosupervisors_external, setCoSupervisorExternal] = useState([]);
 
-  /*useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await API.getListExternalCosupervisors()
-        .then((list)=>{
-          setCoSupervisorExternal(list.map(item => item.email));
-        }).catch((err)=>{
-          console.log(err);
-        })
-      } catch (error) {
-        console.error('Error fetching external co-supervisors:', error);
-      }
-    };
+  const fetchData = async () => {
+    try {
+      await API.getListExternalCosupervisors()
+      .then((list)=>{
+        setCoSupervisorExternal(list.map(item => item.email));
+      }).catch((err)=>{
+        console.log(err);
+      })
+    } catch (error) {
+      console.error('Error fetching external co-supervisors:', error);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
-  }) */
+  }, []); 
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -59,14 +61,14 @@ function NewProposal(props) {
         [field]: [...formData[field], value]
       });
     }
-  }
+  };
 
   const deleteChip = (field, value) => {
     setFormData({
       ...formData,
       [field]: formData[field].filter(item => item !== value)
     });
-  }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -75,26 +77,33 @@ function NewProposal(props) {
       keywords: formData.keywords.join(", ")
     };
     await API.newProposal(newProp)
-      .then((response)=>{
-        console.log(response)
+      .then(response => {
+        if(response && "errors" in response) {
+          setErrors(response.errors);
+        }
+        else {
+          setFormData({
+            title: '',
+            description: '',
+            supervisor_id: '',
+            cosupervisors_internal: [],
+            cosupervisors_external: [],
+            thesis_level: '',
+            keywords: [],
+            type_name: '',
+            cod_group: '',
+            required_knowledge: '',
+            notes: '',
+            expiration: '',
+            cod_degree: '',
+            is_archived: false,
+          });
+          setErrors(null);
+        }
       })
-      .then((e) => setFormData({
-        title: '',
-        description: '',
-        supervisor_id: '',
-        cosupervisors_internal: [],
-        cosupervisors_external: [],
-        thesis_level: '',
-        keywords: [],
-        type_name: '',
-        cod_group: '',
-        required_knowledge: '',
-        notes: '',
-        expiration: '',
-        cod_degree: '',
-        is_archived: false,
-      }))
-      .catch((err) => console.log(err));
+      .catch(error => {
+        setErrors([{msg: error.message}])
+      })
   };
 
   return (
@@ -158,7 +167,7 @@ function NewProposal(props) {
                         values= {formData.cosupervisors_internal}
                         add= {addChip}
                         remove= {deleteChip}
-                        placeholder= "Enter an internal co-supervisor ID"
+                        placeholder= "Enter internal co-supervisors ID and press enter"
                       />
                     </Form.Group>
                     <Form.Group className="mb-3">
@@ -166,9 +175,19 @@ function NewProposal(props) {
                       <Form.Select
                         multiple
                         value={formData.cosupervisors_external} 
-                        onChange={e => setFormData({
-                          ...formData,
-                          cosupervisors_external: [...formData.cosupervisors_external,[].slice.call(e.target.selectedOptions).map(item => item.value)]})}
+                        onChange={e => { 
+                          const selectedItem = e.target.value
+                          if (formData.cosupervisors_external.includes(selectedItem)) {
+                            const tempArray = formData.cosupervisors_external.filter(item => item !== selectedItem);
+                            setFormData({
+                              ...formData,
+                              cosupervisors_external: [...tempArray]});
+                          } else {
+                            setFormData({
+                              ...formData,
+                              cosupervisors_external: [...formData.cosupervisors_external, selectedItem]});
+                          }
+                        }}
                       >
                         { cosupervisors_external.map(item => 
                           <option key={item} value={item}>{item}</option>
@@ -180,16 +199,17 @@ function NewProposal(props) {
                       </Button>
                       <Modal show={showForm} onHide={() => setShowForm(false)}>
                         <Modal.Header closeButton>
-                          <Modal.Title>Add Co-Supervisor</Modal.Title>
+                          <Modal.Title>Add a new external co-supervisor</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
-                          <NewExternalCoSupervisor />
+                          <NewExternalCoSupervisor 
+                            fetchData={fetchData}
+                          />
                         </Modal.Body>
                         <Modal.Footer>
                           <Button 
                             variant="secondary" 
                             onClick={async () => {
-                              await fetchData();
                               setShowForm(false);
                             }}
                           >
@@ -219,7 +239,7 @@ function NewProposal(props) {
                         values= {formData.keywords}
                         add= {addChip}
                         remove= {deleteChip}
-                        placeholder= "Enter a keyword"
+                        placeholder= "Enter a keyword and press enter"
                       />
                     </Form.Group>
                     <Form.Group className="mb-3">
@@ -303,6 +323,15 @@ function NewProposal(props) {
                         required
                       />
                     </Form.Group>
+                    {errors && (
+                      <div className="alert alert-danger">
+                        <ul>
+                          {Object.values(errors).map((error, index) => (
+                            <li key={index}> {error?.path ? error.path + ":" : ""} {error.msg}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                     <Button variant="primary" type="button" onClick={handleSubmit}>
                       Create
                     </Button>

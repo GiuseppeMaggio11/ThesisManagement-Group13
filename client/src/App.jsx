@@ -118,8 +118,6 @@ function App() {
                 <NewProposal
                   loading={loading}
                   setLoading={setLoading}
-                  error={error}
-                  setError={setError}
                 />
               ) : (
                 <ErrorAlert />

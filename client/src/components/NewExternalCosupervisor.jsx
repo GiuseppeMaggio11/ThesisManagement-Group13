@@ -9,6 +9,8 @@ function NewExternalCoSupervisorForm(props) {
     surname: '',
   });
 
+  const [errors, setErrors] = useState(null);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCoSupervisor({
@@ -19,15 +21,23 @@ function NewExternalCoSupervisorForm(props) {
 
   const handleAddCoSupervisor = async () => {
     await API.newExternalCosupervisor(coSupervisor)
-      .then((response)=>{
-        console.log(response)
+      .then(response => {
+        if(response && "errors" in response) {
+          setErrors(response.errors);
+        }
+        else {
+          setCoSupervisor({
+            email: '',
+            name: '',
+            surname: '',
+          });
+          setErrors(null);
+          props.fetchData();
+        }
       })
-      .then((e) => setCoSupervisor({
-        email: '',
-        name: '',
-        surname: '',
-      }))
-      .catch((err) => setError(err));
+      .catch(error => {
+        setErrors([{msg: error.message}])
+      })
   };
 
   return (
@@ -64,9 +74,17 @@ function NewExternalCoSupervisorForm(props) {
           onChange={handleChange}
         />
       </Form.Group>
-
+      {errors && (
+        <div className="alert alert-danger">
+          <ul>
+            {Object.values(errors).map((error, index) => (
+              <li key={index}> {error?.path ? error.path + ":" : ""} {error.msg}</li>
+            ))}
+          </ul>
+        </div>
+      )}
       <Button variant="primary" onClick={handleAddCoSupervisor}>
-        Add external Co-Supervisor
+        Add
       </Button>
     </Form>
   );
