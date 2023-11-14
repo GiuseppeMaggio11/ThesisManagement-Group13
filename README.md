@@ -42,7 +42,7 @@ Maggio Giuseppe 313346
 - Route `/`: Initial route. Unauthenticated users will not see anything in it.
 Authenticated users will see buttons to access the various routes
 - Route `/login`: Route containing the login form
-- Route `/proposals`: Route containing the list of all thesis proposals. It is accessible only to authenticated users and shows only basic information (title, supervisor and expiration date).
+- Route `/proposals`: Route containing the list of all thesis proposals relating to the degree of the logged-in student. It is accessible only to authenticated users and shows only basic information (title, supervisor and expiration date).
 It is possible to filter thesis proposals based on the content of a text field form
 
 
@@ -80,7 +80,7 @@ It is possible to filter thesis proposals based on the content of a text field f
 
 #### getThesisProposals
 
-- Description: Asks the server for the list of all thesis proposals relating to the degree of the student
+- Description: Asks the server for the list of all thesis proposals relating to the degree of the logged-in student
 - API server called: GET `/api/proposals`
 - Input: _None_
 - Output: A vector containing detailed information on all thesis proposals
