@@ -80,7 +80,7 @@ It is possible to filter thesis proposals based on the content of a text field f
 
 #### getThesisProposals
 
-- Description: Asks the server for the list of all thesis proposals
+- Description: Asks the server for the list of all thesis proposals relating to the degree of the student
 - API server called: GET `/api/proposals`
 - Input: _None_
 - Output: A vector containing detailed information on all thesis proposals
@@ -133,6 +133,6 @@ It is possible to filter thesis proposals based on the content of a text field f
 ## Main React Components
 
 - `SearchProposalComponent` (inside `SearchProposal.jsx`): It's a component that appears in the `/proposals` route.
-Starting from the list of thesis proposals obtained from the server, it builds a filtered list. The filter is a string that can be set in a special form on the same page. If the filtered list is empty, it shows a message, otherwise it builds a table containing a row for each thesis proposal. The table rows are constructed using the `ProposalTableRow` component present in the same file and contain only the basic information of a thesis proposals (title, supervisor and expiration date). To access all the data of a specific thesis proposal, the user need to click on its title.
+Starting from the list of thesis proposals obtained from the server, it builds a filtered list. The filter is a string that can be set in a special form on the same page. If the filtered list is empty, it shows a message, otherwise it builds a table containing a row for each thesis proposal. The table rows are constructed using the `ProposalTableRow` component present in the same file and contain only the basic information of a thesis proposals (title, supervisor and expiration date). To access all the data of a specific thesis proposal, the user needs to click on its title. If the device screen is very small, the list is replaced by an accordion. Each accordion item is buildt using the `ProposalAccordion` component and has the title of a proposal in the header and supervisor and expiration date in the body.
 
 ## Users Credentials
