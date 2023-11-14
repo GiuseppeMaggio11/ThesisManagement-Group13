@@ -79,16 +79,22 @@ async function applicationThesis(thesis_id, date) {
   )
 }
 
-async function sendFiles(formData) {
-  return getJson(fetch(URL + `/newFiles`, formData, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-    credentials: "include"
-  })
-  )
+async function sendFiles(formData, thesis_id) {
+  try {
+    const uploadURL = `${URL}/newFiles/${thesis_id}`;
+    
+    const response = await fetch(uploadURL, {
+      method: 'POST',
+      body: formData, // FormData object containing the files
+      credentials: 'include',
+    });
+
+    return await getJson(response);
+  } catch (error) {
+    return { error: 'Cannot communicate' };
+  }
 }
+
 
 async function getThesisProposals() {
   const response = await fetch(URL + "/proposals", {

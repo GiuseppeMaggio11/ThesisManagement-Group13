@@ -14,6 +14,7 @@ function ThesisPage(props) {
     const {handleErrors} = useContext(MessageContext)
     const [pageData, setPageData] = useState({})
     const [openPanel, setOpenPanel] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
     const [selectedFiles, setSelectedFiles] = useState([]);
     const isMobile = useMediaQuery({ maxWidth: 767 });
 
@@ -36,25 +37,26 @@ function ThesisPage(props) {
                     expiration: thesisData.expiration,
                     level: thesisData.thesis_level
                 })
+                setIsLoading(false)
             } catch (error){
                props.setError(true)
             }
         }
         init()
-        props.setLoading(false)
+       
     },[])
                 
     const handleApplication = () => {
-        submitApplication(pageData.id, props.virtualClock);
-        handleUpload();
+        //submitApplication(params.id, props.virtualClock);
+        handleUpload(params.id);
     }
 
-    const handleUpload = () => {
+    const handleUpload = (thesis_id) => {
         const formData = new FormData();
         for (let i = 0; i < selectedFiles.length; i++) {
-            formData.append(`file${i + 1}`, selectedFiles[i]);
+            formData.append(`file`, selectedFiles[i]);
         }
-        API.sendFiles(formData).then(
+        API.sendFiles(formData, thesis_id).then(
             () => { console.log("tutto ok") }
         ).catch((err) => { console.log(err) });
     }
@@ -72,7 +74,8 @@ function ThesisPage(props) {
     }
     return (
         <>
-            {props.loading ? <Loading /> : ""}
+            {isLoading ? <Loading /> :(
+            <>
             <Container className="navbarMargin">
                 <Table className="table-rounded">
                     <thead >
@@ -216,7 +219,8 @@ function ThesisPage(props) {
           
 
         </>
-    );
+    )}
+    </>)
 }
 
 export default ThesisPage;

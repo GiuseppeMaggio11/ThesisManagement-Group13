@@ -115,7 +115,7 @@ function App() {
             />
             {/*Others route here */}
 
-          <Route path='/application/:id' element={ loggedIn ? <ThesisPage loading={loading} virtualClock={virtualClock} setLoading={setLoading}/> :  <LoginForm
+          <Route path='/proposals/:id' element={ loggedIn ? <ThesisPage loading={loading} virtualClock={virtualClock} setLoading={setLoading}/> :  <LoginForm
                   loginSuccessful={loginSuccessful}
                   logOut={logOut}
                   loading={loading}

@@ -299,7 +299,7 @@ exports.isAlreadyExisting = async (studentID, thesisID) => {
     throw { error: "parameter is missing" };
   }
   const sql =
-    "SELECT COUNT(*) as count FROM application_table WHERE student_id = ? AND thesis_id = ?";
+    "SELECT COUNT(*) as count FROM application WHERE student_id = ? AND thesis_id = ?";
 
   return new Promise((resolve, reject) => {
     connection.query(sql, [studentID, thesisID], function (err, rows, fields) {
@@ -320,7 +320,7 @@ exports.newApply = async (studentID, ThesisID, date) => {
   const formattedDate = new Date(date).toISOString().slice(0, 19).replace('T', ' ');
   try {
     const sql =
-      "INSERT INTO application_table (student_id, thesis_id, status, application_date) VALUES (?, ?, ?, ?)";
+      "INSERT INTO application (student_id, thesis_id, status, application_date) VALUES (?, ?, ?, ?)";
 
     return new Promise((resolve, reject) => {
       connection.query(sql, [studentID, ThesisID, status, formattedDate], function (err, rows, fields) {

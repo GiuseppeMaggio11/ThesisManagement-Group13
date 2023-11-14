@@ -9,7 +9,7 @@ const cors = require("cors");
 const multer = require('multer');
 const LocalStrategy = require("passport-local").Strategy;
 const session = require("express-session");
-const fs=require('fs')
+const fs = require('fs')
 const zipdir = require('zip-dir');
 
 
@@ -66,7 +66,7 @@ const storage = multer.diskStorage({
       const userID = await dao.getUserID(req.user.username);
       const thesis_id = req.params.thesis_id;
       const userFolderPath = `studentFiles/${userID}/${thesis_id}`;
-      
+
       // Create directories recursively if they don't exist
       fs.mkdirSync(userFolderPath, { recursive: true });
 
@@ -154,10 +154,10 @@ app.get("/api/session/userinfo", (req, res) => {
 
 //GET PROPOSALS
 app.get("/api/proposals", isLoggedIn, async (req, res) => {
-  try{
+  try {
     const proposals = await dao.getProposals(req.user.user_type, req.user.username);
     res.status(200).json(proposals);
-  }catch(err){
+  } catch (err) {
     res.status(500).json({ error: ` error: ${err} ` });
   }
 });
@@ -187,15 +187,15 @@ app.post('/api/newApplication/:thesis_id', isStudent, async (req, res) => {
     }
     const userID = await dao.getUserID(req.user.username);
     const isValid = await dao.isThesisValid(thesis_id, date);
-      if(!isValid){
-        return res.status(422).json("This thesis is not valid")
-      }
+    if (!isValid) {
+      return res.status(422).json("This thesis is not valid")
+    }
     const existing = await dao.isAlreadyExisting(userID, thesis_id);
-      if(existing){
-        return res.status(422).json("You are already applied for this thesis")
-      }
+    if (existing) {
+      return res.status(422).json("You are already applied for this thesis")
+    }
     const result = await dao.newApply(userID, thesis_id, date);
- 
+
     res.status(200).send('Application created successfully');
   } catch (error) {
     res.status(500).send(error.message + ' ');
@@ -203,17 +203,28 @@ app.post('/api/newApplication/:thesis_id', isStudent, async (req, res) => {
 });
 
 
-app.post('/api/newFiles/:thesis_id', isStudent, async(req, res)=>{
-  upload.array('file', 10)(req, res, (err) => {
-    if (err instanceof multer.MulterError) {
-      res.status(500).send('Multer error');
-    } else if (err) {
-      res.status(500).send('An unexpected error occurred');
+app.post('/api/newFiles/:thesis_id', isStudent, async (req, res) => {
+  const thesis_id = req.params.thesis_id;
+  try {
+    if (!Number.isInteger(Number(thesis_id))) {
+      throw new Error('Thesis ID must be an integer');
     }
-    else{
-      res.status(200).send('files uploaded correctly')
-    }
-  })
+    upload.array('file', 10)(req, res, (err) => {
+      if (err instanceof multer.MulterError) {
+        res.status(422).send('Multer error');
+        console.log(err)
+      } else if (err) {
+        res.status(422).send('An unexpected error occurred');
+        console.log(err)
+      }
+      else {
+        res.status(200).send('files uploaded correctly')
+      }
+    })
+  }
+  catch (error) {
+    res.status(422).send(error);
+  }
 })
 
 

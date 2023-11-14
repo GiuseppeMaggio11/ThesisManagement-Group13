@@ -91,7 +91,7 @@ function FileDropModal({ showModal, closeModal, handleSave, setSelectedFiles, se
                     <Button className="button-style-cancel" onClick={closeModal}>
                         Cancel
                     </Button>
-                    <Button className="button-style" variant="primary"  onClick={()=>{handleSave; closeModal}}>
+                    <Button className="button-style" variant="primary"  onClick={()=>{handleSave(); closeModal()}}>
                         Save
                     </Button>
                 </Form>
