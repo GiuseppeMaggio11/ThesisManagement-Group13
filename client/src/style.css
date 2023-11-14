@@ -259,9 +259,19 @@ table.table-rounded thead tr {
   background-color: #f0f0f0;
 }
 
+/* Margin for tables and alerts - SearchProposal*/
+.margin-custom {
+  margin: 1rem;
+}
+
+/* Margin for Titles */
+.margin-titles-custom {
+  margin-bottom: 2rem;
+}
+
+/* Margin for Buttons */
 .margin-buttons-custom {
   margin-left: 1rem;
-  margin-right: 1rem;
 }
 
 @media (min-width: 765px) {
