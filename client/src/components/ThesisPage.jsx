@@ -47,7 +47,7 @@ function ThesisPage(props) {
     },[])
                 
     const handleApplication = () => {
-        //submitApplication(params.id, props.virtualClock);
+        submitApplication(params.id, props.virtualClock);
         handleUpload(params.id);
     }
 
