@@ -1,0 +1,32 @@
+####
+POST http://localhost:3001/api/session/login HTTP/1.1
+content-type: application/json
+
+{
+    "username": "mario.rossi@polito.it",
+    "password": "P123456"
+}
+
+######
+POST http://localhost:3001/api/session/login HTTP/1.1
+content-type: application/json
+
+{
+    "username": "luca.esposito@studenti.polito.it",
+    "password": "S123456"
+}
+
+######
+## Execute Log Out.
+DELETE http://localhost:3001/api/session/logout HTTP/1.1
+###
+
+
+###
+POST http://localhost:3001/api/newApply
+Content-Type: application/json
+
+{   
+    "thesis_id": 5
+}
+###

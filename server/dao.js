@@ -1,7 +1,8 @@
 "use strict";
 
-const crypto = require("crypto");
+//const crypto = require("crypto");
 const mysql = require("mysql2");
+const crypto = require("crypto");
 
 // open the database
 const dbConfig = {
@@ -41,6 +42,7 @@ exports.getUser = (email, password) => {
   });
 };
 
+
 exports.getUserByEmail = (email) => {
   return new Promise((resolve, reject) => {
     const sql = "SELECT * FROM users WHERE email = ?";
@@ -62,9 +64,31 @@ exports.getUserByEmail = (email) => {
   });
 };
 
+//retrive the UserID from teh username
+exports.getUserID = (username) => {
+  return new Promise((resolve, reject) => {
+    if (!username) {
+      reject({ error: "parameter is missing" });
+    }
+    const sql = "SELECT * FROM student WHERE email = ?";
+    connection.query(sql, [username], (error, results, fields) => {
+      if (error) {
+        console.error("Errore nella query getUserIDByEmail:", error);
+        reject(error);
+      } else if (results.length === 0) {
+        reject({ error: "User not found." });
+      } else {
+        const userRow = results[0];
+        resolve(userRow.id);
+      }
+    });
+  });
+};
+
+//Get proposals
 exports.getProposals = (user_type, username) => {
   return new Promise((resolve, reject) => {
-    var studentTitleDegree;
+    let studentTitleDegree;
     //all loged-in users can retrieve all the proposals. students can only retrieve thesis proposals which are intended for their degree
     if(user_type === 'STUD'){
       //check if the requested thesis degree is same to student's degree or not. if not, do not show anything to student
@@ -78,7 +102,7 @@ exports.getProposals = (user_type, username) => {
       });
     }
 
-    var finalResult;
+    let finalResult;
     //joining associated tables, to provide easily readable thesis proposal fields
     const sql = "select t.id, title, description, tch.name ,tch.surname , thesis_level ,thesis_type , required_knowledge , notes, expiration, keywords , dg.title_degree , g.group_name, d.department_name  , is_archived from thesis t join teacher tch on t.supervisor_id = tch.id join degree_table dg on t.cod_degree = dg.cod_degree join group_table g on tch.cod_group = g.cod_group join department d on tch.cod_department = d.cod_department";
     connection.query(sql, (error, results, fields) => {
@@ -87,7 +111,7 @@ exports.getProposals = (user_type, username) => {
       } else if (results.length === 0) {
         resolve({ error: "no entry" });
       } else {
-        var thesisFromSameDegreeOfStudent = results;
+        let thesisFromSameDegreeOfStudent = results;
         //if the user which made the request is a student, then we should show him only thesis which are offered inside student's degree
         if(user_type === 'STUD'){
           thesisFromSameDegreeOfStudent = results.filter(item => item.title_degree === studentTitleDegree);
@@ -107,7 +131,7 @@ exports.getProposals = (user_type, username) => {
 
         //4- split keywords from a single string into an array
         const splitKeywordsToArray = changeGroupValueToArray.map(item => {
-          var keywordsArray = [];
+          let keywordsArray = [];
           if (item.keywords !== null && item.keywords !== undefined){
              keywordsArray = item.keywords.split(',');
           }
@@ -164,6 +188,7 @@ exports.getProposals = (user_type, username) => {
   });
 };
 
+//Get proposal by id
 exports.getProposalById = (requested_thesis_id, user_type, username) => {
   return new Promise((resolve, reject) => {
     //all loged-in users can retrieve all the proposals. students can only retrieve thesis proposals which are intended for their degree
@@ -187,7 +212,7 @@ exports.getProposalById = (requested_thesis_id, user_type, username) => {
         }
       });
     }
-    var finalResult;
+    let finalResult;
     //joining associated tables, to provide easily readable thesis proposal fields
     const sql = "select t.id, title, description, tch.name ,tch.surname , thesis_level ,thesis_type , required_knowledge , notes, expiration, keywords , dg.title_degree , g.group_name, d.department_name  , is_archived from thesis t join teacher tch on t.supervisor_id = tch.id join degree_table dg on t.cod_degree = dg.cod_degree join group_table g on tch.cod_group = g.cod_group join department d on tch.cod_department = d.cod_department where t.id = ?";
     connection.query(sql, [requested_thesis_id], (error, results, fields) => {
@@ -200,7 +225,7 @@ exports.getProposalById = (requested_thesis_id, user_type, username) => {
 
         const changeGroupValueToArray = {...addcosupervisorsArrayToResult, group_name: [{group: addcosupervisorsArrayToResult.group_name, department: addcosupervisorsArrayToResult.department_name}]};
 
-        var keywordsArray = [];
+        let keywordsArray = [];
         if(changeGroupValueToArray.keywords !== null && changeGroupValueToArray.keywords !== undefined){
           keywordsArray = changeGroupValueToArray.keywords.split(',');
         }
@@ -244,10 +269,76 @@ exports.getProposalById = (requested_thesis_id, user_type, username) => {
     });
   });
 };
-process.on("exit", () => {
-  console.log("Closing db connection");
-  connection.end();
-});
+
+//returns true if the thesis is not expired or archived, otherwise true
+exports.isThesisValid = async (thesisID, date) => {
+  let formattedDate = new Date(date).toISOString().slice(0, 19).replace('T', ' ');
+
+  if (!thesisID) {
+    throw { error: "parameter is missing" };
+  }
+  const sql =
+    "SELECT * FROM thesis WHERE id = ? AND expiration>? AND is_archived = FALSE";
+  try {
+    const results = await connection.execute(sql, [thesisID, formattedDate]);
+
+    if (results.length === 0) {
+      return false;
+    } else {
+      return true;
+    }
+  } catch (error) {
+    console.error("Error in the query:", error);
+    throw error;
+  }
+};
+
+//returns false is the student is not already applied for a thesis,  otherwise true
+exports.isAlreadyExisting = async (studentID, thesisID) => {
+  if (!thesisID || !studentID) {
+    throw { error: "parameter is missing" };
+  }
+  const sql =
+    "SELECT COUNT(*) as count FROM application WHERE student_id = ? AND thesis_id = ?";
+
+  return new Promise((resolve, reject) => {
+    connection.query(sql, [studentID, thesisID], function (err, rows, fields) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows[0].count === 1);
+      }
+    });
+  });
+};
+
+
+
+// Function to create a new application
+exports.newApply = async (studentID, ThesisID, date) => {
+  const status = "pending";
+  const formattedDate = new Date(date).toISOString().slice(0, 19).replace('T', ' ');
+  try {
+    const sql =
+      "INSERT INTO application (student_id, thesis_id, status, application_date) VALUES (?, ?, ?, ?)";
+
+    return new Promise((resolve, reject) => {
+      connection.query(sql, [studentID, ThesisID, status, formattedDate], function (err, rows, fields) {
+        if (err) {
+          if (err.code === "ER_DUP_ENTRY") {
+            reject("You have already applied to this thesis.");
+          } else {
+            reject(err);
+          }
+        } else {
+          resolve(rows);
+        }
+      });
+    });
+  } catch (error) {
+    throw error;
+  }
+};
 
 // Creates a new thesis row in thesis table, must receive every data of thesis, returns newly created row, including autoicremented id ( used to add new rows in successive tables)
 exports.createThesis = (thesis) => {
@@ -472,3 +563,10 @@ exports.rollback = () => {
     });
   });
 };
+
+
+
+process.on("exit", () => {
+  console.log("Closing db connection");
+  connection.end();
+});

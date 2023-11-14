@@ -20,6 +20,7 @@
   .custom-navdropdown {
     max-width: 30%;
   }
+
 }
 
 /*Virtual clock*/
@@ -81,17 +82,183 @@
   padding: 5px;
 }
 
-/* Margin for tables and alerts */
-.margin-custom {
-  margin: 1rem;
+/*Loading*/
+.loader-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
 }
 
-/* Margin for Titles */
-.margin-titles-custom {
-  margin-bottom: 2rem;
+.navbarMargin {
+  margin-top: 1rem;
 }
 
-/* Margin for Buttons */
+.colorStyle {
+  color: white;
+}
+
+.footer_application {
+  color: black;
+  justify-content: space-between;
+}
+
+.margin_left_accordition {
+  margin-left: 2rem;
+}
+
+.button-apply {
+  text-align: end;
+  margin-right: 2em;
+}
+
+.confirmation_application_div {
+  width: 100%;
+}
+
+table.table-rounded {
+  border-radius: 30px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+table.table-rounded thead tr {
+  background-color: #4682B4 !important;
+  text-align: center;
+  color: #fff;
+  /* Specify your custom text color if needed */
+}
+
+.leftText {
+  padding-inline-start: 0.8rem;
+  font-weight: 680;
+}
+
+
+.table-footer {
+  text-align: left;
+  font-size: 13px;
+  margin-left: 2rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.button-apply {
+  margin-right: 1em;
+}
+
+
+.rightText {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.button-style {
+  background-color: #4682B4;
+  border-color: #4682B4;
+}
+
+.button-style-cancel {
+  background-color: #e19861;
+  border-color: #e19861;
+  margin-right: 0.5em;
+}
+
+.button-style-cancel:hover {
+  background-color: #f27e25;
+  border-color: #f27e25;
+  margin-right: 0.5em;
+}
+
+.button-style:hover {
+  background-color: #215884;
+  border-color: #215884;
+}
+
+.accordion-button {
+  padding: 0 !important;
+  vertical-align: middle;
+  font-weight: 680;
+}
+
+.accordion-item {
+  border: none;
+}
+
+.accordion-td {
+  vertical-align: middle;
+}
+
+.accordion-body {
+  vertical-align: middle;
+}
+
+.bold {
+  font-weight: 680;
+}
+
+.accordion-button:hover .accordion-button:focus {
+  box-shadow: white !important;
+  border-color: white !important;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: white !important;
+  border-color: white !important;
+  box-shadow: none !important;
+  color: rgb(0, 0, 0) !important;
+}
+
+.customLeftColumn {
+  width: 15%;
+  /* Adjust the width as needed */
+}
+
+.btn-outline-danger {
+  border-color: white !important;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 8px;
+  background-color: #fff;
+}
+
+.file-item span {
+  margin-right: 8px;
+}
+
+.file-name {
+  flex-grow: 1;
+}
+
+.drop-area {
+  border: 2px dashed #ccc;
+  border-radius: 4px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.drop-area:hover {
+  background-color: #f0f0f0;
+}
+
 .margin-buttons-custom {
   margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+@media (min-width: 765px) {
+  .title-mediumScreen {
+    margin-left: 2em;
+    margin-right: 2em;
+    border: 1px solid rgb(254, 252, 252);
+    /* Add a border for testing */
+  }
 }
