@@ -161,6 +161,11 @@ table.table-rounded thead tr {
   border-color: #4682B4;
 }
 
+.button-style:hover {
+  background-color: #215884;
+  border-color: #215884;
+}
+
 .button-style-cancel {
   background-color: #e19861;
   border-color: #e19861;
@@ -173,9 +178,14 @@ table.table-rounded thead tr {
   margin-right: 0.5em;
 }
 
-.button-style:hover {
-  background-color: #215884;
-  border-color: #215884;
+.link-style {
+  background-color: #ffffff;
+  border-color: #ffffff;
+}
+
+.link-style:active {
+  background-color: #4682B4;
+  border-color: #4682B4;
 }
 
 .accordion-button {
