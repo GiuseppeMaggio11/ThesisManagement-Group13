@@ -52,9 +52,10 @@ function FileDropModal({ showModal, closeModal, handleSave, setSelectedFiles, se
     return (
         <Modal show={showModal} onHide={closeModal}>
             <Modal.Header>
-                <Modal.Title>Select PDF Files</Modal.Title>
+                <Modal.Title>Are you sure to apply to this thesis?</Modal.Title>
             </Modal.Header>
             <Modal.Body>
+                <div>Upload all the files that the professor could need</div><br></br>
                 <div
                     className="drop-area"
                     onDragOver={handleDragOver}
@@ -77,8 +78,8 @@ function FileDropModal({ showModal, closeModal, handleSave, setSelectedFiles, se
                 <div style={{ marginTop: 5 }}>
                     {selectedFiles.map((file, index) => (
                         <div key={index} className="file-item">
-                            <FileEarmarkPdf /> {file.name}
-                            <Button variant="outline-danger" className="trash-btn" onClick={() => handleRemoveFile(index)}>
+                            <FileEarmarkPdf style={{marginRight:'0.5em'}}/> {file.name}
+                            <Button variant="outline-danger" className="trash-btn" style={{paddingBottom:'0.5em', marginLeft:'0.5em'}} onClick={() => handleRemoveFile(index)}>
                                 <Trash />
                             </Button>
                         </div>
@@ -87,10 +88,10 @@ function FileDropModal({ showModal, closeModal, handleSave, setSelectedFiles, se
             </Modal.Body>
             <Modal.Footer>
                 <Form>
-                    <Button variant="danger" onClick={closeModal}>
+                    <Button className="button-style-cancel" onClick={closeModal}>
                         Cancel
                     </Button>
-                    <Button variant="primary"  onClick={()=>{handleSave; closeModal}}>
+                    <Button className="button-style" variant="primary"  onClick={()=>{handleSave; closeModal}}>
                         Save
                     </Button>
                 </Form>

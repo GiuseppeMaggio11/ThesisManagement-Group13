@@ -106,6 +106,19 @@ table.table-rounded thead tr {
   border-color: #4682B4;
 }
 
+.button-style-cancel{
+  background-color: #e19861;
+  border-color: #e19861;
+  margin-right: 0.5em;
+}
+.button-style-cancel:hover{
+  background-color: #f27e25;
+  border-color: #f27e25;
+  margin-right: 0.5em;
+}
+
+
+
 .button-style:hover{
   background-color: #215884;
   border-color: #215884;
