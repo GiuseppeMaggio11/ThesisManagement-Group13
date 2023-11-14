@@ -111,11 +111,13 @@ app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
 });
 
+
+//CREATES NEW THESIS AND RELATED INT/EXTERNAL COSUPERVISORS
 app.post('/api/newThesis', isProfessor, [
   // Various checks of syntax of given data
   check('title').isLength({ min: 1, max: 100 }),
   check('supervisor_id').isLength({ min: 1, max: 7 }),
-  check('thesis_level').isIn(['Bachelor', 'Master']),
+  check('thesis_level').isIn(['Bachelor', 'Master', 'bachelor', 'master']),
   check('type_name').isLength({ min: 1, max: 50 }),
   check('expiration').isISO8601().toDate().withMessage("Date time must be in format YYYY-MM-DD HH:MM:SS"), // TODO check if given date is NOT earlier than today
   check('cod_degree').isLength({ min: 1, max: 10 }),
@@ -128,8 +130,10 @@ app.post('/api/newThesis', isProfessor, [
 
   try {
 
+    //inizio transazione
+    await dao.beginTransaction();
 
-    // ---Main supervisor is a teacher, check if given supervisor_id is in teacher table, if it isn't raise error   
+    // ---MAIN SUPEVISOR is a teacher, check if given supervisor_id is in teacher table, if it isn't raise error   
     //Get every teacher id from teacher table
     const teachers = await dao.getTeachers();
     //Check if given teacher id is in list
@@ -137,6 +141,7 @@ app.post('/api/newThesis', isProfessor, [
       return res.status(400).json({ error: `Supervisor_id: ${req.body.supervisor_id} is not a teacher` });
     }
 
+    // ---INTERNAL COSUPERVISOR is a teacher, check if given cosupervisors_internal id is in teacher table, if it isn't raise error   
     if (req.body.cosupervisors_internal != null) {
       for (const internal_cosupervisor of req.body.cosupervisors_internal) {
         if (!teachers.includes(internal_cosupervisor)) {
@@ -145,6 +150,7 @@ app.post('/api/newThesis', isProfessor, [
       }
     }
 
+    // ---EXTERNAL COSUPERVISOR is a teacher, check if given email in cosupervisors_external is in external_supervisor table, if it isn't raise error   
     const external_cosupervisors_emails = await dao.getExternal_cosupervisors_emails()
     if (req.body.cosupervisors_external != null) {
       for (const external_cosupervisor of req.body.cosupervisors_external) {
@@ -154,7 +160,7 @@ app.post('/api/newThesis', isProfessor, [
       }
     }
 
-    // ---Cod_degree should be an actual degree, must be in degree table
+    // ---DEGREE CODE should be an actual degree, must be in degree table
     //Get every cod_degree from degree_table table in db
     const degrees = await dao.getDegrees()
     //If given cod_degre si not in list raise error
@@ -162,7 +168,7 @@ app.post('/api/newThesis', isProfessor, [
       return res.status(400).json({ error: `Cod_degree: ${req.body.cod_degree} is not a valid degree code` });
     }
 
-    // --- Group_id should be and actual research group id, must be in group_table
+    // --- GROUP COD should be an actual research group id, must be in group_table
     // Get every cod_group from group_table table in db
     const codes_group = await dao.getCodes_group();
     // If given cod_group is not in list  raise error
@@ -183,7 +189,9 @@ app.post('/api/newThesis', isProfessor, [
       expiration: req.body.expiration,
       cod_degree: req.body.cod_degree,
       is_archived: req.body.is_archived,
-      keywords: req.body.keywords
+      keywords: req.body.keywords,
+      internal_cosupervisiors: req.body.cosupervisors_internal,
+      external_cosupervisiors: req.body.cosupervisors_external
     }
     //Insert new thesis in db
     const result_thesis = await dao.createThesis(thesis);
@@ -191,6 +199,7 @@ app.post('/api/newThesis', isProfessor, [
     //Create a new thesis_group row which links thesis to its research group
     const result_thesis_group = await dao.createThesis_group(result_thesis.id, req.body.cod_group);
 
+    //Create new rows which link thesis to interal cosupervisor
     if (req.body.cosupervisors_internal != null) {
       for (const internal_cosupervisor of req.body.cosupervisors_internal) {
         const result_cosupervisors_internal = [];
@@ -198,21 +207,30 @@ app.post('/api/newThesis', isProfessor, [
       }
     }
 
-
+    //Create new rows which link thesis to external cosupervisor
     if (req.body.cosupervisors_external != null) {
       for (const external_cosupervisor of req.body.cosupervisors_external) {
         const result_cosupervisors_external = [];
         result_cosupervisors_external.push(await dao.createThesis_cosupervisor_external(result_thesis.id, external_cosupervisor))
       }
     }
+
+    await dao.commit();
+
     //Return inserted data
     return res.json(result_thesis);
+
   } catch (err) {
+
+    //rollback if errors occur
+    await dao.rollback();
+
+    //return error
     return res.status(503).json({ error: ` error: ${err} ` });
   }
 });
 
-
+//RETURNS LIST OF EVERY EXTERNAL COSUPERVISORS
 app.get('/api/listExternalCosupervisors',
   isProfessor,
   (req, res) => {
@@ -222,7 +240,7 @@ app.get('/api/listExternalCosupervisors',
   }
 );
 
-
+//CREATES NEW EXTERNAL COSUPERVISOR 
 app.post('/api/newExternalCosupervisor', isProfessor, [
   // Various checks of syntax of given data
   check('email').isEmail(),
@@ -235,25 +253,34 @@ app.post('/api/newExternalCosupervisor', isProfessor, [
   }
 
   try {
+    //begin new transaction
+    await dao.beginTransaction();
 
+    //check if new external cosupervisor is already in db
     const external_cosupervisors_emails = await dao.getExternal_cosupervisors_emails()
     if (external_cosupervisors_emails.includes(req.body.email)) {
       return res.status(400).json({ error: `External cosupervisor email: ${req.body.email} is already present in db` });
     }
 
-  //Create external_cosupervisor object which contains data from front end
-  const external_cosupervisor = {
-    name: req.body.name,
-    surname: req.body.surname,
-    email: req.body.email
+    //Create external_cosupervisor object which contains data from front end
+    const external_cosupervisor = {
+      name: req.body.name,
+      surname: req.body.surname,
+      email: req.body.email
+    }
+    //Insert new cosupervisor in db
+    const result_external_cosupervisor = await dao.create_external_cosupervisor(external_cosupervisor);
+
+    //commit transaction
+    await dao.commit();
+
+    //Return inserted data
+    return res.json(result_external_cosupervisor);
+    
+  } catch (err) {
+    //rolback if error occurs
+    await dao.rollback();
+    //return error code
+    return res.status(503).json({ error: ` error: ${err} ` });
   }
-  //Insert new cosupervisor in db
-  const result_external_cosupervisor = await dao.create_external_cosupervisor(external_cosupervisor);
-
-
-  //Return inserted data
-  return res.json(result_external_cosupervisor);
-} catch (err) {
-  return res.status(503).json({ error: ` error: ${err} ` });
-}
 });

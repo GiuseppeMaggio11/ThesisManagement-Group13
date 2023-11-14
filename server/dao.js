@@ -218,6 +218,7 @@ exports.getExternal_cosupervisors = () => {
   });
 };
 
+//return every email of external cosupervisors
 exports.getExternal_cosupervisors_emails = () => {
   return new Promise((resolve, reject) => {
     const sql =
@@ -238,6 +239,7 @@ exports.getExternal_cosupervisors_emails = () => {
   });
 };
 
+// create new external cosuper visor
 exports.create_external_cosupervisor = (external_cosupervisor) => {
   return new Promise((resolve, reject) => {
     const sql = 'INSERT INTO external_supervisor (email, surname, name) VALUES (?,?,?)';
@@ -246,6 +248,45 @@ exports.create_external_cosupervisor = (external_cosupervisor) => {
         reject(err);
       }
       resolve(external_cosupervisor);
+    });
+  });
+};
+
+//begin transaction function
+exports.beginTransaction = () => {
+  return new Promise((resolve, reject) => {
+    connection.beginTransaction((err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
+};
+
+//commit function for transactions
+exports.commit = () => {
+  return new Promise((resolve, reject) => {
+    connection.commit((err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
+};
+
+//rollback function for transactions
+exports.rollback = () => {
+  return new Promise((resolve, reject) => {
+    connection.rollback((err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
     });
   });
 };

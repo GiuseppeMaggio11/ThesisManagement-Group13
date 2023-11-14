@@ -15,10 +15,10 @@ POST http://localhost:3001/api/newThesis
 Content-Type: application/json
 
 {   
-    "title": "Test title",
+    "title": "Test ERROR2",
     "description": "Test description",
     "supervisor_id":"P123456",
-    "thesis_level": "bachelor",
+    "thesis_level": "Bachelor",
     "type_name": "Test type_name2",
     "required_knowledge": " Test required_knowledge",
     "notes": " test noted",
@@ -38,7 +38,7 @@ POST http://localhost:3001/api/newExternalCosupervisor
 Content-Type: application/json
 
 {   
-    "email": "testmail@mail.org",
+    "email": "testmai22222222l@mail.org",
     "name":"testname",
     "surname":"testsurname"
     
