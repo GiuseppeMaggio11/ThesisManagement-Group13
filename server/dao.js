@@ -271,14 +271,16 @@ exports.getProposalById = (requested_thesis_id, user_type, username) => {
 };
 
 //returns true if the thesis is not expired or archived, otherwise true
-exports.isThesisValid = async (thesisID) => {
+exports.isThesisValid = async (thesisID, date) => {
+  let formattedDate = new Date(date).toISOString().slice(0, 19).replace('T', ' ');
+
   if (!thesisID) {
     throw { error: "parameter is missing" };
   }
   const sql =
-    "SELECT * FROM thesis WHERE id = ? AND expiration > NOW() AND is_archived = FALSE";
+    "SELECT * FROM thesis WHERE id = ? AND expiration>? AND is_archived = FALSE";
   try {
-    const results = await connection.execute(sql, [thesisID]);
+    const results = await connection.execute(sql, [thesisID, formattedDate]);
 
     if (results.length === 0) {
       return false;
@@ -297,7 +299,7 @@ exports.isAlreadyExisting = async (studentID, thesisID) => {
     throw { error: "parameter is missing" };
   }
   const sql =
-    "SELECT COUNT(*) as count FROM application WHERE student_id = ? AND thesis_id = ?";
+    "SELECT COUNT(*) as count FROM application_table WHERE student_id = ? AND thesis_id = ?";
 
   return new Promise((resolve, reject) => {
     connection.query(sql, [studentID, thesisID], function (err, rows, fields) {
@@ -311,16 +313,17 @@ exports.isAlreadyExisting = async (studentID, thesisID) => {
 };
 
 
-// Function to create a new application
-exports.newApply = async (studentID, ThesisID) => {
-  const status = "pending";
 
+// Function to create a new application
+exports.newApply = async (studentID, ThesisID, date) => {
+  const status = "pending";
+  const formattedDate = new Date(date).toISOString().slice(0, 19).replace('T', ' ');
   try {
     const sql =
-      "INSERT INTO application (student_id, thesis_id, status, application_date) VALUES (?, ?, ?, ?)";
+      "INSERT INTO application_table (student_id, thesis_id, status, application_date) VALUES (?, ?, ?, ?)";
 
     return new Promise((resolve, reject) => {
-      connection.query(sql, [studentID, ThesisID, status, new Date()], function (err, rows, fields) {
+      connection.query(sql, [studentID, ThesisID, status, formattedDate], function (err, rows, fields) {
         if (err) {
           if (err.code === "ER_DUP_ENTRY") {
             reject("You have already applied to this thesis.");

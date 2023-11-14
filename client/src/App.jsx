@@ -22,7 +22,7 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [virtualClock, setVirtualClock] = useState(new Date());
   const [message, setMessage] = useState('');
-
+  const [error, setError] = useState('')
    // If an error occurs, the error message will be shown in a toast.
    const handleErrors = (err) => {
     let msg = '';
@@ -115,12 +115,13 @@ function App() {
             />
             {/*Others route here */}
 
-            <Route path='/proposals/:id' element={ loggedIn ? <ThesisPage loading={loading}/> :  <LoginForm
-                    loginSuccessful={loginSuccessful}
-                    logOut={logOut}
-                    loading={loading}
-                    setLoading={setLoading}
-                  />}></Route>
+          <Route path='/application/:id' element={ loggedIn ? <ThesisPage loading={loading} virtualClock={virtualClock} setLoading={setLoading}/> :  <LoginForm
+                  loginSuccessful={loginSuccessful}
+                  logOut={logOut}
+                  loading={loading}
+                  setLoading={setLoading}
+                  
+                />}></Route>
 
             {/*Leave DefaultRoute as last route */}
             <Route path="/*" element={<DefaultRoute />} />

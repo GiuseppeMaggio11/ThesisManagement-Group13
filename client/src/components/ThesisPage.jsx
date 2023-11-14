@@ -1,11 +1,13 @@
-import { Container, Table, Accordion, Button, Modal, Form} from "react-bootstrap";
-import { useEffect, useState, useContext } from "react";
+import { Container, Table, Accordion, Button, Modal, Form, Row, Col} from "react-bootstrap";
 import { useParams} from 'react-router-dom';
+import React, { useEffect, useState, useContext } from "react";
 import API from '../API';
 import MessageContext from '../messageCtx'
 import 'bootstrap-icons/font/bootstrap-icons.css';
-
+import '../style.css'
+import { useMediaQuery } from 'react-responsive';
 import Loading from "./Loading";
+import FileDropModal from './FileModal';
 
 function ThesisPage(props) {
     const params = useParams();
@@ -13,26 +15,12 @@ function ThesisPage(props) {
     const [pageData, setPageData] = useState({})
     const [openPanel, setOpenPanel] = useState(false)
     const [selectedFiles, setSelectedFiles] = useState([]);
-
-    const handleFileChange = (e) => {
-        const newFiles = Array.from(e.target.files);
-
-        // Filter only pdf's files
-        const pdfFiles = newFiles.filter(file => file.type === 'application/pdf');
-
-        // Add the new file
-        setSelectedFiles(prevFiles => [...prevFiles, ...pdfFiles]);
-    };
-
-    const handleRemoveFile = (index) => {
-        const newFiles = [...selectedFiles];
-        newFiles.splice(index, 1);
-        setSelectedFiles(newFiles);
-    };
+    const isMobile = useMediaQuery({ maxWidth: 767 });
 
     useEffect(()=>{
         const init = async() => {
             try{
+                props.setLoading(true)
                 const thesisData = await API.getThesisProposalsById(params.id);
                 //GESTIRE PROBLEMI
                 setPageData({
@@ -44,174 +32,191 @@ function ThesisPage(props) {
                     type: thesisData.thesis_type,
                     groups: thesisData.group_name.map((element)=>{return element.group}),
                     requiredKnowledge: thesisData.requiredKnowledge,
-                    description: thesisData.description,
                     ...(thesisData.notes !== 'None' && { notes: thesisData.notes }),
                     expiration: thesisData.expiration,
                     level: thesisData.thesis_level
                 })
             } catch (error){
-                
+               props.setError(true)
             }
         }
         init()
-        // setLoading(false)
+        props.setLoading(false)
     },[])
-    
-    const handleApplication = (event) => {
-        event.preventDefault();
-        submitApplication(params.id);
+                
+    const handleApplication = () => {
+        submitApplication(pageData.id, props.virtualClock);
+        handleUpload();
     }
 
-    const submitApplication = (idThesis) => {
-        API.applicationThesis(idThesis).then(
-            ()=>{console.log("tutto ok")}
-        ).catch((err)=>{
-            handleErrors(err)}
-        );
+    const handleUpload = () => {
+        const formData = new FormData();
+        for (let i = 0; i < selectedFiles.length; i++) {
+            formData.append(`file${i + 1}`, selectedFiles[i]);
+        }
+        API.sendFiles(formData).then(
+            () => { console.log("tutto ok") }
+        ).catch((err) => { console.log(err) });
+    }
+
+    const closeModal=()=>{
+            setOpenPanel(false)
+            setSelectedFiles([])
+    }
+
+
+    const submitApplication = (idThesis, date) => {
+        API.applicationThesis(idThesis, date).then(
+            () => { console.log("tutto ok") }
+        ).catch((err) => { handleErrors(err)});
     }
     return (
-      <>
-        {props.loading ? <Loading /> : ""}
-        <Container>
-            <Table striped className="navbarMargin">
-                <thead class="head_tableApplication">
-                    <tr class="colorStyle">
-                        {pageData.title}
-                    </tr>
-                </thead>
-                <tbody>
-                   <tr>
-                    <Accordion defaultActiveKey={['0','3','5','6']} alwaysOpen>
-                       
-                        <Accordion.Item eventKey="0">
-                            <Accordion.Header>SUPERVISOR</Accordion.Header>
-                            <Accordion.Body className="margin_left_accordition">
-                                {pageData.supervisor}
-                            </Accordion.Body>
-                        </Accordion.Item>
-                        
-                        { pageData.coSupervisor && 
-                        <Accordion.Item eventKey="1">
-                            <Accordion.Header>CO-SUPERVISOR</Accordion.Header>
-                            <Accordion.Body className="margin_left_accordition">
-                                {pageData.coSupervisor.map((name, index)=>{
-                                    if(index === pageData.coSupervisor.length -1){
-                                        return name.toUpperCase()
-                                    }
-                                    return name.toUpperCase().concat(", ")})}
-                            </Accordion.Body>
-                        </Accordion.Item>
-                        }
-                        { pageData.keywords && 
-                        <Accordion.Item eventKey="2">
-                            <Accordion.Header>KEY WORDS</Accordion.Header>
-                            <Accordion.Body className="margin_left_accordition">
-                                {pageData.keywords.map((element, index) => {
-                                    if(index === pageData.keywords.length -1) {
-                                        return <u key={index}> {element.toUpperCase()} </u>
-                                    }
-                                    return <u key={index}> {element.toUpperCase().concat(", ")} </u>})}
-                            </Accordion.Body>
-                        </Accordion.Item>
-                        }
-                        <Accordion.Item eventKey="3">
-                            <Accordion.Header>TYPE</Accordion.Header>
-                            <Accordion.Body className="margin_left_accordition">
-                                {pageData.type}
-                            </Accordion.Body>
-                        </Accordion.Item>
-                        {pageData.groups && 
-                            <Accordion.Item eventKey="4">
-                                <Accordion.Header>GROUPS</Accordion.Header>
-                                <Accordion.Body className="margin_left_accordition">
-                                    {pageData.groups.map((name, index)=>{
-                                        if(index === pageData.groups.length -1){
-                                            return name.toUpperCase()
-                                        }
-                                        return name.toUpperCase().concat(", ")})}
-                                </Accordion.Body>
-                            </Accordion.Item> 
-                        }
-                        <Accordion.Item eventKey="5">
-                            <Accordion.Header>DESCRIPTION</Accordion.Header>
-                            <Accordion.Body className="margin_left_accordition">
-                                {pageData.description}
-                            </Accordion.Body>
-                        </Accordion.Item>
-                        {pageData.requiredKnowledge && 
-                            <Accordion.Item eventKey="6">
-                                <Accordion.Header>REQUIRED KNOWLEDGE</Accordion.Header>
-                                <Accordion.Body className="margin_left_accordition">
-                                    {pageData.requiredKnowledge.map((name, index)=>{
-                                        if(index === pageData.groups.length -1){
-                                            return name.toUpperCase()
-                                        }
-                                        return name.toUpperCase().concat(", ")})}
-                                </Accordion.Body>
-                            </Accordion.Item> 
-                        }
-                        {pageData.notes && 
-                            <Accordion.Item eventKey="7">
-                                <Accordion.Header>NOTES</Accordion.Header>
-                                <Accordion.Body className="margin_left_accordition">
-                                    {pageData.notes}
-                                </Accordion.Body>
-                            </Accordion.Item> 
-                        }
-                    </Accordion>
-                   </tr>
-                    <tr class="footer_application">
-                        Experation: {pageData.expiration} Level: {pageData.level}
-                    </tr>
-                    <td>
-                        <div className="button-apply">
-                            <Button variant="success" onClick={()=>setOpenPanel(true)}>APPLY</Button>
-                        </div>
-                    </td>
-                </tbody>
-            </Table>
-        </Container>
-        <Modal show={openPanel}>
-            <Modal.Header>
-                <Modal.Title>Application confirm</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-            <div>
-                <label htmlFor="fileInput">Select PDF files that supervisor has to considering in your application:</label>
-                <input
-                type="file"
-                id="fileInput"
-                accept=".pdf"
-                onChange={handleFileChange}
-                multiple 
-                />
-            </div>
-            <div>
-                {selectedFiles.map((file, index) => (
-                <div key={index}>
-                    {file.name}
-                    <Button variant="outline-danger"onClick={() => handleRemoveFile(index)}>
-                        <i class="bi bi-x-circle"></i>
-                    </Button>
-                </div>
-                ))}
-            </div>
-            </Modal.Body>
-            <Modal.Footer>
-                <div className="confirmation_application_div">Confirm application for {pageData.title} thesis?</div>
-            <Form onSubmit={handleApplication}>
-                <Button variant="danger" onClick={()=>setOpenPanel(false)}>
-                    Cancel
-                </Button>
-                <Button variant="primary" type="submit">
-                    Apply
-                </Button>
-            </Form>
-            </Modal.Footer>
-        </Modal>
-        
-      </>
-    );
-  }
+        <>
+            {props.loading ? <Loading /> : ""}
+            <Container className="navbarMargin">
+                <Table className="table-rounded">
+                    <thead >
+                        <tr>
+                            <th colSpan="6" className="title-mediumScreen" >{pageData.title}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {pageData.supervisor && (
+                            <tr>
+                                <td colSpan="2" className="leftText customLeftColumn"> Supervisor</td>
+                                <td className="rightText">{pageData.supervisor}</td>
+                            </tr>
+                        )}
 
-  export default ThesisPage;
+                        {pageData.coSupervisor.length > 1 && (
+                            <tr>
+                                <td colSpan="2" className="leftText customLeftColumn">Co-Supervisors</td>
+                                <td className="rightText">{pageData.coSupervisor.join(', ')}</td>
+                            </tr>
+                        )}
+
+                        {pageData.coSupervisor.lengt == 1 && (
+                            <tr>
+                                <td colSpan="2" className="leftText customLeftColumn">Co-Supervisor</td>
+                                <td className="rightText">{pageData.coSupervisor.join(', ')}</td>
+                            </tr>
+                        )}
+
+                        {pageData.keywords && (
+                            <tr>
+                                <td colSpan="2" className="leftText customLeftColumn">Keywords</td>
+                                <td className="rightText">
+                                    {pageData.keywords.map((element, index) => (
+                                        <React.Fragment key={index}>
+                                            {index !== 0 && <span>, </span>}
+                                            <u>{element}</u>
+                                        </React.Fragment>
+                                    ))}
+                                </td>
+                            </tr>
+                        )}
+
+                        <tr>
+                            <td colSpan="2" className="leftText customLeftColumn">Type</td>
+                            <td className="rightText">{pageData.type}</td>
+                        </tr>
+
+                        {pageData.groups && (
+                            <tr>
+                                <td colSpan="2" className="leftText customLeftColumn">Groups</td>
+                                <td className="rightText">{pageData.groups.join(', ')}</td>
+                            </tr>
+                        )}
+                        {!isMobile && pageData.description && (
+                            <tr>
+                                <td colSpan="2" className="leftText customLeftColumn">Description</td>
+                                <td className="rightText">{pageData.description}</td>
+                            </tr>
+                        )}
+
+                        {isMobile && pageData.description && (
+                            <tr>
+                                <td colSpan="3" className="accordion-td">
+                                    <Accordion defaultActiveKey="1">
+                                        <Accordion.Item eventKey="0">
+                                            <Accordion.Header>Description</Accordion.Header>
+                                            <Accordion.Body>
+                                                {pageData.description}
+                                            </Accordion.Body>
+                                        </Accordion.Item>
+                                    </Accordion>
+                                </td>
+                            </tr>
+                        )}
+
+                        {pageData.requiredKnowledge && (
+                            <tr>
+                                <td colSpan="2" className="leftText customLeftColumn">Required Knowledge</td>
+                                <td className="rightText">{pageData.requiredKnowledge.join(', ')}</td>
+                            </tr>
+                        )}
+
+                        {!isMobile && pageData.notes && (
+                            <tr>
+                                <td colSpan="2" className="leftText customLeftColumn">Notes</td>
+                                <td className="rightText">{pageData.notes}</td>
+                            </tr>
+                        )}
+                        {isMobile && pageData.notes && (
+                            <tr>
+                                <td colSpan="3" className="accordion-td">
+                                    <Accordion defaultActiveKey="1">
+                                        <Accordion.Item eventKey="0">
+                                            <Accordion.Header>Notes</Accordion.Header>
+                                            <Accordion.Body>
+                                                {pageData.notes}
+                                            </Accordion.Body>
+                                        </Accordion.Item>
+                                    </Accordion>
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colSpan="3" className="text-center table-footer">
+                                <Row className="justify-content-between">
+                                    <Col>
+                                        <div className="table-footer">
+                                            <span className="bold">{pageData.level}</span><span> thesis</span>
+                                        </div>
+                                        <div className="table-footer">
+                                            <span>Valid until</span><span className="bold"> {pageData.expired}</span>
+                                        </div>
+                                    </Col>
+                                    <Col>
+                                        <div className="button-apply">
+                                            <Button className="button-style" onClick={() => setOpenPanel(true)}>
+                                                APPLY
+                                            </Button>
+                                        </div>
+                                    </Col>
+                                </Row>
+                            </td>
+                        </tr>
+                    </tfoot>
+
+                </Table>
+            </Container>
+             
+                <FileDropModal
+                    showModal={openPanel}
+                    closeModal={closeModal}
+                    handleSave={() => {
+                        handleApplication();
+                    }}
+                    setSelectedFiles={setSelectedFiles}
+                    selectedFiles={selectedFiles}
+                />
+          
+
+        </>
+    );
+}
+
+export default ThesisPage;
