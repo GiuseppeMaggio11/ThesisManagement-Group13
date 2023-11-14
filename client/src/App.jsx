@@ -96,11 +96,12 @@ function App() {
           />
           {/*Others route here */}
 
-          <Route path='/application/:id' element={ loggedIn ? <UserApplication loading={loading}/> :  <LoginForm
+          <Route path='/application/:id' element={ loggedIn ? <UserApplication loading={loading} virtualClock={virtualClock}/> :  <LoginForm
                   loginSuccessful={loginSuccessful}
                   logOut={logOut}
                   loading={loading}
                   setLoading={setLoading}
+                  
                 />}></Route>
 
           {/*Leave DefaultRoute as last route */}

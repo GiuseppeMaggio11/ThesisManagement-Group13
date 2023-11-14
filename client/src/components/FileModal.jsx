@@ -86,11 +86,11 @@ function FileDropModal({ showModal, closeModal, handleSave, setSelectedFiles, se
                 </div>
             </Modal.Body>
             <Modal.Footer>
-                <Form onSubmit={handleSave}>
+                <Form>
                     <Button variant="danger" onClick={closeModal}>
                         Cancel
                     </Button>
-                    <Button variant="primary" type="submit">
+                    <Button variant="primary"  onClick={()=>{handleSave; closeModal}}>
                         Save
                     </Button>
                 </Form>

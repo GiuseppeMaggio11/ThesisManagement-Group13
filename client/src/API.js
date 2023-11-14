@@ -39,12 +39,15 @@ async function getUserInfo() {
   }
 }
 
-async function applicationThesis (thesis_id) {
-  const response = await fetch(URL + `/newApplication/${thesis_id}`, {
+async function applicationThesis (thesis_id, date) {
+ const response = await fetch(URL + `/newApplication/${thesis_id}`, {
     method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify({
+        date: date
+      }),
     credentials: "include"
   });
 
@@ -52,7 +55,7 @@ async function applicationThesis (thesis_id) {
     return ;
   } else {
     throw  response.errDetail;
-  }
+  } 
 }
 
 async function sendFiles (formData) {
@@ -71,5 +74,5 @@ async function sendFiles (formData) {
   }
 }
 
-const API = { logIn, logOut, getUserInfo, applicationThesis};
+const API = { logIn, logOut, getUserInfo, applicationThesis, sendFiles};
 export default API;

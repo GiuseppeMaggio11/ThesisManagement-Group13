@@ -62,30 +62,30 @@ passport.deserializeUser((username, done) => {
 
 const storage = multer.diskStorage({
   destination: async (req, file, cb) => {
-    try{
-    const userID = await dao.getUserID(req.user.username);
-    console.log(userID)
-    const userFolderPath = `studentsFiles/${userID}`;
-    console.log(userFolderPath)
-    fs.mkdirSync(userFolderPath, { recursive: true });
+    try {
+      const userID = await dao.getUserID(req.user.username);
+      const thesis_id = req.params.thesis_id;
+      const userFolderPath = `studentFiles/${userID}/${thesis_id}`;
+      
+      // Create directories recursively if they don't exist
+      fs.mkdirSync(userFolderPath, { recursive: true });
 
-    cb(null, userFolderPath);
-  }
-    catch(error){
-      throw new Error(error)
+      cb(null, userFolderPath);
+    } catch (error) {
+      cb(error);
     }
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = file.originalname
+    const uniqueSuffix = file.originalname;
     let filename;
-    if(uniqueSuffix.endsWith('.pdf')){
-      filename=uniqueSuffix
+
+    if (uniqueSuffix.endsWith('.pdf')) {
+      filename = uniqueSuffix;
+    } else {
+      filename = uniqueSuffix + '.pdf';
     }
-    else {
-      filename = uniqueSuffix+'.pdf'
-    }
-    filename=filename.replace(/\s/g, "_");
-    console.log(filename)
+
+    filename = filename.replace(/\s/g, "_");
     cb(null, filename);
   }
 });
@@ -153,14 +153,14 @@ app.get("/api/session/userinfo", (req, res) => {
 /***API***/
 app.post('/api/newApplication/:thesis_id', isStudent, async (req, res) => {
   const thesis_id = req.params.thesis_id; // Extract thesis_id from the URL
-  console.log('thesis_id ' + thesis_id);
-
+  const date = req.body.date
+  console.log(date)
   try {
     if (!Number.isInteger(Number(thesis_id))) {
       throw new Error('Thesis ID must be an integer');
     }
     const userID = await dao.getUserID(req.user.username);
-    const isValid = await dao.isThesisValid(thesis_id);
+    const isValid = await dao.isThesisValid(thesis_id, date);
       if(!isValid){
         return res.status(422).json("This thesis is not valid")
       }
@@ -168,8 +168,8 @@ app.post('/api/newApplication/:thesis_id', isStudent, async (req, res) => {
       if(existing){
         return res.status(422).json("You are already applied for this thesis")
       }
-    const result = await dao.newApply(userID, thesis_id);
-
+    const result = await dao.newApply(userID, thesis_id, date);
+ 
     res.status(200).send('Application created successfully');
   } catch (error) {
     res.status(500).send(error.message + ' ');
@@ -177,7 +177,7 @@ app.post('/api/newApplication/:thesis_id', isStudent, async (req, res) => {
 });
 
 
-app.post('/api/newFiles', isStudent, async(req, res)=>{
+app.post('/api/newFiles/:thesis_id', isStudent, async(req, res)=>{
   upload.array('file', 10)(req, res, (err) => {
     if (err instanceof multer.MulterError) {
       res.status(500).send('Multer error');
@@ -191,16 +191,27 @@ app.post('/api/newFiles', isStudent, async(req, res)=>{
 })
 
 
-app.get('/api/getAllFiles/:student_id', isProfessor, async (req, res) => {
+app.get('/api/getAllFiles/:student_id/:thesis_id', isProfessor, async (req, res) => {
   try {
     const studentID = req.params.student_id;
-    const userFolderPath = `studentsFiles/${studentID}`;
+    const thesisID = req.params.thesis_id;
+    const userFolderPath = `studentFiles/${studentID}/${thesisID}`;
+    const zipFilePath = `studentFiles/${studentID}/${thesisID}/student_files_${studentID}.zip`;
 
-    zipdir(userFolderPath, { saveTo: `studentsFiles/student_files_${studentID}.zip` }, function (err, buffer) {
+    zipdir(userFolderPath, { saveTo: zipFilePath }, function (err, buffer) {
       if (err) {
         res.status(500).send('An error occurred while creating the zip archive.');
       } else {
-        res.download(`studentsFiles/student_files_${studentID}.zip`);
+        res.download(zipFilePath, () => {
+          // Delete the file after the download is complete
+          fs.unlink(zipFilePath, (err) => {
+            if (err) {
+              console.error('Error deleting the zip file:', err);
+            } else {
+              console.log('Zip file deleted successfully.');
+            }
+          });
+        });
       }
     });
   } catch (error) {
@@ -208,11 +219,11 @@ app.get('/api/getAllFiles/:student_id', isProfessor, async (req, res) => {
   }
 });
 
-
-app.get('/api/getStudentFilesList/:student_id', isProfessor, async (req, res) => {
+app.get('/api/getStudentFilesList/:student_id/:thesis_id', isProfessor, async (req, res) => {
   try {
     const studentID = req.params.student_id;
-    const userFolderPath = `studentsFiles/${studentID}`;
+    const thesisID = req.params.thesis_id;
+    const userFolderPath = `studentFiles/${studentID}/${thesisID}`;
 
     fs.readdir(userFolderPath, (err, files) => {
       if (err) {
@@ -227,11 +238,12 @@ app.get('/api/getStudentFilesList/:student_id', isProfessor, async (req, res) =>
   }
 });
 
-app.get('/api/getFile/:student_id/:file_name', isProfessor, async (req, res) => {
+app.get('/api/getFile/:student_id/:thesis_id/:file_name', isProfessor, async (req, res) => {
   try {
     const studentID = req.params.student_id;
+    const thesisID = req.params.thesis_id;
     const fileName = req.params.file_name;
-    const filePath = `studentsFiles/${studentID}/${fileName}`;
+    const filePath = `studentFiles/${studentID}/${thesisID}/${fileName}`;
 
     fs.access(filePath, fs.constants.F_OK, (err) => {
       if (err) {

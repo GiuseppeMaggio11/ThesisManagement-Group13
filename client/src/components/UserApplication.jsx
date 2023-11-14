@@ -6,6 +6,7 @@ import '../style.css'
 import { useMediaQuery } from 'react-responsive';
 import Loading from "./Loading";
 import FileDropModal from './FileModal';
+import VirtualClock from "./VirtualClock";
 
 function UserApplication(props) {
     const [pageData, setPageData] = useState({
@@ -37,11 +38,9 @@ function UserApplication(props) {
         // setLoading(false)
     }, [])
 
-    const handleApplication = (event) => {
-        event.preventDefault();
-        submitApplication(pageData.id);
+    const handleApplication = () => {
+        submitApplication(pageData.id, props.virtualClock);
         handleUpload();
-       
     }
 
     const handleUpload = () => {
@@ -60,8 +59,8 @@ function UserApplication(props) {
         }
 
 
-    const submitApplication = (idThesis) => {
-        API.applicationThesis(idThesis).then(
+    const submitApplication = (idThesis, date) => {
+        API.applicationThesis(idThesis, date).then(
             () => { console.log("tutto ok") }
         ).catch((err) => { console.log(err) });
     }
