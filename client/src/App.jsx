@@ -110,7 +110,9 @@ function App() {
             element={<SearchProposalRoute 
               error={error} 
               resetError={() => setError("")} 
-              handleError={handleError} loading={loading}
+              handleError={handleError} 
+              loading={loading}
+              setLoading={setLoading}
               />
             }
           />

@@ -16,11 +16,13 @@ function SearchProposalRoute(props) {
     const isMobile = useMediaQuery({ maxWidth: 767 });
 
     useEffect(() => {
+        props.setLoading(true);
         //if (dirtyThesisProposals) {
         API.getThesisProposals()
             .then((list) => {
                 setThesisProposals(list);
                 //setDirtyThesisProposals(false);
+                props.setLoading(false);
             })
             .catch((err) => props.handleError(err))
         //}
