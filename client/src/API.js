@@ -39,6 +39,66 @@ async function getUserInfo() {
   }
 }
 
+async function newProposal(thesis) {
+  const response = await fetch(URL + "/newThesis", {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(thesis),
+  });
+  if (response.ok) {
+    const newProposal = await response.json();
+    return newProposal;
+  } else if (response.status == "422") {
+    const errors = await response.json();
+    return errors.errors;
+  } else {
+    const error = await response.json();
+    throw Error(error.error);
+  }
+}
+
+async function getListExternalCosupervisors() {
+  try {
+    const response = await fetch(URL + "/listExternalCosupervisors", {
+      method: "GET",
+      credentials: "include",
+    });
+    const list = await response.json();
+    if (response.ok) {
+      return list;
+    } else {
+      const error = await response.json();
+      throw Error(error.error);
+      }
+  } catch (err) {
+    throw Error(err.error);
+  }
+}
+
+async function newExternalCosupervisor(external_cosupervisor) {
+  const response = await fetch(URL + "/newExternalCosupervisor", {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(external_cosupervisor),
+  });
+  if (response.ok) {
+    const newProposal = await response.json();
+    return newProposal;
+  } else if (response.status == "422") {
+    const errors = await response.json();
+    return errors.errors;
+  } else {
+    const error = await response.json();
+    throw Error(error.error);
+  }  
+}
+
 async function getThesisProposals () {
   const response = await fetch(URL + "/proposals", {
     credentials: "include",
@@ -69,5 +129,5 @@ async function getThesisProposals () {
   }
 }
 
-const API = { logIn, logOut, getUserInfo, getThesisProposals };
+const API = { logIn, logOut, getUserInfo, getThesisProposals, newProposal, getListExternalCosupervisors, newExternalCosupervisor };
 export default API;

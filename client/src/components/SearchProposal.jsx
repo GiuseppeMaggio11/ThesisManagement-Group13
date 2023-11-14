@@ -28,7 +28,7 @@ function SearchProposalRoute(props) {
         //}
     }, [/*dirtyThesisProposals*/]);
 
-    console.log(thesisProposals)
+    
 
     return (
         <>

@@ -4,6 +4,8 @@ import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
 import ErrorAlert from "./components/ErrorAlert";
 import HomePage from "./components/HomePage";
 import LoginForm from "./components/LoginForm";
+import TeacherPage from "./components/TeacherPage";
+import NewProposal from "./components/NewProposal";
 import SearchProposalRoute from "./components/SearchProposal";
 import "./style.css";
 import { Button, Container } from "react-bootstrap";
@@ -84,16 +86,21 @@ function App() {
           <Route
             path="/login"
             element={
-              loggedIn ? (
-                <Navigate replace to="/" />
+              loggedIn && user.user_type === "PROF" ? (
+                <Navigate replace to="/teacher" />
+              ) : (
+                loggedIn ? (
+                  <Navigate replace to="/" />
               ) : (
                 <LoginForm
-                  loginSuccessful={loginSuccessful}
-                  logOut={logOut}
-                  loading={loading}
-                  setLoading={setLoading}
-                />
-              )
+                 loginSuccessful={loginSuccessful}
+                 logOut={logOut}
+                 loading={loading}
+                 setLoading={setLoading}
+               />
+             )
+
+              ) 
             }
           />
           <Route
@@ -116,7 +123,34 @@ function App() {
               />
             }
           />
-          {/*Others route here */}
+          <Route
+            path="/teacher"
+            element={
+              loggedIn && user.user_type === "PROF" ? (
+                <TeacherPage
+                  loading={loading}
+                  setLoading={setLoading}
+                  error={error}
+                  setError={setError}
+                />
+              ) : (
+                <Navigate replace to="/login" />
+              ) 
+            }
+          />
+          <Route
+            path="/newproposal"
+            element={
+              loggedIn && user.user_type === "PROF" ? (
+                <NewProposal
+                  loading={loading}
+                  setLoading={setLoading}
+                />
+              ) : (
+                <ErrorAlert />
+              )
+            }
+          />
           {/*Leave DefaultRoute as last route */}
           <Route path="/*" element={<DefaultRoute />} />
         </Routes>
