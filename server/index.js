@@ -155,7 +155,7 @@ app.get("/api/session/userinfo", (req, res) => {
 //GET PROPOSALS
 app.get("/api/proposals", isLoggedIn, async (req, res) => {
   try {
-    const proposals = await dao.getProposals(req.user.user_type, req.user.username);
+    const proposals = await dao.getProposals(req.user.user_type, req.user.username, req.query.date);
     res.status(200).json(proposals);
   } catch (err) {
     res.status(500).json({ error: ` error: ${err} ` });
@@ -179,7 +179,7 @@ app.get('/api/proposal/:id', isLoggedIn, async (req, res) => {
 //DO AN APPLICATION FOR A PROPOSAL
 app.post('/api/newApplication/:thesis_id', isStudent, async (req, res) => {
   const thesis_id = req.params.thesis_id; // Extract thesis_id from the URL
-  const date = req.body.dat
+  const date = req.body.date
   try {
     if (!Number.isInteger(Number(thesis_id))) {
       throw new Error('Thesis ID must be an integer');
@@ -190,7 +190,7 @@ app.post('/api/newApplication/:thesis_id', isStudent, async (req, res) => {
       return res.status(422).json("This thesis is not valid")
     }
     const existing = await dao.isAlreadyExisting(userID, thesis_id);
-    if (existing) {
+    if (!existing) {
       return res.status(422).json("You are already applied for this thesis")
     }
     const result = await dao.newApply(userID, thesis_id, date);

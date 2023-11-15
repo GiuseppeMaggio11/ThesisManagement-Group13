@@ -7,7 +7,6 @@ import HomePage from "./components/HomePage";
 import LoginForm from "./components/LoginForm";
 import TeacherPage from "./components/TeacherPage";
 import NewProposal from "./components/NewProposal";
-import SearchProposalRoute from "./components/SearchProposal";
 
 import ThesisPage from "./components/ThesisPage";
 
@@ -17,7 +16,7 @@ import Header from "./components/Header";
 import API from "./API";
 import VirtualClock from "./components/VirtualClock";
 import MessageContext from "./messageCtx";
-import StudentPage from "./components/StudentPage";
+import SearchProposalRoute from "./components/SearchProposal"
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -96,7 +95,7 @@ function App() {
                 loggedIn && user.user_type === "PROF" ? (
                   <Navigate replace to="/teacher" />
                 ) : loggedIn && user.user_type === "STUD" ? (
-                  <Navigate replace to="/student" />
+                  <Navigate replace to='/proposal'/>
                 ) : (
                   <LoginForm
                     loginSuccessful={loginSuccessful}
@@ -117,15 +116,6 @@ function App() {
               }
             />
             <Route
-              path="/proposals"
-              element={
-                <SearchProposalRoute
-                  loading={loading}
-                  setLoading={setLoading}
-                />
-              }
-            />
-            <Route
               path="/teacher"
               element={
                 loggedIn && user.user_type === "PROF" ? (
@@ -141,14 +131,13 @@ function App() {
               }
             />
             <Route
-              path="/student"
+              path="/proposal"
               element={
                 loggedIn && user.user_type === "STUD" ? (
-                  <StudentPage
+                  <SearchProposalRoute
                     loading={loading}
                     setLoading={setLoading}
-                    error={error}
-                    setError={setError}
+                    virtualClock={virtualClock}
                   />
                 ) : (
                   <Navigate replace to="/login" />

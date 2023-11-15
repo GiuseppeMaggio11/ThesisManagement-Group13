@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate} from "react-router-dom";
 import { useMediaQuery } from "react-responsive";
 import {
   Accordion,
@@ -11,13 +11,15 @@ import {
   Spinner,
   Table,
 } from "react-bootstrap";
-import { useState, useEffect } from "react";
+import MessageContext from '../messageCtx'
+import { useState, useEffect, useContext } from "react";
 
 import dayjs from "dayjs";
 
 import API from "../API";
 
 function SearchProposalRoute(props) {
+  const {handleErrors} = useContext(MessageContext)
   const [thesisProposals, setThesisProposals] = useState([]);
   //const [dirtyThesisProposals, setDirtyThesisProposals] = useState(true);
 
@@ -26,34 +28,22 @@ function SearchProposalRoute(props) {
   useEffect(
     () => {
       props.setLoading(true);
-      //if (dirtyThesisProposals) {
-      API.getThesisProposals()
+      //if (dirtyThesisProposals) 
+      API.getThesisProposals(props.virtualClock)
         .then((list) => {
           setThesisProposals(list);
           //setDirtyThesisProposals(false);
           props.setLoading(false);
         })
-        .catch((err) => props.handleError(err));
+        .catch((err) => handleErrors(err));
       //}
     },
-    [
-      /*dirtyThesisProposals*/
-    ]
+    []
   );
 
   return (
     <>
-      {props.error ? (
-        <Alert
-          variant="danger"
-          dismissible
-          className="margin-custom"
-          onClose={props.resetError}
-        >
-          {props.error}
-        </Alert>
-      ) : null}
-      {props.error || props.loading ? (
+      {props.loading ? (
         <Spinner className="m-2" animation="border" role="status" />
       ) : (
         <SearchProposalComponent

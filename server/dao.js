@@ -93,7 +93,7 @@ exports.getUserID = (username) => {
 };
 
 //Get proposals
-exports.getProposals = (user_type, username) => {
+exports.getProposals = (user_type, username, date) => {
   return new Promise((resolve, reject) => {
     let studentTitleDegree;
     //all loged-in users can retrieve all the proposals. students can only retrieve thesis proposals which are intended for their degree
@@ -110,9 +110,10 @@ exports.getProposals = (user_type, username) => {
     }
 
     let finalResult;
+    let formattedDate = new dayjs(date).format('YYYY-MM-DD HH:mm:ss');
     //joining associated tables, to provide easily readable thesis proposal fields
-    const sql = "select t.id, title, description, tch.name ,tch.surname , thesis_level ,thesis_type , required_knowledge , notes, expiration, keywords , dg.title_degree , g.group_name, d.department_name  , is_archived from thesis t join teacher tch on t.supervisor_id = tch.id join degree_table dg on t.cod_degree = dg.cod_degree join group_table g on tch.cod_group = g.cod_group join department d on tch.cod_department = d.cod_department";
-    connection.query(sql, (error, results, fields) => {
+    const sql = "select t.id, title, description, tch.name ,tch.surname , thesis_level ,thesis_type , required_knowledge , notes, expiration, keywords , dg.title_degree , g.group_name, d.department_name  , is_archived from thesis t join teacher tch on t.supervisor_id = tch.id join degree_table dg on t.cod_degree = dg.cod_degree join group_table g on tch.cod_group = g.cod_group join department d on tch.cod_department = d.cod_department where t.expiration > ?";
+    connection.query(sql,[formattedDate] ,(error, results, fields) => {
       if (error) {
         reject(error);
       } else if (results.length === 0) {
@@ -284,24 +285,23 @@ exports.isThesisValid = async (thesisID, date) => {
   if (!thesisID) {
     throw { error: "parameter is missing" };
   }
-  const sql =
-    "SELECT COUNT(*) as count FROM thesis WHERE id = ? AND expiration>? AND is_archived = FALSE";
+  const sql ="SELECT COUNT(*) as count FROM thesis WHERE id = ? AND expiration>? AND is_archived = FALSE";
   return new Promise((resolve, reject) => {
-    connection.execute(sql, [thesisID, formattedDate]), function (err, rows, fields) {
+    connection.execute(sql, [thesisID, formattedDate], function (err, rows, fields) {
       if (err) {
         reject(err);
       } else {
         if (rows[0].count === 0) {
-          resolve(false)
+          resolve(false);
+        } else if (rows[0].count === 1) {
+          resolve(true);
+        } else {
+          reject('Database error');
         }
-        else if (rows[0].count === 1) {
-          resolve(true)
-        }
-        else
-          reject('Database error')
       }
-    }
+    });
   });
+  
 };
 
 //returns false is the student is not already applied for a thesis,  otherwise true
@@ -309,8 +309,7 @@ exports.isAlreadyExisting = async (studentID, thesisID) => {
   if (!thesisID || !studentID) {
     throw { error: "parameter is missing" };
   }
-  const sql =
-    "SELECT COUNT(*) as count FROM application WHERE student_id = ? AND thesis_id = ?";
+  const sql ="SELECT COUNT(*) as count FROM application WHERE student_id = ? AND thesis_id = ?";
 
   return new Promise((resolve, reject) => {
     connection.query(sql, [studentID, thesisID], function (err, rows, fields) {
