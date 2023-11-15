@@ -1,12 +1,12 @@
 const dao = require("../dao");
-const mysql = require("mysql2");
+const mysql = require("mysql2/promise");
 const dayjs = require("dayjs");
 
 
 
 let connection;
 
-beforeAll(() => {
+beforeAll(async () => {
     const dbConfig = {
         host: "127.0.0.1",
         user: "root",
@@ -14,28 +14,33 @@ beforeAll(() => {
         database: "test_thesismanagement",
     };
 
-    connection = mysql.createConnection(dbConfig);
+    connection = await mysql.createConnection(dbConfig);
 });
 
 afterAll(async () => {
-    connection.end((error) => {
-        if (error) {
-            console.log("Error closing MySQL connection: ", error);
-            return;
-        }
+    await connection.end();
+    /*return new Promise((resolve, reject) => {
+        connection.end((error) => {
+            if (error) {
+                console.log("Error closing MySQL connection: ", error);
+                reject(error);
+                return;
+            }
 
-        console.log("MySQL connection closed.");
-    });
+            console.log("MySQL connection closed.");
+            resolve();
+        });
+    });*/
 });
 
 describe("isThesisValid", () => {
-    
+
     beforeEach(async () => {
-        connection.execute("DELETE FROM group_table");
-        connection.execute("DELETE FROM department");
-        connection.execute("DELETE FROM teacher");
-        connection.execute("DELETE FROM degree_table");
-        connection.execute("DELETE FROM thesis");
+        await connection.execute("DELETE FROM thesis");
+        await connection.execute("DELETE FROM degree_table");
+        await connection.execute("DELETE FROM teacher");
+        await connection.execute("DELETE FROM department");
+        await connection.execute("DELETE FROM group_table");
     });
 
     test("Should return true if the thesis is not expired or archived", async () => {
@@ -43,23 +48,23 @@ describe("isThesisValid", () => {
             cod_group: "GRP001",
             group_name: "Group 1"
         };
-        connection.execute(
+        await connection.execute(
             `
                 INSERT INTO group_table (cod_group, group_name)
                 vALUES (?, ?)
             `,
             [
-                group. cod_group,
+                group.cod_group,
                 group.group_name
             ]
         );
 
         const department = {
-            cod_department: "DPR001", 
-            department_name: "department_name", 
+            cod_department: "DPR001",
+            department_name: "department_name",
             cod_group: "GRP001"
         };
-        connection.execute(
+        await connection.execute(
             `
                 INSERT INTO department (cod_department, department_name, cod_group) 
                 VALUES (?, ?, ?)
@@ -76,10 +81,10 @@ describe("isThesisValid", () => {
             surname: "surname",
             name: "name",
             email: "email",
-            cod_group:  "GRP001",
+            cod_group: "GRP001",
             cod_department: "DPR001"
         };
-        connection.execute(
+        await connection.execute(
             `
                 INSERT INTO teacher (id, surname, name, email, cod_group, cod_department) 
                 VALUES (?, ?, ?, ?, ?, ?)
@@ -95,10 +100,10 @@ describe("isThesisValid", () => {
         );
 
         const degree = {
-            cod_degree: "DGR001", 
+            cod_degree: "DGR001",
             title_degree: "title_degree"
         };
-        connection.execute(
+        await connection.execute(
             `
                 INSERT INTO degree_table (cod_degree, title_degree) 
                 VALUES (?, ?)
@@ -108,7 +113,7 @@ describe("isThesisValid", () => {
                 degree.title_degree
             ]
         );
-        
+
         const thesisProposal = {
             title: "title",
             description: "description",
@@ -117,12 +122,12 @@ describe("isThesisValid", () => {
             thesis_type: "type",
             required_knowledge: "required_knowledge",
             notes: "notes",
-            expiration: dayjs("2023-01-01"),
+            expiration: dayjs("2023-01-01").format("YYYY-MM-DD HH:mm:ss"),
             cod_degree: degree.cod_degree,
             keywords: "keywords",
             is_archived: false
         };
-        connection.execute(
+        await connection.execute(
             `
                 INSERT INTO thesis (title, description, supervisor_id, thesis_level, thesis_type, required_knowledge, notes, expiration, cod_degree, keywords, is_archived)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -142,13 +147,33 @@ describe("isThesisValid", () => {
             ]
         );
         
+        
+
+        /*let id;
+        connection.execute("SELECT id FROM thesis", [], function (err, rows, fields) {
+            if (err) console.log("ERRORE");
+            else {
+                console.log(rows);
+                console.log(rows[0])
+                id = rows[0].id;
+                console.log(id)
+            }
+        });
+        console.log(id)*/
+
+        let [rows] = await connection.execute("SELECT id FROM thesis LIMIT 1");
+        console.log(rows)
+        let id = rows[0].id;
+        // Ora puoi accedere all'id dalla prima riga restituita
+        //const thesisId222 = rows[0].id;
+
         const input = {
-            thesisID: 1,
+            thesisID: id,
             date: dayjs("2022-01-01")
         };
-        
+
         const result = await dao.isThesisValid(input.thesisID, input.date);
-        
+
         expect(result).toBe(true);
     });
 
@@ -157,23 +182,23 @@ describe("isThesisValid", () => {
             cod_group: "GRP001",
             group_name: "Group 1"
         };
-        connection.execute(
+        await connection.execute(
             `
                 INSERT INTO group_table (cod_group, group_name)
                 vALUES (?, ?)
             `,
             [
-                group. cod_group,
+                group.cod_group,
                 group.group_name
             ]
         );
 
         const department = {
-            cod_department: "DPR001", 
-            department_name: "department_name", 
+            cod_department: "DPR001",
+            department_name: "department_name",
             cod_group: "GRP001"
         };
-        connection.execute(
+        await connection.execute(
             `
                 INSERT INTO department (cod_department, department_name, cod_group) 
                 VALUES (?, ?, ?)
@@ -190,10 +215,10 @@ describe("isThesisValid", () => {
             surname: "surname",
             name: "name",
             email: "email",
-            cod_group:  "GRP001",
+            cod_group: "GRP001",
             cod_department: "DPR001"
         };
-        connection.execute(
+        await connection.execute(
             `
                 INSERT INTO teacher (id, surname, name, email, cod_group, cod_department) 
                 VALUES (?, ?, ?, ?, ?, ?)
@@ -209,10 +234,10 @@ describe("isThesisValid", () => {
         );
 
         const degree = {
-            cod_degree: "DGR001", 
+            cod_degree: "DGR001",
             title_degree: "title_degree"
         };
-        connection.execute(
+        await connection.execute(
             `
                 INSERT INTO degree_table (cod_degree, title_degree) 
                 VALUES (?, ?)
@@ -222,7 +247,7 @@ describe("isThesisValid", () => {
                 degree.title_degree
             ]
         );
-        
+
         const thesisProposal = {
             title: "title",
             description: "description",
@@ -231,12 +256,12 @@ describe("isThesisValid", () => {
             thesis_type: "type",
             required_knowledge: "required_knowledge",
             notes: "notes",
-            expiration: dayjs("2023-01-01"),
+            expiration: dayjs("2023-01-01").format("YYYY-MM-DD HH:mm:ss"),
             cod_degree: degree.cod_degree,
             keywords: "keywords",
             is_archived: false
         };
-        connection.execute(
+        await connection.execute(
             `
                 INSERT INTO thesis (title, description, supervisor_id, thesis_level, thesis_type, required_knowledge, notes, expiration, cod_degree, keywords, is_archived)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -255,7 +280,7 @@ describe("isThesisValid", () => {
                 thesisProposal.is_archived,
             ]
         );
-        connection.execute(
+        await connection.execute(
             `
                 INSERT INTO thesis (title, description, supervisor_id, thesis_level, thesis_type, required_knowledge, notes, expiration, cod_degree, keywords, is_archived)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -274,21 +299,22 @@ describe("isThesisValid", () => {
                 thesisProposal.is_archived,
             ]
         );
-        
-        connection.execute("SELECT * FROM thesis WHERE id=1", [], function(err, results, fields) {
-            console.log(results);
-        });
+
+        let [rows] = await connection.execute("SELECT id FROM thesis LIMIT 1");
+        console.log(rows)
+        let id = rows[0].id;
+
         const input = {
-            thesisID: 1,
+            thesisID: id,
             date: dayjs("2024-01-01")
         };
-        
+
         const result = await dao.isThesisValid(input.thesisID, input.date);
         //console.log("RESULT = " + result);
         expect(result).toBe(false);
     });
 
-    test.only("Should return false if the thesis is archived", async () => {
+    test("Should return false if the thesis is archived", async () => {
         const group = {
             cod_group: "GRP001",
             group_name: "Group 1"
@@ -299,14 +325,14 @@ describe("isThesisValid", () => {
                 vALUES (?, ?)
             `,
             [
-                group. cod_group,
+                group.cod_group,
                 group.group_name
             ]
         );
 
         const department = {
-            cod_department: "DPR001", 
-            department_name: "department_name", 
+            cod_department: "DPR001",
+            department_name: "department_name",
             cod_group: "GRP001"
         };
         connection.execute(
@@ -326,7 +352,7 @@ describe("isThesisValid", () => {
             surname: "surname",
             name: "name",
             email: "email",
-            cod_group:  "GRP001",
+            cod_group: "GRP001",
             cod_department: "DPR001"
         };
         connection.execute(
@@ -345,7 +371,7 @@ describe("isThesisValid", () => {
         );
 
         const degree = {
-            cod_degree: "DGR001", 
+            cod_degree: "DGR001",
             title_degree: "title_degree"
         };
         connection.execute(
@@ -358,7 +384,7 @@ describe("isThesisValid", () => {
                 degree.title_degree
             ]
         );
-        
+
         const thesisProposal = {
             title: "title",
             description: "description",
@@ -367,7 +393,7 @@ describe("isThesisValid", () => {
             thesis_type: "type",
             required_knowledge: "required_knowledge",
             notes: "notes",
-            expiration: dayjs("2023-01-01"),
+            expiration: dayjs("2023-01-01").format("YYYY-MM-DD HH:mm:ss"),
             cod_degree: degree.cod_degree,
             keywords: "keywords",
             is_archived: true
@@ -391,7 +417,7 @@ describe("isThesisValid", () => {
                 thesisProposal.is_archived,
             ]
         );
-        
+
         /*connection.execute("SELECT * FROM thesis WHERE id=1", [], function(err, results, fields) {
             console.log(results);
         });*/
@@ -399,7 +425,7 @@ describe("isThesisValid", () => {
             thesisID: 1,
             date: dayjs("2022-01-01")
         };
-        
+
         const result = await dao.isThesisValid(input.thesisID, input.date);
         //console.log("RESULT = " + result);
         expect(result).toBe(false);

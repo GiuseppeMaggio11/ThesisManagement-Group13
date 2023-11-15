@@ -277,10 +277,10 @@ exports.getProposalById = (requested_thesis_id, user_type, username) => {
   });
 };
 
-//returns true if the thesis is not expired or archived, otherwise true
+//returns true if the thesis is not expired or archived, otherwise false
 exports.isThesisValid = async (thesisID, date) => {
   let formattedDate = dayjs(date).format('YYYY-MM-DD HH:mm:ss');
-  console.log('formattedDate' + formattedDate)
+  
   if (!thesisID || !date) {
     throw { error: "parameter is missing" };
   }
@@ -291,6 +291,7 @@ exports.isThesisValid = async (thesisID, date) => {
       if (err) {
         reject(err);
       } else {
+        console.log(rows)
         if (rows[0].count === 0) {
           resolve(false)
         }
