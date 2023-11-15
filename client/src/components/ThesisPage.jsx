@@ -40,14 +40,15 @@ function ThesisPage(props) {
                     description:thesisData.description,
                     supervisor:`${thesisData.name} ${thesisData.surname}`,
                     coSupervisor: thesisData.cosupervisors,
-                    keywords: thesisData.keywords,
+                    keywords: thesisData.keywords.length!== 0 && thesisData.keywords,
                     type: thesisData.thesis_type,
                     groups: thesisData.group_name.map((element)=>{return element.group}),
-                    requiredKnowledge: thesisData.requiredKnowledge,
+                    requiredKnowledge: thesisData.required_knowledge,
                     ...(thesisData.notes !== 'None' && { notes: thesisData.notes }),
                     expiration: formatDate(new Date(thesisData.expiration)),
                     level: thesisData.thesis_level
                 })
+                console.log(thesisData)
                 setIsLoading(false)
             } catch (error){
                handleErrors(error)
@@ -102,16 +103,9 @@ function ThesisPage(props) {
                             </tr>
                         )}
 
-                        {pageData.coSupervisor.length > 1 && (
+                        {pageData.coSupervisor.length > 0 && (
                             <tr>
                                 <td colSpan="2" className="leftText customLeftColumn">Co-Supervisors</td>
-                                <td className="rightText">{pageData.coSupervisor.join(', ')}</td>
-                            </tr>
-                        )}
-
-                        {pageData.coSupervisor.lengt == 1 && (
-                            <tr>
-                                <td colSpan="2" className="leftText customLeftColumn">Co-Supervisor</td>
                                 <td className="rightText">{pageData.coSupervisor.join(', ')}</td>
                             </tr>
                         )}
@@ -166,7 +160,7 @@ function ThesisPage(props) {
                         {pageData.requiredKnowledge && (
                             <tr>
                                 <td colSpan="2" className="leftText customLeftColumn">Required Knowledge</td>
-                                <td className="rightText">{pageData.requiredKnowledge.join(', ')}</td>
+                                <td className="rightText">{pageData.requiredKnowledge}</td>
                             </tr>
                         )}
 
