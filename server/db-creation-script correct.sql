@@ -214,3 +214,137 @@ VALUES
     (4, 'maria.gentile@email.net'),
     (4, 'antonio.bruno@email.org'),
     (6, 'andrea.ferrari@email.com');
+
+
+
+
+CREATE DATABASE IF NOT EXISTS test_thesismanagement;
+
+USE test_thesismanagement;
+
+CREATE TABLE IF NOT EXISTS user_type (
+    id VARCHAR(4) PRIMARY KEY,
+    user_type VARCHAR(30) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS users (
+    email VARCHAR(255) PRIMARY KEY,
+    salt VARCHAR(16) NOT NULL,
+    password VARCHAR(128) NOT NULL,
+    user_type_id VARCHAR(4) NOT NULL,
+    FOREIGN KEY (user_type_id) REFERENCES user_type(id)
+);
+
+CREATE TABLE IF NOT EXISTS student (
+    id VARCHAR(7) PRIMARY KEY,
+    surname VARCHAR(50) NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    gender VARCHAR(10) NOT NULL,
+    nationality VARCHAR(50) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    cod_degree VARCHAR(10) NOT NULL,
+    enrollment_year INT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS teacher (
+    id VARCHAR(7) PRIMARY KEY,
+    surname VARCHAR(50) NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    cod_group VARCHAR(10) NOT NULL,
+    cod_department VARCHAR(10) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS degree_table (
+    cod_degree VARCHAR(10) PRIMARY KEY,
+    title_degree VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS career (
+    id VARCHAR(7) NOT NULL,
+    cod_course VARCHAR(10) NOT NULL,
+    title_course VARCHAR(50) NOT NULL,
+    cfu INT NOT NULL,
+    grade DECIMAL(3, 0) NOT NULL,
+    date DATE NOT NULL,
+    PRIMARY KEY (id, cod_course),
+    FOREIGN KEY (id) REFERENCES student(id)
+);
+
+CREATE TABLE IF NOT EXISTS group_table(
+    cod_group VARCHAR(10) PRIMARY KEY,
+    group_name VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS department(
+    cod_department VARCHAR(10) NOT NULL,
+    department_name VARCHAR(50) NOT NULL,
+    cod_group VARCHAR(10) NOT NULL,
+    PRIMARY KEY (cod_department, cod_group),
+    FOREIGN KEY (cod_group) REFERENCES group_table(cod_group)
+);
+
+CREATE TABLE IF NOT EXISTS external_supervisor(
+    email VARCHAR(255) PRIMARY KEY,
+    surname VARCHAR(50) NOT NULL,
+    name VARCHAR(50) NOT NULL
+);
+
+-- CREATE TABLE IF NOT EXISTS keyword(
+--     name VARCHAR(50) PRIMARY KEY
+-- );
+
+-- CREATE TABLE IF NOT EXISTS type_table(
+--     name VARCHAR(50) PRIMARY KEY
+-- );
+
+CREATE TABLE IF NOT EXISTS thesis(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
+    supervisor_id VARCHAR(7) NOT NULL,
+    thesis_level VARCHAR(20) NOT NULL,
+    thesis_type VARCHAR(50) NOT NULL,
+    required_knowledge TEXT NOT NULL,
+    notes TEXT NOT NULL,
+    expiration DATETIME NOT NULL,
+    cod_degree VARCHAR(10) NOT NULL,
+    keywords TEXT,
+    is_archived BOOLEAN NOT NULL,
+    FOREIGN KEY (cod_degree) REFERENCES degree_table(cod_degree),
+    FOREIGN KEY (supervisor_id) REFERENCES teacher(id)
+);
+
+CREATE TABLE IF NOT EXISTS thesis_group(
+    thesis_id INT NOT NULL,
+    group_id VARCHAR(10) NOT NULL,
+    PRIMARY KEY (thesis_id, group_id),
+    FOREIGN KEY (thesis_id) REFERENCES thesis(id),
+    FOREIGN KEY (group_id) REFERENCES group_table(cod_group)
+);
+
+CREATE TABLE IF NOT EXISTS thesis_cosupervisor_teacher(
+    thesis_id INT NOT NULL,
+    cosupevisor_id VARCHAR(7) NOT NULL,
+    PRIMARY KEY (thesis_id, cosupevisor_id),
+    FOREIGN KEY (thesis_id) REFERENCES thesis(id),
+    FOREIGN KEY (cosupevisor_id) REFERENCES teacher(id)
+);
+
+CREATE TABLE IF NOT EXISTS thesis_cosupervisor_external(
+    thesis_id INT NOT NULL,
+    cosupevisor_id VARCHAR(255) NOT NULL,
+    PRIMARY KEY (thesis_id, cosupevisor_id),
+    FOREIGN KEY (thesis_id) REFERENCES thesis(id),
+    FOREIGN KEY (cosupevisor_id) REFERENCES external_supervisor(email)
+);
+
+CREATE TABLE IF NOT EXISTS application(
+    student_id VARCHAR(7) NOT NULL,
+    thesis_id INT NOT NULL,
+    status VARCHAR(10) NOT NULL,
+    application_date DATETIME NOT NULL,
+    PRIMARY KEY (student_id, thesis_id),
+    FOREIGN KEY (student_id) REFERENCES student(id),
+    FOREIGN KEY (thesis_id) REFERENCES thesis(id)
+);
