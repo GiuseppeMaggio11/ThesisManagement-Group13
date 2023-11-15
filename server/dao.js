@@ -335,6 +335,9 @@ exports.isAlreadyExisting = async (studentID, thesisID) => {
 
 // Function to create a new application
 exports.newApply = async (studentID, ThesisID, date) => {
+  if (!studentID || !ThesisID || !date) {
+    throw { error: "parameter is missing" };
+  }
   const status = "pending";
   const formattedDate = dayjs(date).format('YYYY-MM-DD HH:mm:ss');
   try {
