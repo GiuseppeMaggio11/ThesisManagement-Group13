@@ -16,7 +16,7 @@ const dbConfig = {
   host: "127.0.0.1",
   user: "root",
   password: "root",
-  database: "db_se_thesismanagement",
+  database: "test_thesismanagement",
 };
 const connection = mysql.createConnection(dbConfig);
 

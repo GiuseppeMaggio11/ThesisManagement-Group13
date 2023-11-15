@@ -2,7 +2,7 @@ const dayjs = require("dayjs");
 const dao = require("../dao");
 const mysql = require("mysql2");
 
-beforeEach(() => {
+beforeAll(() => {
     jest.clearAllMocks();
 });
 

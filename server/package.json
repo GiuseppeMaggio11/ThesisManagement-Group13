@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --detectOpenHandles",
     "test:coverage": "jest --runInBand --coverage --colors",
     "test:unit": "npx jest --runInBand --coverage --coverageDirectory=coverage/coverage_unit --colors dao.unit.test.js index.unit.test.js",
     "test:integration": "npx jest --runInBand --coverage --coverageDirectory=coverage/coverage_integration --colors dao.integration.test.js index.integration.test.js"
