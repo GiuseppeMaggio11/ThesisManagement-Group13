@@ -281,13 +281,13 @@ exports.getProposalById = (requested_thesis_id, user_type, username) => {
 exports.isThesisValid = async (thesisID, date) => {
   let formattedDate = new dayjs(date).format('YYYY-MM-DD HH:mm:ss');
   console.log('formattedDate' + formattedDate)
-  if (!thesisID) {
+  if (!thesisID || !date) {
     throw { error: "parameter is missing" };
   }
   const sql =
     "SELECT COUNT(*) as count FROM thesis WHERE id = ? AND expiration>? AND is_archived = FALSE";
   return new Promise((resolve, reject) => {
-    connection.execute(sql, [thesisID, formattedDate]), function (err, rows, fields) {
+    connection.execute(sql, [thesisID, formattedDate], function (err, rows, fields) {
       if (err) {
         reject(err);
       } else {
@@ -300,7 +300,7 @@ exports.isThesisValid = async (thesisID, date) => {
         else
           reject('Database error')
       }
-    }
+    });
   });
 };
 
@@ -318,10 +318,10 @@ exports.isAlreadyExisting = async (studentID, thesisID) => {
         reject(err);
       } else {
         if (rows[0].count === 1) {
-          resolve(false)
+          resolve(true)
         }
         else if (rows[0].count === 0) {
-          resolve(true)
+          resolve(false)
         }
         else
           reject('Database error')

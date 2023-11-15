@@ -28,7 +28,7 @@ afterAll(async () => {
     });
 });
 
-describe.skip("isThesisValid", () => {
+describe("isThesisValid", () => {
     
     beforeEach(async () => {
         connection.execute("DELETE FROM group_table");
@@ -288,7 +288,7 @@ describe.skip("isThesisValid", () => {
         expect(result).toBe(false);
     });
 
-    test("Should return false if the thesis is archived", async () => {
+    test.only("Should return false if the thesis is archived", async () => {
         const group = {
             cod_group: "GRP001",
             group_name: "Group 1"
@@ -392,9 +392,9 @@ describe.skip("isThesisValid", () => {
             ]
         );
         
-        connection.execute("SELECT * FROM thesis WHERE id=1", [], function(err, results, fields) {
+        /*connection.execute("SELECT * FROM thesis WHERE id=1", [], function(err, results, fields) {
             console.log(results);
-        });
+        });*/
         const input = {
             thesisID: 1,
             date: dayjs("2022-01-01")
