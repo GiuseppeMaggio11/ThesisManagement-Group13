@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { Form, Button } from 'react-bootstrap';
-import API from '../API';
+import React, { useState } from "react";
+import { Form, Button } from "react-bootstrap";
+import API from "../API";
 
 function NewExternalCoSupervisorForm(props) {
   const [coSupervisor, setCoSupervisor] = useState({
-    email: '',
-    name: '',
-    surname: '',
+    email: "",
+    name: "",
+    surname: "",
   });
 
   const [errors, setErrors] = useState(null);
@@ -21,23 +21,22 @@ function NewExternalCoSupervisorForm(props) {
 
   const handleAddCoSupervisor = async () => {
     await API.newExternalCosupervisor(coSupervisor)
-      .then(response => {
-        if(response && "errors" in response) {
+      .then((response) => {
+        if (response && "errors" in response) {
           setErrors(response.errors);
-        }
-        else {
+        } else {
           setCoSupervisor({
-            email: '',
-            name: '',
-            surname: '',
+            email: "",
+            name: "",
+            surname: "",
           });
           setErrors(null);
           props.fetchData();
         }
       })
-      .catch(error => {
-        setErrors([{msg: error.message}])
-      })
+      .catch((error) => {
+        setErrors([{ msg: error.message }]);
+      });
   };
 
   return (
@@ -75,15 +74,18 @@ function NewExternalCoSupervisorForm(props) {
         />
       </Form.Group>
       {errors && (
-        <div className="alert alert-danger">
+        <div className="alert alert-danger mt-3">
           <ul>
             {Object.values(errors).map((error, index) => (
-              <li key={index}> {error?.path ? error.path + ":" : ""} {error.msg}</li>
+              <li key={index}>
+                {" "}
+                {error?.path ? error.path + ":" : ""} {error.msg}
+              </li>
             ))}
           </ul>
         </div>
       )}
-      <Button variant="primary" onClick={handleAddCoSupervisor}>
+      <Button className="button-style mt-3" onClick={handleAddCoSupervisor}>
         Add
       </Button>
     </Form>

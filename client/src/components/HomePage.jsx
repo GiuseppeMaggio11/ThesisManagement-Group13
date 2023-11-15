@@ -1,21 +1,18 @@
-import { Button, Container } from "react-bootstrap";
+import { Button, Container, Image } from "react-bootstrap";
 import Loading from "./Loading";
 import { Link } from "react-router-dom";
 
 function HomePage(props) {
   return (
     <>
-      {props.loading ? <Loading /> : ""}
-      <Container className="margin-custom">
-        <h1 className="margin-titles-custom">HomePage</h1>
-        {
-          props.user ?
-            <Link to="/proposals" className="m-1">
-              <Button className="margin-buttons-custom">Search Thesis Proposal</Button>
-            </Link>
-            : ""
-        }
-        
+      <Container>
+        <Container className="mt-4">
+          <Image
+            src="https://upload.wikimedia.org/wikipedia/it/archive/4/47/20210407201938%21Logo_PoliTo_dal_2021_blu.png"
+            alt="logo polito"
+            fluid
+          />
+        </Container>
       </Container>
     </>
   );
