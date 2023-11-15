@@ -16,7 +16,7 @@ const dbConfig = {
   host: "127.0.0.1",
   user: "root",
   password: "root",
-  database: "db_se_thesismanagement",
+  database: "test_thesismanagement",
 };
 const connection = mysql.createConnection(dbConfig);
 
@@ -279,7 +279,7 @@ exports.getProposalById = (requested_thesis_id, user_type, username) => {
 
 //returns true if the thesis is not expired or archived, otherwise true
 exports.isThesisValid = async (thesisID, date) => {
-  let formattedDate = new dayjs(date).format('YYYY-MM-DD HH:mm:ss');
+  let formattedDate = dayjs(date).format('YYYY-MM-DD HH:mm:ss');
   console.log('formattedDate' + formattedDate)
   if (!thesisID || !date) {
     throw { error: "parameter is missing" };
@@ -335,7 +335,7 @@ exports.isAlreadyExisting = async (studentID, thesisID) => {
 // Function to create a new application
 exports.newApply = async (studentID, ThesisID, date) => {
   const status = "pending";
-  const formattedDate = new Date(date).toISOString().slice(0, 19).replace('T', ' ');
+  const formattedDate = dayjs(date).format('YYYY-MM-DD HH:mm:ss');
   try {
     const sql =
       "INSERT INTO application (student_id, thesis_id, status, application_date) VALUES (?, ?, ?, ?)";

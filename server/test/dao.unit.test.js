@@ -13,7 +13,7 @@ describe("isThesisValid", () => {
     test("Should return true if the thesis is not expired or archived", async () => {
         const mockInput = {
             thesisID: 1,
-            formattedDate: dayjs().format("YYYY-MM-DD hh:mm:ss")
+            formattedDate: dayjs().format("YYYY-MM-DD HH:mm:ss")
         };
         const mockExecuteOutput = [
             {count: 1}
@@ -39,7 +39,7 @@ describe("isThesisValid", () => {
     test("Should return false if the thesis is expired or archived", async () => {
         const mockInput = {
             thesisID: 1,
-            formattedDate: dayjs().format("YYYY-MM-DD hh:mm:ss")
+            formattedDate: dayjs().format("YYYY-MM-DD HH:mm:ss")
         };
         const mockExecuteOutput = [
             {count: 0}
@@ -65,7 +65,7 @@ describe("isThesisValid", () => {
     test("Should throw an error if there is more than one thesis", async () => {
         const mockInput = {
             thesisID: 1,
-            formattedDate: dayjs().format("YYYY-MM-DD hh:mm:ss")
+            formattedDate: dayjs().format("YYYY-MM-DD HH:mm:ss")
         };
         const mockExecuteOutput = [
             {count: 2}
@@ -90,7 +90,7 @@ describe("isThesisValid", () => {
     test("Should throw an error if \"thesisID\" parameter is missing", async () => {
         const mockInput = {
             thesisID: undefined,
-            formattedDate: dayjs().format("YYYY-MM-DD hh:mm:ss")
+            formattedDate: dayjs().format("YYYY-MM-DD HH:mm:ss")
         };
         const mockExecute = jest.spyOn(mysql.Connection.prototype, "execute");
 
@@ -122,7 +122,7 @@ describe("isThesisValid", () => {
     test("Should handle errors during query execution", async () => {
         const mockInput = {
             thesisID: 1,
-            formattedDate: dayjs().format("YYYY-MM-DD hh:mm:ss")
+            formattedDate: dayjs().format("YYYY-MM-DD HH:mm:ss")
         };
         const mockExecute = jest.spyOn(mysql.Connection.prototype, "execute");
         mockExecute.mockImplementation((sql, params, callback) => {
@@ -261,21 +261,89 @@ describe("isAlreadyExisting", () => {
 
 });
 
+describe("newApply", () => {
 
-
-
-
-/*describe("getTeachers", () => {
-    test("Should return the arrays of teachers", async () => {
-        const mockRows = [{ id: 1 }, { id: 2 }, { id: 3 }];
-        const mockExecute = jest.spyOn(mysql.Connection.prototype, "query");
-        mockExecute.mockImplementation((sql, params, callback) => {
-            callback(null, mockRows);
+    test("Should insert a new application into the database", async () => {
+        const mockInput = {
+            studentID: 1,
+            thesisID: 1,
+            date: dayjs()
+        };
+        const mockOutput = [1, 2, 3];
+        const mockQuery = jest.spyOn(mysql.Connection.prototype, "query");
+        mockQuery.mockImplementation((sql, params, callback) => {
+            callback(null, mockOutput);
         });
-        
-        const result = await dao.getTeachers();
-        
-        expect(result).toEqual([1, 2, 3]);
+
+        const result = await dao.newApply(mockInput.studentID, mockInput.thesisID, mockInput.date);
+
+        expect(mockQuery).toHaveBeenCalledWith(
+            "INSERT INTO application (student_id, thesis_id, status, application_date) VALUES (?, ?, ?, ?)",
+            [
+                mockInput.studentID, 
+                mockInput.thesisID,
+                "pending",
+                mockInput.date.format("YYYY-MM-DD HH:mm:ss")
+            ],
+            expect.any(Function)
+        );
+        expect(result).toStrictEqual(mockOutput);
     });
 
-});*/
+    test("Should handle duplicate entry error", async () => {
+        const mockInput = {
+            studentID: 1,
+            thesisID: 1,
+            date: dayjs()
+        };
+        const mockQueryOutput = {
+            code: "ER_DUP_ENTRY"
+        };
+        const mockQuery = jest.spyOn(mysql.Connection.prototype, "query");
+        mockQuery.mockImplementation((sql, params, callback) => {
+            callback(mockQueryOutput);
+        });
+
+        await expect(dao.newApply(mockInput.studentID, mockInput.thesisID, mockInput.date)).rejects.toStrictEqual("You have already applied to this thesis.");
+
+        expect(mockQuery).toHaveBeenCalledWith(
+            "INSERT INTO application (student_id, thesis_id, status, application_date) VALUES (?, ?, ?, ?)",
+            [
+                mockInput.studentID, 
+                mockInput.thesisID,
+                "pending",
+                mockInput.date.format("YYYY-MM-DD HH:mm:ss")
+            ],
+            expect.any(Function)
+        )
+    });
+
+    test("Should handle other errors", async () => {
+        const mockInput = {
+            studentID: 1,
+            thesisID: 1,
+            date: dayjs()
+        };
+        const mockQueryOutput = {
+            code: "NOT_ER_DUP_ENTRY"
+        };
+        const mockQuery = jest.spyOn(mysql.Connection.prototype, "query");
+        mockQuery.mockImplementation((sql, params, callback) => {
+            callback(mockQueryOutput);
+        });
+
+        await expect(dao.newApply(mockInput.studentID, mockInput.thesisID, mockInput.date)).rejects.toStrictEqual(mockQueryOutput);
+
+        expect(mockQuery).toHaveBeenCalledWith(
+            "INSERT INTO application (student_id, thesis_id, status, application_date) VALUES (?, ?, ?, ?)",
+            [
+                mockInput.studentID, 
+                mockInput.thesisID,
+                "pending",
+                mockInput.date.format("YYYY-MM-DD HH:mm:ss")
+            ],
+            expect.any(Function)
+        )
+    });
+
+});
