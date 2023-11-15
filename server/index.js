@@ -179,8 +179,7 @@ app.get('/api/proposal/:id', isLoggedIn, async (req, res) => {
 //DO AN APPLICATION FOR A PROPOSAL
 app.post('/api/newApplication/:thesis_id', isStudent, async (req, res) => {
   const thesis_id = req.params.thesis_id; // Extract thesis_id from the URL
-  const date = req.body.date
-  console.log(date)
+  const date = req.body.dat
   try {
     if (!Number.isInteger(Number(thesis_id))) {
       throw new Error('Thesis ID must be an integer');
