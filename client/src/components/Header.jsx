@@ -57,7 +57,7 @@ function Header(props) {
               as={NavLink}
               to={
                 props.user && props.user.user_type === "STUD"
-                  ? "student"
+                  ? "proposal"
                   : props.user && props.user.user_type === "PROF"
                   ? "teacher"
                   : "/"

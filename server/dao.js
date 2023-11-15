@@ -96,6 +96,7 @@ exports.getUserID = (username) => {
 exports.getProposals = (user_type, username, date) => {
   return new Promise((resolve, reject) => {
     let studentTitleDegree;
+    let studentApplicationid;
     //all loged-in users can retrieve all the proposals. students can only retrieve thesis proposals which are intended for their degree
     if (user_type === 'STUD') {
       //check if the requested thesis degree is same to student's degree or not. if not, do not show anything to student
@@ -105,6 +106,14 @@ exports.getProposals = (user_type, username, date) => {
           reject(error);
         } else {
           studentTitleDegree = result[0].title_degree;
+        }
+      });
+      const sql2 = "SELECT thesis_id FROM student s join application a on s.id = a.student_id WHERE s.email = ?"
+      connection.query(sql2, [username], (error, result, fields) => {
+        if (error) {
+          reject(error);
+        } else {
+          studentApplicationid = result.length !== 0 ? result.map((element)=>element.thesis_id) : [];
         }
       });
     }
@@ -122,7 +131,7 @@ exports.getProposals = (user_type, username, date) => {
         let thesisFromSameDegreeOfStudent = results;
         //if the user which made the request is a student, then we should show him only thesis which are offered inside student's degree
         if (user_type === 'STUD') {
-          thesisFromSameDegreeOfStudent = results.filter(item => item.title_degree === studentTitleDegree);
+          thesisFromSameDegreeOfStudent = results.filter(item => {return (item.title_degree === studentTitleDegree && !studentApplicationid.includes(item.id))});
         }
 
         //we have to modify results of query before sending them back to front end

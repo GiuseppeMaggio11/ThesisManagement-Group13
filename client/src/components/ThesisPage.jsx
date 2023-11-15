@@ -1,5 +1,5 @@
 import { Container, Table, Accordion, Button, Modal, Form, Row, Col} from "react-bootstrap";
-import { useParams} from 'react-router-dom';
+import { useParams, useNavigate} from 'react-router-dom';
 import React, { useEffect, useState, useContext } from "react";
 import API from '../API';
 import MessageContext from '../messageCtx'
@@ -9,14 +9,25 @@ import { useMediaQuery } from 'react-responsive';
 import Loading from "./Loading";
 import FileDropModal from './FileModal';
 
+
 function ThesisPage(props) {
     const params = useParams();
+    const navigate = useNavigate();
     const {handleErrors} = useContext(MessageContext)
     const [pageData, setPageData] = useState({})
     const [openPanel, setOpenPanel] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
     const [selectedFiles, setSelectedFiles] = useState([]);
     const isMobile = useMediaQuery({ maxWidth: 767 });
+
+    function formatDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Aggiunge lo zero iniziale se necessario
+        const day = String(date.getDate()).padStart(2, '0'); // Aggiunge lo zero iniziale se necessario
+      
+        return `${year}-${month}-${day}`;
+      }
+      
 
     useEffect(()=>{
         const init = async() => {
@@ -34,12 +45,12 @@ function ThesisPage(props) {
                     groups: thesisData.group_name.map((element)=>{return element.group}),
                     requiredKnowledge: thesisData.requiredKnowledge,
                     ...(thesisData.notes !== 'None' && { notes: thesisData.notes }),
-                    expiration: thesisData.expiration,
+                    expiration: formatDate(new Date(thesisData.expiration)),
                     level: thesisData.thesis_level
                 })
                 setIsLoading(false)
             } catch (error){
-               props.setError(true)
+               handleErrors(error)
             }
         }
         init()
@@ -57,8 +68,8 @@ function ThesisPage(props) {
             formData.append(`file`, selectedFiles[i]);
         }
         API.sendFiles(formData, thesis_id).then(
-            () => { console.log("tutto ok") }
-        ).catch((err) => { console.log(err) });
+            () => { navigate("/proposal")}
+        ).catch((err) => { handleErrors(error) });
     }
 
     const closeModal=()=>{
@@ -189,7 +200,7 @@ function ThesisPage(props) {
                                             <span className="bold">{pageData.level}</span><span> thesis</span>
                                         </div>
                                         <div className="table-footer">
-                                            <span>Valid until</span><span className="bold"> {pageData.expired}</span>
+                                            <span>Valid until</span><span className="bold"> {pageData.expiration}</span>
                                         </div>
                                     </Col>
                                     <Col>
