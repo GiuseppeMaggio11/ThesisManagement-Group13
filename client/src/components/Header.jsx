@@ -25,7 +25,12 @@ function Header(props) {
   };
 
   return (
-    <Navbar expanded={expanded} expand="md" bg="primary" variant="dark">
+    <Navbar
+      expanded={expanded}
+      expand="md"
+      variant="dark"
+      style={{ background: "#215884" }}
+    >
       <Container>
         <Navbar.Brand as={NavLink} to="/" className="fs-1">
           Thesis management
@@ -48,6 +53,26 @@ function Header(props) {
             >
               Home
             </Nav.Link>
+            <Nav.Link
+              as={NavLink}
+              to={
+                props.user && props.user.user_type === "STUD"
+                  ? "proposal"
+                  : props.user && props.user.user_type === "PROF"
+                  ? "teacher"
+                  : "/"
+              }
+              onClick={() => {
+                if (isSmallScreen) setExpanded((old) => !old);
+              }}
+              className="fs-5"
+            >
+              {props.user && props.user.user_type === "STUD"
+                ? "Student Dashboard"
+                : props.user && props.user.user_type === "PROF"
+                ? "Teacher Dashboard"
+                : ""}
+            </Nav.Link>
           </Nav>
           <Nav className="me-0">
             {props.user ? (
@@ -65,13 +90,32 @@ function Header(props) {
                     props.user.username.split(".")[0].slice(1)}
                 </Dropdown.Toggle>
                 <Dropdown.Menu className="custom-navdropdown">
-                  <Dropdown.Item onClick={() => navigate("/virtualclock")}>
+                  <Dropdown.Item
+                    className="link-style"
+                    onClick={() => {
+                      if (isSmallScreen) setExpanded((old) => !old);
+                      navigate("/virtualclock");
+                    }}
+                  >
                     Virtual Clock
                   </Dropdown.Item>
                   <Dropdown.Item
-                    onClick={handleLogout}
-                    className="dropdown-mouse-hover"
+                    className="link-style"
+                    onClick={() => {
+                      if (isSmallScreen) setExpanded((old) => !old);
+                      if (props.user && props.user.user_type === "STUD")
+                        navigate("/proposal");
+                      else if (props.user && props.user.user_type === "PROF")
+                        navigate("/teacher");
+                    }}
                   >
+                    {props.user && props.user.user_type === "STUD"
+                      ? "Student Dashboard"
+                      : props.user && props.user.user_type === "PROF"
+                      ? "Teacher Dashboard"
+                      : ""}
+                  </Dropdown.Item>
+                  <Dropdown.Item className="link-style" onClick={handleLogout}>
                     Logout
                   </Dropdown.Item>
                 </Dropdown.Menu>

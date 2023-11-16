@@ -13,8 +13,8 @@ import API from "../API";
 import Loading from "./Loading";
 
 function LoginForm(props) {
-  const [username, setUsername] = useState("mario.rossi@polito.it");
-  const [password, setPassword] = useState("P123456");
+  const [username, setUsername] = useState("luca.esposito@studenti.polito.it");
+  const [password, setPassword] = useState("S123456");
   const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
@@ -48,7 +48,6 @@ function LoginForm(props) {
   return (
     <>
       <Container>
-        {props.loading ? <Loading /> : ""}
         <Row>
           <Col
             style={{
@@ -91,12 +90,12 @@ function LoginForm(props) {
                       onChange={(ev) => setPassword(ev.target.value)}
                     />
                   </Form.Group>
-                  <Button className="my-2" type="submit">
+                  <Button className="button-style my-2" type="submit">
                     Login
                   </Button>
                   <Button
-                    className="my-2 mx-2"
-                    variant="secondary"
+                    className="button-style-cancel my-2 mx-2"
+                    variant="light"
                     onClick={() => navigate("/")}
                   >
                     Back
