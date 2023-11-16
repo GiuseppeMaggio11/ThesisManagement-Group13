@@ -8,6 +8,8 @@ beforeEach(() => {
     jest.clearAllMocks();
 });
 
+
+
 describe("isThesisValid", () => {
     
     test("Should return true if the thesis is not expired or archived", async () => {
@@ -17,7 +19,7 @@ describe("isThesisValid", () => {
         };
         const mockExecuteOutput = [
             {count: 1}
-        ]
+        ];
         const mockExecute = jest.spyOn(mysql.Connection.prototype, "execute");
         mockExecute.mockImplementation((sql, params, callback) => {
             callback(null, mockExecuteOutput);

@@ -12,6 +12,8 @@ const session = require("express-session");
 const fs = require('fs')
 const zipdir = require('zip-dir');
 
+const { isLoggedIn, isProfessor, isStudent } = require('./middleware');
+
 
 const app = express();
 const port = 3001;
@@ -103,21 +105,6 @@ const upload = multer({
   }
 });
 
-const isLoggedIn = (req, res, next) => {
-  if (req.isAuthenticated()) return next();
-  return res.status(401).json({ error: "Not authenticated" });
-};
-
-const isProfessor = (req, res, next) => {
-  if (req.isAuthenticated() && req.user.user_type === "PROF") return next();
-  return res.status(401).json({ error: "Not professor" });
-};
-
-const isStudent = (req, res, next) => {
-  if (req.isAuthenticated() && req.user.user_type === "STUD") return next();
-  return res.status(401).json({ error: "Not student" });
-};
-
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -177,9 +164,9 @@ app.get('/api/proposal/:id', isLoggedIn, async (req, res) => {
   }
 });
 //DO AN APPLICATION FOR A PROPOSAL
-app.post('/api/newApplication/:thesis_id', isStudent, async (req, res) => {
+app.post('/api/newApplication/:thesis_id', isStudentMiddleware, async (req, res) => {
   const thesis_id = req.params.thesis_id; // Extract thesis_id from the URL
-  const date = req.body.dat
+  const date = req.body.date
   try {
     if (!Number.isInteger(Number(thesis_id))) {
       throw new Error('Thesis ID must be an integer');
@@ -194,7 +181,6 @@ app.post('/api/newApplication/:thesis_id', isStudent, async (req, res) => {
       return res.status(422).json("You are already applied for this thesis")
     }
     const result = await dao.newApply(userID, thesis_id, date);
-
     res.status(200).send('Application created successfully');
   } catch (error) {
     res.status(500).send(error.message + ' ');
@@ -292,12 +278,6 @@ app.get('/api/getFile/:student_id/:thesis_id/:file_name', isProfessor, async (re
     res.status(500).send('An unexpected error occurred');
   }
 });
-
-// Activate the server
-app.listen(port, () => {
-  console.log(`Server listening at http://localhost:${port}`);
-});
-
 
 //CREATES NEW THESIS AND RELATED INT/EXTERNAL COSUPERVISORS
 app.post('/api/newThesis', isProfessor, [
@@ -471,3 +451,12 @@ app.post('/api/newExternalCosupervisor', isProfessor, [
     return res.status(503).json({ error: ` error: ${err} ` });
   }
 });
+
+
+
+// Activate the server
+app.listen(port, () => {
+  console.log(`Server listening at http://localhost:${port}`);
+});
+
+export { app }; 
