@@ -294,7 +294,7 @@ exports.isThesisValid = async (thesisID, date) => {
   if (!thesisID) {
     throw { error: "parameter is missing" };
   }
-  const sql ="SELECT COUNT(*) as count FROM thesis WHERE id = ? AND expiration>? AND is_archived = FALSE";
+  const sql ="SELECT COUNT(*) as count FROM thesis WHERE id = ? AND expiration>? ";
   return new Promise((resolve, reject) => {
     connection.execute(sql, [thesisID, formattedDate], function (err, rows, fields) {
       if (err) {
