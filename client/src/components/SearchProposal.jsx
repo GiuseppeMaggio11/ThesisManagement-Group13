@@ -233,7 +233,7 @@ function ProposalAccordion(props) {
     <Accordion.Item eventKey={props.proposal.id.toString()}>
       <Accordion.Header>
         <span className="my-3">
-          <Link to={`/proposals/${props.proposal.id}`}>
+          <Link style={{color:'#4682B4', fontSize:18}} to={`/proposals/${props.proposal.id}`}>
             {props.proposal.title}
           </Link>
         </span>
