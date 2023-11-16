@@ -1,4 +1,4 @@
-import { Link, useNavigate} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useMediaQuery } from "react-responsive";
 import {
   Accordion,
@@ -17,9 +17,11 @@ import { useState, useEffect, useContext } from "react";
 import dayjs from "dayjs";
 
 import API from "../API";
+import { HoverIconButton } from "./HoverIconButton";
+import { Search } from "react-bootstrap-icons";
 
 function SearchProposalRoute(props) {
-  const {handleErrors} = useContext(MessageContext)
+  const { handleErrors } = useContext(MessageContext)
   const [thesisProposals, setThesisProposals] = useState([]);
   //const [dirtyThesisProposals, setDirtyThesisProposals] = useState(true);
 
@@ -66,7 +68,9 @@ function SearchProposalComponent(props) {
   }, [props.thesisProposals]);
 
   const handleSubmit = (event) => {
-    event.preventDefault();
+    if(event){
+      event.preventDefault();
+    }
 
     setFilteredThesisProposals(
       props.thesisProposals.filter((proposal) => {
@@ -162,62 +166,63 @@ function SearchProposalComponent(props) {
       </Row>
     </Container>
   ) : (
-    <Container className="margin-custom">
-      <Row>
-        <Col>
-          <h1 className="margin-titles-custom">Thesis Proposals</h1>
-        </Col>
-        <Col className="d-flex align-self-center justify-content-end">
-          <Form className="d-flex" onSubmit={handleSubmit}>
-            <Form.Group className="mb-3 me-2 d-flex align-items-center">
-              <Form.Label className="me-2 mb-0">Filter: </Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Insert a filter"
-                value={filter}
-                onChange={(event) => setFilter(event.target.value)}
-              />
-            </Form.Group>
-            <Button
-              className="mb-3 margin-buttons-custom"
-              variant="success"
-              type="submit"
-            >
-              Search
-            </Button>
-            <Button
-              className="mb-3 margin-buttons-custom"
-              variant="secondary"
-              onClick={handleCancel}
-            >
-              Cancel
-            </Button>
-          </Form>
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          {filteredThesisProposals.length == 0 ? (
-            <h2>No proposal found</h2>
-          ) : (
-            <Table hover>
-              <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>Supervisor</th>
-                  <th>Expiration Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[...filteredThesisProposals].map((element) => (
-                  <ProposalTableRow key={element.id} proposal={element} />
-                ))}
-              </tbody>
-            </Table>
-          )}
-        </Col>
-      </Row>
-    </Container>
+    <div className="d-flex justify-content-center">
+      <Container className="width-80 margin-custom">
+        <Row className="justify-content-center">
+          <Col sm={12} md={8}>
+            <h1 className="margin-titles-custom">Thesis Proposals</h1>
+          </Col>
+          <Col sm={12} md={4} className="d-flex align-items-center justify-content-end">
+            <Form className="d-flex" onSubmit={(e) => e.preventDefault()}>
+              <Form.Group className="mb-3 me-2 d-flex align-items-center position-relative">
+                <Form.Control
+                  type="text"
+                  placeholder="Insert a filter"
+                  value={filter}
+                  onChange={(event) => setFilter(event.target.value)}
+                  onKeyDown={(event) => {
+                    console.log(event.key)
+                    if (event.key === 'Enter') {
+                      event.preventDefault()
+                      handleSubmit();
+
+                    }
+                  }}
+                />
+                {filter && (
+                  <button className="clear-btn" onClick={handleCancel}>
+                    <span>&times;</span>
+                  </button>
+                )}
+                <Search className="search-button" onClick={handleSubmit} />
+              </Form.Group>
+            </Form>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            {filteredThesisProposals.length == 0 ? (
+              <h2>No proposal found</h2>
+            ) : (
+              <Table hover>
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Supervisor</th>
+                    <th>Expiration Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...filteredThesisProposals].map((element) => (
+                    <ProposalTableRow key={element.id} proposal={element} />
+                  ))}
+                </tbody>
+              </Table>
+            )}
+          </Col>
+        </Row>
+      </Container>
+    </div>
   );
 }
 

@@ -294,7 +294,7 @@ table.table-rounded thead tr {
 
 /* Margin for tables and alerts - SearchProposal*/
 .margin-custom {
-  margin: 1rem;
+  margin: 2rem;
 }
 
 /* Margin for Titles */
@@ -306,8 +306,32 @@ table.table-rounded thead tr {
 .margin-buttons-custom {
   margin-left: 1rem;
 }
+.clear-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 0;
+  height: 100%;
+  margin-right: 3rem;
+}
 
-
+.Form.Group {
+  position: relative;
+}
+.clear-btn span {
+  font-size: 18px;
+  color: #999;
+}
+.search-button{
+  margin-left: 1em;
+  font-size: larger;
+  color: black;
+}
 @media (min-width: 765px) {
   .title-mediumScreen {
     margin-left: 2em;
