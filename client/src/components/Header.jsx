@@ -104,7 +104,7 @@ function Header(props) {
                     onClick={() => {
                       if (isSmallScreen) setExpanded((old) => !old);
                       if (props.user && props.user.user_type === "STUD")
-                        navigate("/student");
+                        navigate("/proposal");
                       else if (props.user && props.user.user_type === "PROF")
                         navigate("/teacher");
                     }}

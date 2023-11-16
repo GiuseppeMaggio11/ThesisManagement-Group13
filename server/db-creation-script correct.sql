@@ -188,7 +188,7 @@ VALUES
     (4, 'GRP02'),
     (5, 'GRP01'),
     (6, 'GRP02');
-INSERT INTO application (student_id, thesis_id, status, application_date)
+/*INSERT INTO application (student_id, thesis_id, status, application_date)
 VALUES
     ('S123456', 1, 'Pending', '2023-12-15 10:30:00'),
     ('S123456', 2, 'Approved', '2023-11-20 14:45:00'),
@@ -196,7 +196,7 @@ VALUES
     ('S654321', 4, 'Approved', '2023-03-12 09:00:00'),
     ('S123456', 5, 'Pending', '2023-07-10 11:30:00'),
     ('S654321', 6, 'Approved', '2023-02-28 13:15:00')
-;
+;*/
 INSERT INTO thesis_cosupervisor_teacher (thesis_id, cosupevisor_id)
 VALUES 
     (1, 'P654321'),
