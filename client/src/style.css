@@ -171,6 +171,18 @@ table.table-rounded thead tr {
   border-color: #e19861;
   margin-right: 0.5em;
 }
+.button-style-trash {
+  background-color: transparent;
+  border-color: transparent;
+  color:#e19861;
+  margin-left: 0.2em;
+}
+.button-style-trash:hover {
+  background-color: transparent;
+  border-color: transparent;
+  color:#e19861;
+  margin-left: 0.2em;
+}
 
 .button-style-cancel:hover {
   background-color: #f27e25;
@@ -255,6 +267,27 @@ table.table-rounded thead tr {
   cursor: pointer;
 }
 
+.drop-area-wrong {
+  border: 2px dashed #e19861;
+  border-radius: 4px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.text-wrong{
+  color: black;
+  font-weight: 500;
+}
+.text-wrong-underlined{
+  color: rgb(0, 0, 0);
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: #f27e25;
+  text-decoration-thickness: 15%;
+
+}
+
 .drop-area:hover {
   background-color: #f0f0f0;
 }
@@ -273,6 +306,7 @@ table.table-rounded thead tr {
 .margin-buttons-custom {
   margin-left: 1rem;
 }
+
 
 @media (min-width: 765px) {
   .title-mediumScreen {

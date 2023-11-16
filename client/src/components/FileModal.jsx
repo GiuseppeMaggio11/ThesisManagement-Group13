@@ -1,7 +1,7 @@
-import React from "react";
+import React,{ useState } from "react";
 import { Modal, Form, Button } from "react-bootstrap";
-import { Trash, FileEarmarkPdf, FileEarmarkPlus } from "react-bootstrap-icons";
-
+import { Trash, FileEarmarkPdf, FileEarmarkPlus, TrashFill } from "react-bootstrap-icons";
+import { HoverIconButton } from "./HoverIconButton";
 function FileDropModal({
   showModal,
   closeModal,
@@ -9,6 +9,7 @@ function FileDropModal({
   setSelectedFiles,
   selectedFiles,
 }) {
+  const [wrongInput, setWrongInput] = useState(false)
   const handleRemoveFile = (index) => {
     const newFiles = [...selectedFiles];
     newFiles.splice(index, 1);
@@ -17,7 +18,7 @@ function FileDropModal({
 
   const handleDragOver = (e) => {
     e.preventDefault();
-  };
+  }
 
   const checkAndAdd = (files) => {
     let oldFiles = [...selectedFiles];
@@ -37,12 +38,20 @@ function FileDropModal({
 
   const handleDrop = (e) => {
     e.preventDefault();
+    setWrongInput(false)
     const droppedFiles = Array.from(e.dataTransfer.files);
 
     // Filter only pdf's files
     const pdfFiles = droppedFiles.filter(
       (file) => file.type === "application/pdf"
     );
+
+    const nonPdfFilesExist = droppedFiles.some(
+      (file) => file.type !== "application/pdf"
+    );
+
+    if (nonPdfFilesExist) 
+      setWrongInput(true)
 
     checkAndAdd(pdfFiles);
   };
@@ -53,8 +62,17 @@ function FileDropModal({
   };
 
   const handleFileInputChange = (e) => {
+    setWrongInput(false)
     const newFiles = Array.from(e.target.files);
     const pdfFiles = newFiles.filter((file) => file.type === "application/pdf");
+
+    const nonPdfFilesExist = newFiles.some(
+      (file) => file.type !== "application/pdf"
+    );
+
+    if (nonPdfFilesExist) 
+      setWrongInput(true)
+
     checkAndAdd(pdfFiles);
   };
 
@@ -67,14 +85,15 @@ function FileDropModal({
         <div>Upload all the files that the professor could need</div>
         <br></br>
         <div
-          className="drop-area"
+          className={wrongInput?"drop-area-wrong":"drop-area"}
           onDragOver={handleDragOver}
           onDrop={handleDrop}
           onClick={handleLabelClick}
         >
           <label htmlFor="fileInput">
             <FileEarmarkPlus size={60} style={{ marginBottom: "8px" }} />
-            <div>Drag & Drop or Click to Select PDF Files</div>
+          { !wrongInput && <div>Drag & Drop or Click to Select PDF Files</div>}
+          { wrongInput && <div> <span className="text-wrong">Only </span><span className="text-wrong-underlined">PDF</span><span className="text-wrong"> files are allowed</span> </div>}
           </label>
         </div>
         <input
@@ -89,14 +108,8 @@ function FileDropModal({
           {selectedFiles.map((file, index) => (
             <div key={index} className="file-item">
               <FileEarmarkPdf style={{ marginRight: "0.5em" }} /> {file.name}
-              <Button
-                variant="outline-danger"
-                className="trash-btn"
-                style={{ paddingBottom: "0.5em", marginLeft: "0.5em" }}
-                onClick={() => handleRemoveFile(index)}
-              >
-                <Trash />
-              </Button>
+              <HoverIconButton defaultIcon={Trash} hoverIcon={TrashFill} className={"button-style-trash" } onClick={() => handleRemoveFile(index)}></HoverIconButton>
+             
             </div>
           ))}
         </div>
