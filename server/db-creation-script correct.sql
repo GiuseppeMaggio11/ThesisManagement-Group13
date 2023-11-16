@@ -181,12 +181,12 @@ INSERT INTO external_supervisor (email, surname, name)
     ('elena.conti@email.net', 'Conti', 'Elena');
 INSERT INTO thesis (title, description, supervisor_id, thesis_level, thesis_type, required_knowledge, notes, expiration, cod_degree, keywords, is_archived)
 VALUES
-    ('Development of a Secure Web Application', 'Creating a web application with a focus on security features.', 'P123456', 'Master', 'Sperimental', 'Strong knowledge of web security and programming.', 'None', '2023-05-15 23:59:59', 'DEGR01','AUTOMATATION, HUMAN COMPUTER INTERACTION',0),
-    ('IoT-Based Smart Home Automation', 'Designing an IoT system for smart home automation.', 'P654321', 'Master', 'Company', 'Experience with IoT protocols and devices.', 'The thesis must be completed within 6 months.', '2023-08-30 23:59:59', 'DEGR02','USER EXPERIENCE, AUTOMATATION, MACHINE LEARNING', 0),
-    ('Network Traffic Analysis', 'Analyzing network traffic for security and optimization purposes.', 'P123456', 'Master', 'Sperimental', 'Background in network security and data analysis.', 'None', '2023-07-30 23:59:59', 'DEGR01',null,0),
-    ('Data Visualization Tool', 'Developing a tool for visualizing complex data sets.', 'P654321', 'Master', 'Company', 'Strong knowledge of data visualization techniques.', 'The thesis must be completed within 5 months.', '2023-09-30 23:59:59' ,'DEGR02','SOFTWARE QUALITY',0),
-    ('Machine Learning for Image Recognition', 'Implementing machine learning for image recognition tasks.', 'P123456', 'Master', 'Sperimental', 'Proficiency in machine learning and computer vision.', 'None', '2023-09-30 23:59:59', 'DEGR01',null ,0),
-    ('Embedded Systems Programming', 'Developing software for embedded systems in IoT devices.', 'P654321', 'Master', 'Abroad', 'Experience with embedded systems and low-level programming.', 'The thesis must be completed within 7 months.', '2023-05-15 23:59:59' ,'DEGR02','DATA ANALYSIS, AUTOMATATION',0);
+    ('Development of a Secure Web Application', 'Creating a web application with a focus on security features.', 'P123456', 'Master', 'Sperimental', 'Strong knowledge of web security and programming.', 'None', '2024-05-15 23:59:59', 'DEGR01','AUTOMATATION, HUMAN COMPUTER INTERACTION',0),
+    ('IoT-Based Smart Home Automation', 'Designing an IoT system for smart home automation.', 'P654321', 'Master', 'Company', 'Experience with IoT protocols and devices.', 'The thesis must be completed within 6 months.', '2023-12-30 23:59:59', 'DEGR02','USER EXPERIENCE, AUTOMATATION, MACHINE LEARNING', 0),
+    ('Network Traffic Analysis', 'Analyzing network traffic for security and optimization purposes.', 'P123456', 'Master', 'Sperimental', 'Background in network security and data analysis.', 'None', '2023-12-30 23:59:59', 'DEGR01',null,0),
+    ('Data Visualization Tool', 'Developing a tool for visualizing complex data sets.', 'P654321', 'Master', 'Company', 'Strong knowledge of data visualization techniques.', 'The thesis must be completed within 5 months.', '2023-11-30 23:59:59' ,'DEGR02','SOFTWARE QUALITY',0),
+    ('Machine Learning for Image Recognition', 'Implementing machine learning for image recognition tasks.', 'P123456', 'Master', 'Sperimental', 'Proficiency in machine learning and computer vision.', 'None', '2024-10-30 23:59:59', 'DEGR01',null ,0),
+    ('Embedded Systems Programming', 'Developing software for embedded systems in IoT devices.', 'P654321', 'Master', 'Abroad', 'Experience with embedded systems and low-level programming.', 'The thesis must be completed within 7 months.', '2024-05-15 23:59:59' ,'DEGR02','DATA ANALYSIS, AUTOMATATION',0);
 INSERT INTO thesis_group (thesis_id, group_id)
 VALUES
     (1, 'GRP01'),
@@ -195,7 +195,7 @@ VALUES
     (4, 'GRP02'),
     (5, 'GRP01'),
     (6, 'GRP02');
-INSERT INTO application (student_id, thesis_id, status, application_date)
+/*INSERT INTO application (student_id, thesis_id, status, application_date)
 VALUES
     ('S123456', 1, 'Pending', '2023-04-15 10:30:00'),
     ('S123456', 2, 'Approved', '2023-03-20 14:45:00'),
@@ -203,7 +203,7 @@ VALUES
     ('S654321', 4, 'Approved', '2023-06-12 09:00:00'),
     ('S123456', 5, 'Pending', '2023-07-10 11:30:00'),
     ('S654321', 6, 'Approved', '2023-02-28 13:15:00')
-;
+;*/
 INSERT INTO thesis_cosupervisor_teacher (thesis_id, cosupevisor_id)
 VALUES 
     (1, 'P654321'),
