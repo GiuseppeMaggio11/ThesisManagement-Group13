@@ -44,7 +44,8 @@ Authenticated users will see buttons to access the various routes
 - Route `/login`: Route containing the login form
 - Route `/proposals`: Route containing the list of all thesis proposals relating to the degree of the logged-in student. It is accessible only to authenticated users and shows only basic information (title, supervisor and expiration date).
 It is possible to filter thesis proposals based on the content of a text field form
-
+- Route `/teacher`: Route only accessible to authenticated professors containing a button to create a new thesis proposal.
+- Route `/newproposal`: Route only accessible to authenticated professors. It allows them to create a new thesis proposal by filling all its informations (title, description, supervisor, co-supervisors, level, keywords, type, group, required knowledge, notes, expiration date, degree and if it's archived).
 
 ## API Server
 
@@ -95,6 +96,89 @@ It is possible to filter thesis proposals based on the content of a text field f
       {
         "file": "file2.pdf"
       }
+    ]
+    ```
+
+#### 3. **New thesis**: `POST /api/newThesis`
+
+  - **Description**: Creates a new thesis and related int/external cosupervisors
+  - **Middleware**: `isProfessor`
+  - **Request Body**:
+    - `title` (string): The title of the thesis that is created,
+    - `description` (string): The description of the thesis that is created,
+    - `supervisor_id` (string): The supervisor ID of the thesis that is created,
+    - `thesis_level` (string): The level of the thesis that is created,
+    - `type_name` (string): The type of the thesis that is created,
+    - `required_knowledge` (string): The required knowledge of the thesis that is created,
+    - `notes` (string): Notes about the thesis that is created,
+    - `expiration` (date): The expiration date of the thesis that is created,
+    - `cod_degree` (string): The degree of the thesis that is created,
+    - `is_archived` (boolean): If the thesis that is created is archived,
+    - `keywords` (string): The keywords of the thesis that is created,
+    - `internal_cosupervisiors` (array): The internal co-supervisors of the thesis that is created,
+    - `external_cosupervisiors` (array): The external co-supervisors of the thesis that is created
+  - **Response**:
+    - thesis body if all the fields are correct
+    - `422 Unprocessable Entity` if some inputs are wrong
+    - `400`if data is incorrect
+  - **Example**:
+    ```json
+    {   
+      "title": "Test ERROR2",
+      "description": "Test description",
+      "supervisor_id":"P123456",
+      "thesis_level": "Bachelor",
+      "type_name": "Test type_name2",
+      "required_knowledge": " Test required_knowledge",
+      "notes": " test noted",
+      "expiration": "2024-12-31 23:59:59",
+      "cod_degree": "DEGR01",
+      "is_archived": 0,
+      "keywords" : "IoT, Genetica",
+      "cod_group" : "GRP01",
+      "cosupervisors_external": ["antonio.bruno@email.org"],
+      "cosupervisors_internal": ["P123456"]  
+    }
+    ```
+
+#### 4. **External co-supevisors list**: `GET /api/listExternalCosupervisors`
+
+  - **Description**: Returns list of every external cosupervisors
+  - **Middleware**: `isProfessor`
+  - **Response**:
+    - array of external co-supervisors
+    - `500 Internal Server Error` if an unexpected error occurs
+  - **Example**:
+    ```json
+    [
+    {   
+      "email": "testmai22222222l@mail.org",
+      "name":"testname",
+      "surname":"testsurname"
+    }
+    ]
+    ```
+
+#### 5. **New external co-supevisors **: `POST /api/newExternalCosupervisor`
+
+  - **Description**: Creates new external cosupervisor 
+  - **Middleware**: `isProfessor`
+  - **Request Body**:
+    - `email` (string): The email of the external co-supervisor that is created,
+    - `surname` (string): The surname of the external co-supervisor that is created
+    - `name` (string): The name of the external co-supervisor that is created,
+  - **Response**:
+    - new external co-supervisor body
+    - `422 Unprocessable Entity` if some inputs are wrong
+    - `400`if data is incorrect
+  - **Example**:
+    ```json
+    [
+    {   
+      "email": "testmai22222222l@mail.org",
+      "name":"testname",
+      "surname":"testsurname"
+    }
     ]
     ```
 
@@ -161,6 +245,67 @@ It is possible to filter thesis proposals based on the content of a text field f
 ]
 ```
 
+#### newProposal
+
+- Description: Asks the server to create a new thesis proposal
+- API server called: POST `/api/newProposal`
+- Input: thesis object
+- Output: inserted thesis object or errors
+
+```
+{   
+    "title": "Test ERROR2",
+    "description": "Test description",
+    "supervisor_id":"P123456",
+    "thesis_level": "Bachelor",
+    "type_name": "Test type_name2",
+    "required_knowledge": " Test required_knowledge",
+    "notes": " test noted",
+    "expiration": "2024-12-31 23:59:59",
+    "cod_degree": "DEGR01",
+    "is_archived": 0,
+    "keywords" : "IoT, Genetica",
+    "cod_group" : "GRP01",
+    "cosupervisors_external": ["antonio.bruno@email.org"],
+    "cosupervisors_internal": ["P123456"]
+    
+}
+```
+
+#### getListExternalCosupervisors
+
+- Description: Asks the server for the list of all the external co-supervisors
+- API server called: GET `/api/listExternalCosupervisors`
+- Input: _None_
+- Output: A vector containing detailed information on all external co-supervisors
+
+```
+[
+{   
+    "email": "testmai22222222l@mail.org",
+    "name":"testname",
+    "surname":"testsurname"
+    
+}
+]
+```
+
+#### newExternalCosupervisor
+
+- Description: Asks the server to create a new external co-supervisors
+- API server called: POST `/api/newExternalCosupervisor`
+- Input: external co-supervisor object
+- Output: inserted external co-supervisor object
+
+```
+{   
+    "email": "testmai22222222l@mail.org",
+    "name":"testname",
+    "surname":"testsurname"
+    
+}
+```
+
 #### OTHER 2 Client
 
 #### OTHER 3 Client
@@ -175,5 +320,7 @@ It is possible to filter thesis proposals based on the content of a text field f
 
 - `SearchProposalComponent` (inside `SearchProposal.jsx`): It's a component that appears in the `/proposals` route.
 Starting from the list of thesis proposals obtained from the server, it builds a filtered list. The filter is a string that can be set in a special form on the same page. If the filtered list is empty, it shows a message, otherwise it builds a table containing a row for each thesis proposal. The table rows are constructed using the `ProposalTableRow` component present in the same file and contain only the basic information of a thesis proposals (title, supervisor and expiration date). To access all the data of a specific thesis proposal, the user needs to click on its title. If the device screen is very small, the list is replaced by an accordion. Each accordion item is buildt using the `ProposalAccordion` component and has the title of a proposal in the header and supervisor and expiration date in the body.
+- `NewProposal` (inside `NewProposal.jsx`): It's a component that appears in the `/newproposal` route, only accessible by authenticated professors. It's a form component that handles the creation of a new thesis proposal. The user has to enter a few mandatory fields which are : title, supervisor_id, type, level, group, degree, expiration. The others are optional. In order to choose external co-supervisors the user can select one or more existing ones, or add a new one by clicking on the corresponding button and fill the form in the `NewExternalCosupervisor.jsx` component. The errors returned by the server are displayed at the bottom of the form when the user clicks on the create button. The internal co-supervisors and keywords inputs are handled by the `ChipsInput.jsx`component. The user has to enter them one by one by pressing enter each time.
+- `TeacherPage` (inside `TeacherPage.jsx`): It's a component that appears in the `/teacher` route, only accessible by authenticated professors. It contains a button redirecting to the `NewProposal`component.
 
 ## Users Credentials
