@@ -131,9 +131,9 @@ function SearchProposalComponent(props) {
     setFilteredThesisProposals([...props.thesisProposals]);
   };
 
-  return props.isMobile ? (
-    <Container>
-      <Row>
+  
+    {/*<Container>
+       <Row>
         <h1>Thesis Proposals</h1>
       </Row>
       <Row className="mt-3">
@@ -156,24 +156,17 @@ function SearchProposalComponent(props) {
             </Button>
           </Form>
         </Col>
-      </Row>
-      <Row>
-        <Accordion>
-          {[...filteredThesisProposals].map((element) => (
-            <ProposalAccordion key={element.id} proposal={element} />
-          ))}
-        </Accordion>
-      </Row>
-    </Container>
-  ) : (
-    <div className="d-flex justify-content-center">
-      <Container className="width-80 margin-custom">
-        <Row className="justify-content-center">
-          <Col sm={12} md={8}>
-            <h1 className="margin-titles-custom">Thesis Proposals</h1>
-          </Col>
-          <Col sm={12} md={4} className="d-flex align-items-center justify-content-end">
-            <Form className="d-flex" onSubmit={(e) => e.preventDefault()}>
+      </Row> */}
+return(
+<>
+<div className="d-flex justify-content-center">
+        <Container className="width-80 margin-custom">
+          <Row className="align-items-center">
+            <Col xs={12} className="d-flex justify-content-between align-items-center">
+              <h1 className={`margin-titles-custom ${props.isMobile ? 'smaller-heading' : ''}`}>
+                Thesis Proposals
+              </h1>
+              <Form className="d-flex" onSubmit={(e) => e.preventDefault()}>
               <Form.Group className="mb-3 me-2 d-flex align-items-center position-relative">
                 <Form.Control
                   type="text"
@@ -185,9 +178,9 @@ function SearchProposalComponent(props) {
                     if (event.key === 'Enter') {
                       event.preventDefault()
                       handleSubmit();
-
                     }
                   }}
+                  className="custom-input" 
                 />
                 {filter && (
                   <button className="clear-btn" onClick={handleCancel}>
@@ -199,6 +192,7 @@ function SearchProposalComponent(props) {
             </Form>
           </Col>
         </Row>
+       {!props.isMobile ? (
         <Row>
           <Col>
             {filteredThesisProposals.length == 0 ? (
@@ -220,10 +214,18 @@ function SearchProposalComponent(props) {
               </Table>
             )}
           </Col>
-        </Row>
+        </Row>):(
+          <Row>
+        <Accordion>
+          {[...filteredThesisProposals].map((element) => (
+            <ProposalAccordion key={element.id} proposal={element} />
+          ))}
+        </Accordion>
+      </Row>
+        )}
       </Container>
     </div>
-  );
+    </>)
 }
 
 function ProposalAccordion(props) {
@@ -250,15 +252,16 @@ function ProposalAccordion(props) {
 }
 
 function ProposalTableRow(props) {
+  const navigation = useNavigate()
   return (
-    <tr>
+    <tr onClick={()=>navigation(`/proposals/${props.proposal.id}`)}>
       <td>
-        <Link to={`/proposals/${props.proposal.id}`}>
+        <Link style={{color:'#4682B4', fontSize:18}} to={`/proposals/${props.proposal.id}`}>
           {props.proposal.title}
         </Link>
       </td>
-      <td>{props.proposal.supervisor}</td>
-      <td>{dayjs(props.proposal.expiration).format("YYYY-MM-DD")}</td>
+      <td style={{fontSize:18}}>{props.proposal.supervisor}</td>
+      <td style={{fontSize:18}}>{dayjs(props.proposal.expiration).format("YYYY-MM-DD")}</td>
     </tr>
   );
 }

@@ -288,6 +288,10 @@ table.table-rounded thead tr {
 
 }
 
+.smaller-heading {
+  font-size: 24px; /* Adjust the size as needed for mobile devices */
+}
+
 .drop-area:hover {
   background-color: #f0f0f0;
 }
@@ -331,6 +335,16 @@ table.table-rounded thead tr {
   margin-left: 1em;
   font-size: larger;
   color: black;
+}
+
+.custom-input {
+  transition: box-shadow 0.3s ease; 
+  outline: none; 
+  box-shadow: none;
+
+  &:focus {
+    box-shadow: 0 0 0px 0.5px #4682B4;
+  }
 }
 @media (min-width: 765px) {
   .title-mediumScreen {
