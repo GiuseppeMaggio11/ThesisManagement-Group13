@@ -187,39 +187,39 @@ function NewProposal(props) {
                     <Form.Label htmlFor="cosupervisors_external">
                       External Co-supervisors
                     </Form.Label>
-                    <Form.Select
-                      multiple
-                      value={formData.cosupervisors_external}
-                      onChange={(e) => {
-                        const selectedItem = e.target.value;
-                        if (
-                          formData.cosupervisors_external.includes(selectedItem)
-                        ) {
-                          const tempArray =
-                            formData.cosupervisors_external.filter(
-                              (item) => item !== selectedItem
-                            );
-                          setFormData({
-                            ...formData,
-                            cosupervisors_external: [...tempArray],
-                          });
-                        } else {
-                          setFormData({
-                            ...formData,
-                            cosupervisors_external: [
-                              ...formData.cosupervisors_external,
-                              selectedItem,
-                            ],
-                          });
-                        }
-                      }}
-                    >
-                      {cosupervisors_external.map((item) => (
-                        <option key={item} value={item} disabled>
-                          {item}
-                        </option>
-                      ))}
-                    </Form.Select>
+                    {cosupervisors_external.map((item,index) => (
+                      <Form.Check 
+                        type="checkbox"
+                        id={`${index}`}
+                        key={item}
+                        label={item}
+                        value={item}
+                        checked={formData.cosupervisors_external.includes(item)}
+                        onChange={(e) => {
+                          const selectedItem = e.target.value;
+                          if (formData.cosupervisors_external.includes(selectedItem)) {
+
+                            const tempArray =
+                              formData.cosupervisors_external.filter(
+                                (item) => item !== selectedItem
+                              );
+                            setFormData({
+                              ...formData,
+                              cosupervisors_external: [...tempArray],
+                            });
+                          } else {
+
+                            setFormData({
+                              ...formData,
+                              cosupervisors_external: [
+                                ...formData.cosupervisors_external,
+                                selectedItem,
+                              ],
+                            });
+                          }
+                        }}
+                      />
+                    ))}
                     <Button
                       className="button-style mt-3"
                       onClick={() => setShowForm(true)}
