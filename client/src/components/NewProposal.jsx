@@ -12,6 +12,11 @@ import API from "../API";
 import Loading from "./Loading";
 import ChipsInput from "./ChipsInput";
 import NewExternalCoSupervisor from "./NewExternalCosupervisor";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import ToggleComponent from "./Toggle";
+import Toggle from "react-toggle";
+
 
 function NewProposal(props) {
   const [formData, setFormData] = useState({
@@ -84,33 +89,62 @@ function NewProposal(props) {
       ...formData,
       keywords: formData.keywords.join(", "),
     };
-    await API.newProposal(newProp)
-      .then((response) => {
-        if (response && "errors" in response) {
-          setErrors(response.errors);
-        } else {
-          setFormData({
-            title: "",
-            description: "",
-            supervisor_id: "",
-            cosupervisors_internal: [],
-            cosupervisors_external: [],
-            thesis_level: "",
-            keywords: [],
-            type_name: "",
-            cod_group: "",
-            required_knowledge: "",
-            notes: "",
-            expiration: "",
-            cod_degree: "",
-            is_archived: false,
+    try {
+      const response = await API.newProposal(newProp);
+      if (response && "errors" in response) {
+        setErrors(response.errors);
+        Object.values(response.errors).forEach((error, index) => {
+          const errorMessage = `${error?.path ? error.path + ":" : ""} ${error.msg}`;
+          toast.error(errorMessage, {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 10000, // Adjust as needed
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
           });
-          setErrors(null);
-        }
-      })
-      .catch((error) => {
-        setErrors([{ msg: error.message }]);
+        });
+      } else {
+        setFormData({
+          title: "",
+          description: "",
+          supervisor_id: "",
+          cosupervisors_internal: [],
+          cosupervisors_external: [],
+          thesis_level: "",
+          keywords: [],
+          type_name: "",
+          cod_group: "",
+          required_knowledge: "",
+          notes: "",
+          expiration: "",
+          cod_degree: "",
+          is_archived: false,
+        });
+        setErrors(null);
+        toast.success("Proposal created successfully", {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 5000, // Adjust as needed
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      }
+    } catch (error) {
+      setErrors([{ msg: error.message }]);
+      toast.error(error.message, {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 10000, // Adjust as needed
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
       });
+    }
   };
 
   return (
@@ -142,6 +176,13 @@ function NewProposal(props) {
                       value={formData.title}
                       placeholder="Title"
                       onChange={handleChange}
+                      style={
+                        errors &&
+                          errors.some(error => error.path.includes('title')) ?
+                          { borderColor: 'red' } :
+                          {}
+                      }
+
                       required
                     />
                   </Form.Group>
@@ -154,6 +195,12 @@ function NewProposal(props) {
                       value={formData.description}
                       placeholder="Description"
                       onChange={handleChange}
+                      style={
+                        errors &&
+                          errors.some(error => error.path.includes('description')) ?
+                          { borderColor: 'red' } :
+                          {}
+                      }
                       required
                     />
                   </Form.Group>
@@ -168,6 +215,12 @@ function NewProposal(props) {
                       value={formData.supervisor_id}
                       placeholder="Supervisor ID"
                       onChange={handleChange}
+                      style={
+                        errors &&
+                          errors.some(error => error.path.includes('supervisor')) ?
+                          { borderColor: 'red' } :
+                          {}
+                      }
                       required
                     />
                   </Form.Group>
@@ -187,8 +240,8 @@ function NewProposal(props) {
                     <Form.Label htmlFor="cosupervisors_external">
                       External Co-supervisors
                     </Form.Label>
-                    {cosupervisors_external.map((item,index) => (
-                      <Form.Check 
+                    {cosupervisors_external.map((item, index) => (
+                      <Form.Check
                         type="checkbox"
                         id={`${index}`}
                         key={item}
@@ -255,6 +308,12 @@ function NewProposal(props) {
                       name="thesis_level"
                       value={formData.thesis_level}
                       onChange={handleChange}
+                      style={
+                        errors &&
+                          errors.some(error => error.path.includes('level')) ?
+                          { borderColor: 'red' } :
+                          {}
+                      }
                       required
                     >
                       <option>Choose a thesis level</option>
@@ -281,6 +340,12 @@ function NewProposal(props) {
                       value={formData.type_name}
                       placeholder="Type"
                       onChange={handleChange}
+                      style={
+                        errors &&
+                          errors.some(error => error.path.includes('type')) ?
+                          { borderColor: 'red' } :
+                          {}
+                      }
                       required
                     />
                   </Form.Group>
@@ -293,6 +358,12 @@ function NewProposal(props) {
                       value={formData.cod_group}
                       placeholder="Group"
                       onChange={handleChange}
+                      style={
+                        errors &&
+                          errors.some(error => error.path.includes('group')) ?
+                          { borderColor: 'red' } :
+                          {}
+                      }
                       required
                     />
                   </Form.Group>
@@ -307,6 +378,12 @@ function NewProposal(props) {
                       value={formData.required_knowledge}
                       placeholder="Required knowledge"
                       onChange={handleChange}
+                      style={
+                        errors &&
+                          errors.some(error => error.path.includes('required_knowledge')) ?
+                          { borderColor: 'red' } :
+                          {}
+                      }
                       required
                     />
                   </Form.Group>
@@ -319,6 +396,12 @@ function NewProposal(props) {
                       value={formData.notes}
                       placeholder="Notes"
                       onChange={handleChange}
+                      style={
+                        errors &&
+                          errors.some(error => error.path.includes('notes')) ?
+                          { borderColor: 'red' } :
+                          {}
+                      }
                       required
                     />
                   </Form.Group>
@@ -330,9 +413,16 @@ function NewProposal(props) {
                       name="expiration"
                       value={formData.expiration}
                       onChange={handleChange}
+                      style={
+                        errors &&
+                          errors.some(error => error.path.includes('expiration')) ?
+                          { borderColor: 'red' } :
+                          {}
+                      }
                       required
                     />
                   </Form.Group>
+
                   <Form.Group className="mb-3">
                     <Form.Label htmlFor="cod_degree">Degree</Form.Label>
                     <Form.Control
@@ -342,38 +432,45 @@ function NewProposal(props) {
                       value={formData.cod_degree}
                       placeholder="Degree"
                       onChange={handleChange}
+                      style={
+                        errors &&
+                          errors.some(error => error.path.includes('degree')) ?
+                          { borderColor: 'red' } :
+                          {}
+                      }
                       required
                     />
                   </Form.Group>
                   <Form.Group className="mb-3">
-                    <Form.Label htmlFor="is_archived">Is archived</Form.Label>
-                    <Form.Check
-                      id="is_archived"
-                      name="is_archived"
-                      checked={formData.is_archived}
-                      onChange={handleChange}
-                      required
-                    />
+                    <Row className="align-items-center">
+                      <Col xs="auto">
+                        <span style={{ fontSize: 18 }}>Insert this thesis as archived</span>
+                      </Col>
+                      <Col xs="auto">
+                        <Toggle formData={formData} handleChange={handleChange} />
+                      </Col>
+                    </Row>
                   </Form.Group>
-                  {errors && (
-                    <div className="alert alert-danger">
-                      <ul>
-                        {Object.values(errors).map((error, index) => (
-                          <li key={index}>
-                            {" "}
-                            {error?.path ? error.path + ":" : ""} {error.msg}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  <Button
-                    className="button-style"
-                    type="button"
-                    onClick={handleSubmit}
-                  >
-                    Create
-                  </Button>
+
+
+
+
+
+
+                  <ToastContainer />
+
+                  <Row className="justify-content-end">
+                    <Col xs="auto">
+                      <Button
+                        className="button-style"
+                        type="button"
+                        onClick={handleSubmit}
+                      >
+                        Create
+                      </Button>
+                    </Col>
+                  </Row>
+
                 </Form>
               </Card.Body>
             </Card>
