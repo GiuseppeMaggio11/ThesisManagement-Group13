@@ -96,11 +96,7 @@ sections:
 
 
 
-### SAJJAD: also i think it was better if we clarified everything at first, before the start of coding. For example, how should GUI look on different pages. What to show to the user on each page. Or even on the APIs, and small details. If we do so, communication between us would be easier, and rewriting same parts of the codes because of something is missing, will become less
 
-
-
-### PAOLO: These are the assessment proposals I thought about. Feel free to modify them
 
 ## ASSESSMENT
 
