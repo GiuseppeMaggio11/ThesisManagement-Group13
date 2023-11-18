@@ -11,9 +11,8 @@ import {
   Spinner,
   Table,
 } from "react-bootstrap";
-import MessageContext from '../messageCtx'
 import { useState, useEffect, useContext } from "react";
-
+import MessageContext from '../messageCtx'
 import dayjs from "dayjs";
 
 import API from "../API";
@@ -21,8 +20,8 @@ import { HoverIconButton } from "./HoverIconButton";
 import { Search } from "react-bootstrap-icons";
 
 function SearchProposalRoute(props) {
-  const { handleErrors } = useContext(MessageContext)
   const [thesisProposals, setThesisProposals] = useState([]);
+  const {handleToast} = useContext(MessageContext)
   //const [dirtyThesisProposals, setDirtyThesisProposals] = useState(true);
 
   const isMobile = useMediaQuery({ maxWidth: 767 });
@@ -37,7 +36,7 @@ function SearchProposalRoute(props) {
           //setDirtyThesisProposals(false);
           props.setLoading(false);
         })
-        .catch((err) => handleErrors(err));
+        .catch((err) => handleToast(err, 'error'));
       //}
     },
     []

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Button,
   Card,
@@ -16,7 +16,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ToggleComponent from "./Toggle";
 import Toggle from "react-toggle";
-
+import MessageContext from "../messageCtx";
 
 function NewProposal(props) {
   const [formData, setFormData] = useState({
@@ -37,9 +37,9 @@ function NewProposal(props) {
   });
 
   const [errors, setErrors] = useState(null);
-
   const [showForm, setShowForm] = useState(false);
   const [cosupervisors_external, setCoSupervisorExternal] = useState([]);
+  const {handleToast} = useContext(MessageContext)
 
   const fetchData = async () => {
     try {
@@ -132,6 +132,8 @@ function NewProposal(props) {
           draggable: true,
           progress: undefined,
         });
+        handleToast("Proposal created successfully", 'success')
+      
       }
     } catch (error) {
       setErrors([{ msg: error.message }]);
@@ -178,7 +180,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some(error => error.path.includes('title')) ?
+                          errors.some(error => error?.path?.includes('title')) ?
                           { borderColor: 'red' } :
                           {}
                       }
@@ -197,7 +199,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some(error => error.path.includes('description')) ?
+                          errors.some(error => error?.path?.includes('description')) ?
                           { borderColor: 'red' } :
                           {}
                       }
@@ -217,7 +219,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some(error => error.path.includes('supervisor')) ?
+                          errors.some(error => error?.path?.includes('supervisor')) ?
                           { borderColor: 'red' } :
                           {}
                       }
@@ -310,7 +312,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some(error => error.path.includes('level')) ?
+                          errors.some(error => error?.path?.includes('level')) ?
                           { borderColor: 'red' } :
                           {}
                       }
@@ -342,7 +344,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some(error => error.path.includes('type')) ?
+                          errors.some(error => error?.path?.includes('type')) ?
                           { borderColor: 'red' } :
                           {}
                       }
@@ -360,7 +362,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some(error => error.path.includes('group')) ?
+                          errors.some(error => error?.path?.includes('group')) ?
                           { borderColor: 'red' } :
                           {}
                       }
@@ -380,7 +382,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some(error => error.path.includes('required_knowledge')) ?
+                          errors.some(error => error?.path?.includes('required_knowledge')) ?
                           { borderColor: 'red' } :
                           {}
                       }
@@ -398,7 +400,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some(error => error.path.includes('notes')) ?
+                          errors.some(error => error?.path?.includes('notes')) ?
                           { borderColor: 'red' } :
                           {}
                       }
@@ -415,7 +417,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some(error => error.path.includes('expiration')) ?
+                          errors.some(error => error?.path?.includes('expiration')) ?
                           { borderColor: 'red' } :
                           {}
                       }
@@ -434,7 +436,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some(error => error.path.includes('degree')) ?
+                          errors.some(error => error?.path?.includes('degree')) ?
                           { borderColor: 'red' } :
                           {}
                       }

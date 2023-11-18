@@ -13,7 +13,7 @@ import FileDropModal from './FileModal';
 function ThesisPage(props) {
     const params = useParams();
     const navigate = useNavigate();
-    const {handleErrors} = useContext(MessageContext)
+    const {handleToast} = useContext(MessageContext)
     const [pageData, setPageData] = useState({})
     const [openPanel, setOpenPanel] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
@@ -51,7 +51,7 @@ function ThesisPage(props) {
                 console.log(thesisData)
                 setIsLoading(false)
             } catch (error){
-               handleErrors(error)
+               handleToast(error, 'center', 'error')
             }
         }
         init()
@@ -70,7 +70,7 @@ function ThesisPage(props) {
         }
         API.sendFiles(formData, thesis_id).then(
             () => { navigate("/proposal")}
-        ).catch((err) => { handleErrors(error) });
+        ).catch((err) => { handleToast(err, 'error' ) });
     }
 
     const closeModal=()=>{
@@ -82,7 +82,7 @@ function ThesisPage(props) {
     const submitApplication = (idThesis, date) => {
         API.applicationThesis(idThesis, date).then(
             () => { console.log("tutto ok") }
-        ).catch((err) => { handleErrors(err)});
+        ).catch((err) => { handleToast(err, 'error')});
     }
     return (
         <>
