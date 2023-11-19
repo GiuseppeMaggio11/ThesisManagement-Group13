@@ -360,7 +360,7 @@ app.post('/api/newThesis', isProfessor, [
     const codes_group = await dao.getCodes_group();
     // If given cod_group is not in list  raise error
     if (!codes_group.includes(req.body.cod_group)) {
-      return res.status(400).json({ error: `Cod_group: ${req.body.cod_group} is not a valid research group code` });
+      return res.status(422).json({ error: `Cod_group: ${req.body.cod_group} is not a valid research group code` });
     }
 
 

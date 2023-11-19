@@ -394,7 +394,12 @@ input:checked + .slider::before {
   transform: translateX(24px); /* Move knob to the right when checked */
 }
 
-
+.react-toggle:active:not(.react-toggle--disabled) .react-toggle-thumb{
+  box-shadow: none ;
+}
+.react-toggle--focus .react-toggle-thumb{
+  box-shadow: none ;
+}
 @media (min-width: 765px) {
   .title-mediumScreen {
     margin-left: 2em;

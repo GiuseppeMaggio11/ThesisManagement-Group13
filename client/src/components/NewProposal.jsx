@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   Button,
   Card,
@@ -41,7 +41,14 @@ function NewProposal(props) {
   const [errors, setErrors] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [cosupervisors_external, setCoSupervisorExternal] = useState([]);
-  const {handleToast} = useContext(MessageContext)
+  const { handleToast } = useContext(MessageContext)
+  const titleRef = useRef(null)
+  const supervisorRef = useRef(null)
+  const levelRef = useRef(null)
+  const groupRef = useRef(null)
+  const typeRef = useRef(null)
+  const expirationRef = useRef(null)
+  const degreeRef = useRef(null)
 
   const fetchData = async () => {
     try {
@@ -75,9 +82,9 @@ function NewProposal(props) {
     const { name, value } = event.target;
     const today = props.virtualClock
     const selectedDate = dayjs(value);
-    console.log(selectedDate)
+    console.log(today)
     if (selectedDate < today) {
-     handleToast('Please select a date in the future', 'error');   
+      handleToast('Please select a date in the future', 'error');
     } else {
       setFormData({ ...formData, [name]: value });
     }
@@ -99,6 +106,13 @@ function NewProposal(props) {
     });
   };
 
+  const scrollToRef = (ref) => {
+    ref.current.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newProp = {
@@ -107,425 +121,474 @@ function NewProposal(props) {
     };
     try {
       const response = await API.newProposal(newProp);
-      if (response && "errors" in response) {
-        setErrors(response.errors);
+      console.log('response'+JSON.stringify(response))
+      if (response && ("errors") in response) {
+        let id = 0;
         Object.values(response.errors).forEach((error, index) => {
-          let path='';
-          let msg='';
-          let errorMessage='';
+          let path = '';
+          let msg = '';
+          let errorMessage = '';
           let print = 1;
-          if(error?.path.includes('supervisor')){
-            path='Supervisor ID';
-            msg='Invalid value'
-            errorMessage=path+': '+msg;
+          if (error?.path.includes('supervisor')) {
+            path = 'Supervisor ID';
+            msg = 'Invalid value'
+            errorMessage = path + ': ' + msg;
+            id = 1;
           }
-          else if(error?.path.includes('title')){
-            path='Thesis level';
-            msg='Insert a value';
-            errorMessage=path+': '+msg;
-            }
-          else if(error?.path.includes('level')){
-            path='Thesis level';
-            msg='Insert a value';
-            errorMessage=path+': '+msg;
-            }
-          else if(error?.path.includes('type')){
-            path='Type';
-            msg='Insert a value';
-            errorMessage=path+': '+msg;
+          else if (error?.path.includes('title')) {
+            path = 'Thesis level';
+            msg = 'Insert a value';
+            errorMessage = path + ': ' + msg;
+            if (!id)
+              id = 2;
           }
-          else if(error?.path.includes('expiration')){
-            path='Expiration date';
-            msg='The date is required';
-            errorMessage=path+': '+msg;
+          else if (error?.path.includes('level')) {
+            path = 'Thesis level';
+            msg = 'Insert a value';
+            errorMessage = path + ': ' + msg;
+            if (!id)
+              id = 3;
           }
-          else if(error?.path.includes('degree')){
-            path='degree';
-            msg='Insert a value';
-            errorMessage=path+': '+msg;
+          else if (error?.path.includes('type')) {
+            path = 'Type';
+            msg = 'Insert a value';
+            errorMessage = path + ': ' + msg;
+            if (!id)
+              id = 4;
           }
-          else{
-            if(!(error?.path.includes('date'))){
-                console.log(error?.path + errorMessage)
-                errorMessage = `${error?.path ? error.path + ":" : ""} ${error.msg}`;
+          else if (error?.path.includes('group')) {
+            path = 'Group';
+            msg = 'Insert a valid value';
+            errorMessage = path + ': ' + msg;
+            if (!id)
+              id = 4;
           }
-              else{
-                print=0;
-              }
+          else if (error?.path.includes('expiration')) {
+            path = 'Expiration date';
+            msg = 'The date is required';
+            errorMessage = path + ': ' + msg;
+            if (!id)
+              id = 5;
           }
-          if(print){
-            toast.error(errorMessage, {
-              position: toast.POSITION.TOP_RIGHT,
-              autoClose: 10000, // Adjust as needed
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-            });
+          else if (error?.path.includes('degree')) {
+            path = 'degree';
+            msg = 'Insert a value';
+            errorMessage = path + ': ' + msg;
+            if (!id)
+              id = 6;
           }
           else{
-            print=1;
+            console.log(error?.path + errorMessage)
+            errorMessage = `${error?.path ? error.path + ":" : ""} ${error.msg}`;
           }
-        });
-      } else {
-        setFormData({
-          title: "",
-          description: "",
-          supervisor_id: "",
-          cosupervisors_internal: [],
-          cosupervisors_external: [],
-          thesis_level: "",
-          keywords: [],
-          type_name: "",
-          cod_group: "",
-          required_knowledge: "",
-          notes: "",
-          expiration: "",
-          cod_degree: "",
-          is_archived: false,
-        });
-        setErrors(null);
-        handleToast("Proposal created successfully", 'success')
-      
-      }
-    } catch (error) {
-      handleToast(error.msg, 'error')
+        
+        if (print) {
+          toast.error(errorMessage, {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 10000, // Adjust as needed
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+          switch (id) {
+            case 1:
+              scrollToRef(titleRef);
+              break;
+            case 2:
+              scrollToRef(supervisorRef);   
+              break;
+            case 3:
+              scrollToRef(levelRef);
+              break;
+            case 4:
+              scrollToRef(typeRef);
+              break;
+            case 5:
+              scrollToRef(expirationRef);
+              break;
+            case 6:
+              scrollToRef(degreeRef);
+              break;
+            default:
+              break;
+          }
+        }
+        else {
+          print = 1;
+        }
+      });
+      id=0;
+    } 
+    else if(response && ("error") in response){
+      console.log(response)
     }
-  };
+      else {
+      setFormData({
+        title: "",
+        description: "",
+        supervisor_id: "",
+        cosupervisors_internal: [],
+        cosupervisors_external: [],
+        thesis_level: "",
+        keywords: [],
+        type_name: "",
+        cod_group: "",
+        required_knowledge: "",
+        notes: "",
+        expiration: "",
+        cod_degree: "",
+        is_archived: false,
+      });
+      setErrors(null);
+      handleToast("Proposal created successfully", 'success')
 
-  return (
-    <>
-      {props.loading ? <Loading /> : ""}
-      <Container>
-        <Row>
-          <Col
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-            }}
+    }
+  } catch (error) {
+    console.log(error.message)
+    const parts = error.message.split(":")
+    console.log(JSON.stringify(parts))
+    if(parts[0] && parts[1]){
+      let message;
+      if(parts[0].includes('degree')){
+        message= parts[0]+': '+parts[1]
+        handleToast(message, 'error')
+      }
+    }
+    else
+    handleToast(error.msg?error.msg:'Unexpected error', 'error')
+  }
+};
+
+return (
+  <>
+    {props.loading ? <Loading /> : ""}
+    <Container>
+      <Row>
+        <Col
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Card
+            className="mt-3"
+            style={{ maxWidth: "1000px", margin: "0 auto" }}
           >
-            <Card
-              className="mt-3"
-              style={{ maxWidth: "1000px", margin: "0 auto" }}
-            >
-              <Card.Header className="fs-4">
-                Create a new thesis proposal
-              </Card.Header>
-              <Card.Body>
-                <Form>
-                  <Form.Group className="mb-3">
-                    <Form.Label htmlFor="title">Title</Form.Label>
-                    <Form.Control
-                      type="text"
-                      id="title"
-                      name="title"
-                      value={formData.title}
-                      placeholder="Title"
-                      onChange={handleChange}
-                      style={
-                        errors &&
-                          errors.some(error => error?.path?.includes('title')) ?
-                          { borderColor: 'red' } :
-                          {}
-                      }
+            <Card.Header className="fs-4">
+              Create a new thesis proposal
+            </Card.Header>
+            <Card.Body>
+              <Form>
+                <Form.Group className="mb-3" ref={titleRef}>
+                  <Form.Label htmlFor="title">Title</Form.Label>
+                  <Form.Control
+                    type="text"
+                    id="title"
+                    name="title"
+                    value={formData.title}
+                    placeholder="Title"
+                    onChange={handleChange}
+                    style={
+                      errors &&
+                        errors.some(error => error?.path?.includes('title')) ?
+                        { borderColor: 'red' } :
+                        {}
+                    }
 
-                      required
-                    />
-                  </Form.Group>
-                  <Form.Group className="mb-3">
-                    <Form.Label htmlFor="description">Description</Form.Label>
-                    <Form.Control
-                      as="textarea"
-                      id="description"
-                      name="description"
-                      value={formData.description}
-                      placeholder="Description"
-                      onChange={handleChange}
-                      style={
-                        errors &&
-                          errors.some(error => error?.path?.includes('description')) ?
-                          { borderColor: 'red' } :
-                          {}
-                      }
-                      required
-                    />
-                  </Form.Group>
-                  <Form.Group className="mb-3">
-                    <Form.Label htmlFor="supervisor_id">
-                      Supervisor ID
-                    </Form.Label>
-                    <Form.Control
-                      type="text"
-                      id="supervisor_id"
-                      name="supervisor_id"
-                      value={formData.supervisor_id}
-                      placeholder="Supervisor ID"
-                      onChange={handleChange}
-                      style={
-                        errors &&
-                          errors.some(error => error?.path?.includes('supervisor')) ?
-                          { borderColor: 'red' } :
-                          {}
-                      }
-                      required
-                    />
-                  </Form.Group>
-                  <Form.Group className="mb-3">
-                    <Form.Label htmlFor="cosupervisors_internal">
-                      Internal Co-supervisors
-                    </Form.Label>
-                    <ChipsInput
-                      field="cosupervisors_internal"
-                      values={formData.cosupervisors_internal}
-                      add={addChip}
-                      remove={deleteChip}
-                      placeholder="Enter internal co-supervisors ID and press enter"
-                    />
-                  </Form.Group>
-                  <Form.Group className="mb-3">
-                    <Form.Label htmlFor="cosupervisors_external">
-                      External Co-supervisors
-                    </Form.Label>
-                    {cosupervisors_external.map((item,index) => (
-                      <Form.Check 
-                        type="checkbox"
-                        id={`${index}`}
-                        key={item}
-                        label={item}
-                        value={item}
-                        checked={formData.cosupervisors_external.includes(item)}
-                        onChange={(e) => {
-                          const selectedItem = e.target.value;
-                          if (formData.cosupervisors_external.includes(selectedItem)) {
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label htmlFor="description">Description</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    id="description"
+                    name="description"
+                    value={formData.description}
+                    placeholder="Description"
+                    onChange={handleChange}
+                    style={
+                      errors &&
+                        errors.some(error => error?.path?.includes('description')) ?
+                        { borderColor: 'red' } :
+                        {}
+                    }
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label htmlFor="supervisor_id" ref={supervisorRef}>
+                    Supervisor ID
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    id="supervisor_id"
+                    name="supervisor_id"
+                    value={formData.supervisor_id}
+                    placeholder="Supervisor ID"
+                    onChange={handleChange}
+                    style={
+                      errors &&
+                        errors.some(error => error?.path?.includes('supervisor')) ?
+                        { borderColor: 'red' } :
+                        {}
+                    }
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label htmlFor="cosupervisors_internal">
+                    Internal Co-supervisors
+                  </Form.Label>
+                  <ChipsInput
+                    field="cosupervisors_internal"
+                    values={formData.cosupervisors_internal}
+                    add={addChip}
+                    remove={deleteChip}
+                    placeholder="Enter internal co-supervisors ID and press enter"
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label htmlFor="cosupervisors_external">
+                    External Co-supervisors
+                  </Form.Label>
+                  {cosupervisors_external.map((item, index) => (
+                    <Form.Check
+                      type="checkbox"
+                      id={`${index}`}
+                      key={item}
+                      label={item}
+                      value={item}
+                      checked={formData.cosupervisors_external.includes(item)}
+                      onChange={(e) => {
+                        const selectedItem = e.target.value;
+                        if (formData.cosupervisors_external.includes(selectedItem)) {
 
-                            const tempArray =
-                              formData.cosupervisors_external.filter(
-                                (item) => item !== selectedItem
-                              );
-                            setFormData({
-                              ...formData,
-                              cosupervisors_external: [...tempArray],
-                            });
-                          } else {
+                          const tempArray =
+                            formData.cosupervisors_external.filter(
+                              (item) => item !== selectedItem
+                            );
+                          setFormData({
+                            ...formData,
+                            cosupervisors_external: [...tempArray],
+                          });
+                        } else {
 
-                            setFormData({
-                              ...formData,
-                              cosupervisors_external: [
-                                ...formData.cosupervisors_external,
-                                selectedItem,
-                              ],
-                            });
-                          }
-                        }}
-                      />
-                    ))}
-                    <Button
-                      className="button-style mt-3"
-                      onClick={() => setShowForm(true)}
-                    >
-                      Add new external co-supervisor
-                    </Button>
-                    <Modal show={showForm} onHide={() => setShowForm(false)}>
-                      <Modal.Header closeButton>
-                        <Modal.Title>
-                          Add a new external co-supervisor
-                        </Modal.Title>
-                      </Modal.Header>
-                      <Modal.Body>
-                        <NewExternalCoSupervisor fetchData={fetchData} />
-                      </Modal.Body>
-                      <Modal.Footer>
-                        <Button
-                          className="button-style-cancel"
-                          variant="light"
-                          onClick={async () => {
-                            setShowForm(false);
-                          }}
-                        >
-                          Close
-                        </Button>
-                      </Modal.Footer>
-                    </Modal>
-                  </Form.Group>
-                  <Form.Group className="mb-3">
-                    <Form.Label htmlFor="thesis_level">Thesis level</Form.Label>
-                    <Form.Select
-                      id="thesis_level"
-                      name="thesis_level"
-                      value={formData.thesis_level}
-                      onChange={handleChange}
-                      style={
-                        errors &&
-                          errors.some(error => error?.path?.includes('level')) ?
-                          { borderColor: 'red' } :
-                          {}
-                      }
-                      required
-                    >
-                      <option>Choose a thesis level</option>
-                      <option value="Bachelor">Bachelor</option>
-                      <option value="Master">Master</option>
-                    </Form.Select>
-                  </Form.Group>
-                  <Form.Group className="mb-3">
-                    <Form.Label htmlFor="keywords">Keywords</Form.Label>
-                    <ChipsInput
-                      field="keywords"
-                      values={formData.keywords}
-                      add={addChip}
-                      remove={deleteChip}
-                      placeholder="Enter a keyword and press enter"
+                          setFormData({
+                            ...formData,
+                            cosupervisors_external: [
+                              ...formData.cosupervisors_external,
+                              selectedItem,
+                            ],
+                          });
+                        }
+                      }}
                     />
-                  </Form.Group>
-                  <Form.Group className="mb-3">
-                    <Form.Label htmlFor="type_name">Type</Form.Label>
-                    <Form.Control
-                      type="text"
-                      id="type_name"
-                      name="type_name"
-                      value={formData.type_name}
-                      placeholder="Type"
-                      onChange={handleChange}
-                      style={
-                        errors &&
-                          errors.some(error => error?.path?.includes('type')) ?
-                          { borderColor: 'red' } :
-                          {}
-                      }
-                      required
-                    />
-                  </Form.Group>
-                  <Form.Group className="mb-3">
-                    <Form.Label htmlFor="cod_group">Group</Form.Label>
-                    <Form.Control
-                      type="text"
-                      id="cod_group"
-                      name="cod_group"
-                      value={formData.cod_group}
-                      placeholder="Group"
-                      onChange={handleChange}
-                      style={
-                        errors &&
-                          errors.some(error => error?.path?.includes('group')) ?
-                          { borderColor: 'red' } :
-                          {}
-                      }
-                      required
-                    />
-                  </Form.Group>
-                  <Form.Group className="mb-3">
-                    <Form.Label htmlFor="required_knowledge">
-                      Required knowledge
-                    </Form.Label>
-                    <Form.Control
-                      type="text"
-                      id="required_knowledge"
-                      name="required_knowledge"
-                      value={formData.required_knowledge}
-                      placeholder="Required knowledge"
-                      onChange={handleChange}
-                      style={
-                        errors &&
-                          errors.some(error => error?.path?.includes('required_knowledge')) ?
-                          { borderColor: 'red' } :
-                          {}
-                      }
-                      required
-                    />
-                  </Form.Group>
-                  <Form.Group className="mb-3">
-                    <Form.Label htmlFor="notes">Notes</Form.Label>
-                    <Form.Control
-                      type="text"
-                      id="notes"
-                      name="notes"
-                      value={formData.notes}
-                      placeholder="Notes"
-                      onChange={handleChange}
-                      style={
-                        errors &&
-                          errors.some(error => error?.path?.includes('notes')) ?
-                          { borderColor: 'red' } :
-                          {}
-                      }
-                      required
-                    />
-                  </Form.Group>
-                  <Form.Group className="mb-3">
-                    <Form.Label htmlFor="expiration">Expiration</Form.Label>
-                    <Form.Control
-                      type="date"
-                      id="expiration"
-                      name="expiration"
-                      value={formData.expiration}
-                      onChange={handleChangeDate}
-                      style={
-                        errors &&
-                          errors.some(error => error?.path?.includes('expiration')) ?
-                          { borderColor: 'red' } :
-                          {}
-                      }
-                      required
-                    />
-                  </Form.Group>
-
-                  <Form.Group className="mb-3">
-                    <Form.Label htmlFor="cod_degree">Degree</Form.Label>
-                    <Form.Control
-                      type="text"
-                      id="cod_degree"
-                      name="cod_degree"
-                      value={formData.cod_degree}
-                      placeholder="Degree"
-                      onChange={handleChange}
-                      style={
-                        errors &&
-                          errors.some(error => error?.path?.includes('degree')) ?
-                          { borderColor: 'red' } :
-                          {}
-                      }
-                      required
-                    />
-                  </Form.Group>
-                  <Form.Group className="mb-3">
-                    <Row className="align-items-center">
-                      <Col xs="auto">
-                        <span style={{ fontSize: 18 }}>Insert this thesis as archived</span>
-                      </Col>
-                      <Col xs="auto">
-                        <Toggle formData={formData} handleChange={handleChange} />
-                      </Col>
-                    </Row>
-                  </Form.Group>
-
-
-
-
-
-
-                  <ToastContainer />
-
-                  <Row className="justify-content-end">
-                    <Col xs="auto">
+                  ))}
+                  <Button
+                    className="button-style mt-3"
+                    onClick={() => setShowForm(true)}
+                  >
+                    Add new external co-supervisor
+                  </Button>
+                  <Modal show={showForm} onHide={() => setShowForm(false)}>
+                    <Modal.Header closeButton>
+                      <Modal.Title>
+                        Add a new external co-supervisor
+                      </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                      <NewExternalCoSupervisor fetchData={fetchData} />
+                    </Modal.Body>
+                    <Modal.Footer>
                       <Button
-                        className="button-style"
-                        type="button"
-                        onClick={handleSubmit}
+                        className="button-style-cancel"
+                        variant="light"
+                        onClick={async () => {
+                          setShowForm(false);
+                        }}
                       >
-                        Create
+                        Close
                       </Button>
+                    </Modal.Footer>
+                  </Modal>
+                </Form.Group>
+                <Form.Group className="mb-3" ref={levelRef}>
+                  <Form.Label htmlFor="thesis_level">Thesis level</Form.Label>
+                  <Form.Select
+                    id="thesis_level"
+                    name="thesis_level"
+                    value={formData.thesis_level}
+                    onChange={handleChange}
+                    style={
+                      errors &&
+                        errors.some(error => error?.path?.includes('level')) ?
+                        { borderColor: 'red' } :
+                        {}
+                    }
+                    required
+                  >
+                    <option>Choose a thesis level</option>
+                    <option value="Bachelor">Bachelor</option>
+                    <option value="Master">Master</option>
+                  </Form.Select>
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label htmlFor="keywords">Keywords</Form.Label>
+                  <ChipsInput
+                    field="keywords"
+                    values={formData.keywords}
+                    add={addChip}
+                    remove={deleteChip}
+                    placeholder="Enter a keyword and press enter"
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3" ref={typeRef}>
+                  <Form.Label htmlFor="type_name">Type</Form.Label>
+                  <Form.Control
+                    type="text"
+                    id="type_name"
+                    name="type_name"
+                    value={formData.type_name}
+                    placeholder="Type"
+                    onChange={handleChange}
+                    style={
+                      errors &&
+                        errors.some(error => error?.path?.includes('type')) ?
+                        { borderColor: 'red' } :
+                        {}
+                    }
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3" ref={groupRef}>
+                  <Form.Label htmlFor="cod_group">Group</Form.Label>
+                  <Form.Control
+                    type="text"
+                    id="cod_group"
+                    name="cod_group"
+                    value={formData.cod_group}
+                    placeholder="Group"
+                    onChange={handleChange}
+                    style={
+                      errors &&
+                        errors.some(error => error?.path?.includes('group')) ?
+                        { borderColor: 'red' } :
+                        {}
+                    }
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label htmlFor="required_knowledge">
+                    Required knowledge
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    id="required_knowledge"
+                    name="required_knowledge"
+                    value={formData.required_knowledge}
+                    placeholder="Required knowledge"
+                    onChange={handleChange}
+                    style={
+                      errors &&
+                        errors.some(error => error?.path?.includes('required_knowledge')) ?
+                        { borderColor: 'red' } :
+                        {}
+                    }
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label htmlFor="notes">Notes</Form.Label>
+                  <Form.Control
+                    type="text"
+                    id="notes"
+                    name="notes"
+                    value={formData.notes}
+                    placeholder="Notes"
+                    onChange={handleChange}
+                    style={
+                      errors &&
+                        errors.some(error => error?.path?.includes('notes')) ?
+                        { borderColor: 'red' } :
+                        {}
+                    }
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3" expirationRef>
+                  <Form.Label htmlFor="expiration">Expiration</Form.Label>
+                  <Form.Control
+                    type="date"
+                    id="expiration"
+                    name="expiration"
+                    value={formData.expiration}
+                    onChange={handleChangeDate}
+                    style={
+                      errors &&
+                        errors.some(error => error?.path?.includes('expiration')) ?
+                        { borderColor: 'red' } :
+                        {}
+                    }
+                    required
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-3" degreeRef>
+                  <Form.Label htmlFor="cod_degree">Degree</Form.Label>
+                  <Form.Control
+                    type="text"
+                    id="cod_degree"
+                    name="cod_degree"
+                    value={formData.cod_degree}
+                    placeholder="Degree"
+                    onChange={handleChange}
+                    style={
+                      errors &&
+                        errors.some(error => error?.path?.includes('degree')) ?
+                        { borderColor: 'red' } :
+                        {}
+                    }
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Row className="align-items-center">
+                    <Col xs="auto">
+                      <span style={{ fontSize: 18 }}>Insert this thesis as archived</span>
+                    </Col>
+                    <Col xs="auto" className="d-flex align-items-center">
+                      {/* Add d-flex and align-items-center to vertically align the Toggle */}
+                      <Toggle formData={formData} handleChange={handleChange} />
                     </Col>
                   </Row>
+                </Form.Group>
 
-                </Form>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
-    </>
-  );
+                <ToastContainer />
+
+                <Row className="justify-content-end">
+                  <Col xs="auto">
+                    <Button
+                      className="button-style"
+                      type="button"
+                      onClick={handleSubmit}
+                    >
+                      Create
+                    </Button>
+                  </Col>
+                </Row>
+
+              </Form>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
+  </>
+);
 }
 
 export default NewProposal;
