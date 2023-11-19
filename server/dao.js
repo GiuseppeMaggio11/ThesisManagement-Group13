@@ -160,7 +160,7 @@ exports.getProposals = async (user_type, username, date) => {
     let finalResult = splitKeywordsToArray;
 
     sql = "select t.id, csve.cosupevisor_id, es.name, es.surname  from thesis t join thesis_cosupervisor_external csve on t.id = csve.thesis_id join external_supervisor es on csve.cosupevisor_id  = es.email";
-    const [result] = await pool.query(sql);
+    const [result] = await pool.execute(sql);
 
     if (result.length === 0) { }
     else {
@@ -174,7 +174,7 @@ exports.getProposals = async (user_type, username, date) => {
 
     //check for cosupervisors which are university professor and add their name and department's name and group to finalresult
     sql = "select t.id, tch.name , tch.surname , g.group_name, d.department_name  from thesis t join thesis_cosupervisor_teacher csvt on t.id = csvt.thesis_id join teacher tch on csvt.cosupevisor_id = tch.id join group_table g on tch.cod_group = g.cod_group join department d on tch.cod_department = d.cod_department";
-    const [results] = await pool.query(sql);
+    const [results] = await pool.execute(sql);
 
     if (result.length === 0) { }
     else {
@@ -210,10 +210,10 @@ exports.getProposalById = async (requested_thesis_id, user_type, username) => {
     if (user_type === 'STUD') {
       //check if the requested thesis degree is same to student's degree or not. if not, do not show anything to student
       sql = "select cod_degree from student where email = ?";
-      const [result] = await pool.query(sql, [username]);
+      const [result] = await pool.execute(sql, [username]);
 
       sql = "select cod_degree from thesis where id = ?";
-      const [result2] = await pool.query(sql, [requested_thesis_id]);
+      const [result2] = await pool.execute(sql, [requested_thesis_id]);
 
       if (result[0].cod_degree != result2[0].cod_degree) {
         return { error: 'you are not allowed to see proposals from other degrees' };
@@ -221,7 +221,7 @@ exports.getProposalById = async (requested_thesis_id, user_type, username) => {
     }
 
     sql = "select t.id, title, description, tch.name ,tch.surname , thesis_level ,thesis_type , required_knowledge , notes, expiration, keywords , dg.title_degree , g.group_name, d.department_name  , is_archived from thesis t join teacher tch on t.supervisor_id = tch.id join degree_table dg on t.cod_degree = dg.cod_degree join group_table g on tch.cod_group = g.cod_group join department d on tch.cod_department = d.cod_department where t.id = ?";
-    let [results] = await pool.query(sql, [requested_thesis_id]);
+    let [results] = await pool.execute(sql, [requested_thesis_id]);
 
     if (results.length === 0) {
       return { error: 'you are not allowed to see proposals from other degrees' };
@@ -241,7 +241,7 @@ exports.getProposalById = async (requested_thesis_id, user_type, username) => {
 
     //check for EXTERNAL cosupervisors and add their name & surname to finalresult
     sql = "select t.id, csve.cosupevisor_id, es.name, es.surname  from thesis t join thesis_cosupervisor_external csve on t.id = csve.thesis_id join external_supervisor es on csve.cosupevisor_id  = es.email  where t.id = ?";
-    [results] = await pool.query(sql, [requested_thesis_id]);
+    [results] = await pool.execute(sql, [requested_thesis_id]);
 
     if (results.length === 0) { }
     else {
@@ -252,7 +252,7 @@ exports.getProposalById = async (requested_thesis_id, user_type, username) => {
 
     //check for cosupervisors which are university professor and add their name and department's name and group to finalresult
     sql = "select t.id, tch.name , tch.surname , g.group_name, d.department_name  from thesis t join thesis_cosupervisor_teacher csvt on t.id = csvt.thesis_id join teacher tch on csvt.cosupevisor_id = tch.id join group_table g on tch.cod_group = g.cod_group join department d on tch.cod_department = d.cod_department where t.id = ?";
-    results = await pool.query(sql, [requested_thesis_id]);
+    results = await pool.execute(sql, [requested_thesis_id]);
 
     if (results.length === 0) { }
     else {
@@ -279,13 +279,9 @@ exports.getProposalById = async (requested_thesis_id, user_type, username) => {
 //returns true if the thesis is not expired or archived, otherwise true
 exports.isThesisValid = async (thesisID, date) => {
   try {
-    if (!thesisID) {
-      throw { error: "parameter is missing" };
-    }
+    const formattedDate = dayjs(date).format('YYYY-MM-DD HH:mm:ss');
 
-    const formattedDate = new dayjs(date).format('YYYY-MM-DD HH:mm:ss');
-
-    const sql = "SELECT COUNT(*) as count FROM thesis WHERE id = ? AND expiration>? ";
+    const sql = "SELECT COUNT(*) as count FROM thesis WHERE id = ? AND expiration>?";
     const [countResult] = await pool.execute(sql, [thesisID, formattedDate]);
 
     if (countResult[0].count === 0) {
@@ -305,17 +301,13 @@ exports.isThesisValid = async (thesisID, date) => {
 //returns false is the student is not already applied for a thesis,  otherwise true
 exports.isAlreadyExisting = async (studentID, thesisID) => {
   try {
-    if (!thesisID || !studentID) {
-      throw { error: "parameter is missing" };
-    }
-
     const sql = "SELECT COUNT(*) as count FROM application WHERE student_id = ? AND thesis_id = ?";
     const [countResult] = await pool.execute(sql, [studentID, thesisID]);
 
     if (countResult[0].count === 1) {
-      return false;
-    } else if (countResult[0].count === 0) {
       return true;
+    } else if (countResult[0].count === 0) {
+      return false;
     } else {
       throw new Error('Database error');
     }
@@ -331,12 +323,8 @@ exports.isAlreadyExisting = async (studentID, thesisID) => {
 // Function to create a new application
 exports.newApply = async (studentID, ThesisID, date) => {
   try {
-    if (!studentID || !ThesisID || !date) {
-      throw { error: "parameter is missing" };
-    }
-
     const status = "pending";
-    const formattedDate = new Date(date).toISOString().slice(0, 19).replace('T', ' ');
+    const formattedDate = dayjs(date).format('YYYY-MM-DD HH:mm:ss');
 
     const sql = "INSERT INTO application (student_id, thesis_id, status, application_date) VALUES (?, ?, ?, ?)";
     await pool.execute(sql, [studentID, ThesisID, status, formattedDate]);
@@ -357,7 +345,7 @@ exports.newApply = async (studentID, ThesisID, date) => {
 exports.createThesis = async (thesis) => {
   try {
     const sql = 'INSERT INTO thesis (title, description, supervisor_id, thesis_level, thesis_type, required_knowledge, notes, expiration, cod_degree, is_archived, keywords) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?); ';
-    const [rows] = await pool.query(sql, [thesis.title, thesis.description, thesis.supervisor_id, thesis.thesis_level, thesis.type_name,
+    const [rows] = await pool.execute(sql, [thesis.title, thesis.description, thesis.supervisor_id, thesis.thesis_level, thesis.type_name,
     thesis.required_knowledge, thesis.notes, thesis.expiration, thesis.cod_degree, thesis.is_archived, thesis.keywords]);
 
     const thesisrow = { id: rows.insertId, ...thesis }
@@ -373,7 +361,7 @@ exports.createThesis = async (thesis) => {
 exports.getTeachers = async () => {
   try {
     const sql = `SELECT id FROM teacher`;
-    const [rows] = await pool.query(sql);
+    const [rows] = await pool.execute(sql);
 
     const teachers = [];
     rows.map((e) => {
@@ -391,7 +379,7 @@ exports.getTeachers = async () => {
 exports.getDegrees = async () => {
   try {
     const sql = `SELECT cod_degree FROM degree_table`;
-    const [rows] = await pool.query(sql);
+    const [rows] = await pool.execute(sql);
 
     const degrees = [];
     rows.map((e) => {
@@ -409,7 +397,7 @@ exports.getDegrees = async () => {
 exports.getCodes_group = async () => {
   try {
     const sql = `SELECT cod_group FROM group_table`;
-    const [rows] = await pool.query(sql);
+    const [rows] = await pool.execute(sql);
 
     const codes_group = [];
     rows.map((e) => {
@@ -431,7 +419,7 @@ exports.createThesis_group = async (thesis_id, group_id) => {
     }
 
     const sql = 'INSERT INTO thesis_group (thesis_id, group_id) VALUES (?,?)';
-    await pool.query(sql, [thesis_id, group_id]);
+    await pool.execute(sql, [thesis_id, group_id]);
 
     const thesis_group = {
       thesis_id: thesis_id,
@@ -453,7 +441,7 @@ exports.createThesis_cosupervisor_teacher = async (thesis_id, professor_id) => {
     }
 
     const sql = 'INSERT INTO thesis_cosupervisor_teacher (thesis_id, cosupevisor_id) VALUES (?,?)';
-    await pool.query(sql, [thesis_id, professor_id]);
+    await pool.execute(sql, [thesis_id, professor_id]);
 
     const thesis_cosupervisor = {
       thesis_id: thesis_id,
@@ -475,7 +463,7 @@ exports.createThesis_cosupervisor_external = async (thesis_id, email) => {
     }
 
     const sql = 'INSERT INTO thesis_cosupervisor_external (thesis_id, cosupevisor_id) VALUES (?,?)';
-    await pool.query(sql, [thesis_id, email]);
+    await pool.execute(sql, [thesis_id, email]);
 
     const thesis_cosupervisor = {
       thesis_id: thesis_id,
@@ -493,7 +481,7 @@ exports.createThesis_cosupervisor_external = async (thesis_id, email) => {
 exports.getExternal_cosupervisors = async () => {
   try {
     const sql = `SELECT * FROM external_supervisor`;
-    const [rows] = await pool.query(sql);
+    const [rows] = await pool.execute(sql);
 
     const external_supervisors = [];
     rows.map((e) => {
@@ -516,7 +504,7 @@ exports.getExternal_cosupervisors = async () => {
 exports.getExternal_cosupervisors_emails = async () => {
   try {
     const sql = `SELECT email FROM external_supervisor`;
-    const [rows] = await pool.query(sql);
+    const [rows] = await pool.execute(sql);
 
     const external_cosupervisor_emails = [];
     rows.map((e) => {
@@ -538,7 +526,7 @@ exports.create_external_cosupervisor = async (external_cosupervisor) => {
     }
 
     const sql = 'INSERT INTO external_supervisor (email, surname, name) VALUES (?,?,?)';
-    await pool.query(sql, [external_cosupervisor.email, external_cosupervisor.surname, external_cosupervisor.name]);
+    await pool.execute(sql, [external_cosupervisor.email, external_cosupervisor.surname, external_cosupervisor.name]);
 
     return external_cosupervisor
 
