@@ -7,7 +7,7 @@ const Toasts = ({ message, type, onClose }) => {
     if (type === 'success') {
       toast.success(message, {
         position: toast.POSITION.TOP_CENTER,
-        autoClose: 10000, // Adjust as needed
+        autoClose: 5000, // Adjust as needed
         hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
@@ -18,7 +18,7 @@ const Toasts = ({ message, type, onClose }) => {
     } else if (type === 'error'){
       toast.error(message, {
         position: toast.POSITION.TOP_CENTER,
-        autoClose: 10000, // Adjust as needed
+        autoClose: 5000, // Adjust as needed
         hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,

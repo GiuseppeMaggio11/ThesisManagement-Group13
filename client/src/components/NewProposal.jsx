@@ -70,6 +70,18 @@ function NewProposal(props) {
     });
   };
 
+  function handleChangeDate(event) {
+    const { name, value } = event.target;
+    const today = new Date();
+    const selectedDate = new Date(value);
+    console.log(selectedDate)
+    if (selectedDate < today) {
+     handleToast('Please select a date in the future', 'error');   
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  }
+
   const addChip = (field, value) => {
     if (!formData[field].includes(value)) {
       setFormData({
@@ -97,16 +109,63 @@ function NewProposal(props) {
       if (response && "errors" in response) {
         setErrors(response.errors);
         Object.values(response.errors).forEach((error, index) => {
-          const errorMessage = `${error?.path ? error.path + ":" : ""} ${error.msg}`;
-          toast.error(errorMessage, {
-            position: toast.POSITION.TOP_RIGHT,
-            autoClose: 10000, // Adjust as needed
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
+          let path='';
+          let msg='';
+          let errorMessage='';
+          let print = 1;
+          if(error?.path.includes('supervisor')){
+            path='Supervisor ID';
+            msg='Invalid value'
+            errorMessage=path+': '+msg;
+          }
+          else if(error?.path.includes('title')){
+            path='Thesis level';
+            msg='Insert a value';
+            errorMessage=path+': '+msg;
+            }
+          else if(error?.path.includes('level')){
+            path='Thesis level';
+            msg='Insert a value';
+            errorMessage=path+': '+msg;
+            }
+          else if(error?.path.includes('type')){
+            path='Type';
+            msg='Insert a value';
+            errorMessage=path+': '+msg;
+          }
+          else if(error?.path.includes('expiration')){
+            path='Expiration date';
+            msg='The date is required';
+            errorMessage=path+': '+msg;
+          }
+          else if(error?.path.includes('degree')){
+            path='degree';
+            msg='Insert a value';
+            errorMessage=path+': '+msg;
+          }
+          else{
+            if(!(error?.path.includes('date'))){
+                console.log(error?.path + errorMessage)
+                errorMessage = `${error?.path ? error.path + ":" : ""} ${error.msg}`;
+          }
+              else{
+                print=0;
+              }
+          }
+          if(print){
+            toast.error(errorMessage, {
+              position: toast.POSITION.TOP_RIGHT,
+              autoClose: 10000, // Adjust as needed
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+          }
+          else{
+            print=1;
+          }
         });
       } else {
         setFormData({
@@ -399,7 +458,7 @@ function NewProposal(props) {
                       id="expiration"
                       name="expiration"
                       value={formData.expiration}
-                      onChange={handleChange}
+                      onChange={handleChangeDate}
                       style={
                         errors &&
                           errors.some(error => error?.path?.includes('expiration')) ?
