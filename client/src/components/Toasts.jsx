@@ -1,32 +1,35 @@
-import React from 'react';
-import { Toast, ToastContainer } from 'react-bootstrap';
+import React, { useEffect } from 'react';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Toasts = ({ message, type, onClose }) => {
-    return (
-      <ToastContainer
-        className="below-nav"
-        position="top-center"
-        style={{
-          marginTop: '1em',
-          position: 'fixed',
-          top: '20px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: '9999', // Ensure it's above other elements if necessary
-        }}
-      >
-        <Toast
-          show={message !== ""}
-          onClose={onClose}
-          delay={10000}
-          autohide={true}
-          bg="danger"
-          style={{ borderRadius: '50px', textAlign: 'center', backgroundColor: type==='success'?'green':'red' }}
-        >
-          <Toast.Body style={{ alignItems: 'center' }}>{message}</Toast.Body>
-        </Toast>
-      </ToastContainer>
-    );
-  };
-  
+  useEffect(() => {
+    if (type === 'success') {
+      toast.success(message, {
+        position: toast.POSITION.TOP_CENTER,
+        autoClose: 10000, // Adjust as needed
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        onClose: onClose
+      });
+    } else if (type === 'error'){
+      toast.error(message, {
+        position: toast.POSITION.TOP_CENTER,
+        autoClose: 10000, // Adjust as needed
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        onClose: onClose
+      });
+    }
+  }, [message, type]);
+
+  return null;
+};
+
 export default Toasts;

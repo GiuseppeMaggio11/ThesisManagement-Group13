@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import API from "../API";
 import Loading from "./Loading";
 import MessageContext from '../messageCtx'
+import { ToastContainer } from "react-toastify";
 
 
 function LoginForm(props) {
@@ -93,6 +94,7 @@ function LoginForm(props) {
                       onChange={(ev) => setPassword(ev.target.value)}
                     />
                   </Form.Group>
+                  <ToastContainer />
                   <Button className="button-style my-2" type="submit">
                     Login
                   </Button>

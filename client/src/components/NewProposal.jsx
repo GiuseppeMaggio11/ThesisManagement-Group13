@@ -18,6 +18,7 @@ import ToggleComponent from "./Toggle";
 import Toggle from "react-toggle";
 import MessageContext from "../messageCtx";
 
+
 function NewProposal(props) {
   const [formData, setFormData] = useState({
     title: "",
@@ -56,7 +57,9 @@ function NewProposal(props) {
   };
 
   useEffect(() => {
+    props.setLoading(true)
     fetchData();
+    props.setLoading(false)
   }, []);
 
   const handleChange = (e) => {
@@ -123,29 +126,11 @@ function NewProposal(props) {
           is_archived: false,
         });
         setErrors(null);
-        toast.success("Proposal created successfully", {
-          position: toast.POSITION.TOP_RIGHT,
-          autoClose: 5000, // Adjust as needed
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
         handleToast("Proposal created successfully", 'success')
       
       }
     } catch (error) {
-      setErrors([{ msg: error.message }]);
-      toast.error(error.message, {
-        position: toast.POSITION.TOP_RIGHT,
-        autoClose: 10000, // Adjust as needed
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      handleToast(error.msg, 'error')
     }
   };
 
@@ -242,8 +227,8 @@ function NewProposal(props) {
                     <Form.Label htmlFor="cosupervisors_external">
                       External Co-supervisors
                     </Form.Label>
-                    {cosupervisors_external.map((item, index) => (
-                      <Form.Check
+                    {cosupervisors_external.map((item,index) => (
+                      <Form.Check 
                         type="checkbox"
                         id={`${index}`}
                         key={item}

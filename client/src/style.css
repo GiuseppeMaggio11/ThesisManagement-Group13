@@ -350,10 +350,8 @@ table.table-rounded thead tr {
 .form-check-input {
   border-color:black
 }
-/* Hide the default checkbox */
-.form-check-input[type='checkbox'] {
-  display: none;
-}
+
+
 
 /* Style for the custom slider */
 .custom-checkbox {
