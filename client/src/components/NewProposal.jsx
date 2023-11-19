@@ -16,6 +16,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ToggleComponent from "./Toggle";
 import Toggle from "react-toggle";
+import dayjs from "dayjs";
 import MessageContext from "../messageCtx";
 
 
@@ -72,8 +73,8 @@ function NewProposal(props) {
 
   function handleChangeDate(event) {
     const { name, value } = event.target;
-    const today = new Date();
-    const selectedDate = new Date(value);
+    const today = props.virtualClock
+    const selectedDate = dayjs(value);
     console.log(selectedDate)
     if (selectedDate < today) {
      handleToast('Please select a date in the future', 'error');   

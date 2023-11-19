@@ -149,7 +149,7 @@ function App() {
               path="/newproposal"
               element={
                 loggedIn && user.user_type === "PROF" ? (
-                  <NewProposal loading={loading} setLoading={setLoading} />
+                  <NewProposal loading={loading} virtualClock={virtualClock} setLoading={setLoading} />
                 ) : (
                   <ErrorAlert />
                 )
