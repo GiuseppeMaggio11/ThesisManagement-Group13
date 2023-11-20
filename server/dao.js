@@ -344,7 +344,7 @@ exports.newApply = async (studentID, ThesisID, date) => {
 // Creates a new thesis row in thesis table, must receive every data of thesis, returns newly created row, including autoicremented id ( used to add new rows in successive tables)
 exports.createThesis = async (thesis) => {
   try {
-    const sql = 'INSERT INTO thesis (title, description, supervisor_id, thesis_level, thesis_type, required_knowledge, notes, expiration, cod_degree, is_archived, keywords) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?); ';
+    const sql = 'INSERT INTO thesis (title, description, supervisor_id, thesis_level, thesis_type, required_knowledge, notes, expiration, cod_degree, is_archived, keywords) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)';
     const [rows] = await pool.execute(sql, [thesis.title, thesis.description, thesis.supervisor_id, thesis.thesis_level, thesis.type_name,
     thesis.required_knowledge, thesis.notes, thesis.expiration, thesis.cod_degree, thesis.is_archived, thesis.keywords]);
 
