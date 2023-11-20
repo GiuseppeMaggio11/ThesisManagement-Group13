@@ -5,9 +5,15 @@ const dayjs = require("dayjs");
 
 
 jest.mock("mysql2/promise", () => {
+    const mockConnection = {
+        beginTransaction: jest.fn(),
+        commit: jest.fn(),
+        rollback: jest.fn(),
+        release: jest.fn(),
+    };
     const mockPool = {
         execute: jest.fn(),
-        query: jest.fn(),
+        getConnection: jest.fn(() => mockConnection),
     };
     return {
         createPool: jest.fn(() => mockPool)
@@ -168,7 +174,10 @@ describe("isAlreadyExisting", () => {
             studentID: 1,
             thesisID: 1,
         };
-        mockPool.execute.mockRejectedValue(new Error("Database error"));
+        const mockExecuteOutput = [
+            [{ count: 2 }]
+        ]
+        mockPool.execute.mockResolvedValue(mockExecuteOutput);
 
         await expect(dao.isAlreadyExisting(mockInput.studentID, mockInput.thesisID)).rejects.toStrictEqual(new Error("Database error"));
 
@@ -929,3 +938,75 @@ describe("getProposalById", () => {
     });
 
 });
+
+describe("beginTransaction", () => {
+
+    test("Should begin a transaction", async () => {
+        let mockConnection = mockPool.getConnection();
+        mockConnection.beginTransaction.mockResolvedValue(true);
+
+        await dao.beginTransaction();
+
+        expect(mockConnection.beginTransaction).toHaveBeenCalledTimes(1);
+        expect(mockConnection.release).toHaveBeenCalledTimes(1);
+    });
+
+    test("Should handle database errors", async () => {
+        let mockConnection = mockPool.getConnection();
+        mockConnection.beginTransaction.mockRejectedValue("Database error");
+
+        await expect(dao.beginTransaction()).rejects.toStrictEqual("Database error");
+
+        expect(mockConnection.beginTransaction).toHaveBeenCalledTimes(1);
+        expect(mockConnection.release).toHaveBeenCalledTimes(1);
+    });
+
+});
+
+describe("commit", () => {
+
+    test("Should commit a transaction", async () => {
+        let mockConnection = mockPool.getConnection();
+        mockConnection.commit.mockResolvedValue(true);
+
+        await dao.commit();
+
+        expect(mockConnection.commit).toHaveBeenCalledTimes(1);
+        expect(mockConnection.release).toHaveBeenCalledTimes(1);
+    });
+
+    test("Should handle database errors", async () => {
+        let mockConnection = mockPool.getConnection();
+        mockConnection.commit.mockRejectedValue("Database error");
+
+        await expect(dao.commit()).rejects.toStrictEqual("Database error");
+
+        expect(mockConnection.commit).toHaveBeenCalledTimes(1);
+        expect(mockConnection.release).toHaveBeenCalledTimes(1);
+    });
+
+});
+
+describe("rollback", () => {
+
+    test("Should rollback a transaction", async () => {
+        let mockConnection = mockPool.getConnection();
+        mockConnection.rollback.mockResolvedValue(true);
+
+        await dao.rollback();
+
+        expect(mockConnection.rollback).toHaveBeenCalledTimes(1);
+        expect(mockConnection.release).toHaveBeenCalledTimes(1);
+    });
+
+    test("Should handle database errors", async () => {
+        let mockConnection = mockPool.getConnection();
+        mockConnection.rollback.mockRejectedValue("Database error");
+
+        await expect(dao.rollback()).rejects.toStrictEqual("Database error");
+
+        expect(mockConnection.rollback).toHaveBeenCalledTimes(1);
+        expect(mockConnection.release).toHaveBeenCalledTimes(1);
+    });
+
+})
