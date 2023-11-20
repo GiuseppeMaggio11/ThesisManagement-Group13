@@ -7,7 +7,7 @@ async function getProposals (req, res) {
         const proposals = await dao.getProposals(req.user.user_type, req.user.username, req.query.date);
         res.status(200).json(proposals);
       } catch (err) {
-        res.status(500).json({ error: ` error: ${err} ` });
+        res.status(500).json(err);
       }
 }
 
@@ -21,7 +21,7 @@ async function getProposal (req,res){
       const proposal = await dao.getProposalById(thesis_id, req.user.user_type, req.user.username);
       res.status(200).json(proposal);
     } catch (error) {
-      res.status(500).send(error.message + ' ');
+      res.status(500).json(error);
     }
 }
 

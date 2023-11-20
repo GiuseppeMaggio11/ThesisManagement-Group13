@@ -1,11 +1,16 @@
 "use strict";
 
-const { isStudent, isProfessor, isLoggedIn } = require("../controllers/middleware")
-const { getProposals, getProposal } = require("../controllers/showThesis")
-const { newApplication } = require("../controllers/manageApplication")
-const { addFiles, getAllFiles, getStudentFilesList, getFile } = require("../controllers/manageFiles")
-const { newThesis } = require("../controllers/manageThesis")
-const { listExternalCosupervisors, createExternalCosupervisor } = require("../controllers/others")
+const { isStudent, isProfessor, isLoggedIn } = require("../controllers/middleware");
+const { getProposals, getProposal } = require("../controllers/showThesis");
+const { newApplication } = require("../controllers/manageApplication");
+const { addFiles, getAllFiles, getStudentFilesList, getFile } = require("../controllers/manageFiles");
+const { newThesis } = require("../controllers/manageThesis");
+const { listExternalCosupervisors, createExternalCosupervisor } = require("../controllers/others");
+
+const dao = require("../dao");
+const dayjs = require("dayjs");
+
+jest.mock("../dao");
 
 
 
@@ -177,6 +182,130 @@ describe("isProfessor", () => {
         expect(mockNext).not.toHaveBeenCalled();
         expect(mockRes.status).toHaveBeenCalledWith(401);
         expect(mockRes.json).toHaveBeenCalledWith({ error: 'Not professor' });
+    });
+
+});
+
+describe("getProposals", () => {
+    
+    test("Should get a list of thesis proposals", async () => {
+        const mockReq = {
+            user: {
+                username: "username",
+                user_type: "STUD"
+            },
+            query:  {
+                date: dayjs()
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        const output = "output";
+        dao.getProposals.mockResolvedValue(output);
+    
+        await getProposals(mockReq, mockRes);
+    
+        expect(dao.getProposals).toHaveBeenCalledTimes(1)
+        expect(mockRes.status).toHaveBeenCalledWith(200);
+        expect(mockRes.json).toHaveBeenCalledWith(output);
+    });
+
+    test("Should return 500 - internal server error", async () => {
+        const mockReq = {
+            user: {
+                username: "username",
+                user_type: "STUD"
+            },
+            query:  {
+                date: dayjs()
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        dao.getProposals.mockRejectedValue("Database error");
+    
+        await getProposals(mockReq, mockRes);
+    
+        expect(dao.getProposals).toHaveBeenCalledTimes(1)
+        expect(mockRes.status).toHaveBeenCalledWith(500);
+        expect(mockRes.json).toHaveBeenCalledWith("Database error");
+    });
+
+});
+
+describe("getProposal", () => {
+    
+    test("Should get all the fields of a thesis proposal", async () => {
+        const mockReq = {
+            params: {
+                id: 1
+            },
+            user: {
+                username: "username",
+                user_type: "STUD"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        const output = "output";
+        dao.getProposalById.mockResolvedValue(output);
+    
+        await getProposal(mockReq, mockRes);
+    
+        expect(dao.getProposalById).toHaveBeenCalledTimes(1)
+        expect(mockRes.status).toHaveBeenCalledWith(200);
+        expect(mockRes.json).toHaveBeenCalledWith(output);
+    });
+
+    test("Should return 500 - \"thesis_id\" is not a number", async () => {
+        const mockReq = {
+            params: {
+                id: "not a number"
+            },
+            user: {
+                username: "username",
+                user_type: "STUD"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+    
+        await getProposal(mockReq, mockRes);
+    
+        expect(dao.getProposalById).not.toHaveBeenCalled()
+        expect(mockRes.status).toHaveBeenCalledWith(500);
+        expect(mockRes.json).toHaveBeenCalledWith(new Error('Thesis ID must be an integer'));
+    });
+
+    test("Should return 500 - internal server error", async () => {
+        const mockReq = {
+            params: {
+                id: 1
+            },
+            user: {
+                username: "username",
+                user_type: "STUD"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        dao.getProposalById.mockRejectedValue("Database error");
+    
+        await getProposal(mockReq, mockRes);
+    
+        expect(dao.getProposalById).toHaveBeenCalledTimes(1)
+        expect(mockRes.status).toHaveBeenCalledWith(500);
+        expect(mockRes.json).toHaveBeenCalledWith("Database error");
     });
 
 });
