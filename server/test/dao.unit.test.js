@@ -32,7 +32,7 @@ describe("isThesisValid", () => {
             formattedDate: dayjs().format("YYYY-MM-DD HH:mm:ss")
         };
         const mockExecuteOutput = [
-            [{count: 1}]
+            [{ count: 1 }]
         ];
         mockPool.execute.mockResolvedValue(mockExecuteOutput);
 
@@ -42,7 +42,7 @@ describe("isThesisValid", () => {
         expect(mockPool.execute).toHaveBeenCalledWith(
             "SELECT COUNT(*) as count FROM thesis WHERE id = ? AND expiration>?",
             [
-                mockInput.thesisID, 
+                mockInput.thesisID,
                 mockInput.formattedDate
             ]
         );
@@ -297,7 +297,7 @@ describe("createThesis", () => {
             is_archived: false,
             keywords: "keywordss"
         };
-        let rows = [{insertId:1}];
+        let rows = [{ insertId: 1 }];
         mockPool.execute.mockResolvedValue(rows);
 
         const result = await dao.createThesis(mockInput);
@@ -305,11 +305,11 @@ describe("createThesis", () => {
         expect(mockPool.execute).toHaveBeenCalledTimes(1);
         expect(mockPool.execute).toHaveBeenCalledWith(
             "INSERT INTO thesis (title, description, supervisor_id, thesis_level, thesis_type, required_knowledge, notes, expiration, cod_degree, is_archived, keywords) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)",
-            [mockInput.title, mockInput.description, mockInput.supervisor_id, 
-                mockInput.thesis_level, mockInput.type_name, mockInput.required_knowledge, mockInput.notes, 
-                mockInput.expiration, mockInput.cod_degree, mockInput.is_archived, mockInput.keywords]
+            [mockInput.title, mockInput.description, mockInput.supervisor_id,
+            mockInput.thesis_level, mockInput.type_name, mockInput.required_knowledge, mockInput.notes,
+            mockInput.expiration, mockInput.cod_degree, mockInput.is_archived, mockInput.keywords]
         );
-        expect(result).toStrictEqual({id: rows[0].insertId, ...mockInput});
+        expect(result).toStrictEqual({ id: rows[0].insertId, ...mockInput });
     });
 
     test("Should handle database error and reject", async () => {
@@ -333,9 +333,9 @@ describe("createThesis", () => {
         expect(mockPool.execute).toHaveBeenCalledTimes(1);
         expect(mockPool.execute).toHaveBeenCalledWith(
             "INSERT INTO thesis (title, description, supervisor_id, thesis_level, thesis_type, required_knowledge, notes, expiration, cod_degree, is_archived, keywords) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)",
-            [mockInput.title, mockInput.description, mockInput.supervisor_id, 
-                mockInput.thesis_level, mockInput.type_name, mockInput.required_knowledge, mockInput.notes, 
-                mockInput.expiration, mockInput.cod_degree, mockInput.is_archived, mockInput.keywords]
+            [mockInput.title, mockInput.description, mockInput.supervisor_id,
+            mockInput.thesis_level, mockInput.type_name, mockInput.required_knowledge, mockInput.notes,
+            mockInput.expiration, mockInput.cod_degree, mockInput.is_archived, mockInput.keywords]
         );
     });
 });
@@ -346,7 +346,7 @@ describe("getTeacher", () => {
         const mockRows = [[{ id: 1 }, { id: 2 }, { id: 3 }]];
         const mockOutput = [1, 2, 3];
         mockPool.execute.mockResolvedValue(mockRows);
-        
+
         const result = await dao.getTeachers();
 
         expect(mockPool.execute).toHaveBeenCalledTimes(1);
@@ -358,7 +358,7 @@ describe("getTeacher", () => {
 
     test("Should handle database error and reject", async () => {
         mockPool.execute.mockRejectedValue("Database error");
-        
+
         await expect(dao.getTeachers()).rejects.toStrictEqual("Database error");
 
         expect(mockPool.execute).toHaveBeenCalledTimes(1);
@@ -386,7 +386,7 @@ describe("getDegrees", () => {
 
     test("Should handle database error and reject", async () => {
         mockPool.execute.mockRejectedValue("Database error");
-        
+
         await expect(dao.getDegrees()).rejects.toStrictEqual("Database error");
 
         expect(mockPool.execute).toHaveBeenCalledTimes(1);
@@ -414,7 +414,7 @@ describe("getCodes_group", () => {
 
     test("Should handle database error and reject", async () => {
         mockPool.execute.mockRejectedValue("Database error");
-        
+
         await expect(dao.getCodes_group()).rejects.toStrictEqual("Database error");
 
         expect(mockPool.execute).toHaveBeenCalledTimes(1);
@@ -455,7 +455,7 @@ describe("createThesis_group", () => {
 
         await expect(dao.createThesis_group(mockInput.thesis_id, mockInput.group_id)).rejects.toStrictEqual("Database error");
 
-        expect(mockPool.execute).toHaveBeenCalledTimes(1); 
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
         expect(mockPool.execute).toHaveBeenCalledWith(
             "INSERT INTO thesis_group (thesis_id, group_id) VALUES (?,?)",
             [mockInput.thesis_id, mockInput.group_id]
@@ -473,7 +473,7 @@ describe("createThesis_group", () => {
             }
         );
 
-        expect(mockPool.execute).not.toHaveBeenCalled(); 
+        expect(mockPool.execute).not.toHaveBeenCalled();
     });
 
     test("Should reject if thesis_id parameter is missing ", async () => {
@@ -732,4 +732,293 @@ describe("create_external_cosupervisor", () => {
 
         expect(mockPool.execute).not.toHaveBeenCalled();
     });
+});
+
+describe("getProposals", () => {
+
+    test("Should get all thesis proposals viewable by a certain student - STUD; applicationResult.length != 0", async () => {
+        const mockInput = {
+            user_type: "STUD",
+            username: "username",
+            date: dayjs()
+        };
+        const mockOutput = [
+            {
+                cosupervisors: ["name surname", "name surname"],
+                department_name: "department_name",
+                description: 1,
+                expiration: "2022-01-01 00:00:00",
+                group_name: [{ "department": "department_name", "group": "group_name" }],
+                id: 1,
+                is_archived: true,
+                keywords: ["keywords"],
+                name: "name",
+                notes: "notes",
+                required_knowledge: "required_knowledge",
+                surname: "surname",
+                thesis_level: "thesis_level",
+                thesis_type: "thesis_type",
+                title: "title",
+                title_degree: "title_degree"
+            }
+        ]
+
+        mockPool.execute
+            .mockResolvedValueOnce([[{ title_degree: "title_degree" }]])
+            .mockResolvedValueOnce([[{ thesis_id: 2 }, { thesis_id: 3 }]])
+            .mockResolvedValueOnce([[{
+                id: 1,
+                title: "title",
+                description: 1,
+                name: "name",
+                surname: "surname",
+                thesis_level: "thesis_level",
+                thesis_type: "thesis_type",
+                required_knowledge: "required_knowledge",
+                notes: "notes",
+                expiration: dayjs("2022-01-01").format("YYYY-MM-DD HH:mm:ss"),
+                keywords: "keywords",
+                title_degree: "title_degree",
+                group_name: "group_name",
+                department_name: "department_name",
+                is_archived: true
+            }]])
+            .mockResolvedValueOnce([[{
+                id: 1,
+                cosupevisor_id: 1,
+                name: "name",
+                surname: "surname"
+            }]])
+            .mockResolvedValueOnce([[{
+                id: 1,
+                name: "name",
+                surname: "surname",
+                group_name: "group_name",
+                department_name: "department_name"
+            }]]);
+
+        const result = await dao.getProposals(mockInput.user_type, mockInput.username, mockInput.date);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(5);
+        expect(result).toStrictEqual(mockOutput);
+
+    });
+
+    test("Should get all thesis proposals viewable by a certain student - NOT STUD", async () => {
+        const mockInput = {
+            user_type: "PROF",
+            username: "username",
+            date: dayjs()
+        };
+        const mockOutput = [
+            {
+                cosupervisors: ["name surname", "name surname"],
+                department_name: "department_name",
+                description: 1,
+                expiration: "2022-01-01 00:00:00",
+                group_name: [{ "department": "department_name", "group": "group_name" }],
+                id: 1,
+                is_archived: true,
+                keywords: ["keywords"],
+                name: "name",
+                notes: "notes",
+                required_knowledge: "required_knowledge",
+                surname: "surname",
+                thesis_level: "thesis_level",
+                thesis_type: "thesis_type",
+                title: "title",
+                title_degree: "title_degree"
+            }
+        ]
+
+        mockPool.execute
+            .mockResolvedValueOnce([[{
+                id: 1,
+                title: "title",
+                description: 1,
+                name: "name",
+                surname: "surname",
+                thesis_level: "thesis_level",
+                thesis_type: "thesis_type",
+                required_knowledge: "required_knowledge",
+                notes: "notes",
+                expiration: dayjs("2022-01-01").format("YYYY-MM-DD HH:mm:ss"),
+                keywords: "keywords",
+                title_degree: "title_degree",
+                group_name: "group_name",
+                department_name: "department_name",
+                is_archived: true
+            }]])
+            .mockResolvedValueOnce([[{
+                id: 1,
+                cosupevisor_id: 1,
+                name: "name",
+                surname: "surname"
+            }]])
+            .mockResolvedValueOnce([[{
+                id: 1,
+                name: "name",
+                surname: "surname",
+                group_name: "group_name",
+                department_name: "department_name"
+            }]]);
+
+        const result = await dao.getProposals(mockInput.user_type, mockInput.username, mockInput.date);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(3);
+        expect(result).toStrictEqual(mockOutput);
+
+    });
+
+    test("Should return error \"no entry\"", async () => {
+        const mockInput = {
+            user_type: "STUD",
+            username: "username",
+            date: dayjs()
+        };
+
+        mockPool.execute
+            .mockResolvedValueOnce([[{ title_degree: "title_degree" }]])
+            .mockResolvedValueOnce([[]])
+            .mockResolvedValueOnce([[]]);
+
+        const result = await dao.getProposals(mockInput.user_type, mockInput.username, mockInput.date)
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(3);
+        expect(result).toStrictEqual({ error: "no entry" });
+
+    });
+
+    test("Should handle database errors", async () => {
+        const mockInput = {
+            user_type: "STUD",
+            username: "username",
+            date: dayjs()
+        };
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getProposals(mockInput.user_type, mockInput.username, mockInput.date)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+    });
+
+});
+
+describe("getProposalById", () => {
+
+    test("Should get all informations about a thesis proposal if it is viewable by a certain student", async () => {
+        const mockInput = {
+            requested_thesis_id: 1,
+            user_type: "STUD",
+            username: "username"
+        };
+        const mockOutput =
+        {
+            cosupervisors: ["name surname", "undefined undefined"],
+            department_name: "department_name",
+            description: 1,
+            expiration: "2022-01-01 00:00:00",
+            group_name: [{ department: "department_name", group: "group_name" }, { department: undefined, group: undefined }],
+            id: 1,
+            is_archived: true,
+            keywords: ["keywords"],
+            name: "name",
+            notes: "notes",
+            required_knowledge: "required_knowledge",
+            surname: "surname",
+            thesis_level: "thesis_level",
+            thesis_type: "thesis_type",
+            title: "title",
+            title_degree: "title_degree"
+        }
+
+
+        mockPool.execute
+            .mockResolvedValueOnce([[{ cod_degree: "DEGR01" }]])
+            .mockResolvedValueOnce([[{ cod_degree: "DEGR01" }]])
+            .mockResolvedValueOnce([[{
+                id: 1,
+                title: "title",
+                description: 1,
+                name: "name",
+                surname: "surname",
+                thesis_level: "thesis_level",
+                thesis_type: "thesis_type",
+                required_knowledge: "required_knowledge",
+                notes: "notes",
+                expiration: dayjs("2022-01-01").format("YYYY-MM-DD HH:mm:ss"),
+                keywords: "keywords",
+                title_degree: "title_degree",
+                group_name: "group_name",
+                department_name: "department_name",
+                is_archived: true
+            }]])
+            .mockResolvedValueOnce([[{
+                id: 1,
+                cosupevisor_id: 1,
+                name: "name",
+                surname: "surname"
+            }]])
+            .mockResolvedValueOnce([[{
+                id: 1,
+                name: "name",
+                surname: "surname",
+                group_name: "group_name",
+                department_name: "department_name"
+            }]]);
+
+        const result = await dao.getProposalById(mockInput.requested_thesis_id, mockInput.user_type, mockInput.username);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(5);
+        expect(result).toStrictEqual(mockOutput);
+    });
+
+    test("Should return error \"you are not allowed to see proposals from other degrees\" - First if", async () => {
+        const mockInput = {
+            requested_thesis_id: 1,
+            user_type: "STUD",
+            username: "username"
+        };
+
+        mockPool.execute
+            .mockResolvedValueOnce([[{ cod_degree: "DEGR01" }]])
+            .mockResolvedValueOnce([[{ cod_degree: "DEGR02" }]]);
+
+        const result = await dao.getProposalById(mockInput.requested_thesis_id, mockInput.user_type, mockInput.username);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(2);
+        expect(result).toStrictEqual({ error: "you are not allowed to see proposals from other degrees" });
+    });
+
+    test("Should return error \"you are not allowed to see proposals from other degrees\" - Second if", async () => {
+        const mockInput = {
+            requested_thesis_id: 1,
+            user_type: "STUD",
+            username: "username"
+        };
+
+        mockPool.execute
+            .mockResolvedValueOnce([[{ cod_degree: "DEGR01" }]])
+            .mockResolvedValueOnce([[{ cod_degree: "DEGR01" }]])
+            .mockResolvedValueOnce([[]]);
+
+        const result = await dao.getProposalById(mockInput.requested_thesis_id, mockInput.user_type, mockInput.username);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(3);
+        expect(result).toStrictEqual({ error: "you are not allowed to see proposals from other degrees" });
+    });
+
+    test("Should handle database errors", async () => {
+        const mockInput = {
+            requested_thesis_id: 1,
+            user_type: "STUD",
+            username: "username"
+        };
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getProposalById(mockInput.requested_thesis_id, mockInput.user_type, mockInput.username)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+    });
+
 });

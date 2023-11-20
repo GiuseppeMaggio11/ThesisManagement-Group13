@@ -121,7 +121,7 @@ exports.getProposals = async (user_type, username, date) => {
       studentApplicationid = applicationResult.length !== 0 ? applicationResult.map((element) => element.thesis_id) : [];
     }
 
-    let formattedDate = new dayjs(date).format('YYYY-MM-DD HH:mm:ss');
+    let formattedDate = dayjs(date).format('YYYY-MM-DD HH:mm:ss');
 
     sql = "select t.id, title, description, tch.name ,tch.surname , thesis_level ,thesis_type , required_knowledge , notes, expiration, keywords , dg.title_degree , g.group_name, d.department_name  , is_archived from thesis t join teacher tch on t.supervisor_id = tch.id join degree_table dg on t.cod_degree = dg.cod_degree join group_table g on tch.cod_group = g.cod_group join department d on tch.cod_department = d.cod_department where t.expiration > ?";
     const [thesisResults] = await pool.execute(sql, [formattedDate]);
