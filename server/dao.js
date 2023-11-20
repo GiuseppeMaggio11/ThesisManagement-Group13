@@ -414,10 +414,6 @@ exports.getCodes_group = async () => {
 // Inserts new row in thesis_group table, must receive id of thesis and id of related group, returns new inserted row
 exports.createThesis_group = async (thesis_id, group_id) => {
   try {
-    if (!thesis_id || !group_id) {
-      throw { error: "parameter is missing" }; 
-    }
-
     const sql = 'INSERT INTO thesis_group (thesis_id, group_id) VALUES (?,?)';
     await pool.execute(sql, [thesis_id, group_id]);
 
@@ -436,10 +432,6 @@ exports.createThesis_group = async (thesis_id, group_id) => {
 // Insert new row in thesis_cosupervisor table, must receive thesis id and cosupervisor id
 exports.createThesis_cosupervisor_teacher = async (thesis_id, professor_id) => {
   try {
-    if (!thesis_id || !professor_id) {
-      throw { error: "parameter is missing" }; 
-    }
-
     const sql = 'INSERT INTO thesis_cosupervisor_teacher (thesis_id, cosupevisor_id) VALUES (?,?)';
     await pool.execute(sql, [thesis_id, professor_id]);
 
@@ -458,10 +450,6 @@ exports.createThesis_cosupervisor_teacher = async (thesis_id, professor_id) => {
 // Insert new row in thesis_cosupervisor_external table, must receive thesis id and email
 exports.createThesis_cosupervisor_external = async (thesis_id, email) => {
   try {
-    if (!thesis_id || !email) {
-      throw { error: "parameter is missing" }; 
-    }
-
     const sql = 'INSERT INTO thesis_cosupervisor_external (thesis_id, cosupevisor_id) VALUES (?,?)';
     await pool.execute(sql, [thesis_id, email]);
 
@@ -521,10 +509,6 @@ exports.getExternal_cosupervisors_emails = async () => {
 // create new external cosuper visor
 exports.create_external_cosupervisor = async (external_cosupervisor) => {
   try {
-    if (!external_cosupervisor) {
-      throw { error: "parameter is missing" }; 
-    }
-
     const sql = 'INSERT INTO external_supervisor (email, surname, name) VALUES (?,?,?)';
     await pool.execute(sql, [external_cosupervisor.email, external_cosupervisor.surname, external_cosupervisor.name]);
 

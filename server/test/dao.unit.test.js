@@ -462,34 +462,6 @@ describe("createThesis_group", () => {
         );
     });
 
-    test("Should reject if group_id parameter is missing ", async () => {
-        const mockInput = {
-            thesis_id: 1,
-        };
-
-        await expect(dao.createThesis_group(mockInput.thesis_id)).rejects.toStrictEqual(
-            {
-                error: "parameter is missing"
-            }
-        );
-
-        expect(mockPool.execute).not.toHaveBeenCalled();
-    });
-
-    test("Should reject if thesis_id parameter is missing ", async () => {
-        const mockInput = {
-            group_id: "GRP01"
-        };
-
-        await expect(dao.createThesis_group(mockInput.group_id)).rejects.toStrictEqual(
-            {
-                error: "parameter is missing"
-            }
-        );
-
-        expect(mockPool.execute).not.toHaveBeenCalled();
-    });
-
 });
 
 describe("createThesis_cosupervisor_teacher", () => {
@@ -532,34 +504,6 @@ describe("createThesis_cosupervisor_teacher", () => {
         );
     });
 
-    test("Should reject if thesis_cosupervisor parameter is missing ", async () => {
-        const mockInput = {
-            thesis_id: 1,
-        };
-
-        await expect(dao.createThesis_cosupervisor_teacher(mockInput.thesis_id)).rejects.toStrictEqual(
-            {
-                error: "parameter is missing"
-            }
-        );
-
-        expect(mockPool.execute).not.toHaveBeenCalled();
-    });
-
-    test("Should reject if thesis_id parameter is missing ", async () => {
-        const mockInput = {
-            professor_id: "P123456"
-        };
-
-        await expect(dao.createThesis_cosupervisor_teacher(mockInput.professor_id)).rejects.toStrictEqual(
-            {
-                error: "parameter is missing"
-            }
-        );
-
-        expect(mockPool.execute).not.toHaveBeenCalled();
-    });
-
 });
 
 describe("createThesis_cosupervisor_external", () => {
@@ -600,34 +544,6 @@ describe("createThesis_cosupervisor_external", () => {
             "INSERT INTO thesis_cosupervisor_external (thesis_id, cosupevisor_id) VALUES (?,?)",
             [mockInput.thesis_id, mockInput.email]
         );
-    });
-
-    test("Should reject if thesis_cosupervisor parameter is missing ", async () => {
-        const mockInput = {
-            thesis_id: 1,
-        };
-
-        await expect(dao.createThesis_cosupervisor_external(mockInput.thesis_id)).rejects.toStrictEqual(
-            {
-                error: "parameter is missing"
-            }
-        );
-
-        expect(mockPool.execute).not.toHaveBeenCalled();
-    });
-
-    test("Should reject if thesis_id parameter is missing ", async () => {
-        const mockInput = {
-            email: "test@test.com"
-        };
-
-        await expect(dao.createThesis_cosupervisor_external(mockInput.email)).rejects.toStrictEqual(
-            {
-                error: "parameter is missing"
-            }
-        );
-
-        expect(mockPool.execute).not.toHaveBeenCalled();
     });
 
 });
@@ -723,15 +639,6 @@ describe("create_external_cosupervisor", () => {
         );
     });
 
-    test("Should reject if parameter is missing ", async () => {
-        await expect(dao.create_external_cosupervisor()).rejects.toStrictEqual(
-            {
-                error: "parameter is missing"
-            }
-        );
-
-        expect(mockPool.execute).not.toHaveBeenCalled();
-    });
 });
 
 describe("getProposals", () => {
