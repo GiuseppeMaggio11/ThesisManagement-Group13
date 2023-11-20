@@ -66,24 +66,15 @@ async function getUserInfo() {
 }
 
 async function newProposal(thesis) {
-  const response = await fetch(URL + "/newThesis", {
+  return getJson(fetch(URL + "/newThesis", {
     method: "POST",
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(thesis),
-  });
-  if (response.ok) {
-    const newProposal = await response.json();
-    return newProposal;
-  } else if (response.status == "422") {
-    const errors = await response.json();
-    return errors.errors;
-  } else {
-    const error = await response.json();
-    throw Error(error.error);
-  }
+  })
+  )
 }
 
 async function getListExternalCosupervisors() {
