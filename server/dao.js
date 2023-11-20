@@ -380,7 +380,7 @@ exports.getDegrees = async () => {
   try {
     const sql = `SELECT cod_degree FROM degree_table`;
     const [rows] = await pool.execute(sql);
-
+    
     const degrees = [];
     rows.map((e) => {
       degrees.push(e.cod_degree);
