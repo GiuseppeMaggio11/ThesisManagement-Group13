@@ -40,7 +40,7 @@ try {
     status: req.body.status
 
   }
-  const applications = await dao.getExternal_cosupervisors();
+  const applications = await dao.getApplications();
   for( const application of applications) {
     if ( application.student_id == req.body.student_id && application.thesis_id==req.body.thesis_id){
         const updated_application = await dao.updateApplicationStatus(decision);

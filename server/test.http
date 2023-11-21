@@ -49,6 +49,6 @@ Content-Type: application/json
 {   
     "thesis_id": 3,
     "student_id": "S123456",
-    "status": "Accepted"
+    "status": "Refused"
 }
 ###

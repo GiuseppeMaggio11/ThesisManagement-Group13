@@ -588,7 +588,7 @@ exports.updateApplicationStatus = (decision) => {
 };
 
 // Selects every application from application table, returns array of applications(only student_id and thesis_id)
-exports.getExternal_cosupervisors = () => {
+exports.getApplications = () => {
   return new Promise((resolve, reject) => {
     const sql =
       `SELECT * FROM application`;
@@ -602,6 +602,8 @@ exports.getExternal_cosupervisors = () => {
           const application = {
             student_id: e.student_id,
             thesis_id: e.thesis_id,
+            application_date:e.application_date,
+            status: e.status
           }
           applications.push(application);
         })
