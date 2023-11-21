@@ -113,7 +113,7 @@ exports.getProposals = (user_type, username, date) => {
         if (error) {
           reject(error);
         } else {
-          studentApplicationid = result.length !== 0 ? result.map((element)=>element.thesis_id) : [];
+          studentApplicationid = result.length !== 0 ? result.map((element) => element.thesis_id) : [];
         }
       });
     }
@@ -122,7 +122,7 @@ exports.getProposals = (user_type, username, date) => {
     let formattedDate = new dayjs(date).format('YYYY-MM-DD HH:mm:ss');
     //joining associated tables, to provide easily readable thesis proposal fields
     const sql = "select t.id, title, description, tch.name ,tch.surname , thesis_level ,thesis_type , required_knowledge , notes, expiration, keywords , dg.title_degree , g.group_name, d.department_name  , is_archived from thesis t join teacher tch on t.supervisor_id = tch.id join degree_table dg on t.cod_degree = dg.cod_degree join group_table g on tch.cod_group = g.cod_group join department d on tch.cod_department = d.cod_department where t.expiration > ?";
-    connection.query(sql,[formattedDate] ,(error, results, fields) => {
+    connection.query(sql, [formattedDate], (error, results, fields) => {
       if (error) {
         reject(error);
       } else if (results.length === 0) {
@@ -131,7 +131,7 @@ exports.getProposals = (user_type, username, date) => {
         let thesisFromSameDegreeOfStudent = results;
         //if the user which made the request is a student, then we should show him only thesis which are offered inside student's degree
         if (user_type === 'STUD') {
-          thesisFromSameDegreeOfStudent = results.filter(item => {return (item.title_degree === studentTitleDegree && !studentApplicationid.includes(item.id))});
+          thesisFromSameDegreeOfStudent = results.filter(item => { return (item.title_degree === studentTitleDegree && !studentApplicationid.includes(item.id)) });
         }
 
         //we have to modify results of query before sending them back to front end
@@ -294,7 +294,7 @@ exports.isThesisValid = async (thesisID, date) => {
   if (!thesisID) {
     throw { error: "parameter is missing" };
   }
-  const sql ="SELECT COUNT(*) as count FROM thesis WHERE id = ? AND expiration>? ";
+  const sql = "SELECT COUNT(*) as count FROM thesis WHERE id = ? AND expiration>? ";
   return new Promise((resolve, reject) => {
     connection.execute(sql, [thesisID, formattedDate], function (err, rows, fields) {
       if (err) {
@@ -310,7 +310,7 @@ exports.isThesisValid = async (thesisID, date) => {
       }
     });
   });
-  
+
 };
 
 //returns false is the student is not already applied for a thesis,  otherwise true
@@ -318,7 +318,7 @@ exports.isAlreadyExisting = async (studentID, thesisID) => {
   if (!thesisID || !studentID) {
     throw { error: "parameter is missing" };
   }
-  const sql ="SELECT COUNT(*) as count FROM application WHERE student_id = ? AND thesis_id = ?";
+  const sql = "SELECT COUNT(*) as count FROM application WHERE student_id = ? AND thesis_id = ?";
 
   return new Promise((resolve, reject) => {
     connection.query(sql, [studentID, thesisID], function (err, rows, fields) {
@@ -541,7 +541,7 @@ exports.getExternal_cosupervisors_emails = () => {
 // create new external cosuper visor
 exports.create_external_cosupervisor = (external_cosupervisor) => {
   return new Promise((resolve, reject) => {
-    const sql = 'INSERT INTO external_supervisor (email, surname, name) VALUES (?,?,?)';
+    const sql = `INSERT INTO external_supervisor (email, surname, name) VALUES(?,?,?)`;
     connection.query(sql, [external_cosupervisor.email, external_cosupervisor.surname, external_cosupervisor.name], function (err) {
       if (err) {
         reject(err);
@@ -550,6 +550,67 @@ exports.create_external_cosupervisor = (external_cosupervisor) => {
     });
   });
 };
+
+// updates is archived value to 1 if date has passed
+exports.updateThesesArchivation = (virtualDateTime) => {
+  return new Promise((resolve, reject) => {
+    const sql = ` 
+                UPDATE thesis
+                SET is_archived = CASE
+                    WHEN expiration < STR_TO_DATE(?, '%Y-%m-%dT%H:%i:%s.%fZ') THEN 1
+                    ELSE 0
+                END;
+                `
+    connection.query(sql, [virtualDateTime], function (err,rows) {
+      if (err) {
+        reject(err);
+      }
+      resolve(rows.info);
+    });
+  });
+};
+
+// updates is archived value to 1 if date has passed
+exports.updateApplicationStatus = (decision) => {
+  return new Promise((resolve, reject) => {
+    const sql = ` 
+    UPDATE application
+    SET status = ?
+  WHERE student_id = ? AND thesis_id = ?;
+                `
+    connection.query(sql, [decision.status, decision.student_id, decision.thesis_id], function (err,rows) {
+      if (err) {
+        reject(err);
+      }
+      resolve(decision);
+    });
+  });
+};
+
+// Selects every application from application table, returns array of applications(only student_id and thesis_id)
+exports.getExternal_cosupervisors = () => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `SELECT * FROM application`;
+    connection.query(sql, [], (err, rows) => {
+      if (err) {
+        reject(err);
+      }
+      else {
+        const applications = [];
+        rows.map((e) => {
+          const application = {
+            student_id: e.student_id,
+            thesis_id: e.thesis_id,
+          }
+          applications.push(application);
+        })
+        resolve(applications);
+      };
+    });
+  });
+};
+
 
 //begin transaction function
 exports.beginTransaction = () => {

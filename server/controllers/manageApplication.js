@@ -25,5 +25,42 @@ async function newApplication (req,res){
     }
 }
 
+async function updateApplicationStatus (req,res) {
+  const errors = validationResult(req);
+if (!errors.isEmpty()) {
+  return res.status(422).json({ errors: errors });
+}
 
-module.exports = {newApplication}
+try {
+  //begin transaction
+  await dao.beginTransaction();
+  const decision= {   
+    student_id: req.body.student_id,
+    thesis_id: req.body.thesis_id,
+    status: req.body.status
+
+  }
+  const applications = await dao.getExternal_cosupervisors();
+  for( const application of applications) {
+    if ( application.student_id == req.body.student_id && application.thesis_id==req.body.thesis_id){
+        const updated_application = await dao.updateApplicationStatus(decision);
+        await dao.commit();
+        return res.json(updated_application); 
+    }
+  }
+  return res.status(400).json(` error: Application of student: ${req.body.student_id} for thesis with id: ${req.body.thesis_id} not found `);
+  //Return inserted data
+  
+
+} catch (err) {
+
+  //rollback if errors occur
+  await dao.rollback();
+
+  //return error
+  return res.status(503).json(  ` error: ${err} ` );
+}
+}
+
+
+module.exports = {newApplication,updateApplicationStatus}

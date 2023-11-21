@@ -199,6 +199,28 @@ async function getThesisProposalsById(thesisId) {
   }
 }
 
-const API = { logIn, logOut, getUserInfo, getThesisProposals, applicationThesis, getThesisProposalsById, sendFiles, newProposal, getListExternalCosupervisors, newExternalCosupervisor };
+async function updateExpiration(virtualTime) {
+  const response = await fetch(URL + "/updateThesesArchivation", {
+    method: "PUT",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body:JSON.stringify( {
+      datetime :virtualTime
+    }
+  )});
+  if (response.ok) {
+    const msg = await response.json();
+    return msg;
+  } else if (response.status == "422") {
+    const errors = await response.json();
+    return errors.errors;
+  } else {
+    const error = await response.json();
+    throw Error(error.error);
+  }
+}
+const API = { logIn, logOut, getUserInfo, getThesisProposals, applicationThesis, getThesisProposalsById, sendFiles, newProposal, getListExternalCosupervisors, newExternalCosupervisor,updateExpiration  };
 
 export default API;
