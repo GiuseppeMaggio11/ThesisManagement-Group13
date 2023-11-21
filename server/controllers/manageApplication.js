@@ -23,7 +23,26 @@ async function newApplication (req,res){
     } catch (error) {
       res.status(500).json(error.message + ' ');
     }
-}
+};
+
+async function getApplicationStudent (req,res){
+    const studentId = req.params.student_id;
+    try{
+
+      //DEVO CONTROLLARE SE L'ID E' DELL'UTENTE LOGGATO!!
+      console.log("ciao")
+      await dao.beginTransaction();
+      
+      const Application = await dao.getStudentApplication(studentId);
+      
+      await dao.commit()
+      return res.status(200).json(Application);
+    } catch (error){
+      
+      await dao.rollback()
+      res.status(500).json(error.message + ' ');
+    }
+};
 
 
-module.exports = {newApplication}
+module.exports = {newApplication,getApplicationStudent}

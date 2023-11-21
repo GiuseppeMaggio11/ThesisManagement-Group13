@@ -6,6 +6,8 @@ const crypto = require("crypto");
 const dayjs = require("dayjs");
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
+const { resolve } = require("path");
+const { rejects } = require("assert");
 
 
 dayjs.extend(utc)
@@ -551,6 +553,18 @@ exports.create_external_cosupervisor = (external_cosupervisor) => {
   });
 };
 
+exports.getStudentApplication = (studentId) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'SELECT * FROM application WHERE student_id = ?';
+    connection.query(sql, [studentId], (err, rows) =>{
+      if(err){
+        reject(err);
+      }
+        resolve(rows);
+    })
+  })
+}
+
 //begin transaction function
 exports.beginTransaction = () => {
   return new Promise((resolve, reject) => {
@@ -589,6 +603,8 @@ exports.rollback = () => {
     });
   });
 };
+
+
 
 
 
