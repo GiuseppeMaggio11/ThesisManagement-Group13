@@ -14,7 +14,7 @@ async function newApplication (req,res){
         return res.status(422).json("This thesis is not valid")
       }
       const existing = await dao.isAlreadyExisting(userID, thesis_id);
-      if (!existing) {
+      if (existing) {
         return res.status(422).json("You are already applied for this thesis")
       }
       const result = await dao.newApply(userID, thesis_id, date);
