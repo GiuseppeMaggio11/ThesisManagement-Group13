@@ -13,15 +13,18 @@ import {
 } from "react-bootstrap";
 import { useState, useEffect, useContext } from "react";
 import MessageContext from '../messageCtx'
+import { HoverIconButton } from "./HoverIconButton";
+import { Funnel, FunnelFill } from "react-bootstrap-icons";
 import dayjs from "dayjs";
 
 import API from "../API";
-import { HoverIconButton } from "./HoverIconButton";
 import { Search } from "react-bootstrap-icons";
+import { FilterCard } from "./FilterCard";
 
 function SearchProposalRoute(props) {
   const [thesisProposals, setThesisProposals] = useState([]);
-  const {handleToast} = useContext(MessageContext)
+  const { handleToast } = useContext(MessageContext)
+  
   //const [dirtyThesisProposals, setDirtyThesisProposals] = useState(true);
 
   const isMobile = useMediaQuery({ maxWidth: 767 });
@@ -58,6 +61,7 @@ function SearchProposalRoute(props) {
 
 function SearchProposalComponent(props) {
   const [filter, setFilter] = useState("");
+  const [showFilters, setShowFilters] = useState(false)
   const [filteredThesisProposals, setFilteredThesisProposals] = useState([
     ...props.thesisProposals,
   ]);
@@ -67,7 +71,7 @@ function SearchProposalComponent(props) {
   }, [props.thesisProposals]);
 
   const handleSubmit = (event) => {
-    if(event){
+    if (event) {
       event.preventDefault();
     }
 
@@ -130,8 +134,12 @@ function SearchProposalComponent(props) {
     setFilteredThesisProposals([...props.thesisProposals]);
   };
 
-  
-    {/*<Container>
+  const handleChangeFilter = () =>{
+    const filter= !showFilters
+    setShowFilters(filter)
+  }
+
+  {/*<Container>
        <Row>
         <h1>Thesis Proposals</h1>
       </Row>
@@ -156,16 +164,16 @@ function SearchProposalComponent(props) {
           </Form>
         </Col>
       </Row> */}
-return(
-<>
-<div className="d-flex justify-content-center">
+  return (
+    <>
+      <div className="d-flex justify-content-center">
         <Container className="width-80 margin-custom">
           <Row className="align-items-center">
             <Col xs={12} className="d-flex justify-content-between align-items-center">
               <h1 className={`margin-titles-custom ${props.isMobile ? 'smaller-heading' : ''}`}>
                 Thesis Proposals
               </h1>
-              <Form className="d-flex" onSubmit={(e) => e.preventDefault()}>
+              {/*  <Form className="d-flex" onSubmit={(e) => e.preventDefault()}>
               <Form.Group className="mb-3 me-2 d-flex align-items-center position-relative">
                 <Form.Control
                   type="text"
@@ -188,42 +196,50 @@ return(
                 )}
                 <Search className="search-button" onClick={handleSubmit} />
               </Form.Group>
-            </Form>
-          </Col>
-        </Row>
-       {!props.isMobile ? (
-        <Row>
-          <Col>
-            {filteredThesisProposals.length == 0 ? (
-              <h2>No proposal found</h2>
-            ) : (
-              <Table hover>
-                <thead>
-                  <tr>
-                    <th>Title</th>
-                    <th>Supervisor</th>
-                    <th>Expiration Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[...filteredThesisProposals].map((element) => (
-                    <ProposalTableRow key={element.id} proposal={element} />
-                  ))}
-                </tbody>
-              </Table>
-            )}
-          </Col>
-        </Row>):(
-          <Row>
-        <Accordion>
-          {[...filteredThesisProposals].map((element) => (
-            <ProposalAccordion key={element.id} proposal={element} />
-          ))}
-        </Accordion>
-      </Row>
-        )}
-      </Container>
-    </div>
+            </Form> */}
+              {!showFilters && <Funnel className={"button-style-filter"} onClick={handleChangeFilter}></Funnel>}
+              {showFilters && <FunnelFill className={"button-style-filter"} onClick={handleChangeFilter}></FunnelFill>}
+              </Col>
+              {showFilters && <FilterCard virtualClock={props.virtualClock} 
+                thesisList={props.thesisProposals} 
+                loading={props.loading} 
+                setLoading={props.setLoading}
+                showFilters={showFilters}
+                />}
+          </Row>
+          {!props.isMobile ? (
+            <Row>
+              <Col>
+                {filteredThesisProposals.length == 0 ? (
+                  <h2>No proposal found</h2>
+                ) : (
+                  <Table hover>
+                    <thead>
+                      <tr>
+                        <th>Title</th>
+                        <th>Supervisor</th>
+                        <th>Expiration Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[...filteredThesisProposals].map((element) => (
+                        <ProposalTableRow key={element.id} proposal={element} />
+                      ))}
+                    </tbody>
+                  </Table>
+                )}
+              </Col>
+            </Row>) : (
+            <Row>
+              <Accordion>
+                {[...filteredThesisProposals].map((element) => (
+                  <ProposalAccordion key={element.id} proposal={element} />
+                ))}
+              </Accordion>
+            </Row>
+          )}
+        </Container>
+      </div>
     </>)
 }
 
@@ -232,7 +248,7 @@ function ProposalAccordion(props) {
     <Accordion.Item eventKey={props.proposal.id.toString()}>
       <Accordion.Header>
         <span className="my-3">
-          <Link style={{color:'#4682B4', fontSize:18}} to={`/proposals/${props.proposal.id}`}>
+          <Link style={{ color: '#4682B4', fontSize: 18 }} to={`/proposals/${props.proposal.id}`}>
             {props.proposal.title}
           </Link>
         </span>
@@ -253,14 +269,14 @@ function ProposalAccordion(props) {
 function ProposalTableRow(props) {
   const navigation = useNavigate()
   return (
-    <tr onClick={()=>navigation(`/proposals/${props.proposal.id}`)}>
+    <tr onClick={() => navigation(`/proposals/${props.proposal.id}`)}>
       <td>
-        <Link style={{color:'#4682B4', fontSize:18}} to={`/proposals/${props.proposal.id}`}>
+        <Link style={{ color: '#4682B4', fontSize: 18 }} to={`/proposals/${props.proposal.id}`}>
           {props.proposal.title}
         </Link>
       </td>
-      <td style={{fontSize:18}}>{props.proposal.supervisor}</td>
-      <td style={{fontSize:18}}>{dayjs(props.proposal.expiration).format("YYYY-MM-DD")}</td>
+      <td style={{ fontSize: 18 }}>{props.proposal.supervisor}</td>
+      <td style={{ fontSize: 18 }}>{dayjs(props.proposal.expiration).format("YYYY-MM-DD")}</td>
     </tr>
   );
 }

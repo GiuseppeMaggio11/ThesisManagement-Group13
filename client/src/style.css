@@ -182,8 +182,26 @@ table.table-rounded thead tr {
   border-color: transparent;
   color:#e19861;
   margin-left: 0.2em;
-}
 
+}
+.button-style-filter {
+  background-color: transparent;
+  border-color: transparent;
+  color:black;
+  font-size: x-large;
+}
+.button-style-filter:hover {
+  background-color: transparent;
+  border-color: transparent;
+  color: black;
+  font-size: x-large;
+}
+.button-style-filter:active {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  color: black;
+  font-size: x-large;
+}
 .button-style-cancel:hover {
   background-color: #f27e25;
   border-color: #f27e25;

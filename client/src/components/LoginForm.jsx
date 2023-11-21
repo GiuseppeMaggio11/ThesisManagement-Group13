@@ -16,8 +16,8 @@ import { ToastContainer } from "react-toastify";
 
 
 function LoginForm(props) {
-  const [username, setUsername] = useState("mario.rossi@polito.it");
-  const [password, setPassword] = useState("P123456");
+  const [username, setUsername] = useState("luca.esposito@studenti.polito.it");
+  const [password, setPassword] = useState("S123456");
   const [errorMessage, setErrorMessage] = useState("");
   const {handleToast} = useContext(MessageContext)
 
