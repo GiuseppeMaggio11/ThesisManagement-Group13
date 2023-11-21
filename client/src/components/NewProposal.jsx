@@ -385,20 +385,9 @@ function NewProposal(props) {
                           Add a new external co-supervisor
                         </Modal.Title>
                       </Modal.Header>
-                      <Modal.Body>
-                        <NewExternalCoSupervisor fetchData={fetchData} />
+                      <Modal.Body style={{paddingTop: 0}}>
+                        <NewExternalCoSupervisor fetchData={fetchData} onClose={() => setShowForm(false)} />
                       </Modal.Body>
-                      <Modal.Footer>
-                        <Button
-                          className="button-style-cancel"
-                          variant="light"
-                          onClick={async () => {
-                            setShowForm(false);
-                          }}
-                        >
-                          Close
-                        </Button>
-                      </Modal.Footer>
                     </Modal>
                   </Form.Group>
                   <Form.Group className="mb-3" ref={levelRef}>

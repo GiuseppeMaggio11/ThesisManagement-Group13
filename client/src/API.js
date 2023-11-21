@@ -96,24 +96,15 @@ async function getListExternalCosupervisors() {
 }
 
 async function newExternalCosupervisor(external_cosupervisor) {
-  const response = await fetch(URL + "/newExternalCosupervisor", {
-    method: "POST",
-    credentials: "include",
+  return getJson(fetch(URL + `/newExternalCosupervisor`, {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify(external_cosupervisor),
-  });
-  if (response.ok) {
-    const newProposal = await response.json();
-    return newProposal;
-  } else if (response.status == "422") {
-    const errors = await response.json();
-    return errors.errors;
-  } else {
-    const error = await response.json();
-    throw Error(error.error);
-  }
+    credentials: "include"
+  })
+  )
 }
 
 async function applicationThesis(thesis_id, date) {
