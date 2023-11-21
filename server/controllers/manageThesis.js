@@ -97,7 +97,7 @@ async function newThesis (req,res) {
     await dao.commit();
 
     //Return inserted data
-    return res.json(result_thesis);
+    return res.status(200).json(result_thesis);
 
   } catch (err) {
 

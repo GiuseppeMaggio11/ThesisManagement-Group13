@@ -2,7 +2,7 @@
 
 const {isStudent, isProfessor, isLoggedIn} = require("./controllers/middleware")
 const {getProposals, getProposal} = require("./controllers/showThesis")
-const {newApplication} = require("./controllers/manageApplication")
+const {newApplication,getApplicationStudent} = require("./controllers/manageApplication")
 const {addFiles, getAllFiles, getStudentFilesList, getFile} = require("./controllers/manageFiles")
 const {newThesis} = require("./controllers/manageThesis")
 const {listExternalCosupervisors, createExternalCosupervisor} = require("./controllers/others")
@@ -195,3 +195,5 @@ app.post('/api/newExternalCosupervisor', isProfessor, [
   check('surname').isLength({ min: 1, max: 50 }),
   check('name').isLength({ min: 1, max: 50 })
 ], createExternalCosupervisor);
+
+app.get('api/student/:student_id/applications',getApplicationStudent);
