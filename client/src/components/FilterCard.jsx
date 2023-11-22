@@ -80,7 +80,6 @@ const SearchDropdown = ({ placeholder, position, items, selectedItems, setSelect
                     <Row>
                         <Col xs={4} className="d-flex justify-content-start align-items-center"></Col>
                         <Col ref={dropdownRef} xs={8} className="ml-4 dropdown-content">
-                            {/* Dropdown content */}
                             {filteredItems.length > 0 && (
                                 <ul className="list-group mt-2">
                                     {filteredItems.map((item, index) => (
@@ -94,7 +93,7 @@ const SearchDropdown = ({ placeholder, position, items, selectedItems, setSelect
                                     ))}
                                 </ul>
                             )}
-                            {filteredItems.length <= 0 && (
+                            {filteredItems.length <= 0 && items.length>0 && (
                                 <ul className="list-group mt-2">
                                     {items.map((item, index) => (
                                         <li
@@ -107,6 +106,7 @@ const SearchDropdown = ({ placeholder, position, items, selectedItems, setSelect
                                     ))}
                                 </ul>
                             )}
+
                         </Col>
                     </Row>
                 </div>
@@ -163,6 +163,7 @@ const FilterCard = (props) => {
                                 supervisors_theses.push(name);
                             }
                         }
+                        console.log("cosupervisor" + item.cosupervisor)
                         if (item.cosupervisors?.length > 0) {
                             if (item.cosupervisors.contains('@'))
                                 internal_cosupervisors.push(item.cosupervisor)
@@ -178,11 +179,6 @@ const FilterCard = (props) => {
                             })
                         }
                     })
-                    /*  console.log(external_cosupervisors)
-                     console.log(internal_cosupervisors)
-                     console.log(keywords_theses)
-                     console.log(group_theses)
-                     console.log(supervisors_theses) */
                     setExternalCosupervisor(external_cosupervisors);
                     setInternalCosupervisor(internal_cosupervisors);
                     setKeywords(keywords_theses)
