@@ -24,7 +24,7 @@ import { FilterCard } from "./FilterCard";
 function SearchProposalRoute(props) {
   const [thesisProposals, setThesisProposals] = useState([]);
   const { handleToast } = useContext(MessageContext)
-  
+
   //const [dirtyThesisProposals, setDirtyThesisProposals] = useState(true);
 
   const isMobile = useMediaQuery({ maxWidth: 767 });
@@ -137,8 +137,8 @@ function SearchProposalComponent(props) {
     setFilteredThesisProposals([...props.thesisProposals]);
   };
 
-  const handleChangeFilter = () =>{
-    const filter= !showFilters
+  const handleChangeFilter = () => {
+    const filter = !showFilters
     setShowFilters(filter)
   }
 
@@ -152,74 +152,59 @@ function SearchProposalComponent(props) {
               <h1 className={`margin-titles-custom ${props.isMobile ? 'smaller-heading' : ''}`}>
                 Thesis Proposals
               </h1>
-              {/*  <Form className="d-flex" onSubmit={(e) => e.preventDefault()}>
-              <Form.Group className="mb-3 me-2 d-flex align-items-center position-relative">
-                <Form.Control
-                  type="text"
-                  placeholder="Insert a filter"
-                  value={filter}
-                  onChange={(event) => setFilter(event.target.value)}
-                  onKeyDown={(event) => {
-                    console.log(event.key)
-                    if (event.key === 'Enter') {
-                      event.preventDefault()
-                      handleSubmit();
-                    }
-                  }}
-                  className="custom-input" 
-                />
-                {filter && (
-                  <button className="clear-btn" onClick={handleCancel}>
-                    <span>&times;</span>
-                  </button>
-                )}
-                <Search className="search-button" onClick={handleSubmit} />
-              </Form.Group>
-            </Form> */}
+
               {!showFilters && <Funnel className={"button-style-filter"} onClick={handleChangeFilter}></Funnel>}
               {showFilters && <FunnelFill className={"button-style-filter"} onClick={handleChangeFilter}></FunnelFill>}
-              </Col>
-              {showFilters && <FilterCard 
-                virtualClock={props.virtualClock} 
-                thesisList={props.thesisProposals} 
-                loading={props.loading} 
-                setLoading={props.setLoading}
-                showFilters={showFilters}
-                />}
+            </Col>
           </Row>
-          {!props.isMobile ? (
-            <Row>
-              <Col>
-                {filteredThesisProposals.length == 0 ? (
-                  <h2>No proposal found</h2>
-                ) : (
-                  <Table hover>
-                    <thead>
-                      <tr>
-                        <th>Title</th>
-                        <th>Supervisor</th>
-                        <th>Expiration Date</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {[...filteredThesisProposals].map((element) => (
-                        <ProposalTableRow key={element.id} proposal={element} />
-                      ))}
-                    </tbody>
-                  </Table>
-                )}
-              </Col>
-            </Row>) : (
-            <Row>
-              <Accordion>
-                {[...filteredThesisProposals].map((element) => (
-                  <ProposalAccordion key={element.id} proposal={element} />
-                ))}
-              </Accordion>
+          {showFilters &&
+          <Container >
+            <Row >
+              <Col xs={12} style={{marginBottom:'0.5em'}}>
+                <FilterCard
+                  virtualClock={props.virtualClock}
+                  thesisList={props.thesisProposals}
+                  loading={props.loading}
+                  setLoading={props.setLoading}
+                  showFilters={showFilters}
+                />
+              </Col >
             </Row>
-          )}
-        </Container>
-      </div>
+            </Container>
+          }
+        {!props.isMobile ? (
+          <Row>
+            <Col>
+              {filteredThesisProposals.length == 0 ? (
+                <h2>No proposal found</h2>
+              ) : (
+                <Table hover>
+                  <thead>
+                    <tr>
+                      <th>Title</th>
+                      <th>Supervisor</th>
+                      <th>Expiration Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[...filteredThesisProposals].map((element) => (
+                      <ProposalTableRow key={element.id} proposal={element} />
+                    ))}
+                  </tbody>
+                </Table>
+              )}
+            </Col>
+          </Row>) : (
+          <Row>
+            <Accordion>
+              {[...filteredThesisProposals].map((element) => (
+                <ProposalAccordion key={element.id} proposal={element} />
+              ))}
+            </Accordion>
+          </Row>
+        )}
+      </Container>
+    </div >
     </>)
 }
 

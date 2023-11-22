@@ -186,7 +186,7 @@ app.post('/api/newThesis', isProfessor, [
   check('is_archived').isBoolean()], newThesis);
 
 //RETURNS LIST OF EVERY EXTERNAL COSUPERVISORS
-app.get('/api/listExternalCosupervisors',isProfessor,listExternalCosupervisors);
+app.get('/api/listExternalCosupervisors',isLoggedIn,listExternalCosupervisors);
 
 //CREATES NEW EXTERNAL COSUPERVISOR 
 app.post('/api/newExternalCosupervisor', isProfessor, [

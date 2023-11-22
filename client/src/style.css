@@ -419,12 +419,36 @@ input:checked + .slider::before {
   box-shadow: none ;
 }
 
-
-
 .modal-dialog {
   display: flex;
   align-items: center;
   min-height: calc(100% - 60px); /* Adjust based on your layout */
+}
+
+.dropdown-container {
+  position: relative;
+}
+
+.dropdown-content {
+  position: absolute;
+  top: 100%; 
+  left: 35%;
+  width: 65%; 
+  z-index: 100;
+  background: white;
+  padding: 0%;
+  border: 2px;
+  border-radius: 5%;
+  max-height: 135px;
+  overflow-y: auto;
+  box-shadow: 0px 0px 0px rgba(0, 0, 0, 1);
+}
+
+.custom-rounded {
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.5);
+  padding: 20px; /* Adjust padding as needed */
 }
 
 @media (min-width: 576px) {
