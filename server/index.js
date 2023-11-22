@@ -1,5 +1,8 @@
 "use strict";
 
+const dotenv = require('dotenv');
+dotenv.config();
+
 const {isStudent, isProfessor, isLoggedIn} = require("./controllers/middleware")
 const {getProposals, getProposal} = require("./controllers/showThesis")
 const {newApplication,getApplicationStudent} = require("./controllers/manageApplication")
@@ -23,12 +26,12 @@ const zipdir = require('zip-dir');
 
 
 const app = express();
-const port = 3001;
+const port = process.env.SERVER_PORT;
 
 app.use(morgan("dev"));
 app.use(express.json());
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: `http://localhost:${process.env.CLIENT_PORT}`,
   credentials: true,
 };
 app.use(cors(corsOptions));

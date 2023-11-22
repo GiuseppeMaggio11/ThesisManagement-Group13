@@ -7,15 +7,19 @@ import {
   Col,
   Card,
 } from "react-bootstrap";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../API";
 import Loading from "./Loading";
+import MessageContext from '../messageCtx'
+import { ToastContainer } from "react-toastify";
+
 
 function LoginForm(props) {
-  const [username, setUsername] = useState("luca.esposito@studenti.polito.it");
-  const [password, setPassword] = useState("S123456");
+  const [username, setUsername] = useState("mario.rossi@polito.it");
+  const [password, setPassword] = useState("P123456");
   const [errorMessage, setErrorMessage] = useState("");
+  const {handleToast} = useContext(MessageContext)
 
   const navigate = useNavigate();
 
@@ -27,7 +31,7 @@ function LoginForm(props) {
         props.loginSuccessful(user);
       })
       .catch((err) => {
-        setErrorMessage("Wrong username or password");
+        handleToast("Wrong username or password", "error");
         props.setLoading(false);
       });
   };
@@ -37,9 +41,9 @@ function LoginForm(props) {
     setErrorMessage("");
 
     if (username === "") {
-      setErrorMessage("Please, insert an email.");
+      handleToast("Please, insert an email.", "error");
     } else if (password === "") {
-      setErrorMessage("Please, insert a password.");
+      handleToast("Please, insert a password.", "error");
     } else {
       doLogIn({ username, password });
     }
@@ -90,6 +94,7 @@ function LoginForm(props) {
                       onChange={(ev) => setPassword(ev.target.value)}
                     />
                   </Form.Group>
+                  <ToastContainer />
                   <Button className="button-style my-2" type="submit">
                     Login
                   </Button>

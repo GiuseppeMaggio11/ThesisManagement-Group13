@@ -13,6 +13,7 @@ Maggio Giuseppe 313346
 ## Contents
 
 - [React Client Application Routes](#react-client-application-routes)
+- [Docker Compose](#docker-compose)
 - [API Server](#api-server)
     + [Authentication Server](#authentication-server)
         * [Login Server](#login-server)
@@ -46,6 +47,35 @@ Authenticated users will see buttons to access the various routes
 It is possible to filter thesis proposals based on the content of a text field form
 - Route `/teacher`: Route only accessible to authenticated professors containing a button to create a new thesis proposal.
 - Route `/newproposal`: Route only accessible to authenticated professors. It allows them to create a new thesis proposal by filling all its informations (title, description, supervisor, co-supervisors, level, keywords, type, group, required knowledge, notes, expiration date, degree and if it's archived).
+
+## Docker Compose
+
+### How to run the application via Docker Compose **as a developper** ?
+
+First, create at the root of the project a new file called `.env` with this content (replace `your-root-password` by your actual sql root password)
+
+```
+MYSQL_PASSWORD = "your-root-password"
+SERVER_PORT = 3001
+CLIENT_PORT = 5173
+DB_PORT = 3306
+```
+
+Then, modify in the server/dao.js file the dbConfig host from "127.0.0.1" to "database" : 
+
+```
+  host: "database",
+```
+
+Finally, run this command at the root of the project : 
+
+```
+docker compose up -d --build
+```
+
+Your app is accessible on this URL `http://localhost:5173/` !
+
+### How to run the application via Docker Compose as a regular user ?
 
 ## API Server
 
