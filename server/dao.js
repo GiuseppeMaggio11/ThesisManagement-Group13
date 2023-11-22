@@ -121,12 +121,12 @@ exports.getProposals = (user_type, username, date) => {
     let finalResult;
     let formattedDate = new dayjs(date).format('YYYY-MM-DD HH:mm:ss');
     //joining associated tables, to provide easily readable thesis proposal fields
-    const sql = "select t.id, title, description, tch.name ,tch.surname , thesis_level ,thesis_type , required_knowledge , notes, expiration, keywords , dg.title_degree , g.group_name, d.department_name  , is_archived from thesis t join teacher tch on t.supervisor_id = tch.id join degree_table dg on t.cod_degree = dg.cod_degree join group_table g on tch.cod_group = g.cod_group join department d on tch.cod_department = d.cod_department where t.expiration > ?";
+    const sql = "select t.id, title, description, tch.name ,tch.surname , thesis_level ,thesis_type , required_knowledge , notes, expiration, keywords , dg.title_degree , g.group_name, d.department_name  , is_archived from thesis t join teacher tch on t.supervisor_id = tch.id join degree_table dg on t.cod_degree = dg.cod_degree join group_table g on tch.cod_group = g.cod_group join department d on tch.cod_department = d.cod_department where t.is_archived = 0";
     connection.query(sql, [formattedDate], (error, results, fields) => {
       if (error) {
         reject(error);
       } else if (results.length === 0) {
-        resolve({ error: "no entry" });
+        reject("no thesis avaible" );
       } else {
         let thesisFromSameDegreeOfStudent = results;
         //if the user which made the request is a student, then we should show him only thesis which are offered inside student's degree
