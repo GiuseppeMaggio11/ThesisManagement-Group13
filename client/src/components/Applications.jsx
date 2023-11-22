@@ -3,6 +3,7 @@ import {
   Accordion,
   Alert,
   Button,
+  Card,
   Col,
   Container,
   Row,
@@ -50,15 +51,9 @@ function Applications(props) {
     props.setLoading(false);
   }, []);
 
-  const handleApplicationAccept = (student_id, thesis_id) => {
+  const handleApplication = (student_id, thesis_id, status) => {
     console.log(
-      "STUDENT: " + student_id + " THESIS: " + thesis_id + " ACCEPTED"
-    );
-  };
-
-  const handleApplicationReject = (student_id, thesis_id) => {
-    console.log(
-      "STUDENT: " + student_id + " THESIS: " + thesis_id + " REJECTED"
+      "STUDENT: " + student_id + " THESIS: " + thesis_id + " STATUS: " + status
     );
   };
 
@@ -67,7 +62,7 @@ function Applications(props) {
       {props.loading && <Loading />}
       <Container>
         <Row className="mb-3">
-          <Col className="fs-3">Students Pending Applications</Col>
+          <Col className="fs-2">Students Pending Applications</Col>
         </Row>
 
         {!applications || applications.length === 0 ? (
@@ -92,8 +87,7 @@ function Applications(props) {
                   <StudentApplication
                     application={appl}
                     key={i}
-                    handleApplicationAccept={handleApplicationAccept}
-                    handleApplicationReject={handleApplicationReject}
+                    handleApplication={handleApplication}
                     isMobile={isMobile}
                   />
                 );
@@ -103,14 +97,18 @@ function Applications(props) {
         ) : (
           <Row>
             <Col>
-              <Accordion>
+              <Row className="fs-5 w-100">
+                <Col>Student ID</Col>
+                <Col>Thesis Name</Col>
+              </Row>
+              <div style={{ borderBottom: "1px solid gray" }}></div>
+              <Accordion className="mx-1">
                 {applications.map((appl, i) => {
                   return (
                     <StudentApplication
                       application={appl}
                       key={i}
-                      handleApplicationAccept={handleApplicationAccept}
-                      handleApplicationReject={handleApplicationReject}
+                      handleApplication={handleApplication}
                       isMobile={isMobile}
                       index={i}
                     />
@@ -136,9 +134,10 @@ function StudentApplication(props) {
         <Button
           variant="success"
           onClick={() =>
-            props.handleApplicationAccept(
+            props.handleApplication(
               props.application.student_id,
-              props.application.thesis_id
+              props.application.thesis_id,
+              "Accepted"
             )
           }
         >
@@ -149,9 +148,10 @@ function StudentApplication(props) {
         <Button
           variant="danger"
           onClick={() =>
-            props.handleApplicationReject(
+            props.handleApplication(
               props.application.student_id,
-              props.application.thesis_id
+              props.application.thesis_id,
+              "Refused"
             )
           }
         >
@@ -160,23 +160,56 @@ function StudentApplication(props) {
       </td>
     </tr>
   ) : (
-    <Accordion.Item eventKey={props.index} className="my-3">
+    <Accordion.Item
+      eventKey={props.index}
+      className="my-3 custom-accordion-item"
+    >
       <Accordion.Header>
-        <Row className="my-3">
+        <Row className="py-3 w-100">
           <Col>
-            <span>{props.application.student_id}</span>
+            <span style={{ fontWeight: "450" }}>
+              {props.application.student_id}
+            </span>
           </Col>
           <Col>
-            <span>{props.application.student_name}</span>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <span>{props.application.thesis_title}</span>
+            <span style={{ fontWeight: "450" }}>
+              {props.application.thesis_title}
+            </span>
           </Col>
         </Row>
       </Accordion.Header>
-      <Accordion.Body style={{ position: "relative" }}>body</Accordion.Body>
+      <Accordion.Body>
+        <Row>
+          <Col className="text-end">
+            <Button
+              variant="success"
+              onClick={() =>
+                props.handleApplication(
+                  props.application.student_id,
+                  props.application.thesis_id,
+                  "Accepted"
+                )
+              }
+            >
+              Accept
+            </Button>
+          </Col>
+          <Col className="text-start">
+            <Button
+              variant="danger"
+              onClick={() =>
+                props.handleApplication(
+                  props.application.student_id,
+                  props.application.thesis_id,
+                  "Refused"
+                )
+              }
+            >
+              Reject
+            </Button>
+          </Col>
+        </Row>
+      </Accordion.Body>
     </Accordion.Item>
   );
 }
