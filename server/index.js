@@ -196,4 +196,4 @@ app.post('/api/newExternalCosupervisor', isProfessor, [
   check('name').isLength({ min: 1, max: 50 })
 ], createExternalCosupervisor);
 
-app.get('api/student/:student_id/applications',getApplicationStudent);
+app.get('api/applications', isStudent, getApplicationStudent);

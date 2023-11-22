@@ -199,6 +199,14 @@ async function getThesisProposalsById(thesisId) {
   }
 }
 
-const API = { logIn, logOut, getUserInfo, getThesisProposals, applicationThesis, getThesisProposalsById, sendFiles, newProposal, getListExternalCosupervisors, newExternalCosupervisor };
+async function getApplicationStudent() {
+  return getJson(fetch(URL + `/applications`, {
+    method: 'GET',
+    credentials: "include"
+  })
+  )
+}
+
+const API = { logIn, logOut, getUserInfo, getThesisProposals, applicationThesis, getThesisProposalsById, sendFiles, newProposal, getListExternalCosupervisors, newExternalCosupervisor, getApplicationStudent };
 
 export default API;
