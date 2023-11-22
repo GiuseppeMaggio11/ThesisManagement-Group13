@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # expose server port
-EXPOSE 3001
+EXPOSE ${SERVER_PORT}
 
 # Run this command when the container is started
 CMD ["node", "index.js"]

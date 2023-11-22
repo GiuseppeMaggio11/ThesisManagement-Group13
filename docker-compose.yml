@@ -13,7 +13,9 @@ services:
     volumes:
       - ./server:/usr/src/app  # Mount the server source code into the container
     ports:
-      - "3001:3001"  # Map server port of the container to server port of the host
+      - ${SERVER_PORT}:${SERVER_PORT}  # Map server port of the container to server port of the host
+    env_file:
+      - .env
     depends_on:
       - database  # Dependency on the database service
 
@@ -26,17 +28,19 @@ services:
     depends_on:
       - server  # Dependency on the server service
     command: run dev -- --host  # Command to run the client service
+    env_file:
+      - .env
     ports:
-      - "5173:5173"  # Map client port of the container to client port of the host
+      - ${CLIENT_PORT}:${CLIENT_PORT}  # Map client port of the container to client port of the host
 
   # Database Service
   database:
     image: mysql:8  # Use MySQL version 8 image
     environment:
-      MYSQL_ROOT_PASSWORD: "root"  # Root user password
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}  # Root user password
       MYSQL_DATABASE: db_se_thesismanagement  # Name of the database
     ports:
-      - "3306:3306"  # Map db port of the container to db port of the host
+      - ${DB_PORT}:${DB_PORT}  # Map db port of the container to db port of the host
     volumes:
       - ./db-data:/var/lib/mysql:rw  # Mount volume to store MySQL data
       - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:rw  # Mount volume for initialization script

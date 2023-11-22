@@ -1,5 +1,8 @@
 "use strict";
 
+const dotenv = require('dotenv');
+dotenv.config();
+
 //const crypto = require("crypto");
 const mysql = require("mysql2/promise");
 const crypto = require("crypto");
@@ -14,9 +17,9 @@ dayjs.extend(timezone)
 // open the database
 const dbConfig = {
   host: "127.0.0.1",
-  port: 3306,
+  port: process.env.DB_PORT,
   user: "root",
-  password: "root",
+  password: process.env.MYSQL_PASSWORD,
   database: "db_se_thesismanagement",
 };
 
