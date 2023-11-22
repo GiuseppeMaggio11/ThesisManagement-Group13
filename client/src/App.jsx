@@ -16,7 +16,8 @@ import Header from "./components/Header";
 import API from "./API";
 import VirtualClock from "./components/VirtualClock";
 import MessageContext from "./messageCtx";
-import SearchProposalRoute from "./components/SearchProposal"
+import SearchProposalRoute from "./components/SearchProposal";
+import Applications from "./components/Applications";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -95,7 +96,7 @@ function App() {
                 loggedIn && user.user_type === "PROF" ? (
                   <Navigate replace to="/teacher" />
                 ) : loggedIn && user.user_type === "STUD" ? (
-                  <Navigate replace to='/proposal'/>
+                  <Navigate replace to="/proposal" />
                 ) : (
                   <LoginForm
                     loginSuccessful={loginSuccessful}
@@ -149,6 +150,16 @@ function App() {
               element={
                 loggedIn && user.user_type === "PROF" ? (
                   <NewProposal loading={loading} setLoading={setLoading} />
+                ) : (
+                  <ErrorAlert />
+                )
+              }
+            />
+            <Route
+              path="/applications"
+              element={
+                loggedIn && user.user_type === "PROF" ? (
+                  <Applications loading={loading} setLoading={setLoading} />
                 ) : (
                   <ErrorAlert />
                 )

@@ -11,7 +11,7 @@ import {
   Spinner,
   Table,
 } from "react-bootstrap";
-import MessageContext from '../messageCtx'
+import MessageContext from "../messageCtx";
 import { useState, useEffect, useContext } from "react";
 
 import dayjs from "dayjs";
@@ -19,34 +19,32 @@ import dayjs from "dayjs";
 import API from "../API";
 import { HoverIconButton } from "./HoverIconButton";
 import { Search } from "react-bootstrap-icons";
+import Loading from "./Loading";
 
 function SearchProposalRoute(props) {
-  const { handleErrors } = useContext(MessageContext)
+  const { handleErrors } = useContext(MessageContext);
   const [thesisProposals, setThesisProposals] = useState([]);
   //const [dirtyThesisProposals, setDirtyThesisProposals] = useState(true);
 
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
-  useEffect(
-    () => {
-      props.setLoading(true);
-      //if (dirtyThesisProposals) 
-      API.getThesisProposals(props.virtualClock)
-        .then((list) => {
-          setThesisProposals(list);
-          //setDirtyThesisProposals(false);
-          props.setLoading(false);
-        })
-        .catch((err) => handleErrors(err));
-      //}
-    },
-    []
-  );
+  useEffect(() => {
+    props.setLoading(true);
+    //if (dirtyThesisProposals)
+    API.getThesisProposals(props.virtualClock)
+      .then((list) => {
+        setThesisProposals(list);
+        //setDirtyThesisProposals(false);
+        props.setLoading(false);
+      })
+      .catch((err) => handleErrors(err));
+    //}
+  }, []);
 
   return (
     <>
       {props.loading ? (
-        <Spinner className="m-2" animation="border" role="status" />
+        <Loading />
       ) : (
         <SearchProposalComponent
           thesisProposals={thesisProposals}
@@ -68,7 +66,7 @@ function SearchProposalComponent(props) {
   }, [props.thesisProposals]);
 
   const handleSubmit = (event) => {
-    if(event){
+    if (event) {
       event.preventDefault();
     }
 
@@ -131,8 +129,8 @@ function SearchProposalComponent(props) {
     setFilteredThesisProposals([...props.thesisProposals]);
   };
 
-  
-    {/*<Container>
+  {
+    /*<Container>
        <Row>
         <h1>Thesis Proposals</h1>
       </Row>
@@ -156,76 +154,86 @@ function SearchProposalComponent(props) {
             </Button>
           </Form>
         </Col>
-      </Row> */}
-return(
-<>
-<div className="d-flex justify-content-center">
+      </Row> */
+  }
+  return (
+    <>
+      <div className="d-flex justify-content-center">
         <Container className="width-80 margin-custom">
           <Row className="align-items-center">
-            <Col xs={12} className="d-flex justify-content-between align-items-center">
-              <h1 className={`margin-titles-custom ${props.isMobile ? 'smaller-heading' : ''}`}>
+            <Col
+              xs={12}
+              className="d-flex justify-content-between align-items-center"
+            >
+              <h1
+                className={`margin-titles-custom ${
+                  props.isMobile ? "smaller-heading" : ""
+                }`}
+              >
                 Thesis Proposals
               </h1>
               <Form className="d-flex" onSubmit={(e) => e.preventDefault()}>
-              <Form.Group className="mb-3 me-2 d-flex align-items-center position-relative">
-                <Form.Control
-                  type="text"
-                  placeholder="Insert a filter"
-                  value={filter}
-                  onChange={(event) => setFilter(event.target.value)}
-                  onKeyDown={(event) => {
-                    console.log(event.key)
-                    if (event.key === 'Enter') {
-                      event.preventDefault()
-                      handleSubmit();
-                    }
-                  }}
-                  className="custom-input" 
-                />
-                {filter && (
-                  <button className="clear-btn" onClick={handleCancel}>
-                    <span>&times;</span>
-                  </button>
+                <Form.Group className="mb-3 me-2 d-flex align-items-center position-relative">
+                  <Form.Control
+                    type="text"
+                    placeholder="Insert a filter"
+                    value={filter}
+                    onChange={(event) => setFilter(event.target.value)}
+                    onKeyDown={(event) => {
+                      console.log(event.key);
+                      if (event.key === "Enter") {
+                        event.preventDefault();
+                        handleSubmit();
+                      }
+                    }}
+                    className="custom-input"
+                  />
+                  {filter && (
+                    <button className="clear-btn" onClick={handleCancel}>
+                      <span>&times;</span>
+                    </button>
+                  )}
+                  <Search className="search-button" onClick={handleSubmit} />
+                </Form.Group>
+              </Form>
+            </Col>
+          </Row>
+          {!props.isMobile ? (
+            <Row>
+              <Col>
+                {filteredThesisProposals.length == 0 ? (
+                  <h2>No proposal found</h2>
+                ) : (
+                  <Table hover>
+                    <thead>
+                      <tr>
+                        <th>Title</th>
+                        <th>Supervisor</th>
+                        <th>Expiration Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[...filteredThesisProposals].map((element) => (
+                        <ProposalTableRow key={element.id} proposal={element} />
+                      ))}
+                    </tbody>
+                  </Table>
                 )}
-                <Search className="search-button" onClick={handleSubmit} />
-              </Form.Group>
-            </Form>
-          </Col>
-        </Row>
-       {!props.isMobile ? (
-        <Row>
-          <Col>
-            {filteredThesisProposals.length == 0 ? (
-              <h2>No proposal found</h2>
-            ) : (
-              <Table hover>
-                <thead>
-                  <tr>
-                    <th>Title</th>
-                    <th>Supervisor</th>
-                    <th>Expiration Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[...filteredThesisProposals].map((element) => (
-                    <ProposalTableRow key={element.id} proposal={element} />
-                  ))}
-                </tbody>
-              </Table>
-            )}
-          </Col>
-        </Row>):(
-          <Row>
-        <Accordion>
-          {[...filteredThesisProposals].map((element) => (
-            <ProposalAccordion key={element.id} proposal={element} />
-          ))}
-        </Accordion>
-      </Row>
-        )}
-      </Container>
-    </div>
-    </>)
+              </Col>
+            </Row>
+          ) : (
+            <Row>
+              <Accordion>
+                {[...filteredThesisProposals].map((element) => (
+                  <ProposalAccordion key={element.id} proposal={element} />
+                ))}
+              </Accordion>
+            </Row>
+          )}
+        </Container>
+      </div>
+    </>
+  );
 }
 
 function ProposalAccordion(props) {
@@ -233,7 +241,10 @@ function ProposalAccordion(props) {
     <Accordion.Item eventKey={props.proposal.id.toString()}>
       <Accordion.Header>
         <span className="my-3">
-          <Link style={{color:'#4682B4', fontSize:18}} to={`/proposals/${props.proposal.id}`}>
+          <Link
+            style={{ color: "#4682B4", fontSize: 18 }}
+            to={`/proposals/${props.proposal.id}`}
+          >
             {props.proposal.title}
           </Link>
         </span>
@@ -252,16 +263,21 @@ function ProposalAccordion(props) {
 }
 
 function ProposalTableRow(props) {
-  const navigation = useNavigate()
+  const navigation = useNavigate();
   return (
-    <tr onClick={()=>navigation(`/proposals/${props.proposal.id}`)}>
+    <tr onClick={() => navigation(`/proposals/${props.proposal.id}`)}>
       <td>
-        <Link style={{color:'#4682B4', fontSize:18}} to={`/proposals/${props.proposal.id}`}>
+        <Link
+          style={{ color: "#4682B4", fontSize: 18 }}
+          to={`/proposals/${props.proposal.id}`}
+        >
           {props.proposal.title}
         </Link>
       </td>
-      <td style={{fontSize:18}}>{props.proposal.supervisor}</td>
-      <td style={{fontSize:18}}>{dayjs(props.proposal.expiration).format("YYYY-MM-DD")}</td>
+      <td style={{ fontSize: 18 }}>{props.proposal.supervisor}</td>
+      <td style={{ fontSize: 18 }}>
+        {dayjs(props.proposal.expiration).format("YYYY-MM-DD")}
+      </td>
     </tr>
   );
 }
