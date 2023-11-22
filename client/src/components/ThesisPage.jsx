@@ -34,7 +34,7 @@ function ThesisPage(props) {
             try{
                 props.setLoading(true)
                 const thesisData = await API.getThesisProposalsById(params.id);
-                //GESTIRE PROBLEMI
+                console.log(thesisData.cosupervisors)
                 setPageData({
                     title:thesisData.title,
                     description:thesisData.description,

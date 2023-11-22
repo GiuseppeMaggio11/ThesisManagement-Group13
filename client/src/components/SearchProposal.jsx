@@ -53,6 +53,9 @@ function SearchProposalRoute(props) {
         <SearchProposalComponent
           thesisProposals={thesisProposals}
           isMobile={isMobile}
+          setLoading={props.setLoading}
+          loadind={props.loading}
+          virtualClock={props.virtualClock}
         />
       )}
     </>
@@ -139,31 +142,7 @@ function SearchProposalComponent(props) {
     setShowFilters(filter)
   }
 
-  {/*<Container>
-       <Row>
-        <h1>Thesis Proposals</h1>
-      </Row>
-      <Row className="mt-3">
-        <Col>
-          <Form className="d-flex" onSubmit={handleSubmit}>
-            <Form.Group className="mb-3 me-2 d-flex align-items-center">
-              <Form.Label className="me-2 mb-0">Filter: </Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Insert a filter"
-                value={filter}
-                onChange={(event) => setFilter(event.target.value)}
-              />
-            </Form.Group>
-            <Button className="mb-3 mx-3" variant="success" type="submit">
-              Search
-            </Button>
-            <Button className="mb-3" variant="secondary" onClick={handleCancel}>
-              Cancel
-            </Button>
-          </Form>
-        </Col>
-      </Row> */}
+
   return (
     <>
       <div className="d-flex justify-content-center">
@@ -200,7 +179,8 @@ function SearchProposalComponent(props) {
               {!showFilters && <Funnel className={"button-style-filter"} onClick={handleChangeFilter}></Funnel>}
               {showFilters && <FunnelFill className={"button-style-filter"} onClick={handleChangeFilter}></FunnelFill>}
               </Col>
-              {showFilters && <FilterCard virtualClock={props.virtualClock} 
+              {showFilters && <FilterCard 
+                virtualClock={props.virtualClock} 
                 thesisList={props.thesisProposals} 
                 loading={props.loading} 
                 setLoading={props.setLoading}
