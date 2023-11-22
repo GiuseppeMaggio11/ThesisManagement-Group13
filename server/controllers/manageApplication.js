@@ -30,12 +30,11 @@ async function getApplicationStudent (req,res){
     try{
 
       //DEVO CONTROLLARE SE L'ID E' DELL'UTENTE LOGGATO!!
-      console.log("ciao")
       await dao.beginTransaction();
       
       const userID = await dao.getUserID(req.user.username);
       const Application = await dao.getStudentApplication(userID);
-      
+      console.log(Application)      
       await dao.commit()
       return res.status(200).json(Application);
     } catch (error){

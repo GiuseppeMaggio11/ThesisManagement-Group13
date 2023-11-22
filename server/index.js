@@ -26,12 +26,12 @@ const zipdir = require('zip-dir');
 
 
 const app = express();
-const port = process.env.SERVER_PORT;
+const port = 3001;
 
 app.use(morgan("dev"));
 app.use(express.json());
 const corsOptions = {
-  origin: `http://localhost:${process.env.CLIENT_PORT}`,
+  origin: `http://localhost:5173`,
   credentials: true,
 };
 app.use(cors(corsOptions));
@@ -160,7 +160,7 @@ app.get("/api/session/userinfo", (req, res) => {
 
 
 /***API***/
-
+app.get('/api/student/applications', isStudent, getApplicationStudent);
 //GET PROPOSALS
 app.get("/api/proposals", isLoggedIn, getProposals);
 
@@ -199,4 +199,3 @@ app.post('/api/newExternalCosupervisor', isProfessor, [
   check('name').isLength({ min: 1, max: 50 })
 ], createExternalCosupervisor);
 
-app.get('api/applications', isStudent, getApplicationStudent);

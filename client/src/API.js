@@ -182,9 +182,12 @@ async function getThesisProposalsById(thesisId) {
 }
 
 async function getApplicationStudent() {
-  return getJson(fetch(URL + `/applications`, {
+  return getJson(fetch(URL + `/student/applications`, {
     method: 'GET',
-    credentials: "include"
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    }
   })
   )
 }
