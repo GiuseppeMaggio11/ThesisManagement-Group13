@@ -62,5 +62,16 @@ try {
 }
 }
 
+//this is for getting all the ACTIVE applications related to all the proposals of a specific professor (which makes this request)
+async function getApplications(req,res){
+  try{
+    const results = await dao.getApplicationsForProfessor(req.user.username);
+    console.log(results)
+    res.status(200).json(results);
 
-module.exports = {newApplication,updateApplicationStatus}
+  }catch(err){
+    return res.status(500).json(`error: ${err} `);
+  }
+}
+
+module.exports = {newApplication,updateApplicationStatus, getApplications}

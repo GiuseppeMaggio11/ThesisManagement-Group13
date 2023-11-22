@@ -2,7 +2,7 @@
 
 const {isStudent, isProfessor, isLoggedIn} = require("./controllers/middleware")
 const {getProposals, getProposal} = require("./controllers/showThesis")
-const {newApplication,updateApplicationStatus} = require("./controllers/manageApplication")
+const {newApplication,updateApplicationStatus, getApplications} = require("./controllers/manageApplication")
 const {addFiles, getAllFiles, getStudentFilesList, getFile} = require("./controllers/manageFiles")
 const {newThesis,updateThesesArchivation} = require("./controllers/manageThesis")
 const {listExternalCosupervisors, createExternalCosupervisor} = require("./controllers/others")
@@ -208,3 +208,6 @@ app.put('/api/updateApplicationStatus',isProfessor,[
   check('status').isIn(['Accepted', 'Refused'])
 ],
 updateApplicationStatus)
+
+//this is for getting all the ACTIVE applications related to all the proposals of a specific professor (which makes this request)
+app.get('/api/getApplications',isProfessor, getApplications)

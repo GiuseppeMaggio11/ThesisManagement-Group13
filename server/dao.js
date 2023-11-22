@@ -613,6 +613,35 @@ exports.getApplications = () => {
   });
 };
 
+//this is for getting all the ACTIVE applications related to all the proposals of a specific professor (which makes this request)
+exports.getApplicationsForProfessor = (profId) =>{
+  return new Promise((resolve, reject) => {
+    const sql =
+      `SELECT a.student_id ,s.name ,s.surname ,a.thesis_id ,t.title ,a.application_date
+      FROM application a join student s on s.id = a.student_id join thesis t on t.id = a.thesis_id join teacher tch on t.supervisor_id = tch.id 
+      WHERE a.status = 'Pending' and tch.email = ? `;
+    connection.query(sql, [profId], (err, rows) => {
+      if (err) {
+        reject(err);
+      }
+      else {
+        const applications = [];
+        rows.map((e) => {
+          const fullName = ''+e.name+' '+e.surname;
+          const application = {
+            student_id:   e.student_id,
+            student_name: fullName,
+            thesis_id:    e.thesis_id,
+            thesis_title: e.title,
+            application_date: e.application_date
+          }
+          applications.push(application);
+        })
+        resolve(applications);
+      };
+    });
+  });
+}
 
 //begin transaction function
 exports.beginTransaction = () => {
