@@ -68,9 +68,25 @@ function Header(props) {
               className="fs-5"
             >
               {props.user && props.user.user_type === "STUD"
-                ? "Student Dashboard"
+                ? "Thesis proposals"
                 : props.user && props.user.user_type === "PROF"
                 ? "Teacher Dashboard"
+                : ""}
+            </Nav.Link>
+            <Nav.Link
+              as={NavLink}
+              to={
+                props.user && props.user.user_type === "STUD"
+                  ? "studentapplications"
+                  : "/"
+              }
+              onClick={() => {
+                if (isSmallScreen) setExpanded((old) => !old);
+              }}
+              className="fs-5"
+            >
+              {props.user && props.user.user_type === "STUD"
+                ? "My applications"
                 : ""}
             </Nav.Link>
           </Nav>

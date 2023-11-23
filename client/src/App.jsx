@@ -18,6 +18,7 @@ import VirtualClock from "./components/VirtualClock";
 import MessageContext from "./messageCtx";
 import SearchProposalRoute from "./components/SearchProposal"
 import Toasts from "./components/Toasts";
+import StudentApplications from "./components/StudentApplications";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -171,6 +172,20 @@ function App() {
                     loading={loading}
                     setLoading={setLoading}
                   />
+                )
+              }
+            ></Route>
+            <Route
+              path="/studentapplications"
+              element={
+                loggedIn && user.user_type === "STUD" ? (
+                  <StudentApplications
+                    loading={loading}
+                    setLoading={setLoading}
+                    virtualClock={virtualClock}
+                  />
+                ) : (
+                  <ErrorAlert />
                 )
               }
             ></Route>

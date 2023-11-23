@@ -181,17 +181,14 @@ async function getThesisProposalsById(thesisId) {
   }
 }
 
-async function getApplicationStudent(date) {
-  return getJson(fetch(URL + `/student/applications`, {
-    method: 'GET',
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-    }
-  })
-  )
+async function getStudentApplications() {
+  return getJson(
+    fetch(`${URL}/student/applications`, {
+      credentials: "include",
+    })
+  );
 }
 
-const API = { logIn, logOut, getUserInfo, getThesisProposals, applicationThesis, getThesisProposalsById, sendFiles, newProposal, getListExternalCosupervisors, newExternalCosupervisor, getApplicationStudent };
+const API = { logIn, logOut, getUserInfo, getThesisProposals, applicationThesis, getThesisProposalsById, sendFiles, newProposal, getListExternalCosupervisors, newExternalCosupervisor, getStudentApplications };
 
 export default API;

@@ -129,13 +129,6 @@ function SearchProposalComponent(props) {
     setFilter("");
     setFilteredThesisProposals([...props.thesisProposals]);
   };
-
-  const handleBrowseApplications = () => {
-    API.getApplicationStudent().then(
-      (result) => { console.log(result) }
-    ).catch((err) => { handleErrors(err)});
-  }
-
   
     {/*<Container>
        <Row>
@@ -228,9 +221,9 @@ return(
         </Accordion>
       </Row>
         )}
-      <Button onClick={handleBrowseApplications}>
-          Browse Applications
-      </Button>
+      <Link to="/studentapplications">
+        <Button className="button-style">My applications</Button>
+      </Link>
       </Container>
     </div>
     </>)

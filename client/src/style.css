@@ -424,3 +424,7 @@ input:checked + .slider::before {
     /* Add a border for testing */
   }
 }
+
+.custom-accordion-item {
+  border-bottom: 1px solid #b3b9c2c6;
+}
