@@ -28,15 +28,18 @@ async function newApplication (req,res){
 async function getApplicationStudent (req,res){
     //const studentId = req.params.student_id;
     try{
-
+      let ThesisInfo;
       //DEVO CONTROLLARE SE L'ID E' DELL'UTENTE LOGGATO!!
       await dao.beginTransaction();
-      
       const userID = await dao.getUserID(req.user.username);
       const Application = await dao.getStudentApplication(userID);
-      console.log(Application)      
+      let Result = await Promise.all(Application.map(async (thesis)=>{
+        ThesisInfo = await dao.getProposalById(thesis.thesis_id, req.user.user_type, req.user.username) 
+        return {...ThesisInfo, status: thesis.status}
+      }))
+      
       await dao.commit()
-      return res.status(200).json(Application);
+      return res.status(200).json(Result);
     } catch (error){
       
       await dao.rollback()

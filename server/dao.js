@@ -114,7 +114,6 @@ exports.getProposals = async (user_type, username, date) => {
   try {
     let studentTitleDegree;
     let studentApplicationid;
-
     let sql;
 
     if (user_type === 'STUD') {
@@ -126,21 +125,19 @@ exports.getProposals = async (user_type, username, date) => {
       const [applicationResult] = await pool.execute(sql, [username]);
       studentApplicationid = applicationResult.length !== 0 ? applicationResult.map((element) => element.thesis_id) : [];
     }
-
-    let formattedDate = dayjs(date).format('YYYY-MM-DD HH:mm:ss');
-
-    sql = "select t.id, title, description, tch.name ,tch.surname , thesis_level ,thesis_type , required_knowledge , notes, expiration, keywords , dg.title_degree , g.group_name, d.department_name  , is_archived from thesis t join teacher tch on t.supervisor_id = tch.id join degree_table dg on t.cod_degree = dg.cod_degree join group_table g on tch.cod_group = g.cod_group join department d on tch.cod_department = d.cod_department where t.expiration > ?";
-    const [thesisResults] = await pool.execute(sql, [formattedDate]);
-
+      let formattedDate = dayjs(date).format('YYYY-MM-DD HH:mm:ss');
+      sql = "select t.id, title, description, tch.name ,tch.surname , thesis_level ,thesis_type , required_knowledge , notes, expiration, keywords , dg.title_degree , g.group_name, d.department_name  , is_archived from thesis t join teacher tch on t.supervisor_id = tch.id join degree_table dg on t.cod_degree = dg.cod_degree join group_table g on tch.cod_group = g.cod_group join department d on tch.cod_department = d.cod_department where t.expiration > ?";
+      const [thesisResults] = await pool.execute(sql, [formattedDate]);
+      
     if (thesisResults.length === 0) {
       return { error: "no entry" };
     }
-
     let thesisFromSameDegreeOfStudent = thesisResults;
 
     if (user_type === 'STUD') {
       thesisFromSameDegreeOfStudent = thesisResults.filter(item => item.title_degree === studentTitleDegree && !studentApplicationid.includes(item.id));
     }
+    
 
     //we have to modify results of query before sending them back to front end
     //2- we don't have cosupervisors field in query result. so we should add an array for cosupervisors for each row
@@ -526,6 +523,7 @@ exports.create_external_cosupervisor = async (external_cosupervisor) => {
   }
 };
 
+// get student application
 exports.getStudentApplication = async (studentId) => {
   try{
     const sql = 'SELECT * FROM application WHERE student_id = ?';

@@ -181,7 +181,7 @@ async function getThesisProposalsById(thesisId) {
   }
 }
 
-async function getApplicationStudent() {
+async function getApplicationStudent(date) {
   return getJson(fetch(URL + `/student/applications`, {
     method: 'GET',
     credentials: "include",
