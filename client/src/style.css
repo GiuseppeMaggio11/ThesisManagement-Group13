@@ -202,21 +202,21 @@ table.table-rounded thead tr {
   border-color: #4682B4;
 }
 
-.accordion-button {
+.accordion-button-custom {
   padding: 0 !important;
   vertical-align: middle;
   font-weight: 680;
 }
 
-.accordion-item {
+.accordion-item-custom {
   border: none;
 }
 
-.accordion-td {
+.accordion-td-custom {
   vertical-align: middle;
 }
 
-.accordion-body {
+.accordion-body-custom {
   vertical-align: middle;
 }
 
@@ -224,12 +224,12 @@ table.table-rounded thead tr {
   font-weight: 680;
 }
 
-.accordion-button:hover .accordion-button:focus {
+.accordion-button-custom:hover .accordion-button-custom:focus {
   box-shadow: white !important;
   border-color: white !important;
 }
 
-.accordion-button:not(.collapsed) {
+.accordion-button-custom:not(.collapsed) {
   background-color: white !important;
   border-color: white !important;
   box-shadow: none !important;
@@ -363,6 +363,6 @@ table.table-rounded thead tr {
   }
 }
 
-.custom-accordion-item {
+.custom-accordion-item-custom {
   border-bottom: 1px solid #b3b9c2c6;
 }

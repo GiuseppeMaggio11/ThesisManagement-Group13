@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Accordion,
   Alert,
@@ -12,34 +12,43 @@ import {
 import Loading from "./Loading";
 import { useMediaQuery } from "react-responsive";
 import API from "../API";
+import MessageContext from "../messageCtx";
+import { CheckLg, XLg } from "react-bootstrap-icons";
 
 function Applications(props) {
   const [applications, setApplications] = useState(undefined);
+  const [thesisTitles, setThesisTitles] = useState(undefined);
+  const { handleErrors } = useContext(MessageContext);
   const isMobile = useMediaQuery({ maxWidth: 767 });
   useEffect(() => {
     props.setLoading(true);
     //API CALL
     const getApplication = async () => {
       const result = await API.getPendingApplications();
+      const uniqueThesisTitles = [
+        ...new Set(result.map((entry) => entry.thesis_title)),
+      ];
       setApplications(result);
+      setThesisTitles(uniqueThesisTitles);
       props.setLoading(false);
     };
     getApplication();
   }, []);
 
   const handleApplication = async (student_id, thesis_id, status) => {
-    console.log(
-      "STUDENT: " + student_id + " THESIS: " + thesis_id + " STATUS: " + status
-    );
     props.setLoading(true);
-    const response = await API.updateApplictionStatus(
-      thesis_id,
-      student_id,
-      status
-    );
-    const result = await API.getPendingApplications();
-    setApplications(result);
-    props.setLoading(false);
+    try {
+      const response = await API.updateApplictionStatus(
+        thesis_id,
+        student_id,
+        status
+      );
+      const result = await API.getPendingApplications();
+      setApplications(result);
+      props.setLoading(false);
+    } catch (err) {
+      handleErrors(err);
+    }
   };
 
   return (
@@ -54,54 +63,44 @@ function Applications(props) {
           <Alert variant="danger" style={{ maxWidth: "300px" }}>
             No Applications found
           </Alert>
-        ) : !isMobile ? (
-          <Table>
-            <thead>
-              <tr>
-                <th>Student ID</th>
-                <th>Student Name</th>
-                <th>Thesis Title</th>
-                <th>Application Date</th>
-                <th></th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {applications.map((appl, i) => {
-                return (
-                  <StudentApplication
-                    application={appl}
-                    key={i}
-                    handleApplication={handleApplication}
-                    isMobile={isMobile}
-                  />
-                );
-              })}
-            </tbody>
-          </Table>
         ) : (
-          <Row>
-            <Col>
-              <Row className="fs-5 w-100">
-                <Col>Student ID</Col>
-                <Col>Thesis Name</Col>
-              </Row>
-              <div style={{ borderBottom: "1px solid gray" }}></div>
-              <Accordion className="mx-1">
-                {applications.map((appl, i) => {
-                  return (
-                    <StudentApplication
-                      application={appl}
-                      key={i}
-                      handleApplication={handleApplication}
-                      isMobile={isMobile}
-                      index={i}
-                    />
-                  );
-                })}
-              </Accordion>
-            </Col>
-          </Row>
+          <Accordion>
+            {thesisTitles.map((title, i) => {
+              return (
+                <Accordion.Item key={i} eventKey={i}>
+                  <Accordion.Header>
+                    <span className="fw-bold">{title}</span>
+                  </Accordion.Header>
+                  <Accordion.Body>
+                    <Table>
+                      <thead>
+                        <tr>
+                          {!isMobile && <th>Student ID</th>}
+                          <th>Student Name</th>
+                          <th>Application Date</th>
+                          <th></th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {applications.map((appl, i) => {
+                          return (
+                            <StudentApplication
+                              application={appl}
+                              key={i}
+                              handleApplication={handleApplication}
+                              isMobile={isMobile}
+                              title={title}
+                            />
+                          );
+                        })}
+                      </tbody>
+                    </Table>
+                  </Accordion.Body>
+                </Accordion.Item>
+              );
+            })}
+          </Accordion>
         )}
       </Container>
     </>
@@ -121,11 +120,11 @@ function StudentApplication(props) {
     }${minutes}`;
   }
 
-  return !props.isMobile ? (
+  //return !props.isMobile && props.title === props.application.thesis_title ? (
+  return props.title === props.application.thesis_title ? (
     <tr>
-      <td>{props.application.student_id}</td>
+      {!props.isMobile && <td>{props.application.student_id}</td>}
       <td>{props.application.student_name}</td>
-      <td>{props.application.thesis_title}</td>
       <td>{formatDate(props.application.application_date)}</td>
       <td>
         <Button
@@ -138,7 +137,7 @@ function StudentApplication(props) {
             )
           }
         >
-          Accept
+          <CheckLg size={20} />
         </Button>
       </td>
       <td>
@@ -152,63 +151,11 @@ function StudentApplication(props) {
             )
           }
         >
-          Reject
+          <XLg size={20} />
         </Button>
       </td>
     </tr>
-  ) : (
-    <Accordion.Item
-      eventKey={props.index}
-      className="my-3 custom-accordion-item"
-    >
-      <Accordion.Header>
-        <Row className="py-3 w-100">
-          <Col>
-            <span style={{ fontWeight: "450" }}>
-              {props.application.student_id}
-            </span>
-          </Col>
-          <Col>
-            <span style={{ fontWeight: "450" }}>
-              {props.application.thesis_title}
-            </span>
-          </Col>
-        </Row>
-      </Accordion.Header>
-      <Accordion.Body>
-        <Row>
-          <Col className="text-end">
-            <Button
-              variant="success"
-              onClick={() =>
-                props.handleApplication(
-                  props.application.student_id,
-                  props.application.thesis_id,
-                  "Accepted"
-                )
-              }
-            >
-              Accept
-            </Button>
-          </Col>
-          <Col className="text-start">
-            <Button
-              variant="danger"
-              onClick={() =>
-                props.handleApplication(
-                  props.application.student_id,
-                  props.application.thesis_id,
-                  "Refused"
-                )
-              }
-            >
-              Reject
-            </Button>
-          </Col>
-        </Row>
-      </Accordion.Body>
-    </Accordion.Item>
-  );
+  ) : null;
 }
 
 export default Applications;
