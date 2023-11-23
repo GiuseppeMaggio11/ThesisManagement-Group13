@@ -27,10 +27,19 @@ function Applications(props) {
     getApplication();
   }, []);
 
-  const handleApplication = (student_id, thesis_id, status) => {
+  const handleApplication = async (student_id, thesis_id, status) => {
     console.log(
       "STUDENT: " + student_id + " THESIS: " + thesis_id + " STATUS: " + status
     );
+    props.setLoading(true);
+    const response = await API.updateApplictionStatus(
+      thesis_id,
+      student_id,
+      status
+    );
+    const result = await API.getPendingApplications();
+    setApplications(result);
+    props.setLoading(false);
   };
 
   return (
@@ -100,12 +109,24 @@ function Applications(props) {
 }
 
 function StudentApplication(props) {
+  function formatDate(dateString) {
+    var date = new Date(dateString);
+    var day = date.getDate();
+    var month = date.getMonth() + 1;
+    var year = date.getFullYear();
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    return `${day}/${month}/${year} ${hours}:${
+      minutes < 10 ? "0" : ""
+    }${minutes}`;
+  }
+
   return !props.isMobile ? (
     <tr>
       <td>{props.application.student_id}</td>
       <td>{props.application.student_name}</td>
       <td>{props.application.thesis_title}</td>
-      <td>{props.application.application_date}</td>
+      <td>{formatDate(props.application.application_date)}</td>
       <td>
         <Button
           variant="success"

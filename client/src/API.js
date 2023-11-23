@@ -213,7 +213,28 @@ async function updateExpiration(virtualTime) {
   }
 }
 async function getPendingApplications() {
-  return getJson(fetch(`${URL}/getApplications`));
+  return getJson(
+    fetch(`${URL}/getApplications`, {
+      credentials: "include",
+    })
+  );
+}
+
+async function updateApplictionStatus(thesis_id, student_id, status) {
+  return getJson(
+    fetch(URL + `/updateApplicationStatus`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        thesis_id,
+        student_id,
+        status,
+      }),
+      credentials: "include",
+    })
+  );
 }
 
 const API = {
@@ -227,7 +248,9 @@ const API = {
   newProposal,
   getListExternalCosupervisors,
   newExternalCosupervisor,
+  updateExpiration,
   getPendingApplications,
+  updateApplictionStatus,
 };
 
 export default API;
