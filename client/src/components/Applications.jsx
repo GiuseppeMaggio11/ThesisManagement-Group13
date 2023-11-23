@@ -11,6 +11,7 @@ import {
 } from "react-bootstrap";
 import Loading from "./Loading";
 import { useMediaQuery } from "react-responsive";
+import API from "../API";
 
 function Applications(props) {
   const [applications, setApplications] = useState(undefined);
@@ -18,37 +19,12 @@ function Applications(props) {
   useEffect(() => {
     props.setLoading(true);
     //API CALL
-    setApplications([
-      {
-        student_id: "S123456",
-        student_name: "Luca Esposito",
-        thesis_id: 1,
-        thesis_title: "Development of a Secure Web Application",
-        application_date: "2023-11-22",
-      },
-      {
-        student_id: "S654321",
-        student_name: "Alessandra Moretti",
-        thesis_id: 1,
-        thesis_title: "Development of a Secure Web Application",
-        application_date: "2023-10-10",
-      },
-      {
-        student_id: "S123456",
-        student_name: "Luca Esposito",
-        thesis_id: 2,
-        thesis_title: "IoT-Based Smart Home Automation",
-        application_date: "2023-11-15",
-      },
-      {
-        student_id: "S654321",
-        student_name: "Alessandra Moretti",
-        thesis_id: 3,
-        thesis_title: "Network Traffic Analysis",
-        application_date: "2023-11-22",
-      },
-    ]);
-    props.setLoading(false);
+    const getApplication = async () => {
+      const result = await API.getPendingApplications();
+      setApplications(result);
+      props.setLoading(false);
+    };
+    getApplication();
   }, []);
 
   const handleApplication = (student_id, thesis_id, status) => {
