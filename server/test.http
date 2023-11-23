@@ -2,10 +2,12 @@
 POST http://localhost:3001/api/session/login HTTP/1.1
 content-type: application/json
 
+
 {
     "username": "mario.rossi@polito.it",
     "password": "P123456"
 }
+
 
 ######
 POST http://localhost:3001/api/session/login HTTP/1.1
@@ -28,5 +30,25 @@ Content-Type: application/json
 
 {   
     "thesis_id": 5
+}
+###
+
+###
+PUT http://localhost:3001/api/updateThesesArchivation
+Content-Type: application/json
+
+{   
+    "datetime": "2026-01-21T10:00:26.145Z"
+}
+###
+
+###
+PUT http://localhost:3001/api/updateApplicationStatus
+Content-Type: application/json
+
+{   
+    "thesis_id": 3,
+    "student_id": "S123456",
+    "status": "Refused"
 }
 ###

@@ -2,9 +2,9 @@
 
 const {isStudent, isProfessor, isLoggedIn} = require("./controllers/middleware")
 const {getProposals, getProposal} = require("./controllers/showThesis")
-const {newApplication} = require("./controllers/manageApplication")
+const {newApplication,updateApplicationStatus, getApplications} = require("./controllers/manageApplication")
 const {addFiles, getAllFiles, getStudentFilesList, getFile} = require("./controllers/manageFiles")
-const {newThesis} = require("./controllers/manageThesis")
+const {newThesis,updateThesesArchivation} = require("./controllers/manageThesis")
 const {listExternalCosupervisors, createExternalCosupervisor} = require("./controllers/others")
 
 
@@ -168,6 +168,7 @@ app.post('/api/newApplication/:thesis_id', isStudent, newApplication);
 //ADD FILES
 app.post('/api/newFiles/:thesis_id', isStudent, addFiles)
 
+
 app.get('/api/getAllFiles/:student_id/:thesis_id', isProfessor, getAllFiles);
 
 app.get('/api/getStudentFilesList/:student_id/:thesis_id', isProfessor, getStudentFilesList);
@@ -195,3 +196,18 @@ app.post('/api/newExternalCosupervisor', isProfessor, [
   check('surname').isLength({ min: 1, max: 50 }),
   check('name').isLength({ min: 1, max: 50 })
 ], createExternalCosupervisor);
+
+//UPDATE THESES WITH NEW VIRTUALCLOCK TIME  
+app.put('/api/updateThesesArchivation',[
+  // Check if valid date
+  check('expiration').isISO8601().toDate()],
+  updateThesesArchivation)
+
+//ACCEPT/REJECT APPLICATION  
+app.put('/api/updateApplicationStatus',isProfessor,[
+  check('status').isIn(['Accepted', 'Refused'])
+],
+updateApplicationStatus)
+
+//this is for getting all the ACTIVE applications related to all the proposals of a specific professor (which makes this request)
+app.get('/api/getApplications',isProfessor, getApplications)

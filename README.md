@@ -182,6 +182,40 @@ It is possible to filter thesis proposals based on the content of a text field f
     ]
     ```
 
+#### 6. **Update archivation of proposal **: `PUT /api/updateThesesArchivation`
+
+  - **Description**: Updates archivation status of thesis proposal based on new virtualclock time
+  - **Middleware**: 
+  - **Request Body**:
+    - `datetime` (string): The new virtual clock time
+  - **Response**:
+    - String with info on number of updated rows
+    - `500 Internal Server Error` if an unexpected error occurs
+  - **Example**:
+    ```json
+      {   
+          "datetime": "2026-01-21T10:00:26.145Z"
+      }
+    ```
+#### 7. **New external co-supevisors **: `POST /api/updateApplicationStatus`
+
+  - **Description**: Updates status of application
+  - **Middleware**: `isProfessor`
+  - **Request Body**:
+    - `thesis_id` (string): The id of the thesis the application refers to,
+    - `student_id` (string): The id of the student of the application,
+    - `status` (string): The new status of the application ,
+  - **Response**:
+    - Some application information
+    - `400`if data is incorrect
+  - **Example**:
+    ```json
+      {
+        "student_id": "S123456",
+        "thesis_id": 3,
+        "status": "Accepted"
+      }
+    ```
 
 #### OTHER 1 Server
 
@@ -304,6 +338,16 @@ It is possible to filter thesis proposals based on the content of a text field f
     "surname":"testsurname"
     
 }
+```
+#### updateExpiration
+
+- Description: Asks the server to update archivation of proposals based on new virtual clock time
+- API server called: PUT `/api/updateThesesArchivation`
+- Input: datetime string
+- Output: information on update
+
+```
+"Rows matched: 6  Changed: 3  Warnings: 0"
 ```
 
 #### OTHER 2 Client
