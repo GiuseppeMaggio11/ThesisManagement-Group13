@@ -586,6 +586,39 @@ exports.updateApplicationStatus = (decision) => {
     });
   });
 };
+//rejects every application for specific thesis except for the one of accepted student
+exports.rejectApplicationsExcept = (accepted) => {
+  return new Promise((resolve, reject) => {
+    const sql = ` 
+    UPDATE application
+    SET status = "Rejected"
+    WHERE  thesis_id = ?
+    AND student_id <> ?
+                `
+    connection.query(sql, [accepted.thesis_id, accepted.student_id], function (err,rows) {
+      if (err) {
+        reject(err);
+      }
+      resolve(accepted);
+    });
+  });
+};
+
+exports.cancelStudentApplications = (accepted) => {
+  return new Promise((resolve, reject) => {
+    const sql = ` 
+    DELETE FROM application
+    WHERE student_id = ?
+    AND thesis_id <> ?;
+                `
+    connection.query(sql, [accepted.student_id, accepted.thesis_id], function (err,rows) {
+      if (err) {
+        reject(err);
+      }
+      resolve(accepted);
+    });
+  });
+};
 
 // Selects every application from application table, returns array of applications(only student_id and thesis_id)
 exports.getApplications = () => {
