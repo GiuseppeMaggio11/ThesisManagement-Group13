@@ -80,14 +80,14 @@ const SearchDropdown = ({ placeholder, position, items, setItems, selectedItems,
     const handleItemClick = (item) => {
         let newSelectedItems = [...selectedItems, item];
         let is = items.filter((i) => !newSelectedItems.includes(i));
-        console.log('remaining items ' + is)
+        
         setItems(is);
         setSelectedItems(newSelectedItems);
         setInput("")
         setShowDropdown(false)
     };
 
-    console.log(items)
+
 
     return (
         <div className="mt-0 p-2" style={{ marginBottom: '0.5em' }}>
@@ -170,9 +170,14 @@ const FilterCard = (props) => {
     const [groups, setGroups] = useState([])
     const [selectedGroups, setSelectedGroups] = useState([])
     const [type, setType] = useState(['Sperimental', ''])
+    const [selectedType, setSelectedType] = useState([])
+
+    const [reset, setReset] = useState(true)
 
     const [selectedDate, setSelectedDate] = useState(props.virtualClock)
 
+    const thesisList = props.thesisList
+    
     useEffect(() => {
         const setFilters = async () => {
             let keywords_theses = [];
@@ -181,27 +186,29 @@ const FilterCard = (props) => {
             let internal_cosupervisors = []
             let external_cosupervisors = []
             try {
-                if (props.thesisList) {
-                    console.log(props.thesisList)
-                    props.thesisList.forEach(item => {
-                        console.log(item)
+                if (thesisList) {
+                   
+                    thesisList.forEach(item => {
+                       
                         if (item.keywords.length > 0) {
-                            console.log(keywords_theses)
+                           
                             item.keywords.forEach(i => {
-                                keywords_theses.push(i)
+                                if (i != '' && i != ' ')
+                                    keywords_theses.push(i)
                             })
                         }
                         if (item.supervisor) {
                             const name = item.supervisor
+                           
                             const supervisorExists = supervisors_theses.some(sup =>
                                 sup === name
                             );
-
+                            
                             if (!supervisorExists) {
                                 supervisors_theses.push(name);
                             }
                         }
-                        console.log("cosupervisor" + item.cosupervisor)
+
                         if (item.cosupervisors?.length > 0) {
                             if (item.cosupervisors.contains('@'))
                                 internal_cosupervisors.push(item.cosupervisor)
@@ -210,13 +217,14 @@ const FilterCard = (props) => {
                         }
                         if (item.groups?.length > 0) {
                             item.groups.forEach(i => {
-                                console.log(i)
+                                
                                 let exist = group_theses.some(g => g === i.group)
                                 if (!exist)
                                     group_theses.push(i.group)
                             })
                         }
                     })
+                    console.log(thesisList[1].groups)
                     setExternalCosupervisor(external_cosupervisors);
                     setInternalCosupervisor(internal_cosupervisors);
                     setKeywords(keywords_theses)
@@ -229,24 +237,98 @@ const FilterCard = (props) => {
                 handleToast(error.error, 'error')
             }
         }
-        props.setLoading(true)
-        setFilters()
+        if(reset){
+            props.setLoading(true)
+            setFilters()
+            setReset(false)
+        }
         props.setLoading(false)
-    }, [])
+       
+    }, [reset, thesisList])
 
+    const handleReset = () =>{
+        setSelectedExternalCosupervisor([])
+        setSelectedinternalCosupervisor([])
+        setSelectedSupervisor([])
+        setSelectedGroups([])
+        setSelectedKeywords([])
+        setSelectedType([])
+        setSelectedDate(props.virtualClock)
+        props.setProposals(thesisList)
+        setReset(true)
+    }
+    
+    const handleFilter = () => {
+        let filtered = [...thesisList];
+
+        if (selectedSupervisor?.length > 0) {
+            filtered = filtered.filter(thesis =>
+                selectedSupervisor.includes(thesis.supervisor)
+            );
+        }
+        if (selectedDate!=props.virtualClock) {
+            filtered = filtered.filter(thesis =>
+                selectedDate > thesis.date
+            );
+        }
+    
+        if (selectedExternalCosupervisor?.length > 0) {
+            filtered = filtered.filter(thesis =>
+                selectedExternalCosupervisor.includes(thesis.cosupervisor)
+            );
+        }
+    
+        if (selectedinternalCosupervisor?.length > 0) {
+            filtered = filtered.filter(thesis =>
+                selectedinternalCosupervisor.includes(thesis.cosupervisor)
+            );
+        }
+    
+        if (selectedType?.length > 0) {
+            filtered = filtered.filter(thesis =>
+                selectedType.includes(thesis.type)
+            );
+        }
+
+        if (selectedKeywords?.length > 0) {
+            filtered = filtered.filter(thesis =>
+                thesis.keywords.some(keyword =>
+                    selectedKeywords.includes(keyword)
+                )
+            );
+        }
+
+        if (selectedGroups?.length > 0) {
+                filtered = filtered.filter(thesis =>
+                    thesis.groups.some(group =>
+                        selectedGroups.includes(group.group)
+                    )
+                );
+        }
+        props.setProposals(filtered)
+    };
+        
+
+    
     return (
         <Card className="container mt-6 custom-rounded" style={{ marginBottom: '0.5em' }}>
             <Form>
-                {/* Supervisor */}
+                {/* Supervisor and Valid until */}
                 <Row>
                     <Col xs={2} className="d-flex align-items-center justify-content-start">
                         {/* This column is empty */}
                     </Col>
-                    <Col xs={8}>
+                    <Col xs={4}>
                         <Form.Group>
                             <Row className="align-items-center">
                                 <Col>
-                                    <Form.Label className="chip-list">
+                                    <Form.Label className="chip-list"
+                                        style={{ overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
+                                        ref={(labelRef) => {
+                                            if (labelRef) {
+                                                labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
+                                            }
+                                        }}>
                                         {selectedSupervisor && selectedSupervisor.length > 0 && (
                                             <Chips2
                                                 items={supervisors}
@@ -260,7 +342,9 @@ const FilterCard = (props) => {
                             </Row>
                         </Form.Group>
                     </Col>
-                    
+                    <Col xs={2} className="d-flex align-items-center justify-content-end">
+                        {/* This column is empty */}
+                    </Col>
                     <Col xs={6}>
                         <SearchDropdown placeholder={'Supervisor'} position={'start'} items={supervisors} setItems={setSupervisors} selectedItems={selectedSupervisor} setSelectedItems={setSelectedSupervisor} />
                     </Col>
@@ -271,12 +355,19 @@ const FilterCard = (props) => {
                             </Col>
                             <Col xs={8} className="position-relative">
                                 <Form.Group>
-                                <Form.Control
+                                    <Form.Control
                                         type="date"
                                         id="expiration"
                                         name="expiration"
-                                        value={new Date()}
-                                        onChange={() => console.log('ok')}
+                                        value={selectedDate}
+                                        onChange={(e) => {
+                                            const selected = new Date(e.target.value);
+                                            if (selected > props.virtualClock) {
+                                                setSelectedDate(e.target.value);
+                                            } else {
+                                                handleToast('Date must be in the future', 'error')
+                                            }
+                                        }}
                                     />
                                 </Form.Group>
                             </Col>
@@ -284,22 +375,22 @@ const FilterCard = (props) => {
                     </Col>
                 </Row>
 
-
-
-
-
-
-
-                {/* internal cosupervisor */}
+                {/* internal cosupervisor and type */}
                 <Row>
                     <Col xs={2} className="d-flex align-items-center justify-content-start">
                         {/* This column is empty */}
                     </Col>
-                    <Col xs={8}>
+                    <Col xs={6}>
                         <Form.Group>
                             <Row className="align-items-center">
                                 <Col>
-                                    <Form.Label className="chip-list">
+                                    <Form.Label className="chip-list"
+                                        style={{ overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
+                                        ref={(labelRef) => {
+                                            if (labelRef) {
+                                                labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
+                                            }
+                                        }}>
                                         {selectedinternalCosupervisor && selectedinternalCosupervisor.length > 0 && (
                                             <Chips2
                                                 items={internalCosupervisor}
@@ -313,7 +404,10 @@ const FilterCard = (props) => {
                             </Row>
                         </Form.Group>
                     </Col>
-                    
+                    <Col xs={2} className="d-flex align-items-center justify-content-end">
+                        {/* This column is empty */}
+                    </Col>
+
                     <Col xs={6}>
                         <SearchDropdown placeholder={'Internal cosupervisor'} position={'start'} items={internalCosupervisor} setItems={setInternalCosupervisor} selectedItems={selectedinternalCosupervisor} setSelectedItems={setSelectedinternalCosupervisor} />
                     </Col>
@@ -336,16 +430,22 @@ const FilterCard = (props) => {
                     </Col>
                 </Row>
 
-                 {/* external cosupervisor */}
+                {/* external cosupervisor and keyword */}
                 <Row>
                     <Col xs={2} className="d-flex align-items-center justify-content-start">
                         {/* This column is empty */}
                     </Col>
-                    <Col xs={8}>
+                    <Col xs={4}>
                         <Form.Group>
                             <Row className="align-items-center">
                                 <Col>
-                                    <Form.Label className="chip-list">
+                                    <Form.Label className="chip-list"
+                                        style={{ overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
+                                        ref={(labelRef) => {
+                                            if (labelRef) {
+                                                labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
+                                            }
+                                        }}>
                                         {selectedExternalCosupervisor && selectedExternalCosupervisor.length > 0 && (
                                             <Chips2
                                                 items={externalCosupervisor}
@@ -359,21 +459,20 @@ const FilterCard = (props) => {
                             </Row>
                         </Form.Group>
                     </Col>
-                
-                    <Col xs={6}>
-                        <SearchDropdown placeholder={'External cosupervisor'} position={'start'} items={externalCosupervisor} setItems={setExternalCosupervisor} selectedItems={selectedExternalCosupervisor} setSelectedItems={setSelectedExternalCosupervisor} />
-                    </Col>
-                </Row>
-
-                <Row>
                     <Col xs={2} className="d-flex align-items-center justify-content-start">
                         {/* This column is empty*/}
                     </Col>
-                    <Col xs={8}>
+                    <Col xs={4}>
                         <Form.Group>
                             <Row className="align-items-center">
                                 <Col>
-                                    <Form.Label className="chip-list">
+                                    <Form.Label className="chip-list"
+                                        style={{ overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
+                                        ref={(labelRef) => {
+                                            if (labelRef) {
+                                                labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
+                                            }
+                                        }}>
                                         {selectedKeywords && selectedKeywords.length > 0 && (
                                             <Chips2
                                                 items={keywords}
@@ -387,21 +486,33 @@ const FilterCard = (props) => {
                             </Row>
                         </Form.Group>
                     </Col>
+                </Row>
+                <Row>
                     <Col xs={6}>
-                        <SearchDropdown placeholder={'Keywords'} position={'start'} items={keywords} setItems={setKeywords} selectedItems={selectedKeywords} setSelectedItems={setSelectedKeywords} />
+                        <SearchDropdown placeholder={'External cosupervisor'} position={'start'} items={externalCosupervisor} setItems={setExternalCosupervisor} selectedItems={selectedExternalCosupervisor} setSelectedItems={setSelectedExternalCosupervisor} />
+                    </Col>
+
+                    <Col xs={6} className="align-items-center" >
+                        <SearchDropdown placeholder={'Keywords'} position={'end'} items={keywords} setItems={setKeywords} selectedItems={selectedKeywords} setSelectedItems={setSelectedKeywords} />
                     </Col>
                 </Row>
 
-
+                {/* groups and buttons */}
                 <Row>
                     <Col xs={2} className="d-flex align-items-center justify-content-start">
                         {/* This column is empty */}
                     </Col>
-                    <Col xs={8}>
+                    <Col xs={6}>
                         <Form.Group>
                             <Row className="align-items-center">
                                 <Col>
-                                    <Form.Label className="chip-list">
+                                    <Form.Label className="chip-list"
+                                        style={{ overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
+                                        ref={(labelRef) => {
+                                            if (labelRef) {
+                                                labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
+                                            }
+                                        }}>
                                         {selectedGroups && selectedGroups.length > 0 && (
                                             <Chips2
                                                 items={groups}
@@ -415,15 +526,20 @@ const FilterCard = (props) => {
                             </Row>
                         </Form.Group>
                     </Col>
+                    <Col xs={2} className="d-flex align-items-center justify-content-end">
+                        {/* This column is empty */}
+                    </Col>
                     <Col xs={6}>
                         <SearchDropdown placeholder={'Groups'} position={'start'} items={groups} setItems={setGroups} selectedItems={selectedGroups} setSelectedItems={setSelectedGroups} />
                     </Col>
                     <Col xs={6} className="d-flex justify-content-end" style={{ paddingRight: '3em', paddingTop: '3em' }}>
-                        <Button className="button-style-cancel">Reset</Button>
-                        <Button className="button-style">Search</Button>
+                        <Button className="button-style-cancel" onClick={handleReset}>Reset</Button>
+                        <Button className="button-style" onClick={()=>{handleFilter(); props.showFilters()}}>Search</Button>
                     </Col>
                 </Row>
+
                 <ToastContainer />
+
             </Form>
         </Card>
     );

@@ -74,69 +74,6 @@ function SearchProposalComponent(props) {
     setFilteredThesisProposals([...props.thesisProposals]);
   }, [props.thesisProposals]);
 
-  const handleSubmit = (event) => {
-    if (event) {
-      event.preventDefault();
-    }
-
-    setFilteredThesisProposals(
-      props.thesisProposals.filter((proposal) => {
-        const filterLowerCase = filter.toLowerCase();
-
-        return Object.entries(proposal).some(([key, value]) => {
-          if (key === "id") {
-            return false; // Exclude the "id" field
-          }
-
-          if (Array.isArray(value)) {
-            // If the value is an array, check if the filter is present in at least one of the elements
-            return value.some((item) => {
-              if (typeof item === "object" && item !== null) {
-                // If the item is an object, search within its properties
-                return Object.values(item).some((nestedValue) => {
-                  if (
-                    typeof nestedValue === "string" ||
-                    typeof nestedValue === "number"
-                  ) {
-                    return nestedValue
-                      .toString()
-                      .toLowerCase()
-                      .includes(filterLowerCase);
-                  } else if (dayjs.isDayjs(nestedValue)) {
-                    return dayjs(nestedValue)
-                      .format("YYYY-MM-DD")
-                      .includes(filterLowerCase);
-                  }
-                  return false;
-                });
-              } else if (typeof item === "string" || typeof item === "number") {
-                // If the item is a string or number, handle the normal search
-                return item.toString().toLowerCase().includes(filterLowerCase);
-              } else if (dayjs.isDayjs(item)) {
-                // If the item is a date handled by dayjs
-                return dayjs(item)
-                  .format("YYYY-MM-DD")
-                  .includes(filterLowerCase);
-              }
-            });
-          } else if (typeof value === "string" || typeof value === "number") {
-            // If the value is a string or number, handle the normal search
-            return value.toString().toLowerCase().includes(filterLowerCase);
-          } else if (dayjs.isDayjs(value)) {
-            // If the value is a date handled by dayjs
-            return dayjs(value).format("YYYY-MM-DD").includes(filterLowerCase);
-          }
-
-          return false;
-        });
-      })
-    );
-  };
-
-  const handleCancel = () => {
-    setFilter("");
-    setFilteredThesisProposals([...props.thesisProposals]);
-  };
 
   const handleChangeFilter = () => {
     const filter = !showFilters
@@ -168,6 +105,7 @@ function SearchProposalComponent(props) {
                   loading={props.loading}
                   setLoading={props.setLoading}
                   showFilters={showFilters}
+                  setProposals={setFilteredThesisProposals}
                 />
               </Col >
             </Row>
