@@ -5,6 +5,7 @@ import MessageContext from "../messageCtx"
 import { ToastContainer } from 'react-toastify';
 import { ChevronCompactDown, ChevronCompactUp, Search } from 'react-bootstrap-icons'
 import Loading from "./Loading";
+import dayjs from 'dayjs'
 
 const Chips2 = ({ items, selectedItems, setItems, setSelectedItems }) => {
     return (
@@ -174,7 +175,7 @@ const FilterCard = (props) => {
 
     const [reset, setReset] = useState(true)
 
-    const [selectedDate, setSelectedDate] = useState(props.virtualClock)
+    const [selectedDate, setSelectedDate] = useState(dayjs(props.virtualClock).format('YYYY-MM-DD'))
 
     const thesisList = props.thesisList
     
@@ -224,7 +225,6 @@ const FilterCard = (props) => {
                             })
                         }
                     })
-                    console.log(thesisList[1].groups)
                     setExternalCosupervisor(external_cosupervisors);
                     setInternalCosupervisor(internal_cosupervisors);
                     setKeywords(keywords_theses)
@@ -253,9 +253,10 @@ const FilterCard = (props) => {
         setSelectedGroups([])
         setSelectedKeywords([])
         setSelectedType([])
-        setSelectedDate(props.virtualClock)
-        props.setProposals(thesisList)
+        setSelectedDate(dayjs(props.virtualClock))
         setReset(true)
+        props.setProposals(thesisList)
+        props.setAdvancedFilter(false)
     }
     
     const handleFilter = () => {
@@ -267,8 +268,10 @@ const FilterCard = (props) => {
             );
         }
         if (selectedDate!=props.virtualClock) {
+            console.log('date diff')
+            console.log(selectedDate)
             filtered = filtered.filter(thesis =>
-                selectedDate > thesis.date
+                dayjs(thesis.expiration).isAfter(selectedDate)
             );
         }
     
@@ -305,6 +308,7 @@ const FilterCard = (props) => {
                     )
                 );
         }
+        
         props.setProposals(filtered)
     };
         
@@ -534,7 +538,7 @@ const FilterCard = (props) => {
                     </Col>
                     <Col xs={6} className="d-flex justify-content-end" style={{ paddingRight: '3em', paddingTop: '3em' }}>
                         <Button className="button-style-cancel" onClick={handleReset}>Reset</Button>
-                        <Button className="button-style" onClick={()=>{handleFilter(); props.showFilters()}}>Search</Button>
+                        <Button className="button-style" onClick={()=>{handleFilter()}}>Search</Button>
                     </Col>
                 </Row>
 

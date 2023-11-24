@@ -340,12 +340,13 @@ table.table-rounded thead tr {
   position: absolute;
   right: 0;
   height: 100%;
-  margin-right: 3rem;
+  margin-right: 0.5rem;
 }
 
 .Form.Group {
   position: relative;
 }
+
 .clear-btn span {
   font-size: 18px;
   color: #999;
@@ -370,8 +371,6 @@ table.table-rounded thead tr {
   border-color:black
 }
 
-
-
 /* Style for the custom slider */
 .custom-checkbox {
   display: inline-block;
@@ -392,6 +391,7 @@ table.table-rounded thead tr {
   border-radius: 26px; /* Round shape to create slider appearance */
   transition: 0.4s;
 }
+
 
 /* Slider knob appearance */
 .slider::before {
