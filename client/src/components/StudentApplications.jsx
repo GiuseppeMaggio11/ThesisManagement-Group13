@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from "react";
+import { Link } from "react-router-dom";
 import { 
   Container, 
   Row, 
@@ -64,7 +65,15 @@ function StudentApplications(props) {
               <tbody>
                 {applications.map((element, index) => (
                   <tr key={index}>
-                    <td>{element.title}</td>
+                    <td>
+                    <Link 
+                      style={{color:'#4682B4', fontSize:18}} 
+                      to={`/proposals/${element.id}`}
+                      state={{ from: "applications" }}
+                    >
+                      {element.title}
+                    </Link>
+                    </td>
                     <td>{element.name+" "+element.surname}</td>
                     <td>{dayjs(element.application_date).format("YYYY-MM-DD")}</td>
                     <td>

@@ -1,5 +1,5 @@
 import { Container, Table, Accordion, Button, Modal, Form, Row, Col} from "react-bootstrap";
-import { useParams, useNavigate} from 'react-router-dom';
+import { useParams, useNavigate, useLocation} from 'react-router-dom';
 import React, { useEffect, useState, useContext } from "react";
 import API from '../API';
 import MessageContext from '../messageCtx'
@@ -19,6 +19,8 @@ function ThesisPage(props) {
     const [isLoading, setIsLoading] = useState(true)
     const [selectedFiles, setSelectedFiles] = useState([]);
     const isMobile = useMediaQuery({ maxWidth: 767 });
+    const { state } = useLocation();
+    const from = state?.from;
 
     function formatDate(date) {
         const year = date.getFullYear();
@@ -197,13 +199,15 @@ function ThesisPage(props) {
                                             <span>Valid until</span><span className="bold"> {pageData.expiration}</span>
                                         </div>
                                     </Col>
-                                    <Col>
-                                        <div className="button-apply">
-                                            <Button className="button-style" onClick={() => setOpenPanel(true)}>
-                                                APPLY
-                                            </Button>
-                                        </div>
-                                    </Col>
+                                    { !(from === "applications") &&
+                                        <Col>
+                                            <div className="button-apply">
+                                                <Button className="button-style" onClick={() => setOpenPanel(true)}>
+                                                    APPLY
+                                                </Button>
+                                            </div>
+                                        </Col>
+                                    }
                                 </Row>
                             </td>
                         </tr>

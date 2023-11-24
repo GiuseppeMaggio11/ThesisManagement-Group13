@@ -234,7 +234,11 @@ function ProposalAccordion(props) {
     <Accordion.Item eventKey={props.proposal.id.toString()}>
       <Accordion.Header>
         <span className="my-3">
-          <Link style={{color:'#4682B4', fontSize:18}} to={`/proposals/${props.proposal.id}`}>
+          <Link 
+            style={{color:'#4682B4', fontSize:18}} 
+            to={`/proposals/${props.proposal.id}`}
+            state={{ from: "thesis" }}
+          >
             {props.proposal.title}
           </Link>
         </span>
@@ -257,7 +261,11 @@ function ProposalTableRow(props) {
   return (
     <tr onClick={()=>navigation(`/proposals/${props.proposal.id}`)}>
       <td>
-        <Link style={{color:'#4682B4', fontSize:18}} to={`/proposals/${props.proposal.id}`}>
+        <Link 
+          style={{color:'#4682B4', fontSize:18}} 
+          to={`/proposals/${props.proposal.id}`}
+          state={{ from: "thesis" }}
+        >
           {props.proposal.title}
         </Link>
       </td>
