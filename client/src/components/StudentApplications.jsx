@@ -34,38 +34,6 @@ function StudentApplications(props) {
     catch (err) {
       handleErrors(err);
     }
-    /*setApplications([
-      {
-        title: "Development of a Secure Web Application",
-        description: "Description",
-        supervisor: "Mario Rossi", 
-        co_supervisors: "Sofia Bianchi, ",
-        keywords: "AUTOMATATION, HUMAN COMPUTER INTERACTION",
-        type: "Sperimental",
-        groups: "GRP01",
-        required_knowledge: "Strong knowledge of web security and programming.",
-        notes: "None",
-        expiration: "2024-07-30",
-        level: "Master",
-        status: "Pending", 
-        application_date: "2023-09-30"
-      },
-      {
-        title: "IoT-Based Smart Home Automation",
-        description: "Description",
-        supervisor: "Mario Rossi", 
-        co_supervisors: "Sofia Bianchi, ",
-        keywords: "USER EXPERIENCE, AUTOMATATION, MACHINE LEARNING",
-        type: "Company",
-        groups: "GRP01",
-        required_knowledge: "Experience with IoT protocols and devices.",
-        notes: "None",
-        expiration: "2024-07-30",
-        level: "Master",
-        status: "Refused",
-        application_date: "2023-09-30"
-      }
-    ])*/
   }, []);
 
   return (
@@ -97,7 +65,7 @@ function StudentApplications(props) {
                 {applications.map((element, index) => (
                   <tr key={index}>
                     <td>{element.title}</td>
-                    <td>{element.supervisor}</td>
+                    <td>{element.name+" "+element.surname}</td>
                     <td>{dayjs(element.application_date).format("YYYY-MM-DD")}</td>
                     <td>
                       <ApplicationStatus
@@ -161,7 +129,7 @@ function MobileApplication(props) {
           <b>{dayjs(props.application.application_date).format("YYYY-MM-DD")}</b>
         </p>
         <p>
-          Supervisor: <b>{props.application.supervisor}</b>
+          Supervisor: <b>{props.application.name+" "+props.application.surname}</b>
         </p>
         <p>
           Expiration date:{" "}
@@ -173,11 +141,11 @@ function MobileApplication(props) {
 }
 
 function ApplicationStatus(props) {
-  return props.status === "Refused" ? (
+  return props.status === "refused" ? (
     <Badge bg= "danger" style={{ maxWidth: "100px" }}>
       Rejected
     </Badge>
-  ) : props.status === "Pending" ? (
+  ) : props.status === "pending" ? (
     <Badge bg= "secondary" style={{ maxWidth: "100px" }}>
       Pending
     </Badge>

@@ -37,6 +37,8 @@ function NewProposal(props) {
     cod_degree: "",
     is_archived: false,
   });
+  const [internal_cosupervisor_input, setInternalCosupervisorInput] = useState("");
+  const [keywords_input, setKeywordsInput] = useState("");
 
   const [errors, setErrors] = useState(null);
   const [showForm, setShowForm] = useState(false);
@@ -49,6 +51,7 @@ function NewProposal(props) {
   const typeRef = useRef(null)
   const expirationRef = useRef(null)
   const degreeRef = useRef(null)
+
 
   const fetchData = async () => {
     try {
@@ -97,6 +100,8 @@ function NewProposal(props) {
         [field]: [...formData[field], value],
       });
     }
+    setInternalCosupervisorInput("");
+    setKeywordsInput("");
   };
 
   const deleteChip = (field, value) => {
@@ -331,9 +336,21 @@ function NewProposal(props) {
                     <ChipsInput
                       field="cosupervisors_internal"
                       values={formData.cosupervisors_internal}
-                      add={addChip}
                       remove={deleteChip}
-                      placeholder="Enter internal co-supervisors ID and press enter"
+                    />
+                    <Form.Control
+                      id="cosupervisors_internal"
+                      type="text"
+                      placeholder="Enter a keyword and press enter"
+                      autoComplete="off"
+                      value={internal_cosupervisor_input}
+                      onChange={(e) => setInternalCosupervisorInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault(); // Prevent the default form submission behavior
+                          addChip("cosupervisors_internal", e.target.value);
+                        }
+                      }}
                     />
                   </Form.Group>
                   <Form.Group className="mb-3">
@@ -414,10 +431,22 @@ function NewProposal(props) {
                     <Form.Label htmlFor="keywords">Keywords</Form.Label>
                     <ChipsInput
                       field="keywords"
-                      values={formData.keywords}
-                      add={addChip}
                       remove={deleteChip}
+                      values={formData.keywords}
+                    />
+                    <Form.Control
+                      id="keywords"
+                      type="text"
                       placeholder="Enter a keyword and press enter"
+                      autoComplete="off"
+                      value={keywords_input}
+                      onChange={(e) => setKeywordsInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault(); // Prevent the default form submission behavior
+                          addChip("keywords", e.target.value);
+                        }
+                      }}
                     />
                   </Form.Group>
                   <Form.Group className="mb-3" ref={typeRef}>
