@@ -6,12 +6,38 @@ import { ToastContainer } from 'react-toastify';
 import { ChevronCompactDown, ChevronCompactUp, Search } from 'react-bootstrap-icons'
 import Loading from "./Loading";
 
+const Chips2 = ({ items, selectedItems, setItems, setSelectedItems }) => {
+    return (
+        <div>
+            {selectedItems.map((item, index) => (
+                <span key={index} className="chip" style={{ fontSize: 10 }}>
+                    {item}
+                    <span
+                        className="chip"
+                        onClick={() => {
+                            const updatedSupervisor = items.concat(item);
+                            const updatedSelectedSupervisor = selectedItems.filter(
+                                (selectedItem) => selectedItem !== item
+                            );
+                            setItems(updatedSupervisor);
+                            setSelectedItems(updatedSelectedSupervisor);
+                        }}
+                    >
+                        X
+                    </span>
+                </span>
+            ))}
+        </div>
+    );
+};
 
-const SearchDropdown = ({ placeholder, position, items, selectedItems, setSelectedItems }) => {
+const SearchDropdown = ({ placeholder, position, items, setItems, selectedItems, setSelectedItems }) => {
     const [showDropdown, setShowDropdown] = useState(false);
     const [filteredItems, setFilteredItems] = useState([]);
     const [highlightedItem, setHighlightedItem] = useState(null);
+    const [loading, setLoading] = useState(true)
     const dropdownRef = useRef(null);
+    const [input, setInput] = useState("")
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -29,33 +55,42 @@ const SearchDropdown = ({ placeholder, position, items, selectedItems, setSelect
 
     const handleChange = (e) => {
         const value = e.target.value.toLowerCase();
-        setFilteredItems(
-            items.filter(item => {
-                const fullName = `${item.surname} ${item.name}`.toLowerCase();
-                return fullName.includes(value);
-            })
-        );
+
+        if (value === '') {
+            setFilteredItems([]);
+            setInput("")
+        } else {
+            setInput(value)
+            setFilteredItems(
+                items.filter((item) => {
+                    const fullName = `${item}`.toLowerCase();
+
+                    if (fullName.includes(' ')) {
+                        const parts = fullName.split(' ');
+                        return parts.some((part) => part.startsWith(value));
+                    } else {
+                        return fullName.startsWith(value);
+                    }
+                })
+            );
+        }
         setShowDropdown(true);
     };
 
     const handleItemClick = (item) => {
-        const selectedIndex = selectedItems.findIndex(selectedItem => selectedItem === item);
-        let newSelectedItems = [...selectedItems];
-
-        if (selectedIndex !== -1) {
-            // Item already selected, remove it
-            newSelectedItems.splice(selectedIndex, 1);
-        } else {
-            // Item not selected, add it
-            newSelectedItems = [...selectedItems, item];
-        }
-
+        let newSelectedItems = [...selectedItems, item];
+        let is = items.filter((i) => !newSelectedItems.includes(i));
+        console.log('remaining items ' + is)
+        setItems(is);
         setSelectedItems(newSelectedItems);
-        setHighlightedItem(item);
+        setInput("")
+        setShowDropdown(false)
     };
 
+    console.log(items)
+
     return (
-        <div className="mt-6 p-4" style={{ marginBottom: '0.5em'}}>
+        <div className="mt-0 p-2" style={{ marginBottom: '0.5em' }}>
             <Row>
                 <Col xs={4} className={`d-flex  align-items-center${position === 'start' ? " justify-content-start" : " justify-content-end"}`}>
                     <p>{placeholder}: </p>
@@ -67,6 +102,7 @@ const SearchDropdown = ({ placeholder, position, items, selectedItems, setSelect
                             className="form-control"
                             placeholder={placeholder}
                             onChange={handleChange}
+                            value={input}
                         />
                         <span className="input-group-text">
                             {!showDropdown && <ChevronCompactDown onClick={() => { setShowDropdown(true) }} />}
@@ -84,26 +120,31 @@ const SearchDropdown = ({ placeholder, position, items, selectedItems, setSelect
                                 <ul className="list-group mt-2">
                                     {filteredItems.map((item, index) => (
                                         <li
-                                            className={`list-group-item${selectedItems.includes(item) ? " active" : ""}`}
-                                            key={index}
-                                            onClick={() => handleItemClick(item)}
-                                        >
-                                            {item.surname} {item.name}
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                            {filteredItems.length <= 0 && items.length>0 && (
-                                <ul className="list-group mt-2">
-                                    {items.map((item, index) => (
-                                        <li
-                                            className={`list-group-item${selectedItems.includes(item) ? " active" : ""}`}
+                                            className={`list-group-item`}
                                             key={index}
                                             onClick={() => handleItemClick(item)}
                                         >
                                             {item}
                                         </li>
                                     ))}
+                                </ul>
+                            )}
+                            {input === "" && items.length > 0 && (
+                                <ul className="list-group mt-2">
+                                    {items.map((item, index) => (
+                                        <li
+                                            className={`list-group-item`}
+                                            key={index}
+                                            onClick={() => handleItemClick(item)}
+                                        >
+                                            {item}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                            {filteredItems.length <= 0 && input.length !== 0 && (
+                                <ul className="list-group mt-2">
+                                    <li className={`list-group-item`}>No results</li>
                                 </ul>
                             )}
 
@@ -115,9 +156,6 @@ const SearchDropdown = ({ placeholder, position, items, selectedItems, setSelect
         </div>
     );
 };
-
-export default SearchDropdown;
-
 
 const FilterCard = (props) => {
     const { handleToast } = useContext(MessageContext)
@@ -198,19 +236,42 @@ const FilterCard = (props) => {
 
     return (
         <Card className="container mt-6 custom-rounded" style={{ marginBottom: '0.5em' }}>
-            <Row style={{marginTop:'0.5em'}} >
-                <Col xs={6}>
-                    <SearchDropdown placeholder={'Supervisor'} position={'start'} items={supervisors} selectedItems={selectedSupervisor} setSelectedItems={setSelectedSupervisor} />
-                </Col>
-                <Col xs={6} className="p-4">
-                    <Row className="align-items-center">
-                        <Col xs={4} className="d-flex justify-content-end">
-                            <p>valid untill: </p>
-                        </Col>
-                        <Col xs={8} className="position-relative">
-                            <Form>
+            <Form>
+                {/* Supervisor */}
+                <Row>
+                    <Col xs={2} className="d-flex align-items-center justify-content-start">
+                        {/* This column is empty */}
+                    </Col>
+                    <Col xs={8}>
+                        <Form.Group>
+                            <Row className="align-items-center">
+                                <Col>
+                                    <Form.Label className="chip-list">
+                                        {selectedSupervisor && selectedSupervisor.length > 0 && (
+                                            <Chips2
+                                                items={supervisors}
+                                                selectedItems={selectedSupervisor}
+                                                setItems={setSupervisors}
+                                                setSelectedItems={setSelectedSupervisor}
+                                            />
+                                        )}
+                                    </Form.Label>
+                                </Col>
+                            </Row>
+                        </Form.Group>
+                    </Col>
+                    
+                    <Col xs={6}>
+                        <SearchDropdown placeholder={'Supervisor'} position={'start'} items={supervisors} setItems={setSupervisors} selectedItems={selectedSupervisor} setSelectedItems={setSelectedSupervisor} />
+                    </Col>
+                    <Col xs={6} className="p-2">
+                        <Row className="align-items-center">
+                            <Col xs={4} className="d-flex justify-content-end">
+                                <p>Valid untill: </p>
+                            </Col>
+                            <Col xs={8} className="position-relative">
                                 <Form.Group>
-                                    <Form.Control
+                                <Form.Control
                                         type="date"
                                         id="expiration"
                                         name="expiration"
@@ -218,51 +279,152 @@ const FilterCard = (props) => {
                                         onChange={() => console.log('ok')}
                                     />
                                 </Form.Group>
-                            </Form>
-                        </Col>
-                    </Row>
-                </Col>
-            </Row>
-            {/* internal cosupervisor */}
-            <Row>
-                <Col xs={6}>
-                    <SearchDropdown placeholder={'Internal cosupervisor'} position={'start'} items={internalCosupervisor} selectedItems={setInternalCosupervisor} setSelectedItems={setSelectedinternalCosupervisor} />
-                </Col>
-                <Col xs={6}  className="p-4">
-                    <Row className="align-items-center">
-                        <Col xs={4} className="d-flex justify-content-end">
-                            <p>Type: </p>
-                        </Col>
-                        <Col xs={8} className="position-relative">
-                            <Form>
-                                <select className="form-select form-select-xl" aria-label=".form-select-sm example">
-                                    <option selected>Choose a level</option>
-                                    <option value="1">Sperimental</option>
-                                    <option value="2">Type 2</option>
-                                </select>
-                            </Form>
-                        </Col>
-                    </Row>
-                </Col>
-            </Row>
-            <Row>
-                <Col xs={6}>
-                    <SearchDropdown placeholder={'External cosupervisor'} position={'start'} items={externalCosupervisor} selectedItems={selectedExternalCosupervisor} setSelectedItems={setSelectedExternalCosupervisor} />
-                </Col>
-                <Col xs={6}>
-                    <SearchDropdown placeholder={'Keywords'} position={'end'} items={keywords} selectedItems={selectedKeywords} setSelectedItems={setSelectedKeywords} />
-                </Col>
-            </Row>
-            <Row>
-                <Col xs={6}>
-                    <SearchDropdown placeholder={'Groups'} position={'start'} items={groups} selectedItems={selectedGroups} setSelectedItems={setSelectedGroups} />
-                </Col>
-                <Col xs={6} className="d-flex justify-content-end" style={{paddingRight:'3em', paddingTop:'3em'}}>
-                <Button className="button-style-cancel">Reset</Button>
-                    <Button className="button-style">Search</Button>
-                </Col>
-            </Row>
-            <ToastContainer />
+                            </Col>
+                        </Row>
+                    </Col>
+                </Row>
+
+
+
+
+
+
+
+                {/* internal cosupervisor */}
+                <Row>
+                    <Col xs={2} className="d-flex align-items-center justify-content-start">
+                        {/* This column is empty */}
+                    </Col>
+                    <Col xs={8}>
+                        <Form.Group>
+                            <Row className="align-items-center">
+                                <Col>
+                                    <Form.Label className="chip-list">
+                                        {selectedinternalCosupervisor && selectedinternalCosupervisor.length > 0 && (
+                                            <Chips2
+                                                items={internalCosupervisor}
+                                                selectedItems={selectedinternalCosupervisor}
+                                                setItems={setInternalCosupervisor}
+                                                setSelectedItems={setSelectedinternalCosupervisor}
+                                            />
+                                        )}
+                                    </Form.Label>
+                                </Col>
+                            </Row>
+                        </Form.Group>
+                    </Col>
+                    
+                    <Col xs={6}>
+                        <SearchDropdown placeholder={'Internal cosupervisor'} position={'start'} items={internalCosupervisor} setItems={setInternalCosupervisor} selectedItems={selectedinternalCosupervisor} setSelectedItems={setSelectedinternalCosupervisor} />
+                    </Col>
+                    <Col xs={6} className="p-2">
+                        <Row className="align-items-center">
+                            <Col xs={4} className="d-flex justify-content-end">
+                                <p>Type: </p>
+                            </Col>
+                            <Col xs={8} className="position-relative">
+                                <Form.Group>
+                                    {/* Form control for Type */}
+                                    <select className="form-select form-select-xl" aria-label=".form-select-sm example">
+                                        <option selected>Choose a level</option>
+                                        <option value="1">Sperimental</option>
+                                        <option value="2">Type 2</option>
+                                    </select>
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                    </Col>
+                </Row>
+
+                 {/* external cosupervisor */}
+                <Row>
+                    <Col xs={2} className="d-flex align-items-center justify-content-start">
+                        {/* This column is empty */}
+                    </Col>
+                    <Col xs={8}>
+                        <Form.Group>
+                            <Row className="align-items-center">
+                                <Col>
+                                    <Form.Label className="chip-list">
+                                        {selectedExternalCosupervisor && selectedExternalCosupervisor.length > 0 && (
+                                            <Chips2
+                                                items={externalCosupervisor}
+                                                selectedItems={selectedExternalCosupervisor}
+                                                setItems={setExternalCosupervisor}
+                                                setSelectedItems={setSelectedExternalCosupervisor}
+                                            />
+                                        )}
+                                    </Form.Label>
+                                </Col>
+                            </Row>
+                        </Form.Group>
+                    </Col>
+                
+                    <Col xs={6}>
+                        <SearchDropdown placeholder={'External cosupervisor'} position={'start'} items={externalCosupervisor} setItems={setExternalCosupervisor} selectedItems={selectedExternalCosupervisor} setSelectedItems={setSelectedExternalCosupervisor} />
+                    </Col>
+                </Row>
+
+                <Row>
+                    <Col xs={2} className="d-flex align-items-center justify-content-start">
+                        {/* This column is empty*/}
+                    </Col>
+                    <Col xs={8}>
+                        <Form.Group>
+                            <Row className="align-items-center">
+                                <Col>
+                                    <Form.Label className="chip-list">
+                                        {selectedKeywords && selectedKeywords.length > 0 && (
+                                            <Chips2
+                                                items={keywords}
+                                                selectedItems={selectedKeywords}
+                                                setItems={setKeywords}
+                                                setSelectedItems={setSelectedKeywords}
+                                            />
+                                        )}
+                                    </Form.Label>
+                                </Col>
+                            </Row>
+                        </Form.Group>
+                    </Col>
+                    <Col xs={6}>
+                        <SearchDropdown placeholder={'Keywords'} position={'start'} items={keywords} setItems={setKeywords} selectedItems={selectedKeywords} setSelectedItems={setSelectedKeywords} />
+                    </Col>
+                </Row>
+
+
+                <Row>
+                    <Col xs={2} className="d-flex align-items-center justify-content-start">
+                        {/* This column is empty */}
+                    </Col>
+                    <Col xs={8}>
+                        <Form.Group>
+                            <Row className="align-items-center">
+                                <Col>
+                                    <Form.Label className="chip-list">
+                                        {selectedGroups && selectedGroups.length > 0 && (
+                                            <Chips2
+                                                items={groups}
+                                                selectedItems={selectedGroups}
+                                                setItems={setGroups}
+                                                setSelectedItems={setSelectedGroups}
+                                            />
+                                        )}
+                                    </Form.Label>
+                                </Col>
+                            </Row>
+                        </Form.Group>
+                    </Col>
+                    <Col xs={6}>
+                        <SearchDropdown placeholder={'Groups'} position={'start'} items={groups} setItems={setGroups} selectedItems={selectedGroups} setSelectedItems={setSelectedGroups} />
+                    </Col>
+                    <Col xs={6} className="d-flex justify-content-end" style={{ paddingRight: '3em', paddingTop: '3em' }}>
+                        <Button className="button-style-cancel">Reset</Button>
+                        <Button className="button-style">Search</Button>
+                    </Col>
+                </Row>
+                <ToastContainer />
+            </Form>
         </Card>
     );
 };
