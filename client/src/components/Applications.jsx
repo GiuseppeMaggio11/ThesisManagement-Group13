@@ -44,7 +44,11 @@ function Applications(props) {
         status
       );
       const result = await API.getPendingApplications();
+      const uniqueThesisTitles = [
+        ...new Set(result.map((entry) => entry.thesis_title)),
+      ];
       setApplications(result);
+      setThesisTitles(uniqueThesisTitles);
       props.setLoading(false);
     } catch (err) {
       handleErrors(err);
