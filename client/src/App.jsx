@@ -16,7 +16,7 @@ import Header from "./components/Header";
 import API from "./API";
 import VirtualClock from "./components/VirtualClock";
 import MessageContext from "./messageCtx";
-import SearchProposalRoute from "./components/SearchProposal"
+import SearchProposalRoute from "./components/SearchProposal";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -37,7 +37,9 @@ function App() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        setLoading(true);
         const user = await API.getUserInfo();
+        setLoading(false);
         setLoggedIn(true);
         setUser(user);
       } catch (err) {
@@ -48,7 +50,6 @@ function App() {
       }
     };
     checkAuth();
-    setLoading(false);
   }, []);
 
   const loginSuccessful = (user) => {
@@ -95,7 +96,7 @@ function App() {
                 loggedIn && user.user_type === "PROF" ? (
                   <Navigate replace to="/teacher" />
                 ) : loggedIn && user.user_type === "STUD" ? (
-                  <Navigate replace to='/proposal'/>
+                  <Navigate replace to="/proposal" />
                 ) : (
                   <LoginForm
                     loginSuccessful={loginSuccessful}
