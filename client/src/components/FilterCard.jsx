@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState, useRef } from "react"
 import API from "../API"
-import { Button, Card, Col, Form, Row } from 'react-bootstrap'
+import { Button, Card, Col, Form, FormGroup, Row } from 'react-bootstrap'
 import MessageContext from "../messageCtx"
 import { ToastContainer } from 'react-toastify';
 import { ChevronCompactDown, ChevronCompactUp, Search } from 'react-bootstrap-icons'
@@ -16,12 +16,12 @@ const Chips2 = ({ items, selectedItems, setItems, setSelectedItems }) => {
                     <span
                         className="chip"
                         onClick={() => {
-                            const updatedSupervisor = items.concat(item);
-                            const updatedSelectedSupervisor = selectedItems.filter(
+                            const updatedItem = items.concat(item);
+                            const updatedSelectedItem = selectedItems.filter(
                                 (selectedItem) => selectedItem !== item
                             );
-                            setItems(updatedSupervisor);
-                            setSelectedItems(updatedSelectedSupervisor);
+                            setItems(updatedItem);
+                            setSelectedItems(updatedSelectedItem);
                         }}
                     >
                         X
@@ -81,7 +81,7 @@ const SearchDropdown = ({ placeholder, position, items, setItems, selectedItems,
     const handleItemClick = (item) => {
         let newSelectedItems = [...selectedItems, item];
         let is = items.filter((i) => !newSelectedItems.includes(i));
-        
+
         setItems(is);
         setSelectedItems(newSelectedItems);
         setInput("")
@@ -160,6 +160,9 @@ const SearchDropdown = ({ placeholder, position, items, setItems, selectedItems,
 
 const FilterCard = (props) => {
     const { handleToast } = useContext(MessageContext)
+    const [titles, setTitles] = useState([])
+    const [titleFilter, setTitleFilters] = useState("")
+    const [selectedTitlesWords, setSelectedTitlesWords] = useState([])
     const [supervisors, setSupervisors] = useState(null)
     const [keywords, setKeywords] = useState([])
     const [selectedKeywords, setSelectedKeywords] = useState([])
@@ -170,29 +173,39 @@ const FilterCard = (props) => {
     const [selectedExternalCosupervisor, setSelectedExternalCosupervisor] = useState(null)
     const [groups, setGroups] = useState([])
     const [selectedGroups, setSelectedGroups] = useState([])
-    const [type, setType] = useState(['Sperimental', ''])
+    const [type, setType] = useState([])
     const [selectedType, setSelectedType] = useState([])
 
     const [reset, setReset] = useState(true)
 
-    const [selectedDate, setSelectedDate] = useState(dayjs(props.virtualClock).format('YYYY-MM-DD'))
+    const [selectedDate, setSelectedDate] = useState(null)
 
     const thesisList = props.thesisList
-    
+
     useEffect(() => {
         const setFilters = async () => {
             let keywords_theses = [];
             let group_theses = [];
+            let type_theses = [];
             let supervisors_theses = [];
             let internal_cosupervisors = []
             let external_cosupervisors = []
             try {
                 if (thesisList) {
-                   
+
                     thesisList.forEach(item => {
-                       
+
+                        if(item.type){
+
+                            const typeExist = type_theses.some(t =>
+                                t === item.type
+                            );
+                            if(!typeExist)
+                                 type_theses.push(item.type)
+                        }
+
                         if (item.keywords.length > 0) {
-                           
+
                             item.keywords.forEach(i => {
                                 if (i != '' && i != ' ')
                                     keywords_theses.push(i)
@@ -200,11 +213,11 @@ const FilterCard = (props) => {
                         }
                         if (item.supervisor) {
                             const name = item.supervisor
-                           
+
                             const supervisorExists = supervisors_theses.some(sup =>
                                 sup === name
                             );
-                            
+
                             if (!supervisorExists) {
                                 supervisors_theses.push(name);
                             }
@@ -218,15 +231,17 @@ const FilterCard = (props) => {
                         }
                         if (item.groups?.length > 0) {
                             item.groups.forEach(i => {
-                                
+
                                 let exist = group_theses.some(g => g === i.group)
                                 if (!exist)
                                     group_theses.push(i.group)
                             })
                         }
                     })
+    
                     setExternalCosupervisor(external_cosupervisors);
                     setInternalCosupervisor(internal_cosupervisors);
+                    setType(type_theses)
                     setKeywords(keywords_theses)
                     setSupervisors(supervisors_theses)
                     setGroups(group_theses)
@@ -237,16 +252,16 @@ const FilterCard = (props) => {
                 handleToast(error.error, 'error')
             }
         }
-        if(reset){
+        if (reset) {
             props.setLoading(true)
             setFilters()
             setReset(false)
         }
         props.setLoading(false)
-       
+
     }, [reset, thesisList])
 
-    const handleReset = () =>{
+    const handleReset = () => {
         setSelectedExternalCosupervisor([])
         setSelectedinternalCosupervisor([])
         setSelectedSupervisor([])
@@ -254,39 +269,46 @@ const FilterCard = (props) => {
         setSelectedKeywords([])
         setSelectedType([])
         setSelectedDate(dayjs(props.virtualClock))
+        setSelectedTitlesWords([])
         setReset(true)
         props.setProposals(thesisList)
-        props.setAdvancedFilter(false)
     }
-    
+
     const handleFilter = () => {
         let filtered = [...thesisList];
 
+        if (selectedTitlesWords?.length > 0) {
+            filtered = filtered.filter(thesis => {
+                const titleLowerCase = thesis.title.toLowerCase();
+                return selectedTitlesWords.some(word => titleLowerCase.includes(word.toLowerCase()));
+            });
+        }
+        
         if (selectedSupervisor?.length > 0) {
             filtered = filtered.filter(thesis =>
                 selectedSupervisor.includes(thesis.supervisor)
             );
         }
-        if (selectedDate!=props.virtualClock) {
+        if (selectedDate != null) {
             console.log('date diff')
             console.log(selectedDate)
             filtered = filtered.filter(thesis =>
                 dayjs(thesis.expiration).isAfter(selectedDate)
             );
         }
-    
+
         if (selectedExternalCosupervisor?.length > 0) {
             filtered = filtered.filter(thesis =>
                 selectedExternalCosupervisor.includes(thesis.cosupervisor)
             );
         }
-    
+
         if (selectedinternalCosupervisor?.length > 0) {
             filtered = filtered.filter(thesis =>
                 selectedinternalCosupervisor.includes(thesis.cosupervisor)
             );
         }
-    
+
         if (selectedType?.length > 0) {
             filtered = filtered.filter(thesis =>
                 selectedType.includes(thesis.type)
@@ -302,18 +324,27 @@ const FilterCard = (props) => {
         }
 
         if (selectedGroups?.length > 0) {
-                filtered = filtered.filter(thesis =>
-                    thesis.groups.some(group =>
-                        selectedGroups.includes(group.group)
-                    )
-                );
+            filtered = filtered.filter(thesis =>
+                thesis.groups.some(group =>
+                    selectedGroups.includes(group.group)
+                )
+            );
         }
-        
+
         props.setProposals(filtered)
     };
-        
 
-    
+    const addWord = () => {
+        let words = []
+        if(selectedTitlesWords?.length>0)
+            words = [...selectedTitlesWords]
+        let wordExists = words.some(w=> w===titleFilter)
+        if(!wordExists)
+            words.push(titleFilter)
+        setTitleFilters("")
+        setSelectedTitlesWords(words)
+    }
+
     return (
         <Card className="container mt-6 custom-rounded" style={{ marginBottom: '0.5em' }}>
             <Form>
@@ -322,6 +353,34 @@ const FilterCard = (props) => {
                     <Col xs={2} className="d-flex align-items-center justify-content-start">
                         {/* This column is empty */}
                     </Col>
+                    <Col xs={4}>
+                        <Form.Group>
+                            <Row className="align-items-center">
+                                <Col>
+                                    <Form.Label className="chip-list"
+                                        style={{ overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
+                                        ref={(labelRef) => {
+                                            if (labelRef) {
+                                                labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
+                                            }
+                                        }}>
+                                        {selectedTitlesWords && selectedTitlesWords.length > 0 && (
+                                            <Chips2
+                                                items={titles}
+                                                selectedItems={selectedTitlesWords}
+                                                setItems={setTitles}
+                                                setSelectedItems={setSelectedTitlesWords}
+                                            />
+                                        )}
+                                    </Form.Label>
+                                </Col>
+                            </Row>
+                        </Form.Group>
+                    </Col>
+                    <Col xs={2} className="d-flex align-items-center justify-content-start">
+                        {/* This column is empty */}
+                    </Col>
+                    
                     <Col xs={4}>
                         <Form.Group>
                             <Row className="align-items-center">
@@ -346,36 +405,32 @@ const FilterCard = (props) => {
                             </Row>
                         </Form.Group>
                     </Col>
-                    <Col xs={2} className="d-flex align-items-center justify-content-end">
-                        {/* This column is empty */}
-                    </Col>
+                    </Row>
+                    <Row className="d-flex align-items-center ">
+                    
+                                <Col xs={2} className="d-flex align-items-center justify-content-start"> <p style={{paddingLeft:'0.5em', marginRight:'0.5em'}}>Title: </p></Col>
+                                <Col xs={4} className="d-flex m-0 p-2">
+                                    <Form.Group style={{width:'100%', paddingLeft:'0.5em', paddingRight:'0.7em', paddingBottom:'0.4em' }}>
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="insert a text and press enter"
+                                            value={titleFilter}
+                                            onChange={(e)=>{setTitleFilters(e.target.value)}}
+                                            className="custom-input"
+                                            onKeyDown={(e)=>{
+                                                if(e.key === 'Enter'){
+                                                   e.preventDefault();
+                                                    addWord()
+                                                }
+                                            }}
+                                         />
+                                    
+                                    </Form.Group> 
+                             
+                                </Col>
+                 
                     <Col xs={6}>
-                        <SearchDropdown placeholder={'Supervisor'} position={'start'} items={supervisors} setItems={setSupervisors} selectedItems={selectedSupervisor} setSelectedItems={setSelectedSupervisor} />
-                    </Col>
-                    <Col xs={6} className="p-2">
-                        <Row className="align-items-center">
-                            <Col xs={4} className="d-flex justify-content-end">
-                                <p>Valid untill: </p>
-                            </Col>
-                            <Col xs={8} className="position-relative">
-                                <Form.Group>
-                                    <Form.Control
-                                        type="date"
-                                        id="expiration"
-                                        name="expiration"
-                                        value={selectedDate}
-                                        onChange={(e) => {
-                                            const selected = new Date(e.target.value);
-                                            if (selected > props.virtualClock) {
-                                                setSelectedDate(e.target.value);
-                                            } else {
-                                                handleToast('Date must be in the future', 'error')
-                                            }
-                                        }}
-                                    />
-                                </Form.Group>
-                            </Col>
-                        </Row>
+                        <SearchDropdown placeholder={'Supervisor'} position={'end'} items={supervisors} setItems={setSupervisors} selectedItems={selectedSupervisor} setSelectedItems={setSelectedSupervisor} />
                     </Col>
                 </Row>
 
@@ -384,7 +439,7 @@ const FilterCard = (props) => {
                     <Col xs={2} className="d-flex align-items-center justify-content-start">
                         {/* This column is empty */}
                     </Col>
-                    <Col xs={6}>
+                    <Col xs={4}>
                         <Form.Group>
                             <Row className="align-items-center">
                                 <Col>
@@ -408,30 +463,42 @@ const FilterCard = (props) => {
                             </Row>
                         </Form.Group>
                     </Col>
-                    <Col xs={2} className="d-flex align-items-center justify-content-end">
+                    <Col xs={2} className="d-flex align-items-center justify-content-start">
                         {/* This column is empty */}
                     </Col>
-
+                    <Col xs={4}>
+                        <Form.Group>
+                            <Row className="align-items-center">
+                                <Col>
+                                    <Form.Label className="chip-list"
+                                        style={{ overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
+                                        ref={(labelRef) => {
+                                            if (labelRef) {
+                                                labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
+                                            }
+                                        }}>
+                                        {selectedType && selectedType.length > 0 && (
+                                            <Chips2
+                                                items={type}
+                                                selectedItems={selectedType}
+                                                setItems={setType}
+                                                setSelectedItems={setSelectedType}
+                                            />
+                                        )}
+                                    </Form.Label>
+                                </Col>
+                            </Row>
+                        </Form.Group>
+                    </Col>
+                </Row>
+                <Row>
                     <Col xs={6}>
                         <SearchDropdown placeholder={'Internal cosupervisor'} position={'start'} items={internalCosupervisor} setItems={setInternalCosupervisor} selectedItems={selectedinternalCosupervisor} setSelectedItems={setSelectedinternalCosupervisor} />
                     </Col>
-                    <Col xs={6} className="p-2">
-                        <Row className="align-items-center">
-                            <Col xs={4} className="d-flex justify-content-end">
-                                <p>Type: </p>
-                            </Col>
-                            <Col xs={8} className="position-relative">
-                                <Form.Group>
-                                    {/* Form control for Type */}
-                                    <select className="form-select form-select-xl" aria-label=".form-select-sm example">
-                                        <option selected>Choose a level</option>
-                                        <option value="1">Sperimental</option>
-                                        <option value="2">Type 2</option>
-                                    </select>
-                                </Form.Group>
-                            </Col>
-                        </Row>
+                    <Col xs={6}>
+                        <SearchDropdown placeholder={'type'} position={'end'} items={type} setItems={setType} selectedItems={selectedType} setSelectedItems={setSelectedType} />
                     </Col>
+
                 </Row>
 
                 {/* external cosupervisor and keyword */}
@@ -536,10 +603,38 @@ const FilterCard = (props) => {
                     <Col xs={6}>
                         <SearchDropdown placeholder={'Groups'} position={'start'} items={groups} setItems={setGroups} selectedItems={selectedGroups} setSelectedItems={setSelectedGroups} />
                     </Col>
-                    <Col xs={6} className="d-flex justify-content-end" style={{ paddingRight: '3em', paddingTop: '3em' }}>
-                        <Button className="button-style-cancel" onClick={handleReset}>Reset</Button>
-                        <Button className="button-style" onClick={()=>{handleFilter()}}>Search</Button>
+                    <Col xs={6} className="d-flex justify-content-center">
+
+                        <Col xs={4} className="d-flex px-2 justify-content-end">
+                            <p>Valid untill: </p>
+                        </Col>
+                        <Col xs={8} className="position-relative">
+                            <Form.Group style={{ paddingInline: "0.5em" }}>
+                                <Form.Control
+                                    type="date"
+                                    id="expiration"
+                                    name="expiration"
+                                    value={selectedDate}
+                                    onChange={(e) => {
+                                        const selected = new Date(e.target.value);
+                                        if (selected > props.virtualClock) {
+                                            setSelectedDate(e.target.value);
+                                        } else {
+                                            handleToast('Date must be in the future', 'error')
+                                        }
+                                    }}
+
+                                />
+                            </Form.Group>
+                        </Col>
+
                     </Col>
+                    <Row className="d-flex justify-content-end">
+                        <Col xs={2}>
+                            <Button className="button-style-cancel" onClick={handleReset}>Reset</Button>
+                            <Button className="button-style" onClick={() => { handleFilter() }}>Search</Button>
+                        </Col>
+                    </Row>
                 </Row>
 
                 <ToastContainer />

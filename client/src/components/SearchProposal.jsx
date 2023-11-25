@@ -13,7 +13,6 @@ import {
 } from "react-bootstrap";
 import { useState, useEffect, useContext } from "react";
 import MessageContext from '../messageCtx'
-import { HoverIconButton } from "./HoverIconButton";
 import { Funnel, FunnelFill, Search } from "react-bootstrap-icons";
 import dayjs from "dayjs";
 
@@ -65,9 +64,12 @@ function SearchProposalRoute(props) {
 function SearchProposalComponent(props) {
   const [filter, setFilter] = useState("");
   const [showFilters, setShowFilters] = useState(false)
+  const [advancedFilters, setAdvancedFilters] = useState(false)
+  const [titleFilters, setTitleFilters] = useState(false)
   const [filteredThesisProposals, setFilteredThesisProposals] = useState([
     ...props.thesisProposals,
   ]);
+  const [filteredByTitle, setFilteredByTitle] = useState([]);
 
   useEffect(() => {
     setFilteredThesisProposals([...props.thesisProposals]);
@@ -78,8 +80,10 @@ function SearchProposalComponent(props) {
     setFilteredThesisProposals([...props.thesisProposals]);
   };
   const handleChangeFilter = () => {
-    const filter = !showFilters
-    setShowFilters(filter)
+    const f  = !showFilters
+    const s = !advancedFilters
+    setShowFilters(f)
+    setAdvancedFilters(s)
   }
 
   const handleFilterTitle = (event) => {
@@ -87,18 +91,20 @@ function SearchProposalComponent(props) {
     setFilter(value);
 
     let filtered = []
-
+   
     filtered = [...props.thesisProposals];
-
+   
     if (value.trim() !== '') {
       const lowercaseFilter = value.toLowerCase();
 
       filtered = filtered.filter(thesis =>
         thesis.title.toLowerCase().includes(lowercaseFilter)
       );
+      setFilteredByTitle(filtered);
     }
-
-    setFilteredThesisProposals(filtered);
+    else{
+      setFilteredByTitle([])
+    }
   };
 
 
@@ -114,7 +120,7 @@ function SearchProposalComponent(props) {
             </Col>
             <Col xs={6} className="d-flex justify-content-end">
               <Col xs={6} className="d-flex px-4 justify-content-end align-items-end">
-                <Form.Group className="d-flex align-items-center position-relative">
+                {!advancedFilters && <Form.Group className="d-flex align-items-center position-relative">
                   <Form.Control
                     type="text"
                     placeholder="Search by name"
@@ -127,13 +133,9 @@ function SearchProposalComponent(props) {
                       <span>&times;</span>
                     </button>
                   )}
-                </Form.Group>
+                </Form.Group>}
               </Col>
-              <Col xs={1} className="d-flex justify-content-start align-items-center">
-                <Form.Group>
-                  <Search className="button-style-filter" />
-                </Form.Group>
-              </Col>
+          
               <Col xs={2} className="d-flex justify-content-start align-items-center">
                 <Form.Group>
                   {!showFilters && <Funnel className={"button-style-filter"} onClick={handleChangeFilter}></Funnel>}
@@ -153,7 +155,6 @@ function SearchProposalComponent(props) {
                     setLoading={props.setLoading}
                     showFilters={showFilters}
                     setProposals={setFilteredThesisProposals}
-                    
                   />
                 </Col >
               </Row>
@@ -178,9 +179,14 @@ function SearchProposalComponent(props) {
                       </tr>
                     </thead>
                     <tbody>
-                      {[...filteredThesisProposals].map((element) => (
+                      {filteredByTitle.length<=0 && filter==='' && [...filteredThesisProposals].map((element) => (
                         <ProposalTableRow key={element.id} proposal={element} />
                       ))}
+                      {filteredByTitle.length<=0 && filter!=='' && <h2 className="mt-3"> no proposals found</h2>}
+                      { filteredByTitle.length>0 &&  [...filteredByTitle].map((element) => (
+                        <ProposalTableRow key={element.id} proposal={element} />
+                      ))}
+                        
                     </tbody>
                   </Table>
                 )}
