@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@node-saml/passport-saml": "^4.0.4",
     "adm-zip": "^0.5.10",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
