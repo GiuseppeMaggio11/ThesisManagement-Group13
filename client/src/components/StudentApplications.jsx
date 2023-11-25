@@ -121,9 +121,13 @@ function MobileApplication(props) {
       <Accordion.Header>
         <Row className="py-3 w-100">
           <Col>
-            <span style={{ fontWeight: "450" }}>
+            <Link 
+              style={{color:'#4682B4', fontSize:18}} 
+              to={`/proposals/${props.application.id}`}
+              state={{ from: "applications" }}
+            >
               {props.application.title}
-            </span>
+            </Link>
           </Col>
           <Col>
             <ApplicationStatus
