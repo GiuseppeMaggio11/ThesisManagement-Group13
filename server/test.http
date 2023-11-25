@@ -4,6 +4,7 @@ content-type: application/json
 
 
 {
+
     "username": "mario.rossi@polito.it",
     "password": "P123456"
 }
@@ -32,6 +33,17 @@ Content-Type: application/json
     "thesis_id": 5
 }
 ###
+###
+POST http://localhost:3001/api/newExternalCosupervisor
+Content-Type: application/json
+
+{   
+    "name": "luca",
+    "surname": "rossi",
+    "email": "sfsdfsdf"
+}
+###
+
 
 ###
 PUT http://localhost:3001/api/updateThesesArchivation
@@ -49,6 +61,6 @@ Content-Type: application/json
 {   
     "thesis_id": 3,
     "student_id": "S123456",
-    "status": "Refused"
+    "status": "Accepted"
 }
 ###

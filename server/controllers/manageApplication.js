@@ -1,6 +1,6 @@
 const dao = require("../dao");
 const { validationResult } = require("express-validator");
-
+const fs = require("node:fs");
 async function newApplication(req, res) {
   const thesis_id = req.params.thesis_id; // Extract thesis_id from the URL
   const date = req.body.date;
@@ -24,7 +24,8 @@ async function newApplication(req, res) {
     res.status(500).json(error.message + " ");
   }
 }
-
+// accept one student application, cancels all other applications for that student,
+//rejects every other student application to that same thesis
 async function updateApplicationStatus(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -32,9 +33,8 @@ async function updateApplicationStatus(req, res) {
   }
 
   try {
-    //begin transaction
     await dao.beginTransaction();
-    const decision = {
+    let decision = {
       student_id: req.body.student_id,
       thesis_id: req.body.thesis_id,
       status: req.body.status,
@@ -46,6 +46,22 @@ async function updateApplicationStatus(req, res) {
         application.thesis_id == req.body.thesis_id
       ) {
         const updated_application = await dao.updateApplicationStatus(decision);
+        if (decision.status === "Accepted") {
+          for (const a of applications) {
+            if (
+              a.student_id == req.body.student_id &&
+              a.thesis_id !== req.body.thesis_id
+            ) {
+              let dir = `studentFiles/${a.student_id}/${a.thesis_id}`;
+              console.log(dir);
+              fs.rmSync(dir, { recursive: true, force: true });
+            }
+          }
+          //reject every other student applications for that thesis
+          const result_reject = await dao.rejectApplicationsExcept(decision);
+          //cancels every other application of that student
+          const result_cancel = await dao.cancelStudentApplications(decision);
+        }
         await dao.commit();
         return res.json(updated_application);
       }
@@ -55,12 +71,8 @@ async function updateApplicationStatus(req, res) {
       .json(
         ` error: Application of student: ${req.body.student_id} for thesis with id: ${req.body.thesis_id} not found `
       );
-    //Return inserted data
   } catch (err) {
-    //rollback if errors occur
     await dao.rollback();
-
-    //return error
     return res.status(503).json(` error: ${err} `);
   }
 }
