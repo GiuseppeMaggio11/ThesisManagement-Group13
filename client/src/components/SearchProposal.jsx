@@ -13,7 +13,7 @@ import {
 } from "react-bootstrap";
 import { useState, useEffect, useContext } from "react";
 import MessageContext from '../messageCtx'
-import { Funnel, FunnelFill, Search } from "react-bootstrap-icons";
+import { Dice1, Funnel, FunnelFill, Search } from "react-bootstrap-icons";
 import dayjs from "dayjs";
 
 import API from "../API";
@@ -93,9 +93,7 @@ function SearchProposalComponent(props) {
   };
   const handleChangeFilter = () => {
     const f = !showFilters
-    const s = !advancedFilters
     setShowFilters(f)
-    setAdvancedFilters(s)
   }
 
   const handleFilterTitle = (event) => {
@@ -132,27 +130,54 @@ function SearchProposalComponent(props) {
             </Col>
             <Col xs={6} className="d-flex justify-content-end">
               <Col xs={6} className="d-flex px-4 justify-content-end align-items-end">
-                {!advancedFilters && <Form.Group className="d-flex align-items-center position-relative">
-                  <Form.Control
-                    type="text"
-                    placeholder="Search by name"
-                    value={filter}
-                    onChange={(e) => { handleFilterTitle(e) }}
-                    className="custom-input"
-                  />
-                  {filter && (
-                    <button className="clear-btn" onClick={handleCancel} disabled={showFilters}>
-                      <span>&times;</span>
-                    </button>
-                  )}
+                {!advancedFilters && 
+                  <Form.Group className="d-flex align-items-center position-relative">
+                    <Form.Control
+                      type="text"
+                      placeholder="Search by name"
+                      value={filter}
+                      onChange={(e) => { handleFilterTitle(e) }}
+                      className="custom-input"
+                    />
+                    {filter && (
+                      <button className="clear-btn" onClick={handleCancel} disabled={showFilters}>
+                        <span>&times;</span>
+                      </button>
+                    )}
                 </Form.Group>}
               </Col>
 
               <Col xs={2} className="d-flex justify-content-start align-items-center">
-                <Form.Group>
-                  {!showFilters && <Funnel className={"button-style-filter"} onClick={handleChangeFilter}></Funnel>}
-                  {showFilters && <FunnelFill className={"button-style-filter"} onClick={handleChangeFilter}></FunnelFill>}
-                </Form.Group>
+              <Form.Group>
+    <div style={{ position: 'relative', display: 'inline-block' }}>
+        {!showFilters && !advancedFilters && <Funnel className={"button-style-filter"} onClick={handleChangeFilter} />}
+        {showFilters && !advancedFilters && <FunnelFill className={"button-style-filter"} onClick={handleChangeFilter} />}
+        {advancedFilters && (
+            <>
+                <FunnelFill className={"button-style-filter"} onClick={handleChangeFilter} />
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: '-2px',
+                        right: '-4px',
+                        borderRadius: '50%',
+                        width: '10px',
+                        height: '10px',
+                        backgroundColor: 'orange',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'white',
+                    }}
+                >
+                    <span>
+                    </span>
+                </div>
+            </>
+        )}
+    </div>
+</Form.Group>
+
               </Col>
             </Col>
           </Row>
@@ -183,6 +208,7 @@ function SearchProposalComponent(props) {
                     setSelectedSupervisor={setSelectedSupervisor}
                     selectedTitlesWords={selectedTitlesWords}
                     setSelectedTitlesWords={setSelectedTitlesWords}
+                    setAdvancedFilters={setAdvancedFilters}
                   />
 
                 </Col >

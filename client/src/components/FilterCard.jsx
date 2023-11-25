@@ -180,7 +180,8 @@ const FilterCard = ({
     selectedSupervisor,
     setSelectedSupervisor,
     selectedTitlesWords,
-    setSelectedTitlesWords}) => {
+    setSelectedTitlesWords,
+    setAdvancedFilters}) => {
 
     const { handleToast } = useContext(MessageContext)
     const [reset, setReset] = useState(true)
@@ -285,6 +286,7 @@ const FilterCard = ({
         setSelectedTitlesWords([])
         setReset(true)
         setProposals(thesisList)
+        setAdvancedFilters(false)
     }
 
     const handleFilter = () => {
@@ -345,6 +347,7 @@ const FilterCard = ({
         }
 
         setProposals(filtered)
+        setAdvancedFilters(true)
     };
 
     const addWord = () => {
