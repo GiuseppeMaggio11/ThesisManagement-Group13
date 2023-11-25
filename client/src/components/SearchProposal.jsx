@@ -71,6 +71,18 @@ function SearchProposalComponent(props) {
   ]);
   const [filteredByTitle, setFilteredByTitle] = useState([]);
 
+
+  const [selectedGroups, setSelectedGroups] = useState([])
+  const [selectedType, setSelectedType] = useState([])
+  const [selectedDate, setSelectedDate] = useState(null)
+  const [selectedExternalCosupervisor, setSelectedExternalCosupervisor] = useState(null)
+  const [selectedinternalCosupervisor, setSelectedinternalCosupervisor] = useState(null)
+  const [selectedKeywords, setSelectedKeywords] = useState([])
+  const [selectedSupervisor, setSelectedSupervisor] = useState([])
+  const [selectedTitlesWords, setSelectedTitlesWords] = useState([])
+
+
+
   useEffect(() => {
     setFilteredThesisProposals([...props.thesisProposals]);
   }, [props.thesisProposals]);
@@ -80,7 +92,7 @@ function SearchProposalComponent(props) {
     setFilteredThesisProposals([...props.thesisProposals]);
   };
   const handleChangeFilter = () => {
-    const f  = !showFilters
+    const f = !showFilters
     const s = !advancedFilters
     setShowFilters(f)
     setAdvancedFilters(s)
@@ -91,9 +103,9 @@ function SearchProposalComponent(props) {
     setFilter(value);
 
     let filtered = []
-   
+
     filtered = [...props.thesisProposals];
-   
+
     if (value.trim() !== '') {
       const lowercaseFilter = value.toLowerCase();
 
@@ -102,7 +114,7 @@ function SearchProposalComponent(props) {
       );
       setFilteredByTitle(filtered);
     }
-    else{
+    else {
       setFilteredByTitle([])
     }
   };
@@ -125,7 +137,7 @@ function SearchProposalComponent(props) {
                     type="text"
                     placeholder="Search by name"
                     value={filter}
-                    onChange={(e)=>{handleFilterTitle(e) }}
+                    onChange={(e) => { handleFilterTitle(e) }}
                     className="custom-input"
                   />
                   {filter && (
@@ -135,7 +147,7 @@ function SearchProposalComponent(props) {
                   )}
                 </Form.Group>}
               </Col>
-          
+
               <Col xs={2} className="d-flex justify-content-start align-items-center">
                 <Form.Group>
                   {!showFilters && <Funnel className={"button-style-filter"} onClick={handleChangeFilter}></Funnel>}
@@ -155,14 +167,28 @@ function SearchProposalComponent(props) {
                     setLoading={props.setLoading}
                     showFilters={showFilters}
                     setProposals={setFilteredThesisProposals}
+                    selectedGroups={selectedGroups}
+                    setSelectedGroups={setSelectedGroups}
+                    selectedType={selectedType}
+                    setSelectedType={setSelectedType}
+                    selectedDate={selectedDate}
+                    setSelectedDate={setSelectedDate}
+                    selectedExternalCosupervisor={selectedExternalCosupervisor}
+                    setSelectedExternalCosupervisor={setSelectedExternalCosupervisor}
+                    selectedinternalCosupervisor={selectedinternalCosupervisor}
+                    setSelectedinternalCosupervisor={setSelectedinternalCosupervisor}
+                    selectedKeywords={selectedKeywords}
+                    setSelectedKeywords={setSelectedKeywords}
+                    selectedSupervisor={selectedSupervisor}
+                    setSelectedSupervisor={setSelectedSupervisor}
+                    selectedTitlesWords={selectedTitlesWords}
+                    setSelectedTitlesWords={setSelectedTitlesWords}
                   />
+
                 </Col >
               </Row>
             </Container>
           }
-
-
-
 
           {!props.isMobile ? (
             <Row>
@@ -179,14 +205,14 @@ function SearchProposalComponent(props) {
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredByTitle.length<=0 && filter==='' && [...filteredThesisProposals].map((element) => (
+                      {filteredByTitle.length <= 0 && filter === '' && [...filteredThesisProposals].map((element) => (
                         <ProposalTableRow key={element.id} proposal={element} />
                       ))}
-                      {filteredByTitle.length<=0 && filter!=='' && <h2 className="mt-3"> no proposals found</h2>}
-                      { filteredByTitle.length>0 &&  [...filteredByTitle].map((element) => (
+                      {filteredByTitle.length <= 0 && filter !== '' && <h2 className="mt-3"> no proposals found</h2>}
+                      {filteredByTitle.length > 0 && [...filteredByTitle].map((element) => (
                         <ProposalTableRow key={element.id} proposal={element} />
                       ))}
-                        
+
                     </tbody>
                   </Table>
                 )}

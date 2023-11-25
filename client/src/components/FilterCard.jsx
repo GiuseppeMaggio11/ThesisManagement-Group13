@@ -158,29 +158,42 @@ const SearchDropdown = ({ placeholder, position, items, setItems, selectedItems,
     );
 };
 
-const FilterCard = (props) => {
-    const { handleToast } = useContext(MessageContext)
-    const [titles, setTitles] = useState([])
-    const [titleFilter, setTitleFilters] = useState("")
-    const [selectedTitlesWords, setSelectedTitlesWords] = useState([])
-    const [supervisors, setSupervisors] = useState(null)
-    const [keywords, setKeywords] = useState([])
-    const [selectedKeywords, setSelectedKeywords] = useState([])
-    const [selectedSupervisor, setSelectedSupervisor] = useState([])
-    const [internalCosupervisor, setInternalCosupervisor] = useState(null)
-    const [selectedinternalCosupervisor, setSelectedinternalCosupervisor] = useState(null)
-    const [externalCosupervisor, setExternalCosupervisor] = useState(null)
-    const [selectedExternalCosupervisor, setSelectedExternalCosupervisor] = useState(null)
-    const [groups, setGroups] = useState([])
-    const [selectedGroups, setSelectedGroups] = useState([])
-    const [type, setType] = useState([])
-    const [selectedType, setSelectedType] = useState([])
+const FilterCard = ({
+    virtualClock,
+    thesisList,
+    loading,
+    setLoading,
+    showFilters,
+    setProposals,
+    selectedGroups,
+    setSelectedGroups,
+    selectedType,
+    setSelectedType,
+    selectedDate,
+    setSelectedDate,
+    selectedExternalCosupervisor,
+    setSelectedExternalCosupervisor,
+    selectedinternalCosupervisor,
+    setSelectedinternalCosupervisor,
+    selectedKeywords,
+    setSelectedKeywords,
+    selectedSupervisor,
+    setSelectedSupervisor,
+    selectedTitlesWords,
+    setSelectedTitlesWords}) => {
 
+    const { handleToast } = useContext(MessageContext)
     const [reset, setReset] = useState(true)
 
-    const [selectedDate, setSelectedDate] = useState(null)
+    const [titles, setTitles] = useState([])
+    const [titleFilter, setTitleFilters] = useState("")
+    const [supervisors, setSupervisors] = useState(null)
+    const [keywords, setKeywords] = useState([])
+    const [internalCosupervisor, setInternalCosupervisor] = useState(null)   
+    const [externalCosupervisor, setExternalCosupervisor] = useState(null)
+    const [groups, setGroups] = useState([])
+    const [type, setType] = useState([])
 
-    const thesisList = props.thesisList
 
     useEffect(() => {
         const setFilters = async () => {
@@ -253,11 +266,11 @@ const FilterCard = (props) => {
             }
         }
         if (reset) {
-            props.setLoading(true)
+            setLoading(true)
             setFilters()
             setReset(false)
         }
-        props.setLoading(false)
+        setLoading(false)
 
     }, [reset, thesisList])
 
@@ -268,10 +281,10 @@ const FilterCard = (props) => {
         setSelectedGroups([])
         setSelectedKeywords([])
         setSelectedType([])
-        setSelectedDate(dayjs(props.virtualClock))
+        setSelectedDate(dayjs(virtualClock))
         setSelectedTitlesWords([])
         setReset(true)
-        props.setProposals(thesisList)
+        setProposals(thesisList)
     }
 
     const handleFilter = () => {
@@ -331,7 +344,7 @@ const FilterCard = (props) => {
             );
         }
 
-        props.setProposals(filtered)
+        setProposals(filtered)
     };
 
     const addWord = () => {
@@ -617,7 +630,7 @@ const FilterCard = (props) => {
                                     value={selectedDate}
                                     onChange={(e) => {
                                         const selected = new Date(e.target.value);
-                                        if (selected > props.virtualClock) {
+                                        if (selected > virtualClock) {
                                             setSelectedDate(e.target.value);
                                         } else {
                                             handleToast('Date must be in the future', 'error')
