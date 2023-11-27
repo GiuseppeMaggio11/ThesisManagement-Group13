@@ -13,10 +13,6 @@ function getJson(httpResponsePromise) {
             .json()
             .then((json) => resolve(json))
             .catch((err) => reject({ error: "Cannot parse server response" }));
-          response
-            .json()
-            .then((json) => resolve(json))
-            .catch((err) => reject({ error: "Cannot parse server response" }));
         } else {
           // analyzing the cause of error
           response
@@ -231,7 +227,6 @@ async function updateApplictionStatus(thesis_id, student_id, status) {
 }
 
 const API = {
-  logIn,
   logOut,
   getUserInfo,
   getThesisProposals,
@@ -244,6 +239,7 @@ const API = {
   updateExpiration,
   getPendingApplications,
   updateApplictionStatus,
+  redirectToLogin,
 };
 
 export default API;

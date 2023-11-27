@@ -128,7 +128,7 @@ function App() {
                     setError={setError}
                   />
                 ) : (
-                  <Navigate replace to="/login" />
+                  <Navigate replace to="/" />
                 )
               }
             />
@@ -142,7 +142,7 @@ function App() {
                     virtualClock={virtualClock}
                   />
                 ) : (
-                  <Navigate replace to="/login" />
+                  <Navigate replace to="/" />
                 )
               }
             />

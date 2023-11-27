@@ -4,6 +4,7 @@ import API from "../API";
 
 const VirtualClock = (props) => {
   const [tempTime, setTempTime] = useState(props.virtualClock);
+
   const updateTime = (amount, unit) => {
     const newDateTime = new Date(tempTime);
 
@@ -19,13 +20,14 @@ const VirtualClock = (props) => {
 
     setTempTime(newDateTime);
   };
-  const handleVirtualTime= async () => {
-    await API.updateExpiration(tempTime)
+  const handleVirtualTime = async (newTime) => {
+    props.setVirtualClock(newTime);
+    await API.updateExpiration(newTime)
       .then((response) => {
         if (response && "errors" in response) {
           //setErrors(response.errors);
         } else {
-          props.setVirtualClock(tempTime);
+          //props.setVirtualClock(newTime);
           //setErrors(null);
         }
       })
@@ -33,9 +35,9 @@ const VirtualClock = (props) => {
         //setErrors([{ msg: error.message }]);
       });
   };
-  const handleRealTime= async () => {
+  const handleRealTime = async () => {
     setTempTime(new Date());
-    
+
     await API.updateExpiration(tempTime)
       .then((response) => {
         if (response && "errors" in response) {
@@ -116,23 +118,23 @@ const VirtualClock = (props) => {
               </Row>
               <Row>
                 <Col>
-                  <Button 
-                    variant= "danger" 
+                  <Button
+                    variant="danger"
                     className="w-50 mb-1"
-                    onClick={() => handleVirtualTime()}
-                    >
-                       Use VirtualTime
+                    onClick={() => handleVirtualTime(tempTime)}
+                  >
+                    Use VirtualTime
                   </Button>
                 </Col>
               </Row>
               <Row>
                 <Col>
-                  <Button 
-                    variant= "primary" 
+                  <Button
+                    variant="primary"
                     className="w-50 mb-1"
                     onClick={() => handleRealTime()}
-                    >
-                       Use real time 
+                  >
+                    Use real time
                   </Button>
                 </Col>
               </Row>
