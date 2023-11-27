@@ -85,9 +85,11 @@ function Header(props) {
                     color: "black",
                   }}
                 >
-                  {"Hi, " +
-                    props.user.username.split(".")[0].charAt(0).toUpperCase() +
-                    props.user.username.split(".")[0].slice(1)}
+                  {
+                    "Hi, " /*+
+                     props.user.username.split(".")[0].charAt(0).toUpperCase() +
+                    props.user.username.split(".")[0].slice(1) */
+                  }
                 </Dropdown.Toggle>
                 <Dropdown.Menu className="custom-navdropdown">
                   <Dropdown.Item

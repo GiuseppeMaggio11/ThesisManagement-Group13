@@ -58,7 +58,7 @@ passport.serializeUser((expressUser, done) => {
 });
 
 passport.deserializeUser((expressUser, done) => {
-  done(err, null);
+  done(null, expressUser);
 });
 passport.use(
   new SamlStrategy(
@@ -68,6 +68,10 @@ passport.use(
         "https://dev-alc65i0s4u7pc5m2.us.auth0.com/samlp/NIBQ40Cep9RJAwUIviRdgPCAPMhY7iG8",
       issuer: "http:localhost:3001",
       cert: fs.readFileSync("./SAML2.0/dev-alc65i0s4u7pc5m2.pem", "utf-8"),
+      logoutUrl:
+        "https://dev-alc65i0s4u7pc5m2.us.auth0.com/samlp/NIBQ40Cep9RJAwUIviRdgPCAPMhY7iG8/logout",
+      wantAssertionsSigned: false,
+      wantAuthnResponseSigned: false,
     },
     function (profile, done) {
       /*findByEmail(profile.email, function (err, user) {
@@ -76,8 +80,8 @@ passport.use(
         }
         return done(null, user); 
         
-      });*/
-      console.log(profile);
+      });
+      console.log(profile);*/
       done(null, profile);
     }
   )
@@ -153,18 +157,29 @@ app.post(
 );
 
 app.get("/whoami", (req, res) => {
-  if (req.isAuthenticated()) {
-    res.status(200).json(req.user);
-  } else res.status(401).json({ error: "Unauthenticated user!" });
+  try {
+    if (req.isAuthenticated()) {
+      res.status(200).json(req.user);
+    } else res.status(401).json({ error: "Unauthenticated user!" });
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 // logout
-app.delete("/api/session/logout", (req, res) => {
+/* app.delete("/api/session/logout", (req, res) => {
   req.logout(() => {
     res.end();
   });
+}); */
+app.get("/logout", (req, res) => {
+  req.logout();
+  res.redirect("/");
 });
-
+app.post("/logout/callback", (req, res) => {
+  // Perform any additional cleanup or redirect logic here
+  res.redirect("/");
+});
 /***API***/
 
 //GET PROPOSALS
