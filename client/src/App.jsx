@@ -90,7 +90,7 @@ function App() {
                 />
               }
             />
-            <Route
+            {/* <Route
               path="/login"
               element={
                 loggedIn && user.user_type === "PROF" ? (
@@ -106,7 +106,7 @@ function App() {
                   />
                 )
               }
-            />
+            /> */}
             <Route
               path="/virtualclock"
               element={

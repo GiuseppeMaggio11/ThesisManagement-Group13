@@ -74,14 +74,13 @@ passport.use(
       wantAuthnResponseSigned: false,
     },
     function (profile, done) {
-      /*findByEmail(profile.email, function (err, user) {
-         if (err) {
-          return done(err);
-        }
-        return done(null, user); 
-        
-      });
-      console.log(profile);*/
+      profile.user_type = profile["http://schemas.auth0.com/user_type"];
+      profile.username =
+        profile[
+          "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+        ];
+      profile.name =
+        profile["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
       done(null, profile);
     }
   )
@@ -167,19 +166,16 @@ app.get("/whoami", (req, res) => {
 });
 
 // logout
-/* app.delete("/api/session/logout", (req, res) => {
-  req.logout(() => {
-    res.end();
+app.post("/logout", (req, res, next) => {
+  res.clearCookie("connect.sid");
+  req.logout(function (err) {
+    console.log(err);
+    req.session.destroy(function (err) {
+      res.send();
+    });
   });
-}); */
-app.get("/logout", (req, res) => {
-  req.logout();
-  res.redirect("/");
 });
-app.post("/logout/callback", (req, res) => {
-  // Perform any additional cleanup or redirect logic here
-  res.redirect("/");
-});
+
 /***API***/
 
 //GET PROPOSALS

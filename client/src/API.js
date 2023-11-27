@@ -1,5 +1,6 @@
 "use strict";
 const URL = "http://localhost:3001/api";
+const URL_LOGIN = "http://localhost:3001";
 
 function getJson(httpResponsePromise) {
   // server API always return JSON, in case of error the format is the following { error: <message> }
@@ -25,29 +26,27 @@ function getJson(httpResponsePromise) {
 }
 
 async function logOut() {
-  /* await fetch(URL + "/session/logout", {
-    method: "DELETE",
-    credentials: "include",
-  }); */
-  await fetch("http://localhost:3001/logout", {
+  await fetch(URL_LOGIN + "/logout", {
+    method: "POST",
     credentials: "include",
   });
 }
 
 const redirectToLogin = () => {
-  window.location.replace("http://localhost:3001/login");
+  window.location.replace(URL_LOGIN + "/login");
 };
 
 async function getUserInfo() {
-  const response = await fetch("http://localhost:3001/whoami", {
+  const response = await fetch(URL_LOGIN + "/whoami", {
     credentials: "include",
   });
   const userInfo = await response.json();
   if (response.ok) {
-    console.log("USER: ", userInfo);
+    //console.log("USER: ", userInfo);
     return userInfo;
   } else {
-    redirectToLogin();
+    //redirectToLogin();
+    throw userInfo;
   }
 }
 
@@ -190,6 +189,7 @@ const API = {
   newProposal,
   getListExternalCosupervisors,
   newExternalCosupervisor,
+  redirectToLogin,
 };
 
 export default API;
