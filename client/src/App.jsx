@@ -38,7 +38,9 @@ function App() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        setLoading(true);
         const user = await API.getUserInfo();
+        setLoading(false);
         setLoggedIn(true);
         setUser(user);
       } catch (err) {
@@ -49,7 +51,6 @@ function App() {
       }
     };
     checkAuth();
-    setLoading(false);
   }, []);
 
   const loginSuccessful = (user) => {
@@ -90,13 +91,13 @@ function App() {
                 />
               }
             />
-            <Route
+            {/* <Route
               path="/login"
               element={
                 loggedIn && user.user_type === "PROF" ? (
                   <Navigate replace to="/teacher" />
                 ) : loggedIn && user.user_type === "STUD" ? (
-                  <Navigate replace to="/proposal" />
+                  <Navigate replace to='/proposal'/>
                 ) : (
                   <LoginForm
                     loginSuccessful={loginSuccessful}
@@ -106,7 +107,7 @@ function App() {
                   />
                 )
               }
-            />
+            /> */}
             <Route
               path="/virtualclock"
               element={

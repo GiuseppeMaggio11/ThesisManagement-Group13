@@ -1,5 +1,6 @@
 "use strict";
 const URL = "http://localhost:3001/api";
+const URL_LOGIN = "http://localhost:3001";
 
 function getJson(httpResponsePromise) {
   // server API always return JSON, in case of error the format is the following { error: <message> }
@@ -8,6 +9,10 @@ function getJson(httpResponsePromise) {
       .then((response) => {
         if (response.ok) {
           // the server always returns a JSON, even empty {}. Never null or non json, otherwise the method will fail
+          response
+            .json()
+            .then((json) => resolve(json))
+            .catch((err) => reject({ error: "Cannot parse server response" }));
           response
             .json()
             .then((json) => resolve(json))
@@ -24,39 +29,27 @@ function getJson(httpResponsePromise) {
   });
 }
 
-async function logIn(credentials) {
-  let response = await fetch(URL + "/session/login", {
+async function logOut() {
+  await fetch(URL_LOGIN + "/logout", {
     method: "POST",
     credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(credentials),
   });
-  if (response.ok) {
-    const user = await response.json();
-    return user;
-  } else {
-    const errDetail = await response.json();
-    throw errDetail.message;
-  }
 }
 
-async function logOut() {
-  await fetch(URL + "/session/logout", {
-    method: "DELETE",
-    credentials: "include",
-  });
-}
+const redirectToLogin = () => {
+  window.location.replace(URL_LOGIN + "/login");
+};
 
 async function getUserInfo() {
-  const response = await fetch(URL + "/session/userinfo", {
+  const response = await fetch(URL_LOGIN + "/whoami", {
     credentials: "include",
   });
   const userInfo = await response.json();
   if (response.ok) {
+    //console.log("USER: ", userInfo);
     return userInfo;
   } else {
+    //redirectToLogin();
     throw userInfo;
   }
 }
