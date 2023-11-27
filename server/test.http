@@ -33,7 +33,6 @@ Content-Type: application/json
     "thesis_id": 5
 }
 ###
-###
 POST http://localhost:3001/api/newExternalCosupervisor
 Content-Type: application/json
 
@@ -53,8 +52,6 @@ Content-Type: application/json
     "datetime": "2026-01-21T10:00:26.145Z"
 }
 ###
-
-###
 PUT http://localhost:3001/api/updateApplicationStatus
 Content-Type: application/json
 
@@ -63,4 +60,6 @@ Content-Type: application/json
     "student_id": "S123456",
     "status": "Accepted"
 }
+###
+GET http://localhost:3001/api/student/S123456/applications
 ###

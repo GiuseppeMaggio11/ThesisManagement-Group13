@@ -11,9 +11,11 @@ import {
   Spinner,
   Table,
 } from "react-bootstrap";
-import MessageContext from "../messageCtx";
-import { useState, useEffect, useContext } from "react";
 
+import MessageContext from "../messageCtx";
+
+import { useState, useEffect, useContext } from "react";
+import MessageContext from '../messageCtx'
 import dayjs from "dayjs";
 
 import API from "../API";
@@ -22,24 +24,32 @@ import { Search } from "react-bootstrap-icons";
 import Loading from "./Loading";
 
 function SearchProposalRoute(props) {
+
   const { handleErrors } = useContext(MessageContext);
+
   const [thesisProposals, setThesisProposals] = useState([]);
+  const {handleToast} = useContext(MessageContext)
   //const [dirtyThesisProposals, setDirtyThesisProposals] = useState(true);
 
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
-  useEffect(() => {
-    props.setLoading(true);
-    //if (dirtyThesisProposals)
-    API.getThesisProposals(props.virtualClock)
-      .then((list) => {
-        setThesisProposals(list);
-        //setDirtyThesisProposals(false);
-        props.setLoading(false);
-      })
-      .catch((err) => handleErrors(err));
-    //}
-  }, []);
+
+  useEffect(
+    () => {
+      props.setLoading(true);
+      //if (dirtyThesisProposals) 
+      API.getThesisProposals(props.virtualClock)
+        .then((list) => {
+          setThesisProposals(list);
+          //setDirtyThesisProposals(false);
+          props.setLoading(false);
+        })
+        .catch((err) => handleToast(err, 'error'));
+      //}
+    },
+    []
+  );
+
 
   return (
     <>
@@ -129,8 +139,9 @@ function SearchProposalComponent(props) {
     setFilteredThesisProposals([...props.thesisProposals]);
   };
 
-  {
-    /*<Container>
+  
+    {/*<Container>
+
        <Row>
         <h1>Thesis Proposals</h1>
       </Row>
@@ -219,21 +230,50 @@ function SearchProposalComponent(props) {
                     </tbody>
                   </Table>
                 )}
-              </Col>
-            </Row>
-          ) : (
-            <Row>
-              <Accordion>
-                {[...filteredThesisProposals].map((element) => (
-                  <ProposalAccordion key={element.id} proposal={element} />
-                ))}
-              </Accordion>
-            </Row>
-          )}
-        </Container>
-      </div>
-    </>
-  );
+
+                <Search className="search-button" onClick={handleSubmit} />
+              </Form.Group>
+            </Form>
+          </Col>
+        </Row>
+       {!props.isMobile ? (
+        <Row>
+          <Col>
+            {filteredThesisProposals.length == 0 ? (
+              <h2>No proposal found</h2>
+            ) : (
+              <Table hover>
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Supervisor</th>
+                    <th>Expiration Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...filteredThesisProposals].map((element) => (
+                    <ProposalTableRow key={element.id} proposal={element} />
+                  ))}
+                </tbody>
+              </Table>
+            )}
+          </Col>
+        </Row>):(
+          <Row>
+        <Accordion>
+          {[...filteredThesisProposals].map((element) => (
+            <ProposalAccordion key={element.id} proposal={element} />
+          ))}
+        </Accordion>
+      </Row>
+        )}
+      <Link to="/studentapplications">
+        <Button className="button-style">My applications</Button>
+      </Link>
+      </Container>
+    </div>
+    </>)
+
 }
 
 function ProposalAccordion(props) {
@@ -241,9 +281,12 @@ function ProposalAccordion(props) {
     <Accordion.Item eventKey={props.proposal.id.toString()}>
       <Accordion.Header>
         <span className="my-3">
-          <Link
-            style={{ color: "#4682B4", fontSize: 18 }}
+
+          <Link 
+            style={{color:'#4682B4', fontSize:18}} 
             to={`/proposals/${props.proposal.id}`}
+            state={{ from: "thesis" }}
+
           >
             {props.proposal.title}
           </Link>
@@ -267,9 +310,12 @@ function ProposalTableRow(props) {
   return (
     <tr onClick={() => navigation(`/proposals/${props.proposal.id}`)}>
       <td>
-        <Link
-          style={{ color: "#4682B4", fontSize: 18 }}
+
+        <Link 
+          style={{color:'#4682B4', fontSize:18}} 
           to={`/proposals/${props.proposal.id}`}
+          state={{ from: "thesis" }}
+
         >
           {props.proposal.title}
         </Link>

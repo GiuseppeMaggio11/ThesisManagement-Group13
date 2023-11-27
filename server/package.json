@@ -6,8 +6,8 @@
   "scripts": {
     "test": "jest",
     "test:coverage": "jest --runInBand --coverage --colors",
-    "test:unit": "npx jest --runInBand --coverage --coverageDirectory=coverage/coverage_unit --colors dao.unit.test.js index.unit.test.js",
-    "test:integration": "npx jest --runInBand --coverage --coverageDirectory=coverage/coverage_integration --colors dao.integration.test.js index.integration.test.js"
+    "test:unit": "npx jest --runInBand --coverage --coverageDirectory=coverage/coverage_unit --colors dao.unit.test.js controllers.unit.test.js",
+    "test:integration": "npx jest --runInBand --coverage --coverageDirectory=coverage/coverage_integration --colors dao.integration.test.js controllers.integration.test.js"
   },
   "author": "",
   "license": "ISC",
@@ -19,6 +19,7 @@
     "crypto": "^1.0.1",
     "dayjs": "^1.11.10",
     "dayjs-ext": "^2.2.0",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "express-validator": "^7.0.1",

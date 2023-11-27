@@ -47,8 +47,8 @@
 .chip {
   display: inline-block;
   white-space: 'nowrap';
-  background: #555;
-  color: white;
+  background: #ebebeb;
+  color: black;
   padding: 3px 5px 3px 10px;
   border-radius: 15px;
   margin: 2px;
@@ -56,11 +56,11 @@
 }
 
 .chip a {
-  color: white;
+  color: black;
   text-decoration: none;
   margin: 5px;
   font-size: 13px;
-  background: #333;
+  background: #ebebeb;
   width: 15px;
   height: 15px;
   border-radius: 50%;
@@ -354,6 +354,77 @@ table.table-rounded thead tr {
   }
 }
 
+
+.form-check-input {
+  border-color:black
+}
+
+
+
+/* Style for the custom slider */
+.custom-checkbox {
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+  position: relative;
+}
+
+/* Slider appearance */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  border-radius: 26px; /* Round shape to create slider appearance */
+  transition: 0.4s;
+}
+
+/* Slider knob appearance */
+.slider::before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: white;
+  transition: 0.4s;
+}
+
+/* Move the knob when checkbox is checked */
+input:checked + .slider {
+  background-color: #2196F3; /* Change background color when checked */
+}
+
+input:checked + .slider::before {
+  transform: translateX(24px); /* Move knob to the right when checked */
+}
+
+.react-toggle:active:not(.react-toggle--disabled) .react-toggle-thumb{
+  box-shadow: none ;
+}
+.react-toggle--focus .react-toggle-thumb{
+  box-shadow: none ;
+}
+
+
+
+.modal-dialog {
+  display: flex;
+  align-items: center;
+  min-height: calc(100% - 60px); /* Adjust based on your layout */
+}
+
+@media (min-width: 576px) {
+  .modal-dialog {
+    max-width: 500px; /* Adjust as needed */
+    margin: auto;
+  }
+}
+
+
 @media (min-width: 765px) {
   .title-mediumScreen {
     margin-left: 2em;
@@ -363,6 +434,8 @@ table.table-rounded thead tr {
   }
 }
 
-.custom-accordion-item-custom {
+
+.custom-accordion-item {
+
   border-bottom: 1px solid #b3b9c2c6;
 }

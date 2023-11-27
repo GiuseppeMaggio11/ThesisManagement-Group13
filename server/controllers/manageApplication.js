@@ -66,7 +66,7 @@ async function updateApplicationStatus(req, res) {
         return res.json(updated_application);
       }
     }
-    return res
+            return res
       .status(400)
       .json(
         ` error: Application of student: ${req.body.student_id} for thesis with id: ${req.body.thesis_id} not found `
@@ -76,6 +76,47 @@ async function updateApplicationStatus(req, res) {
     return res.status(503).json(` error: ${err} `);
   }
 }
+
+async function newApplication (req,res){
+    const thesis_id = req.params.thesis_id; // Extract thesis_id from the URL
+    const date = req.body.date
+    try {
+      if (!Number.isInteger(Number(thesis_id))) {
+        throw new Error('Thesis ID must be an integer');
+      }
+      const userID = await dao.getUserID(req.user.username);
+      const isValid = await dao.isThesisValid(thesis_id, date);
+      if (!isValid) {
+        return res.status(422).json("This thesis is not valid")
+      }
+      const existing = await dao.isAlreadyExisting(userID, thesis_id);
+      if (existing) {
+        return res.status(422).json("You are already applied for this thesis")
+      }
+    }
+};
+
+async function getApplicationStudent (req,res){
+    //const studentId = req.params.student_id;
+    try{
+      let ThesisInfo;
+      //DEVO CONTROLLARE SE L'ID E' DELL'UTENTE LOGGATO!!
+      await dao.beginTransaction();
+      const userID = await dao.getUserID(req.user.username);
+      const Application = await dao.getStudentApplication(userID);
+      let Result = await Promise.all(Application.map(async (thesis)=>{
+        ThesisInfo = await dao.getProposalById(thesis.thesis_id, req.user.user_type, req.user.username) 
+        return {...ThesisInfo, status: thesis.status}
+      }))
+      
+      await dao.commit()
+      return res.status(200).json(Result);
+    } catch (error){
+      
+      await dao.rollback()
+      res.status(500).json(error.message + ' ');
+    }
+};
 
 //this is for getting all the ACTIVE applications related to all the proposals of a specific professor (which makes this request)
 async function getApplications(req, res) {
@@ -87,4 +128,7 @@ async function getApplications(req, res) {
   }
 }
 
-module.exports = { newApplication, updateApplicationStatus, getApplications };
+
+module.exports = { newApplication, updateApplicationStatus, getApplications,getApplicationStudent };
+
+

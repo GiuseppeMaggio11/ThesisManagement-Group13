@@ -1,30 +1,18 @@
 "use strict";
 
-const {
-  isStudent,
-  isProfessor,
-  isLoggedIn,
-} = require("./controllers/middleware");
-const { getProposals, getProposal } = require("./controllers/showThesis");
-const {
-  newApplication,
-  updateApplicationStatus,
-  getApplications,
-} = require("./controllers/manageApplication");
-const {
-  addFiles,
-  getAllFiles,
-  getStudentFilesList,
-  getFile,
-} = require("./controllers/manageFiles");
-const {
-  newThesis,
-  updateThesesArchivation,
-} = require("./controllers/manageThesis");
-const {
-  listExternalCosupervisors,
-  createExternalCosupervisor,
-} = require("./controllers/others");
+
+const dotenv = require('dotenv');
+dotenv.config();
+
+const {isStudent, isProfessor, isLoggedIn} = require("./controllers/middleware")
+const {getProposals, getProposal} = require("./controllers/showThesis")
+const {newApplication,getApplicationStudent,updateApplicationStatus,
+  getApplications} = require("./controllers/manageApplication")
+const {addFiles, getAllFiles, getStudentFilesList, getFile} = require("./controllers/manageFiles")
+const {newThesis, updateThesesArchivation} = require("./controllers/manageThesis")
+const {listExternalCosupervisors, createExternalCosupervisor} = require("./controllers/others")
+
+
 
 const express = require("express");
 const morgan = require("morgan");
@@ -46,7 +34,7 @@ const port = 3001;
 app.use(morgan("dev"));
 app.use(express.json());
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: `http://localhost:5173`,
   credentials: true,
 };
 app.use(cors(corsOptions));
@@ -184,7 +172,7 @@ app.post("/logout", (req, res, next) => {
 });
 
 /***API***/
-
+app.get('/api/student/applications', isStudent, getApplicationStudent);
 //GET PROPOSALS
 app.get("/api/proposals", isLoggedIn, getProposals);
 
@@ -226,6 +214,8 @@ app.post(
 );
 
 //RETURNS LIST OF EVERY EXTERNAL COSUPERVISORS
+
+
 app.get(
   "/api/listExternalCosupervisors",
   isProfessor,
@@ -270,3 +260,13 @@ app.get("/api/getApplications", isProfessor, getApplications);
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
 });
+app.get('/api/listExternalCosupervisors',isProfessor,listExternalCosupervisors);
+
+//CREATES NEW EXTERNAL COSUPERVISOR 
+app.post('/api/newExternalCosupervisor', isProfessor, [
+  // Various checks of syntax of given data
+  check('email').isEmail(),
+  check('surname').isLength({ min: 1, max: 50 }),
+  check('name').isLength({ min: 1, max: 50 })
+], createExternalCosupervisor);
+

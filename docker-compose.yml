@@ -1,0 +1,51 @@
+# Docker Compose version
+version: '3.4'
+
+# Docker services definition
+services:
+
+  # Server Service
+  server:
+    build:
+      context: server  # Build context for the server service
+    restart: always  # Always restart the server service
+    #image: carla802/server_thesis_management_grp13:latest
+    volumes:
+      - ./server:/usr/src/app  # Mount the server source code into the container
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}  # Map server port of the container to server port of the host
+    env_file:
+      - .env
+    depends_on:
+      - database  # Dependency on the database service
+
+  # Client Service
+  client:
+    build:
+      context: client  # Build context for the client service
+    restart: always  # Always restart the client service
+    #image: carla802/client_thesis_management_grp13:latest
+    depends_on:
+      - server  # Dependency on the server service
+    command: run dev -- --host  # Command to run the client service
+    env_file:
+      - .env
+    ports:
+      - ${CLIENT_PORT}:${CLIENT_PORT}  # Map client port of the container to client port of the host
+
+  # Database Service
+  database:
+    image: mysql:8  # Use MySQL version 8 image
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}  # Root user password
+      MYSQL_DATABASE: db_se_thesismanagement  # Name of the database
+    ports:
+      - ${DB_PORT}:${DB_PORT}  # Map db port of the container to db port of the host
+    volumes:
+      - ./db-data:/var/lib/mysql:rw  # Mount volume to store MySQL data
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:rw  # Mount volume for initialization script
+
+# Volume for storing MySQL data
+volumes:
+  db-data:
+
