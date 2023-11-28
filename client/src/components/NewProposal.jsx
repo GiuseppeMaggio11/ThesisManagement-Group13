@@ -195,6 +195,7 @@ function NewProposal(props) {
       keywords: formData.keywords.join(", "),
     };
     try {
+      console.log(newProp);
       const response = await API.newProposal(newProp);
       handleToast("New proposal created successfully", "success");
       console.log(response);
@@ -524,7 +525,7 @@ function NewProposal(props) {
                       required
                     />
                   </Form.Group>
-                  <Form.Group className="mb-3" expirationRef>
+                  <Form.Group className="mb-3" ref={expirationRef}>
                     <Form.Label htmlFor="expiration">Expiration</Form.Label>
                     <Form.Control
                       type="date"
@@ -544,7 +545,7 @@ function NewProposal(props) {
                     />
                   </Form.Group>
 
-                  <Form.Group className="mb-3" degreeRef>
+                  <Form.Group className="mb-3" ref={degreeRef}>
                     <Form.Label htmlFor="cod_degree">Degree</Form.Label>
                     <Form.Control
                       type="text"
