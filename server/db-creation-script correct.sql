@@ -71,6 +71,7 @@ CREATE TABLE IF NOT EXISTS external_supervisor(
 );
 
 
+
 CREATE TABLE IF NOT EXISTS thesis(
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(100) NOT NULL,
@@ -207,3 +208,4 @@ VALUES
     (4, 'maria.gentile@email.net'),
     (4, 'antonio.bruno@email.org'),
     (6, 'andrea.ferrari@email.com');
+

@@ -234,7 +234,6 @@ exports.getProposals = async (user_type, username, date) => {
         }
       });
     }
-
     return finalResult;
   } catch (error) {
     console.error("Error in getProposals: ", error);
@@ -298,12 +297,10 @@ exports.getProposalById = async (requested_thesis_id, user_type, username) => {
     };
 
     let finalResult = splitKeywordsToArray;
-
     //check for EXTERNAL cosupervisors and add their name & surname to finalresult
     sql =
       "select t.id, csve.cosupevisor_id, es.name, es.surname  from thesis t join thesis_cosupervisor_external csve on t.id = csve.thesis_id join external_supervisor es on csve.cosupevisor_id  = es.email  where t.id = ?";
     [results] = await pool.execute(sql, [requested_thesis_id]);
-
     if (results.length === 0) {
     } else {
       results.forEach((item) => {
@@ -313,15 +310,25 @@ exports.getProposalById = async (requested_thesis_id, user_type, username) => {
         ];
       });
     }
-
+    console.log(finalResult)
     //check for cosupervisors which are university professor and add their name and department's name and group to finalresult
     sql =
-      "select t.id, tch.name , tch.surname , g.group_name, d.department_name  from thesis t join thesis_cosupervisor_teacher csvt on t.id = csvt.thesis_id join teacher tch on csvt.cosupevisor_id = tch.id join group_table g on tch.cod_group = g.cod_group join department d on tch.cod_department = d.cod_department where t.id = ?";
+      `SELECT t.id, tch.name, tch.surname, g.group_name, d.department_name
+      FROM thesis t
+      JOIN thesis_cosupervisor_teacher csvt ON t.id = csvt.thesis_id
+      JOIN teacher tch ON csvt.cosupevisor_id = tch.id
+      JOIN group_table g ON tch.cod_group = g.cod_group
+      JOIN department d ON tch.cod_department = d.cod_department
+      WHERE t.id = ?`;
+
     results = await pool.execute(sql, [requested_thesis_id]);
 
     if (results.length === 0) {
     } else {
-      results.forEach((item) => {
+      console.log(finalResult)
+      console.log(results[0])
+      for ( const item of results[0]) {
+        console.log(item)
         finalResult.cosupervisors = [
           ...finalResult.cosupervisors,
           "" + item.name + " " + item.surname,
@@ -342,9 +349,8 @@ exports.getProposalById = async (requested_thesis_id, user_type, username) => {
             { group: item.group_name, department: item.department_name },
           ];
         }
-      });
+      };
     }
-
     return finalResult;
   } catch (error) {
     console.error("Error in getProposalById: ", error);
@@ -780,7 +786,6 @@ exports.getApplicationsForProfessor = async (profId) => {
       if (err) {
         reject(err);
       } else {
-        console.log("ROWS", rows);
         const applications = [];
         rows.map((e) => {
           const fullName = "" + e.name + " " + e.surname;
@@ -793,7 +798,6 @@ exports.getApplicationsForProfessor = async (profId) => {
           };
           applications.push(application);
         });
-        console.log("APPLICATIONS", applications);
         resolve(applications);
       }
     });
