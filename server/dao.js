@@ -115,7 +115,6 @@ exports.getProposals = async (user_type, username, date) => {
     let studentTitleDegree;
     let studentApplicationid;
     let sql;
-
     if (user_type === 'STUD') {
       sql = "SELECT title_degree FROM student s JOIN degree_table d ON s.cod_degree = d.cod_degree WHERE s.email = ?";
       const [degreeResult] = await pool.execute(sql, [username]);

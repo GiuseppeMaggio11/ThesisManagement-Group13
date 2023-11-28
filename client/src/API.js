@@ -129,7 +129,7 @@ async function sendFiles(formData, thesis_id) {
 
 
 async function getThesisProposals(date) {
-  const response = await fetch(URL + `/proposals?${JSON.stringify(date)}`, {
+  const response = await fetch(URL + `/proposals?date=${date}`, {
     credentials: "include",
   });
   const proposals = await response.json();

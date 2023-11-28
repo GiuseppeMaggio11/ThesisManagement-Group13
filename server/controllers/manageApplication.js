@@ -1,29 +1,6 @@
 const dao = require("../dao");
 const { validationResult } = require("express-validator");
 const fs = require("node:fs");
-async function newApplication(req, res) {
-  const thesis_id = req.params.thesis_id; // Extract thesis_id from the URL
-  const date = req.body.date;
-  try {
-    if (!Number.isInteger(Number(thesis_id))) {
-      throw new Error("Thesis ID must be an integer");
-    }
-    const userID = await dao.getUserID(req.user.username);
-    const isValid = await dao.isThesisValid(thesis_id, date);
-    if (!isValid) {
-      return res.status(422).json("This thesis is not valid");
-    }
-    const existing = await dao.isAlreadyExisting(userID, thesis_id);
-    if (!existing) {
-      return res.status(422).json("You are already applied for this thesis");
-    }
-    const result = await dao.newApply(userID, thesis_id, date);
-
-    res.status(200).json("Application created successfully");
-  } catch (error) {
-    res.status(500).json(error.message + " ");
-  }
-}
 // accept one student application, cancels all other applications for that student,
 //rejects every other student application to that same thesis
 async function updateApplicationStatus(req, res) {
@@ -90,7 +67,7 @@ async function newApplication(req, res) {
       return res.status(422).json("This thesis is not valid");
     }
     const existing = await dao.isAlreadyExisting(userID, thesis_id);
-    if (!existing) {
+    if (existing) {
       return res.status(422).json("You are already applied for this thesis");
     }
     const result = await dao.newApply(userID, thesis_id, date);
