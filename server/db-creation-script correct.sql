@@ -209,14 +209,3 @@ VALUES
     (4, 'antonio.bruno@email.org'),
     (6, 'andrea.ferrari@email.com');
 
-DELIMITER //
-CREATE TRIGGER set_is_archived_trigger
-BEFORE INSERT ON thesis
-FOR EACH ROW
-BEGIN
-    IF NEW.expiration < NOW() THEN
-        SET NEW.is_archived = 1;
-    END IF;
-END;
-//
-DELIMITER ;
