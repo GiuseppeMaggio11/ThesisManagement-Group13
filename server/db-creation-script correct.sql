@@ -71,6 +71,7 @@ CREATE TABLE IF NOT EXISTS external_supervisor(
 );
 
 
+
 CREATE TABLE IF NOT EXISTS thesis(
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(100) NOT NULL,
@@ -207,3 +208,15 @@ VALUES
     (4, 'maria.gentile@email.net'),
     (4, 'antonio.bruno@email.org'),
     (6, 'andrea.ferrari@email.com');
+
+DELIMITER //
+CREATE TRIGGER set_is_archived_trigger
+BEFORE INSERT ON thesis
+FOR EACH ROW
+BEGIN
+    IF NEW.expiration < NOW() THEN
+        SET NEW.is_archived = 1;
+    END IF;
+END;
+//
+DELIMITER ;

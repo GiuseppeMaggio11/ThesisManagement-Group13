@@ -5,21 +5,20 @@ POST http://localhost:3001/api/session/login HTTP/1.1
 content-type: application/json
 
 {
-    "username": "luca.esposito@studenti.polito.it",
-    "password": "S123456"
-}
-###
-
-## Execute Log In of user 2
-POST http://localhost:3001/api/session/login HTTP/1.1
-content-type: application/json
-
-{
     "username": "mario.rossi@polito.it",
     "password": "P123456"
 }
 ###
 
+## Execute Log In of user 1 
+POST http://localhost:3001/api/session/login HTTP/1.1
+content-type: application/json
+
+{
+    "username": "luca.esposito@studenti.polito.it",
+    "password": "S123456"
+}
+###
 # New reservation
 POST http://localhost:3001/api/newThesis
 Content-Type: application/json
@@ -60,6 +59,4 @@ Content-Type: application/json
 GET http://localhost:3001/api/listExternalCosupervisors HTTP/1.1
 ###
 
-## Retrieving all the logged in student applications
 GET http://localhost:3001/api/student/applications HTTP/1.1
-###
