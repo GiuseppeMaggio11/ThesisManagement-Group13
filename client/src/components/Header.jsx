@@ -11,12 +11,17 @@ import {
 import { PersonCircle } from "react-bootstrap-icons";
 import { useMediaQuery } from "react-responsive";
 import { NavLink, useNavigate } from "react-router-dom";
+import API from "../API";
 
 function Header(props) {
   const [expanded, setExpanded] = useState(false);
   const isSmallScreen = useMediaQuery({ query: "(max-width: 768px)" });
 
   const navigate = useNavigate();
+
+  const handleLogin = () => {
+    API.redirectToLogin();
+  };
 
   const handleLogout = () => {
     if (isSmallScreen) setExpanded((old) => !old);
@@ -101,9 +106,7 @@ function Header(props) {
                     color: "black",
                   }}
                 >
-                  {"Hi, " +
-                    props.user.username.split(".")[0].charAt(0).toUpperCase() +
-                    props.user.username.split(".")[0].slice(1)}
+                  {"Hi, " + props.user.name}
                 </Dropdown.Toggle>
                 <Dropdown.Menu className="custom-navdropdown">
                   <Dropdown.Item
@@ -137,21 +140,18 @@ function Header(props) {
                 </Dropdown.Menu>
               </Dropdown>
             ) : (
-              <Nav.Link
-                as={NavLink}
-                to="/login"
-                onClick={() => {
-                  if (isSmallScreen) setExpanded((old) => !old);
-                }}
-              >
-                <Container>
-                  <Row className="align-items-center">
-                    <Col>
-                      <PersonCircle size={45} />
-                    </Col>
-                  </Row>
-                </Container>
-              </Nav.Link>
+              <Container>
+                <Row className="align-items-center">
+                  <Col>
+                    <PersonCircle
+                      size={45}
+                      color="white"
+                      onClick={handleLogin}
+                      style={{ cursor: "pointer" }}
+                    />
+                  </Col>
+                </Row>
+              </Container>
             )}
           </Nav>
         </Navbar.Collapse>

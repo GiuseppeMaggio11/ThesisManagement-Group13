@@ -16,9 +16,11 @@ import Header from "./components/Header";
 import API from "./API";
 import VirtualClock from "./components/VirtualClock";
 import MessageContext from "./messageCtx";
+import Applications from "./components/Applications";
 import SearchProposalRoute from "./components/SearchProposal"
 import Toasts from "./components/Toasts";
 import StudentApplications from "./components/StudentApplications";
+
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -45,7 +47,9 @@ function App() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        setLoading(true);
         const user = await API.getUserInfo();
+        setLoading(false);
         setLoggedIn(true);
         setUser(user);
       } catch (err) {
@@ -56,7 +60,6 @@ function App() {
       }
     };
     checkAuth();
-    setLoading(false);
   }, []);
 
   const loginSuccessful = (user) => {
@@ -91,7 +94,7 @@ function App() {
                 />
               }
             />
-            <Route
+            {/* <Route
               path="/login"
               element={
                 loggedIn && user.user_type === "PROF" ? (
@@ -107,7 +110,7 @@ function App() {
                   />
                 )
               }
-            />
+            /> */}
             <Route
               path="/virtualclock"
               element={
@@ -128,7 +131,7 @@ function App() {
                     setError={setError}
                   />
                 ) : (
-                  <Navigate replace to="/login" />
+                  <Navigate replace to="/" />
                 )
               }
             />
@@ -142,7 +145,7 @@ function App() {
                     virtualClock={virtualClock}
                   />
                 ) : (
-                  <Navigate replace to="/login" />
+                  <Navigate replace to="/" />
                 )
               }
             />
@@ -151,6 +154,16 @@ function App() {
               element={
                 loggedIn && user.user_type === "PROF" ? (
                   <NewProposal loading={loading} virtualClock={virtualClock} setLoading={setLoading} />
+                ) : (
+                  <ErrorAlert />
+                )
+              }
+            />
+            <Route
+              path="/applications"
+              element={
+                loggedIn && user.user_type === "PROF" ? (
+                  <Applications loading={loading} setLoading={setLoading} />
                 ) : (
                   <ErrorAlert />
                 )

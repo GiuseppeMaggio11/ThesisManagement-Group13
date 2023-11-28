@@ -509,7 +509,131 @@ exports.getExternal_cosupervisors_emails = async () => {
   }
 };
 
-// create new external cosuper visor
+
+// updates is archived value to 1 if date has passed
+exports.updateThesesArchivation = (virtualDateTime) => {
+  return new Promise((resolve, reject) => {
+    const sql = ` 
+                UPDATE thesis
+                SET is_archived = CASE
+                    WHEN expiration < STR_TO_DATE(?, '%Y-%m-%dT%H:%i:%s.%fZ') THEN 1
+                    ELSE 0
+                END;
+                `
+    connection.query(sql, [virtualDateTime], function (err,rows) {
+      if (err) {
+        reject(err);
+      }
+      resolve(rows.info);
+    });
+  });
+};
+
+// updates is archived value to 1 if date has passed
+exports.updateApplicationStatus = (decision) => {
+  return new Promise((resolve, reject) => {
+    const sql = ` 
+    UPDATE application
+    SET status = ?
+  WHERE student_id = ? AND thesis_id = ?;
+                `
+    connection.query(sql, [decision.status, decision.student_id, decision.thesis_id], function (err,rows) {
+      if (err) {
+        reject(err);
+      }
+      resolve(decision);
+    });
+  });
+};
+//rejects every application for specific thesis except for the one of accepted student
+exports.rejectApplicationsExcept = (accepted) => {
+  return new Promise((resolve, reject) => {
+    const sql = ` 
+    UPDATE application
+    SET status = "Rejected"
+    WHERE  thesis_id = ?
+    AND student_id <> ?
+                `
+    connection.query(sql, [accepted.thesis_id, accepted.student_id], function (err,rows) {
+      if (err) {
+        reject(err);
+      }
+      resolve(accepted);
+    });
+  });
+};
+
+exports.cancelStudentApplications = (accepted) => {
+  return new Promise((resolve, reject) => {
+    const sql = ` 
+    DELETE FROM application
+    WHERE student_id = ?
+    AND thesis_id <> ?;
+                `
+    connection.query(sql, [accepted.student_id, accepted.thesis_id], function (err,rows) {
+      if (err) {
+        reject(err);
+      }
+      resolve(accepted);
+    });
+  });
+};
+
+// Selects every application from application table, returns array of applications(only student_id and thesis_id)
+exports.getApplications = () => {
+  return new Promise((resolve, reject) => {
+    const sql =
+      `SELECT * FROM application`;
+    connection.query(sql, [], (err, rows) => {
+      if (err) {
+        reject(err);
+      }
+      else {
+        const applications = [];
+        rows.map((e) => {
+          const application = {
+            student_id: e.student_id,
+            thesis_id: e.thesis_id,
+            application_date:e.application_date,
+            status: e.status
+          }
+          applications.push(application);
+        })
+        resolve(applications);
+      };
+    });
+  });
+};
+
+//this is for getting all the ACTIVE applications related to all the proposals of a specific professor (which makes this request)
+exports.getApplicationsForProfessor = (profId) =>{
+  return new Promise((resolve, reject) => {
+    const sql =
+      `SELECT a.student_id ,s.name ,s.surname ,a.thesis_id ,t.title ,a.application_date
+      FROM application a join student s on s.id = a.student_id join thesis t on t.id = a.thesis_id join teacher tch on t.supervisor_id = tch.id 
+      WHERE a.status = 'Pending' and tch.email = ? `;
+    connection.query(sql, [profId], (err, rows) => {
+      if (err) {
+        reject(err);
+      }
+      else {
+        const applications = [];
+        rows.map((e) => {
+          const fullName = ''+e.name+' '+e.surname;
+          const application = {
+            student_id:   e.student_id,
+            student_name: fullName,
+            thesis_id:    e.thesis_id,
+            thesis_title: e.title,
+            application_date: e.application_date
+          }
+          applications.push(application);
+        })
+        resolve(applications);
+      };
+    });
+  });
+
 exports.create_external_cosupervisor = async (external_cosupervisor) => {
   try {
     const sql = 'INSERT INTO external_supervisor (email, surname, name) VALUES (?,?,?)';
@@ -534,7 +658,7 @@ exports.getStudentApplication = async (studentId) => {
     console.error("Error in getExternal_cosupervisors_emails: ", error);
     throw error;
   }
-}
+};
 
 //begin transaction function
 exports.beginTransaction = async () => {

@@ -1,5 +1,5 @@
 const dao = require("../dao");
-const {validationResult} = require("express-validator");
+const { validationResult } = require("express-validator");
 
 
 async function getProposals (req, res) {
@@ -23,6 +23,16 @@ async function getProposal (req,res){
     } catch (error) {
       res.status(500).json(error);
     }
+
+    const proposal = await dao.getProposalById(
+      thesis_id,
+      req.user.user_type,
+      req.user.username
+    );
+    res.status(200).json(proposal);
+  } catch (error) {
+    res.status(500).send(error.message + " ");
+  }
 }
 
-module.exports = {getProposals, getProposal}
+module.exports = { getProposals, getProposal };

@@ -1,14 +1,15 @@
+
 import { Container, Table, Accordion, Button, Modal, Form, Row, Col} from "react-bootstrap";
 import { useParams, useNavigate, useLocation} from 'react-router-dom';
-import React, { useEffect, useState, useContext } from "react";
-import API from '../API';
-import MessageContext from '../messageCtx'
-import 'bootstrap-icons/font/bootstrap-icons.css';
-import '../style.css'
-import { useMediaQuery } from 'react-responsive';
-import Loading from "./Loading";
-import FileDropModal from './FileModal';
 
+import React, { useEffect, useState, useContext } from "react";
+import API from "../API";
+import MessageContext from "../messageCtx";
+import "bootstrap-icons/font/bootstrap-icons.css";
+import "../style.css";
+import { useMediaQuery } from "react-responsive";
+import Loading from "./Loading";
+import FileDropModal from "./FileModal";
 
 function ThesisPage(props) {
     const params = useParams();
@@ -75,11 +76,25 @@ function ThesisPage(props) {
         ).catch((err) => { handleToast(err, 'error' ) });
     }
 
-    const closeModal=()=>{
-            setOpenPanel(false)
-            setSelectedFiles([])
-    }
 
+  const handleUpload = (thesis_id) => {
+    const formData = new FormData();
+    for (let i = 0; i < selectedFiles.length; i++) {
+      formData.append(`file`, selectedFiles[i]);
+    }
+    API.sendFiles(formData, thesis_id)
+      .then(() => {
+        navigate("/proposal");
+      })
+      .catch((err) => {
+        handleErrors(error);
+      });
+  };
+
+  const closeModal = () => {
+    setOpenPanel(false);
+    setSelectedFiles([]);
+  };
 
     const submitApplication = (idThesis, date) => {
         API.applicationThesis(idThesis, date).then(
@@ -227,9 +242,19 @@ function ThesisPage(props) {
                 />
           
 
+          <FileDropModal
+            showModal={openPanel}
+            closeModal={closeModal}
+            handleSave={() => {
+              handleApplication();
+            }}
+            setSelectedFiles={setSelectedFiles}
+            selectedFiles={selectedFiles}
+          />
         </>
-    )}
-    </>)
+      )}
+    </>
+  );
 }
 
 export default ThesisPage;
