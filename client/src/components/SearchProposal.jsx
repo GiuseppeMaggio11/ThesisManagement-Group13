@@ -12,7 +12,6 @@ import {
   Table,
 } from "react-bootstrap";
 
-import MessageContext from "../messageCtx";
 
 import { useState, useEffect, useContext } from "react";
 import MessageContext from '../messageCtx'
@@ -209,33 +208,7 @@ function SearchProposalComponent(props) {
               </Form>
             </Col>
           </Row>
-          {!props.isMobile ? (
-            <Row>
-              <Col>
-                {filteredThesisProposals.length == 0 ? (
-                  <h2>No proposal found</h2>
-                ) : (
-                  <Table hover>
-                    <thead>
-                      <tr>
-                        <th>Title</th>
-                        <th>Supervisor</th>
-                        <th>Expiration Date</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {[...filteredThesisProposals].map((element) => (
-                        <ProposalTableRow key={element.id} proposal={element} />
-                      ))}
-                    </tbody>
-                  </Table>
-                )}
 
-                <Search className="search-button" onClick={handleSubmit} />
-              </Form.Group>
-            </Form>
-          </Col>
-        </Row>
        {!props.isMobile ? (
         <Row>
           <Col>

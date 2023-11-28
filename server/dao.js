@@ -633,7 +633,7 @@ exports.getApplicationsForProfessor = (profId) =>{
       };
     });
   });
-
+}
 exports.create_external_cosupervisor = async (external_cosupervisor) => {
   try {
     const sql = 'INSERT INTO external_supervisor (email, surname, name) VALUES (?,?,?)';

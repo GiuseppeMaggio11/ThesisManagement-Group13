@@ -77,20 +77,6 @@ function ThesisPage(props) {
     }
 
 
-  const handleUpload = (thesis_id) => {
-    const formData = new FormData();
-    for (let i = 0; i < selectedFiles.length; i++) {
-      formData.append(`file`, selectedFiles[i]);
-    }
-    API.sendFiles(formData, thesis_id)
-      .then(() => {
-        navigate("/proposal");
-      })
-      .catch((err) => {
-        handleErrors(error);
-      });
-  };
-
   const closeModal = () => {
     setOpenPanel(false);
     setSelectedFiles([]);
