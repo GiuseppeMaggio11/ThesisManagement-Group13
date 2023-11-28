@@ -164,7 +164,7 @@ function ApplicationStatus(props) {
     <Badge bg="danger" style={{ maxWidth: "100px" }}>
       Rejected
     </Badge>
-  ) : props.status === "Pending" ? (
+  ) : props.status === "pending" ? (
     <Badge bg="secondary" style={{ maxWidth: "100px" }}>
       Pending
     </Badge>
