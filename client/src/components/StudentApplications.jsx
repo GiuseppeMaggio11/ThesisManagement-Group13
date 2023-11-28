@@ -20,7 +20,7 @@ function StudentApplications(props) {
 
   const [applications, setApplications] = useState(undefined);
   const isMobile = useMediaQuery({ maxWidth: 767 });
-  const { handleErrors } = useContext(MessageContext)
+  const { handleToast } = useContext(MessageContext)
 
   useEffect(() => {
     props.setLoading(true);
@@ -33,7 +33,7 @@ function StudentApplications(props) {
       getApplications();
     }
     catch (err) {
-      handleErrors(err);
+      handleToast(err, "error");
     }
   }, []);
 

@@ -510,136 +510,252 @@ exports.getExternal_cosupervisors_emails = async () => {
 
 
 // updates is archived value to 1 if date has passed
-exports.updateThesesArchivation = (virtualDateTime) => {
-  return new Promise((resolve, reject) => {
+exports.updateThesesArchivation = async (virtualDateTime) => {
+  /* return new Promise((resolve, reject) => {
     const sql = ` 
                 UPDATE thesis
                 SET is_archived = CASE
                     WHEN expiration < STR_TO_DATE(?, '%Y-%m-%dT%H:%i:%s.%fZ') THEN 1
                     ELSE 0
                 END;
-                `
-    connection.query(sql, [virtualDateTime], function (err,rows) {
+                `;
+     connection.query(sql, [virtualDateTime], function (err, rows) {
       if (err) {
         reject(err);
       }
       resolve(rows.info);
-    });
-  });
+    }); 
+    
+
+  }); */
+  try {
+    const sql = ` 
+                UPDATE thesis
+                SET is_archived = CASE
+                    WHEN expiration < STR_TO_DATE(?, '%Y-%m-%dT%H:%i:%s.%fZ') THEN 1
+                    ELSE 0
+                END;
+                `;
+    const [rows] = await pool.execute(sql, [virtualDateTime]);
+    return rows.info;
+  } catch (err) {
+    console.error("Error in updateThesesArchivation: ", err);
+    throw err;
+  }
 };
 
 // updates is archived value to 1 if date has passed
-exports.updateApplicationStatus = (decision) => {
-  return new Promise((resolve, reject) => {
+exports.updateApplicationStatus = async (decision) => {
+  /* return new Promise((resolve, reject) => {
     const sql = ` 
     UPDATE application
     SET status = ?
   WHERE student_id = ? AND thesis_id = ?;
-                `
-    connection.query(sql, [decision.status, decision.student_id, decision.thesis_id], function (err,rows) {
-      if (err) {
-        reject(err);
+                `;
+    connection.query(
+      sql,
+      [decision.status, decision.student_id, decision.thesis_id],
+      function (err, rows) {
+        if (err) {
+          reject(err);
+        }
+        resolve(decision);
       }
-      resolve(decision);
-    });
-  });
+    );
+  }); */
+  try {
+    const sql = `UPDATE application
+                 SET status = ?
+                 WHERE student_id = ? AND thesis_id = ?;`;
+    const [rows] = await pool.execute(sql, [
+      decision.status,
+      decision.student_id,
+      decision.thesis_id,
+    ]);
+    return decision;
+  } catch (err) {
+    console.error("Error in updateApplicationStatus: ", err);
+    throw err;
+  }
 };
 //rejects every application for specific thesis except for the one of accepted student
-exports.rejectApplicationsExcept = (accepted) => {
-  return new Promise((resolve, reject) => {
+exports.rejectApplicationsExcept = async (accepted) => {
+  /* return new Promise((resolve, reject) => {
     const sql = ` 
     UPDATE application
     SET status = "Rejected"
     WHERE  thesis_id = ?
     AND student_id <> ?
-                `
-    connection.query(sql, [accepted.thesis_id, accepted.student_id], function (err,rows) {
-      if (err) {
-        reject(err);
+                `;
+    connection.query(
+      sql,
+      [accepted.thesis_id, accepted.student_id],
+      function (err, rows) {
+        if (err) {
+          reject(err);
+        }
+        resolve(accepted);
       }
-      resolve(accepted);
-    });
-  });
+    );
+  }); */
+  try {
+    const sql = ` 
+                  UPDATE application
+                  SET status = "Rejected"
+                  WHERE  thesis_id = ?
+                  AND student_id <> ?
+                `;
+    const [rows] = await pool.execute(sql, [
+      accepted.thesis_id,
+      accepted.student_id,
+    ]);
+    return accepted;
+  } catch (err) {
+    console.error("Error in rejectApplicationsExcept: ", err);
+    throw err;
+  }
 };
 
-exports.cancelStudentApplications = (accepted) => {
-  return new Promise((resolve, reject) => {
+exports.cancelStudentApplications = async (accepted) => {
+  /* return new Promise((resolve, reject) => {
     const sql = ` 
     DELETE FROM application
     WHERE student_id = ?
     AND thesis_id <> ?;
-                `
-    connection.query(sql, [accepted.student_id, accepted.thesis_id], function (err,rows) {
-      if (err) {
-        reject(err);
+                `;
+    connection.query(
+      sql,
+      [accepted.student_id, accepted.thesis_id],
+      function (err, rows) {
+        if (err) {
+          reject(err);
+        }
+        resolve(accepted);
       }
-      resolve(accepted);
-    });
-  });
+    );
+  }); */
+  try {
+    const sql = ` 
+                  DELETE FROM application
+                  WHERE student_id = ?
+                  AND thesis_id <> ?;
+                `;
+    const [rows] = await pool.execute(sql, [
+      accepted.student_id,
+      accepted.thesis_id,
+    ]);
+    return accepted;
+  } catch (err) {
+    console.error("Error in cancelStudentApplications: ", err);
+    throw err;
+  }
 };
 
 // Selects every application from application table, returns array of applications(only student_id and thesis_id)
-exports.getApplications = () => {
-  return new Promise((resolve, reject) => {
-    const sql =
-      `SELECT * FROM application`;
+exports.getApplications = async () => {
+  /* return new Promise((resolve, reject) => {
+    const sql = `SELECT * FROM application`;
     connection.query(sql, [], (err, rows) => {
       if (err) {
         reject(err);
-      }
-      else {
+      } else {
         const applications = [];
         rows.map((e) => {
           const application = {
             student_id: e.student_id,
             thesis_id: e.thesis_id,
-            application_date:e.application_date,
-            status: e.status
-          }
+            application_date: e.application_date,
+            status: e.status,
+          };
           applications.push(application);
-        })
+        });
         resolve(applications);
-      };
+      }
     });
-  });
+  }); */
+  try {
+    const sql = `SELECT * FROM application`;
+    const [rows] = await pool.execute(sql, []);
+    const applications = [];
+    rows.map((e) => {
+      const application = {
+        student_id: e.student_id,
+        thesis_id: e.thesis_id,
+        application_date: e.application_date,
+        status: e.status,
+      };
+      applications.push(application);
+    });
+    return applications;
+  } catch (err) {
+    console.error("Error in getApplications: ", err);
+    throw err;
+  }
 };
 
 //this is for getting all the ACTIVE applications related to all the proposals of a specific professor (which makes this request)
-exports.getApplicationsForProfessor = (profId) =>{
-  return new Promise((resolve, reject) => {
-    const sql =
-      `SELECT a.student_id ,s.name ,s.surname ,a.thesis_id ,t.title ,a.application_date
+exports.getApplicationsForProfessor = async (profId) => {
+  /* return new Promise((resolve, reject) => {
+    const sql = `SELECT a.student_id ,s.name ,s.surname ,a.thesis_id ,t.title ,a.application_date
       FROM application a join student s on s.id = a.student_id join thesis t on t.id = a.thesis_id join teacher tch on t.supervisor_id = tch.id 
       WHERE a.status = 'Pending' and tch.email = ? `;
+
     connection.query(sql, [profId], (err, rows) => {
       if (err) {
         reject(err);
-      }
-      else {
+      } else {
+        console.log("ROWS", rows);
         const applications = [];
         rows.map((e) => {
-          const fullName = ''+e.name+' '+e.surname;
+          const fullName = "" + e.name + " " + e.surname;
           const application = {
-            student_id:   e.student_id,
+            student_id: e.student_id,
             student_name: fullName,
-            thesis_id:    e.thesis_id,
+            thesis_id: e.thesis_id,
             thesis_title: e.title,
-            application_date: e.application_date
-          }
+            application_date: e.application_date,
+          };
           applications.push(application);
-        })
+        });
+        console.log("APPLICATIONS", applications);
         resolve(applications);
-      };
+      }
     });
-  });
-}
+  }); */
+  try {
+    const sql = `SELECT a.student_id ,s.name ,s.surname ,a.thesis_id ,t.title ,a.application_date
+                 FROM application a join student s on s.id = a.student_id join thesis t on t.id = a.thesis_id join teacher tch on t.supervisor_id = tch.id 
+                 WHERE a.status = 'Pending' and tch.email = ? `;
+    const [rows] = await pool.execute(sql, [profId]);
+    const applications = [];
+    rows.map((e) => {
+      const fullName = "" + e.name + " " + e.surname;
+      const application = {
+        student_id: e.student_id,
+        student_name: fullName,
+        thesis_id: e.thesis_id,
+        thesis_title: e.title,
+        application_date: e.application_date,
+      };
+      applications.push(application);
+    });
+    return applications;
+  } catch (err) {
+    console.error("Error in getApplicationsForProfessor: ", err);
+    throw err;
+  }
+};
 exports.create_external_cosupervisor = async (external_cosupervisor) => {
   try {
-    const sql = 'INSERT INTO external_supervisor (email, surname, name) VALUES (?,?,?)';
-    await pool.execute(sql, [external_cosupervisor.email, external_cosupervisor.surname, external_cosupervisor.name]);
+    const sql =
+      "INSERT INTO external_supervisor (email, surname, name) VALUES (?,?,?)";
+    await pool.execute(sql, [
+      external_cosupervisor.email,
+      external_cosupervisor.surname,
+      external_cosupervisor.name,
+    ]);
 
-    return external_cosupervisor
-
+    return external_cosupervisor;
   } catch (error) {
     console.error("Error in create_external_cosupervisor: ", error);
     throw error;
@@ -648,11 +764,10 @@ exports.create_external_cosupervisor = async (external_cosupervisor) => {
 
 // get student application
 exports.getStudentApplication = async (studentId) => {
-  try{
-    const sql = 'SELECT * FROM application WHERE student_id = ?';
-    const [rows] = await pool.execute(sql, [studentId])
+  try {
+    const sql = "SELECT * FROM application WHERE student_id = ?";
+    const [rows] = await pool.execute(sql, [studentId]);
     return rows;
-
   } catch (error) {
     console.error("Error in getExternal_cosupervisors_emails: ", error);
     throw error;
@@ -666,7 +781,6 @@ exports.beginTransaction = async () => {
   try {
     connection = await pool.getConnection();
     await connection.beginTransaction();
-
   } catch (error) {
     console.error("Error in beginTransaction: ", error);
     throw error;
@@ -684,7 +798,6 @@ exports.commit = async () => {
   try {
     connection = await pool.getConnection();
     await connection.commit();
-
   } catch (error) {
     console.error("Error in commit: ", error);
     throw error;
@@ -702,7 +815,7 @@ exports.rollback = async () => {
   try {
     connection = await pool.getConnection();
     await connection.rollback();
-      } catch (error) {
+  } catch (error) {
     console.error("Error in rollback: ", error);
     throw error;
   } finally {
@@ -716,4 +829,3 @@ process.on("exit", () => {
   console.log("Closing db connection");
   connection.end();
 });
-

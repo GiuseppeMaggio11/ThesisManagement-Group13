@@ -18,7 +18,7 @@ import { CheckLg, XLg } from "react-bootstrap-icons";
 function Applications(props) {
   const [applications, setApplications] = useState(undefined);
   const [thesisTitles, setThesisTitles] = useState(undefined);
-  const { handleErrors } = useContext(MessageContext);
+  const { handleToast } = useContext(MessageContext);
   const isMobile = useMediaQuery({ maxWidth: 767 });
   useEffect(() => {
     props.setLoading(true);
@@ -51,7 +51,7 @@ function Applications(props) {
       setThesisTitles(uniqueThesisTitles);
       props.setLoading(false);
     } catch (err) {
-      handleErrors(err);
+      handleToast(err, "error");
     }
   };
 

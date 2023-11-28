@@ -24,7 +24,7 @@ import Loading from "./Loading";
 
 function SearchProposalRoute(props) {
 
-  const { handleErrors } = useContext(MessageContext);
+  
 
   const [thesisProposals, setThesisProposals] = useState([]);
   const {handleToast} = useContext(MessageContext)
