@@ -77,7 +77,7 @@ function NewProposal(props) {
     const { id, name, value, checked } = e.target;
     setFormData({
       ...formData,
-      [name]: id==="is_archived" ? checked : value,
+      [name]: id === "is_archived" ? checked : value,
     });
   };
 
@@ -196,11 +196,10 @@ function NewProposal(props) {
       keywords: formData.keywords.join(", "),
     };
     try {
-      console.log(newProp);
       const response = await API.newProposal(newProp);
       handleToast("New proposal created successfully", "success");
       navigate("/teacher")
-      console.log(response);
+      
     } catch (error) {
       console.log(error);
       if (error.error) {
@@ -231,7 +230,7 @@ function NewProposal(props) {
           }
           toast.error(errorMessage, {
             position: toast.POSITION.TOP_RIGHT,
-            autoClose: 10000, // Adjust as needed
+            autoClose: 5000,
             hideProgressBar: false,
             closeOnClick: true,
             pauseOnHover: true,

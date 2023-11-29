@@ -3,8 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import Loading from "./Loading";
 
 function TeacherPage(props) {
-  const navigate = useNavigate();
-
   return (
     <Container>
       <Row>
