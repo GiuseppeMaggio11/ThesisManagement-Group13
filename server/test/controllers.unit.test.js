@@ -2,17 +2,19 @@
 
 const { isStudent, isProfessor, isLoggedIn } = require("../controllers/middleware");
 const { getProposals, getProposal } = require("../controllers/showThesis");
-const { newApplication } = require("../controllers/manageApplication");
+const { newApplication, updateApplicationStatus, getApplications,getApplicationStudent  } = require("../controllers/manageApplication");
 const { addFiles, getAllFiles, getStudentFilesList, getFile } = require("../controllers/manageFiles");
-const { newThesis } = require("../controllers/manageThesis");
+const { newThesis, updateThesesArchivation } = require("../controllers/manageThesis");
 const { listExternalCosupervisors, createExternalCosupervisor } = require("../controllers/others");
 
 const dao = require("../dao");
 const dayjs = require("dayjs");
 const { validationResult } = require("express-validator");
+const fs = require("fs");
 
 jest.mock("../dao");
 jest.mock("express-validator");
+jest.mock("fs");
 
 
 
@@ -942,7 +944,7 @@ describe("newThesis", () => {
         expect(dao.commit).not.toHaveBeenCalled();
         expect(dao.rollback).toHaveBeenCalledTimes(1);
         expect(mockRes.status).toHaveBeenCalledWith(503);
-        expect(mockRes.json).toHaveBeenCalledWith({ error: "Database error" });
+        expect(mockRes.json).toHaveBeenCalledWith({ error: "Database error"});
     });
 
 });
@@ -1112,7 +1114,559 @@ describe("createExternalCosupervisor", () => {
         expect(dao.commit).not.toHaveBeenCalled();
         expect(dao.rollback).toHaveBeenCalledTimes(1);
         expect(mockRes.status).toHaveBeenCalledWith(503);
-        expect(mockRes.json).toHaveBeenCalledWith({ error: "Database error" });
+        expect(mockRes.json).toHaveBeenCalledWith({ error: "Database error"});
+    });
+
+});
+
+// SPRINT 2
+
+describe("updateThesesArchivation", () => {
+
+    test("Should begin a transaction, update \"isArchived\" for every thesis when the virtual clock date is after their expiration date and commit the transaction", async () => {
+        const mockReq = {
+            body: {
+                datetime: dayjs()
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        dao.beginTransaction.mockResolvedValue(true);
+        dao.updateThesesArchivation.mockResolvedValue("ok");
+        dao.commit.mockResolvedValue(true);
+
+        await updateThesesArchivation(mockReq, mockRes);
+
+        expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
+        expect(dao.updateThesesArchivation).toHaveBeenCalledTimes(1);
+        expect(dao.commit).toHaveBeenCalledTimes(1);
+        expect(dao.rollback).not.toHaveBeenCalled();
+        expect(mockRes.status).toHaveBeenCalledWith(200);
+        expect(mockRes.json).toHaveBeenCalledWith("ok");
+    });
+
+    test("Should return 500 - Internal server error", async () => {
+        const mockReq = {
+            body: {
+                datetime: dayjs()
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        dao.beginTransaction.mockRejectedValue("Database error");
+        dao.rollback.mockResolvedValue(true);
+
+        await updateThesesArchivation(mockReq, mockRes);
+
+        expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
+        expect(dao.updateThesesArchivation).not.toHaveBeenCalled();
+        expect(dao.commit).not.toHaveBeenCalled();
+        expect(dao.rollback).toHaveBeenCalledTimes(1);
+        expect(mockRes.status).toHaveBeenCalledWith(500);
+        expect(mockRes.json).toHaveBeenCalledWith("Database error");
+    });
+
+});
+
+describe("updateApplicationStatus", () => {
+
+    test("Should accept a student application, cancels all other applications for that student and rejects every other student application for that same thesis", async () => {
+        const mockReq = {
+            body: {
+                student_id: "S222222",
+                thesis_id: 1,
+                status: "Accepted"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        const mockedValidationResult = {
+            isEmpty: jest.fn(() => true),
+        };
+        const mockApplications = [
+            {
+                student_id: "S111111",
+                thesis_id: 1,
+                application_date: dayjs(),
+                status: "status"
+            },
+            {
+                student_id: "S222222",
+                thesis_id: 1,
+                application_date: dayjs(),
+                status: "status"
+            },
+            {
+                student_id: "S222222",
+                thesis_id: 2,
+                application_date: dayjs(),
+                status: "status"
+            }
+        ];
+        const dir = `studentFiles/${mockReq.body.student_id}/${mockApplications[2].thesis_id}`;
+
+        validationResult.mockReturnValue(mockedValidationResult);
+        dao.beginTransaction.mockResolvedValue(true);
+        dao.getApplications.mockResolvedValue(mockApplications);
+        dao.updateApplicationStatus.mockResolvedValue(mockReq.body);
+        fs.rmSync = jest.fn().mockReturnValue(true);
+        dao.rejectApplicationsExcept.mockResolvedValue(mockReq.body);
+        dao.cancelStudentApplications.mockResolvedValue(mockReq.body);
+        dao.commit.mockResolvedValue(true);
+        
+        await updateApplicationStatus(mockReq, mockRes);
+        
+        expect(validationResult).toHaveBeenCalledTimes(1);
+        expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
+        expect(dao.getApplications).toHaveBeenCalledTimes(1);
+        expect(dao.updateApplicationStatus).toHaveBeenCalledTimes(1);
+        expect(fs.rmSync).toHaveBeenCalledTimes(1);
+        expect(fs.rmSync).toHaveBeenCalledWith(
+            dir,
+            {
+                recursive: true, 
+                force: true
+            }
+        );
+        expect(dao.rejectApplicationsExcept).toHaveBeenCalledTimes(1);
+        expect(dao.cancelStudentApplications).toHaveBeenCalledTimes(1);
+        expect(dao.commit).toHaveBeenCalledTimes(1);
+        expect(dao.rollback).not.toHaveBeenCalled();
+        expect(mockRes.status).toHaveBeenCalledWith(200);
+        expect(mockRes.json).toHaveBeenCalledWith(mockReq.body);
+    });
+
+    test("Should just update an application'status if no student has been accepted", async () => {
+        const mockReq = {
+            body: {
+                student_id: "S222222",
+                thesis_id: 1,
+                status: "Not accepted"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        const mockedValidationResult = {
+            isEmpty: jest.fn(() => true),
+        };
+        const mockApplications = [
+            {
+                student_id: "S111111",
+                thesis_id: 1,
+                application_date: dayjs(),
+                status: "status"
+            },
+            {
+                student_id: "S222222",
+                thesis_id: 1,
+                application_date: dayjs(),
+                status: "status"
+            },
+            {
+                student_id: "S222222",
+                thesis_id: 2,
+                application_date: dayjs(),
+                status: "status"
+            }
+        ];
+
+        validationResult.mockReturnValue(mockedValidationResult);
+        dao.beginTransaction.mockResolvedValue(true);
+        dao.getApplications.mockResolvedValue(mockApplications);
+        dao.updateApplicationStatus.mockResolvedValue(mockReq.body);
+        dao.commit.mockResolvedValue(true);
+
+        await updateApplicationStatus(mockReq, mockRes);
+        
+        expect(validationResult).toHaveBeenCalledTimes(1);
+        expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
+        expect(dao.getApplications).toHaveBeenCalledTimes(1);
+        expect(dao.updateApplicationStatus).toHaveBeenCalledTimes(1);
+        expect(fs.rmSync).not.toHaveBeenCalled();
+        expect(dao.rejectApplicationsExcept).not.toHaveBeenCalled();
+        expect(dao.cancelStudentApplications).not.toHaveBeenCalled();
+        expect(dao.commit).toHaveBeenCalledTimes(1);
+        expect(dao.rollback).not.toHaveBeenCalled();
+        expect(mockRes.status).toHaveBeenCalledWith(200);
+        expect(mockRes.json).toHaveBeenCalledWith(mockReq.body);
+    });
+
+    test("Should return 422 - express-validator has found some errors", async () => {
+        const mockReq = {};
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        const mockedValidationResult = {
+            isEmpty: jest.fn(() => false)
+        };
+
+        validationResult.mockReturnValue(mockedValidationResult);
+
+        await updateApplicationStatus(mockReq, mockRes);
+
+        expect(validationResult).toHaveBeenCalledTimes(1);
+        expect(dao.beginTransaction).not.toHaveBeenCalled();
+        expect(dao.getApplications).not.toHaveBeenCalled();
+        expect(dao.updateApplicationStatus).not.toHaveBeenCalled();
+        expect(fs.rmSync).not.toHaveBeenCalled();
+        expect(dao.rejectApplicationsExcept).not.toHaveBeenCalled();
+        expect(dao.cancelStudentApplications).not.toHaveBeenCalled();
+        expect(dao.commit).not.toHaveBeenCalled();
+        expect(dao.rollback).not.toHaveBeenCalled();
+        expect(mockRes.status).toHaveBeenCalledWith(422);
+        expect(mockRes.json.mock.calls[0][0]).toHaveProperty("errors");
+    });
+
+    test("Should return 400 - No application found", async () => {
+        const mockReq = {
+            body: {
+                student_id: "S333333",
+                thesis_id: 1,
+                status: "Accepted"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        const mockedValidationResult = {
+            isEmpty: jest.fn(() => true),
+        };
+        const mockApplications = [
+            {
+                student_id: "S111111",
+                thesis_id: 1,
+                application_date: dayjs(),
+                status: "status"
+            },
+            {
+                student_id: "S222222",
+                thesis_id: 1,
+                application_date: dayjs(),
+                status: "status"
+            },
+            {
+                student_id: "S222222",
+                thesis_id: 2,
+                application_date: dayjs(),
+                status: "status"
+            }
+        ];
+
+        validationResult.mockReturnValue(mockedValidationResult);
+        dao.beginTransaction.mockResolvedValue(true);
+        dao.getApplications.mockResolvedValue(mockApplications);
+
+        await updateApplicationStatus(mockReq, mockRes);
+        
+        expect(validationResult).toHaveBeenCalledTimes(1);
+        expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
+        expect(dao.getApplications).toHaveBeenCalledTimes(1);
+        expect(dao.updateApplicationStatus).not.toHaveBeenCalled();
+        expect(fs.rmSync).not.toHaveBeenCalled();
+        expect(dao.rejectApplicationsExcept).not.toHaveBeenCalled();
+        expect(dao.cancelStudentApplications).not.toHaveBeenCalled();
+        expect(dao.commit).not.toHaveBeenCalled();
+        expect(dao.rollback).toHaveBeenCalledTimes(1);
+        expect(mockRes.status).toHaveBeenCalledWith(400);
+        expect(mockRes.json).toHaveBeenCalledWith(
+            ` error: Application of student: ${mockReq.body.student_id} for thesis with id: ${mockReq.body.thesis_id} not found `
+        );
+    });
+
+    test("Should return 500 - Internal server error", async () => {
+        const mockReq = {
+            body: {
+                student_id: "S222222",
+                thesis_id: 1,
+                status: "Not accepted"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        const mockedValidationResult = {
+            isEmpty: jest.fn(() => true),
+        };
+
+        validationResult.mockReturnValue(mockedValidationResult);
+        dao.beginTransaction.mockRejectedValue("Database error");
+        dao.rollback.mockResolvedValue(true);
+
+        await updateApplicationStatus(mockReq, mockRes);
+
+        expect(validationResult).toHaveBeenCalledTimes(1);
+        expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
+        expect(dao.getApplications).not.toHaveBeenCalled();
+        expect(dao.updateApplicationStatus).not.toHaveBeenCalled();
+        expect(fs.rmSync).not.toHaveBeenCalled();
+        expect(dao.rejectApplicationsExcept).not.toHaveBeenCalled();
+        expect(dao.cancelStudentApplications).not.toHaveBeenCalled();
+        expect(dao.commit).not.toHaveBeenCalled();
+        expect(dao.rollback).toHaveBeenCalledTimes(1);
+        expect(mockRes.status).toHaveBeenCalledWith(503);
+        expect(mockRes.json).toHaveBeenCalledWith("Database error");
+    });
+    /*
+async function updateApplicationStatus(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors });
+  }
+
+  try {
+    await dao.beginTransaction();
+    let decision = {
+      student_id: req.body.student_id,
+      thesis_id: req.body.thesis_id,
+      status: req.body.status,
+    };
+    const applications = await dao.getApplications();
+    for (const application of applications) {
+      if (
+        application.student_id == req.body.student_id &&
+        application.thesis_id == req.body.thesis_id
+      ) {
+        const updated_application = await dao.updateApplicationStatus(decision);
+        if (decision.status === "Accepted") {
+          for (const a of applications) {
+            if (
+              a.student_id == req.body.student_id &&
+              a.thesis_id !== req.body.thesis_id
+            ) {
+              let dir = `studentFiles/${a.student_id}/${a.thesis_id}`;
+              console.log(dir);
+              fs.rmSync(dir, { recursive: true, force: true });
+            }
+          }
+          //reject every other student applications for that thesis
+          const result_reject = await dao.rejectApplicationsExcept(decision);
+          //cancels every other application of that student
+          const result_cancel = await dao.cancelStudentApplications(decision);
+        }
+        await dao.commit();
+        return res.json(updated_application);
+      }
+    }
+            return res
+      .status(400)
+      .json(
+        ` error: Application of student: ${req.body.student_id} for thesis with id: ${req.body.thesis_id} not found `
+      );
+  } catch (err) {
+    await dao.rollback();
+    return res.status(503).json(` error: ${err} `);
+  }
+} */
+
+});
+
+describe("getApplicationStudent", () => {
+
+    test("Should return all applications submitted by a student", async () => {
+        const mockReq = {
+            params: {
+                student_id: "S123456"
+            },
+            user: {
+                username: "username",
+                user_type: "STUD"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        const mockOutput = [
+            {
+                status: "status",
+                cosupervisors: ["name1 surname1", "name2 surname2"],
+                department_name: "department_name",
+                description: 1,
+                expiration: "2022-01-01 00:00:00",
+                group_name: [{ department: "department_name", group: "group_name" }, { department: "department_name2", group: "group_name2" }],
+                id: 1,
+                is_archived: true,
+                keywords: ["keywords"],
+                name: "name",
+                notes: "notes",
+                required_knowledge: "required_knowledge",
+                surname: "surname",
+                thesis_level: "thesis_level",
+                thesis_type: "thesis_type",
+                title: "title",
+                title_degree: "title_degree"
+            },
+            {
+                status: "status",
+                cosupervisors: ["name1 surname1", "name2 surname2"],
+                department_name: "department_name",
+                description: 1,
+                expiration: "2022-01-01 00:00:00",
+                group_name: [{ department: "department_name", group: "group_name" }, { department: "department_name2", group: "group_name2" }],
+                id: 2,
+                is_archived: true,
+                keywords: ["keywords"],
+                name: "name",
+                notes: "notes",
+                required_knowledge: "required_knowledge",
+                surname: "surname",
+                thesis_level: "thesis_level",
+                thesis_type: "thesis_type",
+                title: "title",
+                title_degree: "title_degree"
+            }
+        ]
+
+        dao.getUserID.mockResolvedValue("S123456");
+        dao.getStudentApplication.mockResolvedValue(
+            [
+                {
+                    thesis_id: 1,
+                    status: "status"
+                },
+                {
+                    thesis_id: 2,
+                    status: "status"
+                },
+            ]
+        );
+        dao.getProposalById
+            .mockResolvedValueOnce(
+                {
+                    cosupervisors: ["name1 surname1", "name2 surname2"],
+                    department_name: "department_name",
+                    description: 1,
+                    expiration: "2022-01-01 00:00:00",
+                    group_name: [{ department: "department_name", group: "group_name" }, { department: "department_name2", group: "group_name2" }],
+                    id: 1,
+                    is_archived: true,
+                    keywords: ["keywords"],
+                    name: "name",
+                    notes: "notes",
+                    required_knowledge: "required_knowledge",
+                    surname: "surname",
+                    thesis_level: "thesis_level",
+                    thesis_type: "thesis_type",
+                    title: "title",
+                    title_degree: "title_degree"
+                }
+            )
+            .mockResolvedValueOnce(
+                {
+                    cosupervisors: ["name1 surname1", "name2 surname2"],
+                    department_name: "department_name",
+                    description: 1,
+                    expiration: "2022-01-01 00:00:00",
+                    group_name: [{ department: "department_name", group: "group_name" }, { department: "department_name2", group: "group_name2" }],
+                    id: 2,
+                    is_archived: true,
+                    keywords: ["keywords"],
+                    name: "name",
+                    notes: "notes",
+                    required_knowledge: "required_knowledge",
+                    surname: "surname",
+                    thesis_level: "thesis_level",
+                    thesis_type: "thesis_type",
+                    title: "title",
+                    title_degree: "title_degree"
+                }
+            );
+        
+        await getApplicationStudent(mockReq, mockRes);
+
+        expect(dao.getUserID).toHaveBeenCalledTimes(1);
+        expect(dao.getStudentApplication).toHaveBeenCalledTimes(1);
+        expect(dao.getProposalById).toHaveBeenCalledTimes(2);
+        expect(mockRes.status).toHaveBeenCalledWith(200);
+        expect(mockRes.json).toHaveBeenCalledWith(mockOutput);
+    });
+
+    test("Should return 500 - Internal server error", async () => {
+        const mockReq = {
+            params: {
+                student_id: "S123456"
+            },
+            user: {
+                username: "username",
+                user_type: "STUD"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        dao.getUserID.mockRejectedValue("Database error");
+
+        await getApplicationStudent(mockReq, mockRes);
+
+        expect(dao.getUserID).toHaveBeenCalledTimes(1);
+        expect(dao.getStudentApplication).not.toHaveBeenCalled();
+        expect(dao.getProposalById).not.toHaveBeenCalled();
+        expect(mockRes.status).toHaveBeenCalledWith(500);
+        expect(mockRes.json).toHaveBeenCalledWith("Database error");
+    });
+
+});
+
+describe("getApplications", () => {
+
+    test("Should return all applications offered by a professor that are still pending", async () => {
+        const mockReq = {
+            user: {
+                username: "username"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        dao.getApplicationsForProfessor.mockResolvedValue("result");
+
+        await getApplications(mockReq, mockRes);
+
+        expect(dao.getApplicationsForProfessor).toHaveBeenCalledTimes(1);
+        expect(mockRes.status).toHaveBeenCalledWith(200);
+        expect(mockRes.json).toHaveBeenCalledWith("result");
+    });
+
+    test("Should return 500 - Internal server error", async () => {
+        const mockReq = {
+            user: {
+                username: "username"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        dao.getApplicationsForProfessor.mockRejectedValue("Database error");
+
+        await getApplications(mockReq, mockRes);
+
+        expect(dao.getApplicationsForProfessor).toHaveBeenCalledTimes(1);
+        expect(mockRes.status).toHaveBeenCalledWith(500);
+        expect(mockRes.json).toHaveBeenCalledWith("Database error");
     });
 
 });
