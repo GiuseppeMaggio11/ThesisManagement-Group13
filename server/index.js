@@ -216,6 +216,7 @@ app.post(
 //RETURNS LIST OF EVERY EXTERNAL COSUPERVISORS
 
 
+
 app.get(
   "/api/listExternalCosupervisors",
   isProfessor,
@@ -260,7 +261,7 @@ app.get("/api/getApplications", isProfessor, getApplications);
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
 });
-app.get('/api/listExternalCosupervisors',isProfessor,listExternalCosupervisors);
+
 
 //CREATES NEW EXTERNAL COSUPERVISOR 
 app.post('/api/newExternalCosupervisor', isProfessor, [

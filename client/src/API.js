@@ -64,21 +64,14 @@ async function newProposal(thesis) {
 }
 
 async function getListExternalCosupervisors() {
-  try {
-    const response = await fetch(URL + "/listExternalCosupervisors", {
-      method: "GET",
-      credentials: "include",
-    });
-    const list = await response.json();
-    if (response.ok) {
-      return list;
-    } else {
-      const error = await response.json();
-      throw Error(error.error);
-    }
-  } catch (err) {
-    throw Error(err.error);
-  }
+  return getJson(fetch(URL + `/listExternalCosupervisors`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: "include"
+  })
+  )
 }
 
 async function newExternalCosupervisor(external_cosupervisor) {
