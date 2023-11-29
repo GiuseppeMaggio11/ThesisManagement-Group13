@@ -74,8 +74,7 @@ function SearchProposalComponent(props) {
   const [selectedGroups, setSelectedGroups] = useState([])
   const [selectedType, setSelectedType] = useState([])
   const [selectedDate, setSelectedDate] = useState(null)
-  const [selectedExternalCosupervisor, setSelectedExternalCosupervisor] = useState(null)
-  const [selectedinternalCosupervisor, setSelectedinternalCosupervisor] = useState(null)
+  const [selectedCosupervisor, setSelectedCosupervisor] = useState([])
   const [selectedKeywords, setSelectedKeywords] = useState([])
   const [selectedSupervisor, setSelectedSupervisor] = useState([])
   const [selectedTitlesWords, setSelectedTitlesWords] = useState([])
@@ -197,10 +196,8 @@ function SearchProposalComponent(props) {
                     setSelectedType={setSelectedType}
                     selectedDate={selectedDate}
                     setSelectedDate={setSelectedDate}
-                    selectedExternalCosupervisor={selectedExternalCosupervisor}
-                    setSelectedExternalCosupervisor={setSelectedExternalCosupervisor}
-                    selectedinternalCosupervisor={selectedinternalCosupervisor}
-                    setSelectedinternalCosupervisor={setSelectedinternalCosupervisor}
+                    selectedCosupervisor={selectedCosupervisor}
+                    setSelectedCosupervisor={setSelectedCosupervisor}
                     selectedKeywords={selectedKeywords}
                     setSelectedKeywords={setSelectedKeywords}
                     selectedSupervisor={selectedSupervisor}

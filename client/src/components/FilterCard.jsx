@@ -79,8 +79,10 @@ const SearchDropdown = ({ placeholder, position, items, setItems, selectedItems,
     };
 
     const handleItemClick = (item) => {
+        console.log(selectedItems)
         let newSelectedItems = [...selectedItems, item];
-        let is = items.filter((i) => !newSelectedItems.includes(i));
+        console.log(item)
+        let is = items.filter((i) => !newSelectedItems?.includes(i));
 
         setItems(is);
         setSelectedItems(newSelectedItems);
@@ -171,10 +173,8 @@ const FilterCard = ({
     setSelectedType,
     selectedDate,
     setSelectedDate,
-    selectedExternalCosupervisor,
-    setSelectedExternalCosupervisor,
-    selectedinternalCosupervisor,
-    setSelectedinternalCosupervisor,
+    selectedCosupervisor,
+    setSelectedCosupervisor,
     selectedKeywords,
     setSelectedKeywords,
     selectedSupervisor,
@@ -191,8 +191,7 @@ const FilterCard = ({
     const [titleFilter, setTitleFilters] = useState("")
     const [supervisors, setSupervisors] = useState(null)
     const [keywords, setKeywords] = useState([])
-    const [internalCosupervisor, setInternalCosupervisor] = useState(null)
-    const [externalCosupervisor, setExternalCosupervisor] = useState(null)
+    const [cosupervisors, setCosupervisors] = useState(null)
     const [groups, setGroups] = useState([])
     const [type, setType] = useState([])
 
@@ -203,8 +202,8 @@ const FilterCard = ({
             let group_theses = [];
             let type_theses = [];
             let supervisors_theses = [];
-            let internal_cosupervisors = []
-            let external_cosupervisors = []
+            let cosupervisors = []
+            //let external_cosupervisors = []
             try {
                 if (thesisList) {
 
@@ -238,11 +237,16 @@ const FilterCard = ({
                             }
                         }
 
-                        if (item.cosupervisors?.length > 0) {
-                            if (item.cosupervisors.contains('@'))
-                                internal_cosupervisors.push(item.cosupervisor)
-                            else
-                                external_cosupervisors.push(item.cosupervisor)
+                        if (item?.cosupervisors?.length > 0) {
+                            console.log(item)
+
+                            item?.cosupervisors.forEach((element) => {
+                                // Check if the element doesn't exist in the first array
+                                if (!cosupervisors.includes(element)) {
+                                    cosupervisors.push(element); // Add the element to the new array
+                                }
+                            });
+
                         }
                         if (item.groups?.length > 0) {
                             item.groups.forEach(i => {
@@ -254,8 +258,9 @@ const FilterCard = ({
                         }
                     })
 
-                    setExternalCosupervisor(external_cosupervisors);
-                    setInternalCosupervisor(internal_cosupervisors);
+                    //setExternalCosupervisor(external_cosupervisors);
+                    console.log(cosupervisors)
+                    setCosupervisors(cosupervisors);
                     setType(type_theses)
                     setKeywords(keywords_theses)
                     setSupervisors(supervisors_theses)
@@ -277,8 +282,7 @@ const FilterCard = ({
     }, [reset, thesisList])
 
     const handleReset = () => {
-        setSelectedExternalCosupervisor([])
-        setSelectedinternalCosupervisor([])
+        setSelectedCosupervisor([])
         setSelectedSupervisor([])
         setSelectedGroups([])
         setSelectedKeywords([])
@@ -313,15 +317,11 @@ const FilterCard = ({
             );
         }
 
-        if (selectedExternalCosupervisor?.length > 0) {
+        if (selectedCosupervisor?.length > 0) {
             filtered = filtered.filter(thesis =>
-                selectedExternalCosupervisor.includes(thesis.cosupervisor)
-            );
-        }
-
-        if (selectedinternalCosupervisor?.length > 0) {
-            filtered = filtered.filter(thesis =>
-                selectedinternalCosupervisor.includes(thesis.cosupervisor)
+                thesis.cosupervisors.some(cosup =>
+                    selectedCosupervisor.includes(cosup)
+                )
             );
         }
 
@@ -451,12 +451,12 @@ const FilterCard = ({
                                                     labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
                                                 }
                                             }}>
-                                            {selectedinternalCosupervisor && selectedinternalCosupervisor.length > 0 && (
+                                            {selectedCosupervisor && selectedCosupervisor.length > 0 && (
                                                 <Chips2
-                                                    items={internalCosupervisor}
-                                                    selectedItems={selectedinternalCosupervisor}
-                                                    setItems={setInternalCosupervisor}
-                                                    setSelectedItems={setSelectedinternalCosupervisor}
+                                                    items={cosupervisors}
+                                                    selectedItems={selectedCosupervisor}
+                                                    setItems={setCosupervisors}
+                                                    setSelectedItems={setSelectedCosupervisor}
                                                 />
                                             )}
                                         </Form.Label>
@@ -464,7 +464,7 @@ const FilterCard = ({
                                 </Row>
                             </Form.Group>
                         </div>
-                        <SearchDropdown placeholder={'Internal cosupervisor'} position={'start'} items={internalCosupervisor} setItems={setInternalCosupervisor} selectedItems={selectedinternalCosupervisor} setSelectedItems={setSelectedinternalCosupervisor} />
+                        <SearchDropdown placeholder={'Co-Supervisors'} position={'start'} items={cosupervisors} setItems={setCosupervisors} selectedItems={selectedCosupervisor} setSelectedItems={setSelectedCosupervisor} />
                     </div>
 
 
@@ -495,36 +495,6 @@ const FilterCard = ({
                         </div>
                         <SearchDropdown placeholder={'type'} position={'end'} items={type} setItems={setType} selectedItems={selectedType} setSelectedItems={setSelectedType} />
                     </div>
-
-
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ width: '100' }}>
-                            <Form.Group>
-                                <Row className="align-items-center">
-                                    <Col>
-                                        <Form.Label className="chip-list"
-                                            style={{ maxWidth: '100%', width: '100%', overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
-                                            ref={(labelRef) => {
-                                                if (labelRef) {
-                                                    labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
-                                                }
-                                            }}>
-                                            {selectedExternalCosupervisor && selectedExternalCosupervisor.length > 0 && (
-                                                <Chips2
-                                                    items={externalCosupervisor}
-                                                    selectedItems={selectedExternalCosupervisor}
-                                                    setItems={setExternalCosupervisor}
-                                                    setSelectedItems={setSelectedExternalCosupervisor}
-                                                />
-                                            )}
-                                        </Form.Label>
-                                    </Col>
-                                </Row>
-                            </Form.Group>
-                        </div>
-                        <SearchDropdown placeholder={'External cosupervisor'} position={'start'} items={externalCosupervisor} setItems={setExternalCosupervisor} selectedItems={selectedExternalCosupervisor} setSelectedItems={setSelectedExternalCosupervisor} />
-                    </div>
-
 
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                         <div style={{ width: '100%' }}>
