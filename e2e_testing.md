@@ -18,9 +18,11 @@
 *Home page for guest users*
 <br/>
 <br/>
+<br/>
 
 ![Login form](./images/IMG_00_02.jpg)
 *Login form*
+<br/>
 <br/>
 <br/>
 
@@ -28,9 +30,11 @@
 *Student login*
 <br/>
 <br/>
+<br/>
 
 ![Home page for autenticated students](./images/IMG_00_04.jpg)
 *Home page for autenticated students*
+<br/>
 <br/>
 <br/>
 
@@ -38,14 +42,17 @@
 *Professor login*
 <br/>
 <br/>
+<br/>
 
 ![Home page for autenticated professors](./images/IMG_00_06.jpg)
 *Home page for autenticated professors*
 <br/>
 <br/>
+<br/>
 
 ![Log out](./images/IMG_00_07.jpg)
 *Log out*
+<br/>
 <br/>
 <br/>
 
