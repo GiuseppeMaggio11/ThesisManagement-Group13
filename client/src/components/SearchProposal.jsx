@@ -122,18 +122,18 @@ function SearchProposalComponent(props) {
       <div className="d-flex justify-content-center">
         <Container className="width-80 margin-custom">
           <Row className="d-flex align-items-center">
-            <Col xs={6} className="d-flex justify-content-between align-items-center">
+            <Col xs={4} className="d-flex justify-content-between align-items-center">
               <h1 className={`margin-titles-custom ${props.isMobile ? 'smaller-heading' : ''}`}>
                 Thesis Proposals
               </h1>
             </Col>
-            <Col xs={6} className="d-flex justify-content-end">
-              <Col xs={6} className="d-flex px-4 justify-content-end align-items-end">
+            <Col xs={8} className="d-flex justify-content-end">
+              <Col xs={6} className="d-flex justify-content-end align-items-end">
                 {!advancedFilters && 
                   <Form.Group className="d-flex align-items-center position-relative">
                     <Form.Control
                       type="text"
-                      placeholder="Search by name"
+                      placeholder= {props.isMobile ? "Search.." : "Search by name"}
                       value={filter}
                       onChange={(e) => { handleFilterTitle(e) }}
                       className="custom-input"
@@ -146,7 +146,7 @@ function SearchProposalComponent(props) {
                 </Form.Group>}
               </Col>
 
-              <Col xs={2} className="d-flex justify-content-start align-items-center">
+              <Col xs={2} className="d-flex px-2 justify-content-start align-items-center">
               <Form.Group>
     <div style={{ position: 'relative', display: 'inline-block' }}>
         {!showFilters && !advancedFilters && <Funnel className={"button-style-filter"} onClick={handleChangeFilter} />}
@@ -208,6 +208,7 @@ function SearchProposalComponent(props) {
                     selectedTitlesWords={selectedTitlesWords}
                     setSelectedTitlesWords={setSelectedTitlesWords}
                     setAdvancedFilters={setAdvancedFilters}
+                    setShowFilters={setShowFilters}
                   />
 
                 </Col >
