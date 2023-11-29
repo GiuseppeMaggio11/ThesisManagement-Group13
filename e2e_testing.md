@@ -14,19 +14,26 @@
 
 ## Homepage and login
 
-![Home page for guest users](./images/IMG_00_01.jpg "Home page for guest users")
+![Home page for guest users](./images/IMG_00_01.jpg)
+*Home page for guest users*
 
-![Login form](./images/IMG_00_02.jpg "Login form")
+![Login form](./images/IMG_00_02.jpg)
+*Login form*
 
-![Student login](./images/IMG_00_03.jpg "Student login")
+![Student login](./images/IMG_00_03.jpg)
+*Student login*
 
-![Home page for autenticated students](./images/IMG_00_04.jpg "Home page for autenticated students")
+![Home page for autenticated students](./images/IMG_00_04.jpg)
+*Home page for autenticated students*
 
-![Professor login](./images/IMG_00_05.jpg "Professor login")
+![Professor login](./images/IMG_00_05.jpg)
+*Professor login*
 
-![Home page for autenticated professors](./images/IMG_00_06.jpg "Home page for autenticated professors")
+![Home page for autenticated professors](./images/IMG_00_06.jpg)
+*Home page for autenticated professors*
 
-![Log out](./images/IMG_00_07.jpg "Log out")
+![Log out](./images/IMG_00_07.jpg)
+*Log out*
 
 
 
