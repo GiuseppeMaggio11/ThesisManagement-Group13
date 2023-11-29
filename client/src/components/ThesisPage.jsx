@@ -65,9 +65,15 @@ function ThesisPage(props) {
 
     const handleUpload = (thesis_id) => {
         const formData = new FormData();
-        for (let i = 0; i < selectedFiles.length; i++) {
+       /*  for (let i = 0; i < selectedFiles.length; i++) {
             formData.append(`file`, selectedFiles[i]);
-        }
+        } */
+
+        selectedFiles.forEach(file=>{
+            formData.append(`file`, file);
+        })
+
+        console.log(formData)
         API.sendFiles(formData, thesis_id).then(
             () => { navigate("/proposal")}
         ).catch((err) => { handleToast(err, 'error' ) });

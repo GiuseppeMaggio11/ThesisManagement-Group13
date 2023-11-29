@@ -71,7 +71,6 @@ function SearchProposalComponent(props) {
   ]);
   const [filteredByTitle, setFilteredByTitle] = useState([]);
 
-
   const [selectedGroups, setSelectedGroups] = useState([])
   const [selectedType, setSelectedType] = useState([])
   const [selectedDate, setSelectedDate] = useState(null)
@@ -246,9 +245,14 @@ function SearchProposalComponent(props) {
             </Row>) : (
             <Row>
               <Accordion>
-                {[...filteredThesisProposals].map((element) => (
+              {filteredByTitle.length <= 0 && filter === '' && [...filteredThesisProposals].map((element) => (
                   <ProposalAccordion key={element.id} proposal={element} />
                 ))}
+                {filteredByTitle.length <= 0 && filter !== '' && <h2 className="mt-3"> no proposals found</h2>}
+                {filteredByTitle.length > 0 && [...filteredByTitle].map((element) => (
+                  <ProposalAccordion key={element.id} proposal={element} />
+                ))}
+              
               </Accordion>
             </Row>
           )}
