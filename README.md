@@ -13,6 +13,7 @@ Maggio Giuseppe 313346
 ## Contents
 
 - [React Client Application Routes](#react-client-application-routes)
+- [Docker Compose](#docker-compose)
 - [API Server](#api-server)
     + [Authentication Server](#authentication-server)
         * [Login Server](#login-server)
@@ -46,6 +47,45 @@ Authenticated users will see buttons to access the various routes
 It is possible to filter thesis proposals based on the content of a text field form
 - Route `/teacher`: Route only accessible to authenticated professors containing a button to create a new thesis proposal.
 - Route `/newproposal`: Route only accessible to authenticated professors. It allows them to create a new thesis proposal by filling all its informations (title, description, supervisor, co-supervisors, level, keywords, type, group, required knowledge, notes, expiration date, degree and if it's archived).
+
+## Docker Compose
+
+### How to run the application via Docker Compose **as a developper** ?
+
+First, modify in the server/dao.js file the dbConfig host from "127.0.0.1" to "database" : 
+
+```
+  host: "database",
+```
+
+Finally, run this command at the root of the project : 
+
+```
+docker compose up -d --build
+```
+
+Your app is accessible on this URL `http://localhost:5173/` !
+
+### How to run the application via Docker Compose as a regular user ?
+
+First, download the docker-compose.yml of our project. 
+
+Then, open a terminal in the same directory and run this command : 
+
+```
+docker compose up -d --build
+```
+
+
+Once you see that the 3 containers started, you can access the app via this URL `http://localhost:5173/` on your browser !
+
+### How to stop the application ?
+
+Run in the same terminal the following command : 
+
+```
+docker compose down
+```
 
 ## API Server
 
@@ -182,6 +222,40 @@ It is possible to filter thesis proposals based on the content of a text field f
     ]
     ```
 
+#### 6. **Update archivation of proposal **: `PUT /api/updateThesesArchivation`
+
+  - **Description**: Updates archivation status of thesis proposal based on new virtualclock time
+  - **Middleware**: 
+  - **Request Body**:
+    - `datetime` (string): The new virtual clock time
+  - **Response**:
+    - String with info on number of updated rows
+    - `500 Internal Server Error` if an unexpected error occurs
+  - **Example**:
+    ```json
+      {   
+          "datetime": "2026-01-21T10:00:26.145Z"
+      }
+    ```
+#### 7. **New external co-supevisors **: `POST /api/updateApplicationStatus`
+
+  - **Description**: Updates status of application
+  - **Middleware**: `isProfessor`
+  - **Request Body**:
+    - `thesis_id` (string): The id of the thesis the application refers to,
+    - `student_id` (string): The id of the student of the application,
+    - `status` (string): The new status of the application ,
+  - **Response**:
+    - Some application information
+    - `400`if data is incorrect
+  - **Example**:
+    ```json
+      {
+        "student_id": "S123456",
+        "thesis_id": 3,
+        "status": "Accepted"
+      }
+    ```
 
 #### OTHER 1 Server
 
@@ -304,6 +378,16 @@ It is possible to filter thesis proposals based on the content of a text field f
     "surname":"testsurname"
     
 }
+```
+#### updateExpiration
+
+- Description: Asks the server to update archivation of proposals based on new virtual clock time
+- API server called: PUT `/api/updateThesesArchivation`
+- Input: datetime string
+- Output: information on update
+
+```
+"Rows matched: 6  Changed: 3  Warnings: 0"
 ```
 
 #### OTHER 2 Client
