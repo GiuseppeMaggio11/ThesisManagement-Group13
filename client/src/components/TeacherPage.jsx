@@ -15,6 +15,9 @@ function TeacherPage(props) {
           <Link to="/newproposal">
             <Button className="button-style">New proposal</Button>
           </Link>
+          <Link to="/applications">
+            <Button className="button-style mx-3">Students applications</Button>
+          </Link>
         </Col>
       </Row>
     </Container>

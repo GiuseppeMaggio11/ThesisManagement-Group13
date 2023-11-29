@@ -97,7 +97,7 @@ async function newThesis (req,res) {
     await dao.commit();
 
     //Return inserted data
-    return res.json(result_thesis);
+    return res.status(200).json(result_thesis);
 
   } catch (err) {
 
@@ -108,5 +108,19 @@ async function newThesis (req,res) {
     return res.status(503).json({ error: ` error: ${err} ` });
   }
 }
+//updates is_archived value of every thesis based on new virtualclock time
+async function updateThesesArchivation(req, res) {
+  try {
+    await dao.beginTransaction();
+    const response_msg = await dao.updateThesesArchivation(req.body.datetime);
+    await dao.commit();
+    res.status(200).json(response_msg);
+    
+  }
+  catch (err) {
+    await dao.rollback();
+    res.status(500).json(err)
+  };
+}
 
-module.exports = {newThesis}
+module.exports = {newThesis,updateThesesArchivation}

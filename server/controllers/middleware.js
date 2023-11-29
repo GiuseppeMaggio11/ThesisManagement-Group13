@@ -1,16 +1,16 @@
 const isLoggedIn = (req, res, next) => {
-    if (req.isAuthenticated()) return next();
-    return res.status(401).json({ error: "Not authenticated" });
-  };
-  
+  if (req.isAuthenticated()) return next();
+  return res.status(401).json({ error: "Not authenticated" });
+};
+
 const isProfessor = (req, res, next) => {
-    if (req.isAuthenticated() && req.user.user_type === "PROF") return next();
-    return res.status(401).json({ error: "Not professor" });
-  };
+  if (req.isAuthenticated() && req.user.user_type === "PROF") return next();
+  return res.status(401).json({ error: "Not professor" });
+};
 
 const isStudent = (req, res, next) => {
-    if (req.isAuthenticated() && req.user.user_type === "STUD") return next();
-    return res.status(401).json({ error: "Not student" });
-  };
+  if (req.isAuthenticated() && req.user.user_type === "STUD") return next();
+  return res.status(401).json({ error: "Not student" });
+};
 
-module.exports = {isLoggedIn, isProfessor, isStudent};
+module.exports = { isLoggedIn, isProfessor, isStudent };

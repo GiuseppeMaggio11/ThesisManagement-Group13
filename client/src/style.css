@@ -47,8 +47,8 @@
 .chip {
   display: inline-block;
   white-space: 'nowrap';
-  background: #555;
-  color: white;
+  background: #ebebeb;
+  color: black;
   padding: 3px 5px 3px 10px;
   border-radius: 15px;
   margin: 2px;
@@ -56,11 +56,11 @@
 }
 
 .chip a {
-  color: white;
+  color: black;
   text-decoration: none;
   margin: 5px;
   font-size: 13px;
-  background: #333;
+  background: #ebebeb;
   width: 15px;
   height: 15px;
   border-radius: 50%;
@@ -172,16 +172,18 @@ table.table-rounded thead tr {
   border-color: #e19861;
   margin-right: 0.5em;
 }
+
 .button-style-trash {
   background-color: transparent;
   border-color: transparent;
-  color:#e19861;
+  color: #e19861;
   margin-left: 0.2em;
 }
+
 .button-style-trash:hover {
   background-color: transparent;
   border-color: transparent;
-  color:#e19861;
+  color: #e19861;
   margin-left: 0.2em;
 
 }
@@ -219,21 +221,21 @@ table.table-rounded thead tr {
   border-color: #4682B4;
 }
 
-.accordion-button {
+.accordion-button-custom {
   padding: 0 !important;
   vertical-align: middle;
   font-weight: 680;
 }
 
-.accordion-item {
+.accordion-item-custom {
   border: none;
 }
 
-.accordion-td {
+.accordion-td-custom {
   vertical-align: middle;
 }
 
-.accordion-body {
+.accordion-body-custom {
   vertical-align: middle;
 }
 
@@ -241,12 +243,12 @@ table.table-rounded thead tr {
   font-weight: 680;
 }
 
-.accordion-button:hover .accordion-button:focus {
+.accordion-button-custom:hover .accordion-button-custom:focus {
   box-shadow: white !important;
   border-color: white !important;
 }
 
-.accordion-button:not(.collapsed) {
+.accordion-button-custom:not(.collapsed) {
   background-color: white !important;
   border-color: white !important;
   box-shadow: none !important;
@@ -294,11 +296,12 @@ table.table-rounded thead tr {
   cursor: pointer;
 }
 
-.text-wrong{
+.text-wrong {
   color: black;
   font-weight: 500;
 }
-.text-wrong-underlined{
+
+.text-wrong-underlined {
   color: rgb(0, 0, 0);
   font-weight: 500;
   text-decoration: underline;
@@ -308,7 +311,8 @@ table.table-rounded thead tr {
 }
 
 .smaller-heading {
-  font-size: 24px; /* Adjust the size as needed for mobile devices */
+  font-size: 24px;
+  /* Adjust the size as needed for mobile devices */
 }
 
 .drop-area:hover {
@@ -329,6 +333,7 @@ table.table-rounded thead tr {
 .margin-buttons-custom {
   margin-left: 1rem;
 }
+
 .clear-btn {
   background: none;
   border: none;
@@ -351,21 +356,23 @@ table.table-rounded thead tr {
   font-size: 18px;
   color: #999;
 }
-.search-button{
+
+.search-button {
   margin-left: 1em;
   font-size: larger;
   color: black;
 }
 
 .custom-input {
-  transition: box-shadow 0.3s ease; 
-  outline: none; 
+  transition: box-shadow 0.3s ease;
+  outline: none;
   box-shadow: none;
 
   &:focus {
     box-shadow: 0 0 0px 0.5px #4682B4;
   }
 }
+
 
 .form-check-input {
   border-color:black
@@ -459,6 +466,7 @@ input:checked + .slider::before {
   }
 }
 
+
 @media (min-width: 765px) {
   .title-mediumScreen {
     margin-left: 2em;
@@ -466,4 +474,10 @@ input:checked + .slider::before {
     border: 1px solid rgb(254, 252, 252);
     /* Add a border for testing */
   }
+}
+
+
+.custom-accordion-item {
+
+  border-bottom: 1px solid #b3b9c2c6;
 }
