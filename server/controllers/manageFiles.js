@@ -1,5 +1,52 @@
 const dao = require("../dao");
+const multer = require("multer");
+const fs = require("fs");
+const zipdir = require("zip-dir");
+
 const {validationResult} = require("express-validator");
+
+const storage = multer.diskStorage({
+  destination: async (req, file, cb) => {
+    try {
+      const userID = await dao.getUserID(req.user.username);
+      const thesis_id = req.params.thesis_id;
+      const userFolderPath = `studentFiles/${userID}/${thesis_id}`;
+
+      // Create directories recursively if they don't exist
+      fs.mkdirSync(userFolderPath, { recursive: true });
+
+      cb(null, userFolderPath);
+    } catch (error) {
+      cb(error);
+    }
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = file.originalname;
+    let filename;
+
+    if (uniqueSuffix.endsWith(".pdf")) {
+      filename = uniqueSuffix;
+    } else {
+      filename = uniqueSuffix + ".pdf";
+    }
+
+    filename = filename.replace(/\s/g, "_");
+    cb(null, filename);
+  },
+});
+
+const upload = multer({
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    const filetypes = /pdf/;
+    const mimetype = filetypes.test(file.mimetype);
+    if (mimetype) {
+      return cb(null, true);
+    } else {
+      cb("Error: Solo file PDF sono ammessi!");
+    }
+  },
+});
 
 async function addFiles (req,res){
     const thesis_id = req.params.thesis_id;
