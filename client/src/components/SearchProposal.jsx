@@ -11,15 +11,10 @@ import {
   Spinner,
   Table,
 } from "react-bootstrap";
-
 import { useState, useEffect, useContext } from "react";
-
 import MessageContext from '../messageCtx'
 import { Dice1, Funnel, FunnelFill, Search } from "react-bootstrap-icons";
 import dayjs from "dayjs";
-import { HoverIconButton } from "./HoverIconButton";
-import { Search } from "react-bootstrap-icons";
-import Loading from "./Loading";
 
 import API from "../API";
 
@@ -49,11 +44,10 @@ function SearchProposalRoute(props) {
     []
   );
 
-
   return (
     <>
       {props.loading ? (
-        <Loading />
+        <Spinner className="m-2" animation="border" role="status" />
       ) : (
         <SearchProposalComponent
           thesisProposals={thesisProposals}
@@ -92,7 +86,6 @@ function SearchProposalComponent(props) {
     setFilteredThesisProposals([...props.thesisProposals]);
   }, [props.thesisProposals]);
 
-
   const handleCancel = () => {
     setFilter("");
     setFilteredThesisProposals([...props.thesisProposals]);
@@ -101,12 +94,6 @@ function SearchProposalComponent(props) {
     const f = !showFilters
     setShowFilters(f)
   }
-
-  const handleSubmit = (event) => {
-    if (event) {
-      event.preventDefault();
-    }
-
 
   const handleFilterTitle = (event) => {
     const value = event.target.value;
@@ -134,7 +121,6 @@ function SearchProposalComponent(props) {
     <>
       <div className="d-flex justify-content-center">
         <Container className="width-80 margin-custom">
-
           <Row className="d-flex align-items-center">
             <Col xs={4} className="d-flex justify-content-between align-items-center">
               <h1 className={`margin-titles-custom ${props.isMobile ? 'smaller-heading' : ''}`}>
@@ -230,7 +216,6 @@ function SearchProposalComponent(props) {
             </Container>
           }
 
-
           {!props.isMobile ? (
             <Row>
               <Col>
@@ -246,7 +231,6 @@ function SearchProposalComponent(props) {
                       </tr>
                     </thead>
                     <tbody>
-
                       {filteredByTitle.length <= 0 && filter === '' && [...filteredThesisProposals].map((element) => (
                         <ProposalTableRow key={element.id} proposal={element} />
                       ))}
@@ -255,12 +239,10 @@ function SearchProposalComponent(props) {
                         <ProposalTableRow key={element.id} proposal={element} />
                       ))}
 
-
                     </tbody>
                   </Table>
                 )}
               </Col>
-
             </Row>) : (
             <Row>
               <Accordion>
@@ -272,16 +254,12 @@ function SearchProposalComponent(props) {
                   <ProposalAccordion key={element.id} proposal={element} />
                 ))}
               
-
               </Accordion>
             </Row>
           )}
         </Container>
-
-      </div>
-    </>
-  );
-
+      </div >
+    </>)
 }
 
 function ProposalAccordion(props) {
@@ -289,12 +267,7 @@ function ProposalAccordion(props) {
     <Accordion.Item eventKey={props.proposal.id.toString()}>
       <Accordion.Header>
         <span className="my-3">
-
-          <Link
-            style={{ color: "#4682B4", fontSize: 18 }}
-            to={`/proposals/${props.proposal.id}`}
-            state={{ from: "thesis" }}
-          >
+          <Link style={{ color: '#4682B4', fontSize: 18 }} to={`/proposals/${props.proposal.id}`}>
             {props.proposal.title}
           </Link>
         </span>
@@ -315,26 +288,16 @@ function ProposalAccordion(props) {
 
 
 function ProposalTableRow(props) {
-  const navigation = useNavigate();
+  const navigation = useNavigate()
   return (
     <tr onClick={() => navigation(`/proposals/${props.proposal.id}`)}>
       <td>
-
-        <Link
-          style={{ color: "#4682B4", fontSize: 18 }}
-          to={`/proposals/${props.proposal.id}`}
-          state={{ from: "thesis" }}
-        >
-
+        <Link style={{ color: '#4682B4', fontSize: 18 }} to={`/proposals/${props.proposal.id}`}>
           {props.proposal.title}
         </Link>
       </td>
       <td style={{ fontSize: 18 }}>{props.proposal.supervisor}</td>
-
-      <td style={{ fontSize: 18 }}>
-        {dayjs(props.proposal.expiration).format("YYYY-MM-DD")}
-      </td>
-
+      <td style={{ fontSize: 18 }}>{dayjs(props.proposal.expiration).format("YYYY-MM-DD")}</td>
     </tr>
   );
 }

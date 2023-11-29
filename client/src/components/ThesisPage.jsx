@@ -39,34 +39,6 @@ function ThesisPage(props) {
     return `${year}-${month}-${day}`;
   }
 
-  useEffect(() => {
-    const init = async () => {
-      try {
-        props.setLoading(true);
-        const thesisData = await API.getThesisProposalsById(params.id);
-        //GESTIRE PROBLEMI
-        setPageData({
-          title: thesisData.title,
-          description: thesisData.description,
-          supervisor: `${thesisData.name} ${thesisData.surname}`,
-          coSupervisor: thesisData.cosupervisors,
-          keywords: thesisData.keywords.length !== 0 && thesisData.keywords,
-          type: thesisData.thesis_type,
-          groups: thesisData.group_name.map((element) => {
-            return element.group;
-          }),
-          requiredKnowledge: thesisData.required_knowledge,
-          ...(thesisData.notes !== "None" && { notes: thesisData.notes }),
-          expiration: formatDate(new Date(thesisData.expiration)),
-          level: thesisData.thesis_level,
-        });
-        setIsLoading(false);
-      } catch (error) {
-        handleToast(error, "center", "error");
-      }
-
-      
-
     useEffect(()=>{
         const init = async() => {
             try{
@@ -99,22 +71,6 @@ function ThesisPage(props) {
     const handleApplication = () => {
         submitApplication(params.id, props.virtualClock);
         handleUpload(params.id);
-    }
-
-    const handleUpload = (thesis_id) => {
-        const formData = new FormData();
-       /*  for (let i = 0; i < selectedFiles.length; i++) {
-            formData.append(`file`, selectedFiles[i]);
-        } */
-
-        selectedFiles.forEach(file=>{
-            formData.append(`file`, file);
-        })
-
-        console.log(formData)
-        API.sendFiles(formData, thesis_id).then(
-            () => { navigate("/proposal")}
-        ).catch((err) => { handleToast(err, 'error' ) });
     }
 
 
@@ -326,4 +282,4 @@ function ThesisPage(props) {
   );
 }
 
-export default ThesisPage;
+export default ThesisPage

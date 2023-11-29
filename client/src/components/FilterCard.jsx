@@ -94,7 +94,7 @@ const SearchDropdown = ({ placeholder, position, items, setItems, selectedItems,
         <div className="mt-0 p-2" style={{ marginBottom: '0.5em' }}>
             <Row>
                 <Col xs={4} className={`d-flex align-items-center justify-content-start`}>
-                    <p style={{margin: '0px'}}>{placeholder}: </p>
+                    <p style={{ margin: '0px' }}>{placeholder}: </p>
                 </Col>
                 <Col xs={8} className="position-relative">
                     <div className="input-group">
@@ -182,7 +182,7 @@ const FilterCard = ({
     selectedTitlesWords,
     setSelectedTitlesWords,
     setAdvancedFilters,
-    setShowFilters}) => {
+    setShowFilters }) => {
 
     const { handleToast } = useContext(MessageContext)
     const [reset, setReset] = useState(true)
@@ -191,7 +191,7 @@ const FilterCard = ({
     const [titleFilter, setTitleFilters] = useState("")
     const [supervisors, setSupervisors] = useState(null)
     const [keywords, setKeywords] = useState([])
-    const [internalCosupervisor, setInternalCosupervisor] = useState(null)   
+    const [internalCosupervisor, setInternalCosupervisor] = useState(null)
     const [externalCosupervisor, setExternalCosupervisor] = useState(null)
     const [groups, setGroups] = useState([])
     const [type, setType] = useState([])
@@ -210,13 +210,13 @@ const FilterCard = ({
 
                     thesisList.forEach(item => {
 
-                        if(item.type){
+                        if (item.type) {
 
                             const typeExist = type_theses.some(t =>
                                 t === item.type
                             );
-                            if(!typeExist)
-                                 type_theses.push(item.type)
+                            if (!typeExist)
+                                type_theses.push(item.type)
                         }
 
                         if (item.keywords.length > 0) {
@@ -253,7 +253,7 @@ const FilterCard = ({
                             })
                         }
                     })
-    
+
                     setExternalCosupervisor(external_cosupervisors);
                     setInternalCosupervisor(internal_cosupervisors);
                     setType(type_theses)
@@ -299,7 +299,7 @@ const FilterCard = ({
                 return selectedTitlesWords.some(word => titleLowerCase.includes(word.toLowerCase()));
             });
         }
-        
+
         if (selectedSupervisor?.length > 0) {
             filtered = filtered.filter(thesis =>
                 selectedSupervisor.includes(thesis.supervisor)
@@ -354,10 +354,10 @@ const FilterCard = ({
 
     const addWord = () => {
         let words = []
-        if(selectedTitlesWords?.length>0)
+        if (selectedTitlesWords?.length > 0)
             words = [...selectedTitlesWords]
-        let wordExists = words.some(w=> w===titleFilter)
-        if(!wordExists)
+        let wordExists = words.some(w => w === titleFilter)
+        if (!wordExists)
             words.push(titleFilter)
         setTitleFilters("")
         setSelectedTitlesWords(words)
@@ -366,15 +366,15 @@ const FilterCard = ({
     return (
         <Card className="container mt-6 custom-rounded" style={{ marginBottom: '0.5em' }}>
             <Form>
-                <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gridGap: '10px'}}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gridGap: '10px' }}>
 
 
 
-                    <div className="mt-0 p-2" style={{ display: 'flex', flexDirection: 'column', marginBottom: '0.5em'}}>
-                        <div style={{width: '100%'}}>
+                    <div className="mt-0 p-2" style={{ display: 'flex', flexDirection: 'column', marginBottom: '0.5em' }}>
+                        <div style={{ width: '100%' }}>
                             <Form.Group>
                                 <Form.Label className="chip-list"
-                                    style={{ maxWidth: '100%', width:'100%',overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
+                                    style={{ maxWidth: '100%', width: '100%', overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
                                     ref={(labelRef) => {
                                         if (labelRef) {
                                             labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
@@ -391,34 +391,34 @@ const FilterCard = ({
                                 </Form.Label>
                             </Form.Group>
                         </div>
-                        <div style={{display: 'flex', flexWrap: 'wrap', alignItems: 'center'}}>
-                            <Col xs={4} className="d-flex align-items-center justify-content-start"> <p style={{margin: '0px'}}>Title: </p></Col>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
+                            <Col xs={4} className="d-flex align-items-center justify-content-start"> <p style={{ margin: '0px' }}>Title: </p></Col>
                             <Col xs={8} className="d-flex">
-                                <Form.Group style={{width:'100%' }}>
+                                <Form.Group style={{ width: '100%' }}>
                                     <Form.Control
                                         type="text"
                                         placeholder="insert a text and press enter"
                                         value={titleFilter}
-                                        onChange={(e)=>{setTitleFilters(e.target.value)}}
+                                        onChange={(e) => { setTitleFilters(e.target.value) }}
                                         className="custom-input"
-                                        onKeyDown={(e)=>{
-                                            if(e.key === 'Enter'){
-                                            e.preventDefault();
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();
                                                 addWord()
                                             }
                                         }}
-                                    />                                
-                                </Form.Group> 
+                                    />
+                                </Form.Group>
                             </Col>
                         </div>
                     </div>
 
 
-                    <div style={{ display: 'flex', flexDirection: 'column'}}>
-                        <div style={{width: '100%'}}>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ width: '100%' }}>
                             <Form.Group>
                                 <Form.Label className="chip-list"
-                                    style={{maxWidth: '100%', width:'100%', overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
+                                    style={{ maxWidth: '100%', width: '100%', overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
                                     ref={(labelRef) => {
                                         if (labelRef) {
                                             labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
@@ -439,13 +439,13 @@ const FilterCard = ({
                     </div>
 
 
-                    <div style={{ display: 'flex', flexDirection: 'column'}}>
-                        <div style={{width: '100%'}}>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ width: '100%' }}>
                             <Form.Group>
                                 <Row className="align-items-center">
                                     <Col>
                                         <Form.Label className="chip-list"
-                                            style={{maxWidth: '100%', width:'100%', overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
+                                            style={{ maxWidth: '100%', width: '100%', overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
                                             ref={(labelRef) => {
                                                 if (labelRef) {
                                                     labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
@@ -468,13 +468,13 @@ const FilterCard = ({
                     </div>
 
 
-                    <div style={{ display: 'flex', flexDirection: 'column'}}>
-                        <div style={{width: '100%'}}>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ width: '100%' }}>
                             <Form.Group>
                                 <Row className="align-items-center">
                                     <Col>
                                         <Form.Label className="chip-list"
-                                            style={{maxWidth: '100%', width:'100%', overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
+                                            style={{ maxWidth: '100%', width: '100%', overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
                                             ref={(labelRef) => {
                                                 if (labelRef) {
                                                     labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
@@ -497,13 +497,13 @@ const FilterCard = ({
                     </div>
 
 
-                    <div style={{ display: 'flex', flexDirection: 'column'}}>
-                        <div style={{width: '100'}}>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ width: '100' }}>
                             <Form.Group>
                                 <Row className="align-items-center">
                                     <Col>
                                         <Form.Label className="chip-list"
-                                            style={{maxWidth: '100%', width:'100%', overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
+                                            style={{ maxWidth: '100%', width: '100%', overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
                                             ref={(labelRef) => {
                                                 if (labelRef) {
                                                     labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
@@ -525,14 +525,14 @@ const FilterCard = ({
                         <SearchDropdown placeholder={'External cosupervisor'} position={'start'} items={externalCosupervisor} setItems={setExternalCosupervisor} selectedItems={selectedExternalCosupervisor} setSelectedItems={setSelectedExternalCosupervisor} />
                     </div>
 
-                    
-                    <div style={{ display: 'flex', flexDirection: 'column'}}>
-                        <div style={{width: '100%'}}>
+
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ width: '100%' }}>
                             <Form.Group>
                                 <Row className="align-items-center">
                                     <Col>
                                         <Form.Label className="chip-list"
-                                            style={{maxWidth: '100%', width:'100%', overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
+                                            style={{ maxWidth: '100%', width: '100%', overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
                                             ref={(labelRef) => {
                                                 if (labelRef) {
                                                     labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
@@ -555,13 +555,13 @@ const FilterCard = ({
                     </div>
 
 
-                    <div style={{ display: 'flex', flexDirection: 'column'}}>
-                        <div style={{width: '100%'}}>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ width: '100%' }}>
                             <Form.Group>
                                 <Row className="align-items-center">
                                     <Col>
                                         <Form.Label className="chip-list"
-                                            style={{maxWidth: '100%', width:'100%', overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
+                                            style={{ maxWidth: '100%', width: '100%', overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
                                             ref={(labelRef) => {
                                                 if (labelRef) {
                                                     labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
@@ -584,13 +584,13 @@ const FilterCard = ({
                     </div>
 
 
-                    <div className="mt-0 p-2" style={{ display: 'flex', flexDirection: 'column' , marginBottom: '0.5em'}}>
-                        <div style={{width:'100%', display: 'flex', flexWrap: 'wrap', alignItems: 'center'}}>
+                    <div className="mt-0 p-2" style={{ display: 'flex', flexDirection: 'column', marginBottom: '0.5em' }}>
+                        <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', alignItems: 'center', marginTop: '1.3em', }}>
                             <Col xs={4} className="d-flex align-items-center justify-content-start">
-                                <p style={{margin: '0px'}}>Valid untill: </p>
+                                <p style={{ margin: '0px' }}>Valid until:</p>
                             </Col>
                             <Col xs={8} className="d-flex">
-                                <Form.Group style={{ width:'100%',paddingInline: "0.5em" }}>
+                                <Form.Group style={{ width: '100%', paddingInline: "0.5em" }}>
                                     <Form.Control
                                         type="date"
                                         id="expiration"
@@ -601,25 +601,26 @@ const FilterCard = ({
                                             if (selected > virtualClock) {
                                                 setSelectedDate(e.target.value);
                                             } else {
-                                                handleToast('Date must be in the future', 'error')
+                                                handleToast('Date must be in the future', 'error');
                                             }
                                         }}
-
                                     />
                                 </Form.Group>
                             </Col>
                         </div>
                     </div>
+
                 </div>
 
 
 
                 <Row className="d-flex justify-content-end">
-                    <Col xs={2}>
+                    <Col xs={8} className="d-flex justify-content-end">
                         <Button className="button-style-cancel" onClick={handleReset}>Reset</Button>
                         <Button className="button-style" onClick={() => { handleFilter() }}>Search</Button>
                     </Col>
                 </Row>
+
                 <ToastContainer />
 
             </Form>
