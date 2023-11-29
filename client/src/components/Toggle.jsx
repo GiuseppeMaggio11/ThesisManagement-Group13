@@ -6,6 +6,7 @@ function ToggleComponent({ formData, handleChange }) {
   return (
     <Toggle
       id="is_archived"
+      name="is_archived"
       checked={formData.is_archived}
       onChange={handleChange}
     />

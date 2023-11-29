@@ -15,7 +15,6 @@ import NewExternalCoSupervisor from "./NewExternalCosupervisor";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ToggleComponent from "./Toggle";
-import Toggle from "react-toggle";
 import dayjs from "dayjs";
 import MessageContext from "../messageCtx";
 
@@ -73,10 +72,10 @@ function NewProposal(props) {
   }, []);
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { id, name, value, checked } = e.target;
     setFormData({
       ...formData,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: id==="is_archived" ? checked : value,
     });
   };
 
@@ -572,7 +571,7 @@ function NewProposal(props) {
                       </Col>
                       <Col xs="auto" className="d-flex align-items-center">
                         {/* Add d-flex and align-items-center to vertically align the Toggle */}
-                        <Toggle
+                        <ToggleComponent
                           formData={formData}
                           handleChange={handleChange}
                         />
