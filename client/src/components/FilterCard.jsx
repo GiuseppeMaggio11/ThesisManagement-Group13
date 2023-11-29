@@ -93,8 +93,8 @@ const SearchDropdown = ({ placeholder, position, items, setItems, selectedItems,
     return (
         <div className="mt-0 p-2" style={{ marginBottom: '0.5em' }}>
             <Row>
-                <Col xs={4} className={`d-flex  align-items-center${position === 'start' ? " justify-content-start" : " justify-content-end"}`}>
-                    <p>{placeholder}: </p>
+                <Col xs={4} className={`d-flex align-items-center justify-content-start`}>
+                    <p style={{margin: '0px'}}>{placeholder}: </p>
                 </Col>
                 <Col xs={8} className="position-relative">
                     <div className="input-group">
@@ -364,295 +364,260 @@ const FilterCard = ({
     return (
         <Card className="container mt-6 custom-rounded" style={{ marginBottom: '0.5em' }}>
             <Form>
-                {/* Supervisor and Valid until */}
-                <Row>
-                    <Col xs={2} className="d-flex align-items-center justify-content-start">
-                        {/* This column is empty */}
-                    </Col>
-                    <Col xs={4}>
-                        <Form.Group>
-                            <Row className="align-items-center">
-                                <Col>
-                                    <Form.Label className="chip-list"
-                                        style={{ overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
-                                        ref={(labelRef) => {
-                                            if (labelRef) {
-                                                labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
-                                            }
-                                        }}>
-                                        {selectedTitlesWords && selectedTitlesWords.length > 0 && (
-                                            <Chips2
-                                                items={titles}
-                                                selectedItems={selectedTitlesWords}
-                                                setItems={setTitles}
-                                                setSelectedItems={setSelectedTitlesWords}
-                                            />
-                                        )}
-                                    </Form.Label>
-                                </Col>
-                            </Row>
-                        </Form.Group>
-                    </Col>
-                    <Col xs={2} className="d-flex align-items-center justify-content-start">
-                        {/* This column is empty */}
-                    </Col>
-                    
-                    <Col xs={4}>
-                        <Form.Group>
-                            <Row className="align-items-center">
-                                <Col>
-                                    <Form.Label className="chip-list"
-                                        style={{ overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
-                                        ref={(labelRef) => {
-                                            if (labelRef) {
-                                                labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
-                                            }
-                                        }}>
-                                        {selectedSupervisor && selectedSupervisor.length > 0 && (
-                                            <Chips2
-                                                items={supervisors}
-                                                selectedItems={selectedSupervisor}
-                                                setItems={setSupervisors}
-                                                setSelectedItems={setSelectedSupervisor}
-                                            />
-                                        )}
-                                    </Form.Label>
-                                </Col>
-                            </Row>
-                        </Form.Group>
-                    </Col>
-                    </Row>
-                    <Row className="d-flex align-items-center ">
-                    
-                                <Col xs={2} className="d-flex align-items-center justify-content-start"> <p style={{paddingLeft:'0.5em', marginRight:'0.5em'}}>Title: </p></Col>
-                                <Col xs={4} className="d-flex m-0 p-2">
-                                    <Form.Group style={{width:'100%', paddingLeft:'0.5em', paddingRight:'0.7em', paddingBottom:'0.4em' }}>
-                                        <Form.Control
-                                            type="text"
-                                            placeholder="insert a text and press enter"
-                                            value={titleFilter}
-                                            onChange={(e)=>{setTitleFilters(e.target.value)}}
-                                            className="custom-input"
-                                            onKeyDown={(e)=>{
-                                                if(e.key === 'Enter'){
-                                                   e.preventDefault();
-                                                    addWord()
-                                                }
-                                            }}
-                                         />
-                                    
-                                    </Form.Group> 
-                             
-                                </Col>
-                 
-                    <Col xs={6}>
-                        <SearchDropdown placeholder={'Supervisor'} position={'end'} items={supervisors} setItems={setSupervisors} selectedItems={selectedSupervisor} setSelectedItems={setSelectedSupervisor} />
-                    </Col>
-                </Row>
+                <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gridGap: '10px'}}>
 
-                {/* internal cosupervisor and type */}
-                <Row>
-                    <Col xs={2} className="d-flex align-items-center justify-content-start">
-                        {/* This column is empty */}
-                    </Col>
-                    <Col xs={4}>
-                        <Form.Group>
-                            <Row className="align-items-center">
-                                <Col>
-                                    <Form.Label className="chip-list"
-                                        style={{ overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
-                                        ref={(labelRef) => {
-                                            if (labelRef) {
-                                                labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
-                                            }
-                                        }}>
-                                        {selectedinternalCosupervisor && selectedinternalCosupervisor.length > 0 && (
-                                            <Chips2
-                                                items={internalCosupervisor}
-                                                selectedItems={selectedinternalCosupervisor}
-                                                setItems={setInternalCosupervisor}
-                                                setSelectedItems={setSelectedinternalCosupervisor}
-                                            />
-                                        )}
-                                    </Form.Label>
-                                </Col>
-                            </Row>
-                        </Form.Group>
-                    </Col>
-                    <Col xs={2} className="d-flex align-items-center justify-content-start">
-                        {/* This column is empty */}
-                    </Col>
-                    <Col xs={4}>
-                        <Form.Group>
-                            <Row className="align-items-center">
-                                <Col>
-                                    <Form.Label className="chip-list"
-                                        style={{ overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
-                                        ref={(labelRef) => {
-                                            if (labelRef) {
-                                                labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
-                                            }
-                                        }}>
-                                        {selectedType && selectedType.length > 0 && (
-                                            <Chips2
-                                                items={type}
-                                                selectedItems={selectedType}
-                                                setItems={setType}
-                                                setSelectedItems={setSelectedType}
-                                            />
-                                        )}
-                                    </Form.Label>
-                                </Col>
-                            </Row>
-                        </Form.Group>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col xs={6}>
-                        <SearchDropdown placeholder={'Internal cosupervisor'} position={'start'} items={internalCosupervisor} setItems={setInternalCosupervisor} selectedItems={selectedinternalCosupervisor} setSelectedItems={setSelectedinternalCosupervisor} />
-                    </Col>
-                    <Col xs={6}>
-                        <SearchDropdown placeholder={'type'} position={'end'} items={type} setItems={setType} selectedItems={selectedType} setSelectedItems={setSelectedType} />
-                    </Col>
 
-                </Row>
 
-                {/* external cosupervisor and keyword */}
-                <Row>
-                    <Col xs={2} className="d-flex align-items-center justify-content-start">
-                        {/* This column is empty */}
-                    </Col>
-                    <Col xs={4}>
-                        <Form.Group>
-                            <Row className="align-items-center">
-                                <Col>
-                                    <Form.Label className="chip-list"
-                                        style={{ overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
-                                        ref={(labelRef) => {
-                                            if (labelRef) {
-                                                labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
-                                            }
-                                        }}>
-                                        {selectedExternalCosupervisor && selectedExternalCosupervisor.length > 0 && (
-                                            <Chips2
-                                                items={externalCosupervisor}
-                                                selectedItems={selectedExternalCosupervisor}
-                                                setItems={setExternalCosupervisor}
-                                                setSelectedItems={setSelectedExternalCosupervisor}
-                                            />
-                                        )}
-                                    </Form.Label>
-                                </Col>
-                            </Row>
-                        </Form.Group>
-                    </Col>
-                    <Col xs={2} className="d-flex align-items-center justify-content-start">
-                        {/* This column is empty*/}
-                    </Col>
-                    <Col xs={4}>
-                        <Form.Group>
-                            <Row className="align-items-center">
-                                <Col>
-                                    <Form.Label className="chip-list"
-                                        style={{ overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
-                                        ref={(labelRef) => {
-                                            if (labelRef) {
-                                                labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
-                                            }
-                                        }}>
-                                        {selectedKeywords && selectedKeywords.length > 0 && (
-                                            <Chips2
-                                                items={keywords}
-                                                selectedItems={selectedKeywords}
-                                                setItems={setKeywords}
-                                                setSelectedItems={setSelectedKeywords}
-                                            />
-                                        )}
-                                    </Form.Label>
-                                </Col>
-                            </Row>
-                        </Form.Group>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col xs={6}>
-                        <SearchDropdown placeholder={'External cosupervisor'} position={'start'} items={externalCosupervisor} setItems={setExternalCosupervisor} selectedItems={selectedExternalCosupervisor} setSelectedItems={setSelectedExternalCosupervisor} />
-                    </Col>
-
-                    <Col xs={6} className="align-items-center" >
-                        <SearchDropdown placeholder={'Keywords'} position={'end'} items={keywords} setItems={setKeywords} selectedItems={selectedKeywords} setSelectedItems={setSelectedKeywords} />
-                    </Col>
-                </Row>
-
-                {/* groups and buttons */}
-                <Row>
-                    <Col xs={2} className="d-flex align-items-center justify-content-start">
-                        {/* This column is empty */}
-                    </Col>
-                    <Col xs={6}>
-                        <Form.Group>
-                            <Row className="align-items-center">
-                                <Col>
-                                    <Form.Label className="chip-list"
-                                        style={{ overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
-                                        ref={(labelRef) => {
-                                            if (labelRef) {
-                                                labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
-                                            }
-                                        }}>
-                                        {selectedGroups && selectedGroups.length > 0 && (
-                                            <Chips2
-                                                items={groups}
-                                                selectedItems={selectedGroups}
-                                                setItems={setGroups}
-                                                setSelectedItems={setSelectedGroups}
-                                            />
-                                        )}
-                                    </Form.Label>
-                                </Col>
-                            </Row>
-                        </Form.Group>
-                    </Col>
-                    <Col xs={2} className="d-flex align-items-center justify-content-end">
-                        {/* This column is empty */}
-                    </Col>
-                    <Col xs={6}>
-                        <SearchDropdown placeholder={'Groups'} position={'start'} items={groups} setItems={setGroups} selectedItems={selectedGroups} setSelectedItems={setSelectedGroups} />
-                    </Col>
-                    <Col xs={6} className="d-flex justify-content-center">
-
-                        <Col xs={4} className="d-flex px-2 justify-content-end">
-                            <p>Valid untill: </p>
-                        </Col>
-                        <Col xs={8} className="position-relative">
-                            <Form.Group style={{ paddingInline: "0.5em" }}>
-                                <Form.Control
-                                    type="date"
-                                    id="expiration"
-                                    name="expiration"
-                                    value={selectedDate}
-                                    onChange={(e) => {
-                                        const selected = new Date(e.target.value);
-                                        if (selected > virtualClock) {
-                                            setSelectedDate(e.target.value);
-                                        } else {
-                                            handleToast('Date must be in the future', 'error')
+                    <div className="mt-0 p-2" style={{ display: 'flex', flexDirection: 'column', marginBottom: '0.5em'}}>
+                        <div style={{width: '100%'}}>
+                            <Form.Group>
+                                <Form.Label className="chip-list"
+                                    style={{ maxWidth: '100%', width:'100%',overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
+                                    ref={(labelRef) => {
+                                        if (labelRef) {
+                                            labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
                                         }
-                                    }}
-
-                                />
+                                    }}>
+                                    {selectedTitlesWords && selectedTitlesWords.length > 0 && (
+                                        <Chips2
+                                            items={titles}
+                                            selectedItems={selectedTitlesWords}
+                                            setItems={setTitles}
+                                            setSelectedItems={setSelectedTitlesWords}
+                                        />
+                                    )}
+                                </Form.Label>
                             </Form.Group>
-                        </Col>
+                        </div>
+                        <div style={{display: 'flex', flexWrap: 'wrap', alignItems: 'center'}}>
+                            <Col xs={4} className="d-flex align-items-center justify-content-start"> <p style={{margin: '0px'}}>Title: </p></Col>
+                            <Col xs={8} className="d-flex">
+                                <Form.Group style={{width:'100%' }}>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="insert a text and press enter"
+                                        value={titleFilter}
+                                        onChange={(e)=>{setTitleFilters(e.target.value)}}
+                                        className="custom-input"
+                                        onKeyDown={(e)=>{
+                                            if(e.key === 'Enter'){
+                                            e.preventDefault();
+                                                addWord()
+                                            }
+                                        }}
+                                    />                                
+                                </Form.Group> 
+                            </Col>
+                        </div>
+                    </div>
 
+
+                    <div style={{ display: 'flex', flexDirection: 'column'}}>
+                        <div style={{width: '100%'}}>
+                            <Form.Group>
+                                <Form.Label className="chip-list"
+                                    style={{maxWidth: '100%', width:'100%', overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
+                                    ref={(labelRef) => {
+                                        if (labelRef) {
+                                            labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
+                                        }
+                                    }}>
+                                    {selectedSupervisor && selectedSupervisor.length > 0 && (
+                                        <Chips2
+                                            items={supervisors}
+                                            selectedItems={selectedSupervisor}
+                                            setItems={setSupervisors}
+                                            setSelectedItems={setSelectedSupervisor}
+                                        />
+                                    )}
+                                </Form.Label>
+                            </Form.Group>
+                        </div>
+                        <SearchDropdown placeholder={'Supervisor'} position={'end'} items={supervisors} setItems={setSupervisors} selectedItems={selectedSupervisor} setSelectedItems={setSelectedSupervisor} />
+                    </div>
+
+
+                    <div style={{ display: 'flex', flexDirection: 'column'}}>
+                        <div style={{width: '100%'}}>
+                            <Form.Group>
+                                <Row className="align-items-center">
+                                    <Col>
+                                        <Form.Label className="chip-list"
+                                            style={{maxWidth: '100%', width:'100%', overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
+                                            ref={(labelRef) => {
+                                                if (labelRef) {
+                                                    labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
+                                                }
+                                            }}>
+                                            {selectedinternalCosupervisor && selectedinternalCosupervisor.length > 0 && (
+                                                <Chips2
+                                                    items={internalCosupervisor}
+                                                    selectedItems={selectedinternalCosupervisor}
+                                                    setItems={setInternalCosupervisor}
+                                                    setSelectedItems={setSelectedinternalCosupervisor}
+                                                />
+                                            )}
+                                        </Form.Label>
+                                    </Col>
+                                </Row>
+                            </Form.Group>
+                        </div>
+                        <SearchDropdown placeholder={'Internal cosupervisor'} position={'start'} items={internalCosupervisor} setItems={setInternalCosupervisor} selectedItems={selectedinternalCosupervisor} setSelectedItems={setSelectedinternalCosupervisor} />
+                    </div>
+
+
+                    <div style={{ display: 'flex', flexDirection: 'column'}}>
+                        <div style={{width: '100%'}}>
+                            <Form.Group>
+                                <Row className="align-items-center">
+                                    <Col>
+                                        <Form.Label className="chip-list"
+                                            style={{maxWidth: '100%', width:'100%', overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
+                                            ref={(labelRef) => {
+                                                if (labelRef) {
+                                                    labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
+                                                }
+                                            }}>
+                                            {selectedType && selectedType.length > 0 && (
+                                                <Chips2
+                                                    items={type}
+                                                    selectedItems={selectedType}
+                                                    setItems={setType}
+                                                    setSelectedItems={setSelectedType}
+                                                />
+                                            )}
+                                        </Form.Label>
+                                    </Col>
+                                </Row>
+                            </Form.Group>
+                        </div>
+                        <SearchDropdown placeholder={'type'} position={'end'} items={type} setItems={setType} selectedItems={selectedType} setSelectedItems={setSelectedType} />
+                    </div>
+
+
+                    <div style={{ display: 'flex', flexDirection: 'column'}}>
+                        <div style={{width: '100'}}>
+                            <Form.Group>
+                                <Row className="align-items-center">
+                                    <Col>
+                                        <Form.Label className="chip-list"
+                                            style={{maxWidth: '100%', width:'100%', overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
+                                            ref={(labelRef) => {
+                                                if (labelRef) {
+                                                    labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
+                                                }
+                                            }}>
+                                            {selectedExternalCosupervisor && selectedExternalCosupervisor.length > 0 && (
+                                                <Chips2
+                                                    items={externalCosupervisor}
+                                                    selectedItems={selectedExternalCosupervisor}
+                                                    setItems={setExternalCosupervisor}
+                                                    setSelectedItems={setSelectedExternalCosupervisor}
+                                                />
+                                            )}
+                                        </Form.Label>
+                                    </Col>
+                                </Row>
+                            </Form.Group>
+                        </div>
+                        <SearchDropdown placeholder={'External cosupervisor'} position={'start'} items={externalCosupervisor} setItems={setExternalCosupervisor} selectedItems={selectedExternalCosupervisor} setSelectedItems={setSelectedExternalCosupervisor} />
+                    </div>
+
+                    
+                    <div style={{ display: 'flex', flexDirection: 'column'}}>
+                        <div style={{width: '100%'}}>
+                            <Form.Group>
+                                <Row className="align-items-center">
+                                    <Col>
+                                        <Form.Label className="chip-list"
+                                            style={{maxWidth: '100%', width:'100%', overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
+                                            ref={(labelRef) => {
+                                                if (labelRef) {
+                                                    labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
+                                                }
+                                            }}>
+                                            {selectedKeywords && selectedKeywords.length > 0 && (
+                                                <Chips2
+                                                    items={keywords}
+                                                    selectedItems={selectedKeywords}
+                                                    setItems={setKeywords}
+                                                    setSelectedItems={setSelectedKeywords}
+                                                />
+                                            )}
+                                        </Form.Label>
+                                    </Col>
+                                </Row>
+                            </Form.Group>
+                        </div>
+                        <SearchDropdown placeholder={'Keywords'} position={'end'} items={keywords} setItems={setKeywords} selectedItems={selectedKeywords} setSelectedItems={setSelectedKeywords} />
+                    </div>
+
+
+                    <div style={{ display: 'flex', flexDirection: 'column'}}>
+                        <div style={{width: '100%'}}>
+                            <Form.Group>
+                                <Row className="align-items-center">
+                                    <Col>
+                                        <Form.Label className="chip-list"
+                                            style={{maxWidth: '100%', width:'100%', overflowX: 'auto', whiteSpace: 'nowrap', scrollBehavior: 'smooth', }}
+                                            ref={(labelRef) => {
+                                                if (labelRef) {
+                                                    labelRef.scrollLeft = labelRef.scrollWidth - labelRef.clientWidth;
+                                                }
+                                            }}>
+                                            {selectedGroups && selectedGroups.length > 0 && (
+                                                <Chips2
+                                                    items={groups}
+                                                    selectedItems={selectedGroups}
+                                                    setItems={setGroups}
+                                                    setSelectedItems={setSelectedGroups}
+                                                />
+                                            )}
+                                        </Form.Label>
+                                    </Col>
+                                </Row>
+                            </Form.Group>
+                        </div>
+                        <SearchDropdown placeholder={'Groups'} position={'start'} items={groups} setItems={setGroups} selectedItems={selectedGroups} setSelectedItems={setSelectedGroups} />
+                    </div>
+
+
+                    <div className="mt-0 p-2" style={{ display: 'flex', flexDirection: 'column' , marginBottom: '0.5em'}}>
+                        <div style={{width:'100%', display: 'flex', flexWrap: 'wrap', alignItems: 'center'}}>
+                            <Col xs={4} className="d-flex align-items-center justify-content-start">
+                                <p style={{margin: '0px'}}>Valid untill: </p>
+                            </Col>
+                            <Col xs={8} className="d-flex">
+                                <Form.Group style={{ width:'100%',paddingInline: "0.5em" }}>
+                                    <Form.Control
+                                        type="date"
+                                        id="expiration"
+                                        name="expiration"
+                                        value={selectedDate}
+                                        onChange={(e) => {
+                                            const selected = new Date(e.target.value);
+                                            if (selected > virtualClock) {
+                                                setSelectedDate(e.target.value);
+                                            } else {
+                                                handleToast('Date must be in the future', 'error')
+                                            }
+                                        }}
+
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <Row className="d-flex justify-content-end">
+                    <Col xs={2}>
+                        <Button className="button-style-cancel" onClick={handleReset}>Reset</Button>
+                        <Button className="button-style" onClick={() => { handleFilter() }}>Search</Button>
                     </Col>
-                    <Row className="d-flex justify-content-end">
-                        <Col xs={2}>
-                            <Button className="button-style-cancel" onClick={handleReset}>Reset</Button>
-                            <Button className="button-style" onClick={() => { handleFilter() }}>Search</Button>
-                        </Col>
-                    </Row>
                 </Row>
-
                 <ToastContainer />
 
             </Form>
