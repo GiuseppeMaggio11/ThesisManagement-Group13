@@ -52,16 +52,7 @@ It is possible to filter thesis proposals based on the content of a text field f
 
 ### How to run the application via Docker Compose **as a developper** ?
 
-First, create at the root of the project a new file called `.env` with this content (replace `your-root-password` by your actual sql root password)
-
-```
-MYSQL_PASSWORD = "your-root-password"
-SERVER_PORT = 3001
-CLIENT_PORT = 5173
-DB_PORT = 3306
-```
-
-Then, modify in the server/dao.js file the dbConfig host from "127.0.0.1" to "database" : 
+First, modify in the server/dao.js file the dbConfig host from "127.0.0.1" to "database" : 
 
 ```
   host: "database",
@@ -76,6 +67,25 @@ docker compose up -d --build
 Your app is accessible on this URL `http://localhost:5173/` !
 
 ### How to run the application via Docker Compose as a regular user ?
+
+First, download the docker-compose.yml of our project. 
+
+Then, open a terminal in the same directory and run this command : 
+
+```
+docker compose up -d --build
+```
+
+
+Once you see that the 3 containers started, you can access the app via this URL `http://localhost:5173/` on your browser !
+
+### How to stop the application ?
+
+Run in the same terminal the following command : 
+
+```
+docker compose down
+```
 
 ## API Server
 
