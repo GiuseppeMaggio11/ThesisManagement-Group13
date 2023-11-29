@@ -124,6 +124,7 @@ async function getThesisProposals(date) {
   });
   const proposals = await response.json();
   if (response.ok) {
+    console.log(proposals)
     return proposals.map((element) => ({
       id: element.id,
       title: element.title,
@@ -137,7 +138,7 @@ async function getThesisProposals(date) {
       keywords: element.keywords,
       groups: element.group_name,
       department: element.department_name,
-      cosupervisors: element.cosupervisor,
+      cosupervisors: element.cosupervisors,
     }));
   } else {
     throw proposals;
