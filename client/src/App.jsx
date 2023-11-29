@@ -3,13 +3,14 @@ import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
 import ErrorAlert from "./components/ErrorAlert";
 import HomePage from "./components/HomePage";
+import { ToastContainer } from 'react-toastify';
 
 import LoginForm from "./components/LoginForm";
 import TeacherPage from "./components/TeacherPage";
 import NewProposal from "./components/NewProposal";
 
 import ThesisPage from "./components/ThesisPage";
-
+import { toast } from 'react-toastify';
 import "./style.css";
 import { Button, Container } from "react-bootstrap";
 import Header from "./components/Header";
@@ -30,8 +31,8 @@ function App() {
       ? new Date(JSON.parse(localStorage.getItem("virtualclock")))
       : new Date()
   );
-  const [message, setMessage] = useState("");
-  const [type, setType] = useState("");
+  //const [message, setMessage] = useState("");
+  //const [type, setType] = useState("");
   const [error, setError] = useState("");
   // If an error occurs, the error message will be shown in a toast.
   const handleToast = (err, type) => {
@@ -40,9 +41,34 @@ function App() {
     if (err.error) msg = err.error;
     else if (typeof err === "string") msg = String(err);
     else msg = "Unknown Error";
-    if (type === "success") setType(type);
+    /* if (type === "success") setType(type);
     else setType("error");
-    setMessage(msg);
+    setMessage(msg); */
+
+    if (type === 'success') {
+      toast.success(msg, {
+        //position: toast.POSITION.RIGHT,
+        position: "top-right",
+        autoClose: 5000, // Adjust as needed
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+       
+      });
+    } else if (type === 'error'){
+      toast.error(msg, {
+        position: toast.POSITION.TOP_CENTER,
+        autoClose: 5000, // Adjust as needed
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        
+      });
+    }
   };
 
   useEffect(() => {
@@ -76,17 +102,10 @@ function App() {
 
   return (
     <BrowserRouter>
-      <MessageContext.Provider value={{ handleToast }}>
-        <Toasts
-          message={message}
-          type={type}
-          onClose={() => {
-            setMessage("");
-            setType("");
-          }}
-        />
+      <MessageContext.Provider value={{ handleToast }}>        
         <div className="wrapper">
           <Header user={user} logout={logOut} />
+          <ToastContainer/>
           <Routes>
             <Route
               path="/"
@@ -98,23 +117,6 @@ function App() {
                 />
               }
             />
-            {/* <Route
-              path="/login"
-              element={
-                loggedIn && user.user_type === "PROF" ? (
-                  <Navigate replace to="/teacher" />
-                ) : loggedIn && user.user_type === "STUD" ? (
-                  <Navigate replace to='/proposal'/>
-                ) : (
-                  <LoginForm
-                    loginSuccessful={loginSuccessful}
-                    logOut={logOut}
-                    loading={loading}
-                    setLoading={setLoading}
-                  />
-                )
-              }
-            /> */}
             <Route
               path="/virtualclock"
               element={

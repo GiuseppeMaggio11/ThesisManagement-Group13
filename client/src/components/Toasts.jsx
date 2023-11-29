@@ -1,8 +1,10 @@
-import React, { useEffect } from 'react';
+/* import React, { useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { Button, Container, Toast, ToastContainer } from "react-bootstrap";
 import 'react-toastify/dist/ReactToastify.css';
 
-const Toasts = ({ message, type, onClose }) => {
+const Toasts = (props) => {
+  
   useEffect(() => {
     if (type === 'success') {
       toast.success(message, {
@@ -27,9 +29,20 @@ const Toasts = ({ message, type, onClose }) => {
         onClose: onClose
       });
     }
-  }, [message, type]);
-
-  return null;
+  }, [message, type]); */
+ /*  return(
+  <>
+  <ToastContainer className='below-nav' position='top-center'>
+            <Toast  show={message !== '' && type==='error'} onClose={() => {setMessage(''); setType('')}} delay={4000} autohide={true} bg='danger'>
+              <Toast.Body >{message}</Toast.Body>
+            </Toast>
+            <Toast  show={message !== '' && type==='success'} onClose={() => {setMessage(''); setType('')}} delay={4000} autohide={true} bg='success'>
+              <Toast.Body >{message}</Toast.Body>
+            </Toast>
+        </ToastContainer>
+    </>
+  )
 };
 
 export default Toasts;
+ */ 

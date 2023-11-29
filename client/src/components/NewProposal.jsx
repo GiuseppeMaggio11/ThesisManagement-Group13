@@ -17,8 +17,10 @@ import "react-toastify/dist/ReactToastify.css";
 import ToggleComponent from "./Toggle";
 import dayjs from "dayjs";
 import MessageContext from "../messageCtx";
+import { useNavigate } from "react-router-dom";
 
 function NewProposal(props) {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -197,6 +199,7 @@ function NewProposal(props) {
       console.log(newProp);
       const response = await API.newProposal(newProp);
       handleToast("New proposal created successfully", "success");
+      navigate("/teacher")
       console.log(response);
     } catch (error) {
       console.log(error);
