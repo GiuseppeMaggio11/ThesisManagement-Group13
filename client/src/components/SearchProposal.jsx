@@ -8,7 +8,6 @@ import {
   Container,
   Form,
   Row,
-  Spinner,
   Table,
 } from "react-bootstrap";
 import { useState, useEffect, useContext } from "react";
@@ -19,6 +18,7 @@ import dayjs from "dayjs";
 import API from "../API";
 
 import { FilterCard } from "./FilterCard";
+import Loading from "./Loading";
 
 function SearchProposalRoute(props) {
   const [thesisProposals, setThesisProposals] = useState([]);
@@ -43,7 +43,7 @@ function SearchProposalRoute(props) {
   return (
     <>
       {props.loading ? (
-        <Spinner className="m-2" animation="border" role="status" />
+        <Loading />
       ) : (
         <SearchProposalComponent
           thesisProposals={thesisProposals}
