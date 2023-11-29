@@ -48,7 +48,7 @@ function ThesisPage(props) {
       try {
         props.setLoading(true);
         const thesisData = await API.getThesisProposalsById(params.id);
-        console.log(thesisData.cosupervisors);
+        //console.log(thesisData.cosupervisors);
         setPageData({
           title: thesisData.title,
           description: thesisData.description,
@@ -64,7 +64,7 @@ function ThesisPage(props) {
           expiration: formatDate(new Date(thesisData.expiration)),
           level: thesisData.thesis_level,
         });
-        console.log(thesisData);
+        // console.log(thesisData);
         setIsLoading(false);
       } catch (error) {
         handleToast(error, "center", "error");
@@ -100,7 +100,7 @@ function ThesisPage(props) {
   const submitApplication = (idThesis, date) => {
     API.applicationThesis(idThesis, date)
       .then(() => {
-        console.log("tutto ok");
+        // console.log("tutto ok");
       })
       .catch((err) => {
         handleToast(err, "error");

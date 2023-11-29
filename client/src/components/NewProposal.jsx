@@ -20,7 +20,7 @@ import MessageContext from "../messageCtx";
 import { useNavigate } from "react-router-dom";
 
 function NewProposal(props) {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -85,7 +85,7 @@ function NewProposal(props) {
     const { name, value } = event.target;
     const today = props.virtualClock;
     const selectedDate = dayjs(value);
-    console.log(today);
+    //console.log(today);
     if (selectedDate < today) {
       handleToast("Please select a date in the future", "error");
     } else {
@@ -150,7 +150,7 @@ function NewProposal(props) {
       errorMessage = path + ": " + msg;
       if (!id) id = 6;
     } else {
-      console.log(path + errorMessage);
+      //console.log(path + errorMessage);
       errorMessage = `${path ? path + ":" : ""} ${msg}`;
     }
     return { errorMessage, id };
@@ -198,8 +198,7 @@ function NewProposal(props) {
     try {
       const response = await API.newProposal(newProp);
       handleToast("New proposal created successfully", "success");
-      navigate("/teacher")
-      
+      navigate("/teacher");
     } catch (error) {
       console.log(error);
       if (error.error) {

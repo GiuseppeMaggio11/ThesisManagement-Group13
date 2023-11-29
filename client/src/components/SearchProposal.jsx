@@ -31,7 +31,7 @@ function SearchProposalRoute(props) {
     //if (dirtyThesisProposals)
     API.getThesisProposals(props.virtualClock)
       .then((list) => {
-        console.log(list);
+        // console.log(list);
         setThesisProposals(list);
         //setDirtyThesisProposals(false);
         props.setLoading(false);

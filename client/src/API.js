@@ -42,10 +42,8 @@ async function getUserInfo() {
   });
   const userInfo = await response.json();
   if (response.ok) {
-    //console.log("USER: ", userInfo);
     return userInfo;
   } else {
-    //redirectToLogin();
     throw userInfo;
   }
 }
@@ -64,14 +62,15 @@ async function newProposal(thesis) {
 }
 
 async function getListExternalCosupervisors() {
-  return getJson(fetch(URL + `/listExternalCosupervisors`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: "include"
-  })
-  )
+  return getJson(
+    fetch(URL + `/listExternalCosupervisors`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    })
+  );
 }
 
 async function newExternalCosupervisor(external_cosupervisor) {
@@ -124,7 +123,6 @@ async function getThesisProposals(date) {
   });
   const proposals = await response.json();
   if (response.ok) {
-    console.log(proposals)
     return proposals.map((element) => ({
       id: element.id,
       title: element.title,
