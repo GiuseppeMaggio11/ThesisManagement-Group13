@@ -12,13 +12,11 @@ import API from "../API";
 import Loading from "./Loading";
 import ChipsInput from "./ChipsInput";
 import NewExternalCoSupervisor from "./NewExternalCosupervisor";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import ToggleComponent from "./Toggle";
-import Toggle from "react-toggle";
 import dayjs from "dayjs";
 import MessageContext from "../messageCtx";
-
 
 function NewProposal(props) {
   const [formData, setFormData] = useState({
@@ -37,18 +35,21 @@ function NewProposal(props) {
     cod_degree: "",
     is_archived: false,
   });
+  const [internal_cosupervisor_input, setInternalCosupervisorInput] =
+    useState("");
+  const [keywords_input, setKeywordsInput] = useState("");
 
   const [errors, setErrors] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [cosupervisors_external, setCoSupervisorExternal] = useState([]);
-  const { handleToast } = useContext(MessageContext)
-  const titleRef = useRef(null)
-  const supervisorRef = useRef(null)
-  const levelRef = useRef(null)
-  const groupRef = useRef(null)
-  const typeRef = useRef(null)
-  const expirationRef = useRef(null)
-  const degreeRef = useRef(null)
+  const { handleToast } = useContext(MessageContext);
+  const titleRef = useRef(null);
+  const supervisorRef = useRef(null);
+  const levelRef = useRef(null);
+  const groupRef = useRef(null);
+  const typeRef = useRef(null);
+  const expirationRef = useRef(null);
+  const degreeRef = useRef(null);
 
   const fetchData = async () => {
     try {
@@ -65,26 +66,26 @@ function NewProposal(props) {
   };
 
   useEffect(() => {
-    props.setLoading(true)
+    props.setLoading(true);
     fetchData();
-    props.setLoading(false)
+    props.setLoading(false);
   }, []);
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { id, name, value, checked } = e.target;
     setFormData({
       ...formData,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: id==="is_archived" ? checked : value,
     });
   };
 
   function handleChangeDate(event) {
     const { name, value } = event.target;
-    const today = props.virtualClock
+    const today = props.virtualClock;
     const selectedDate = dayjs(value);
-    console.log(today)
+    console.log(today);
     if (selectedDate < today) {
-      handleToast('Please select a date in the future', 'error');
+      handleToast("Please select a date in the future", "error");
     } else {
       setFormData({ ...formData, [name]: value });
     }
@@ -97,6 +98,8 @@ function NewProposal(props) {
         [field]: [...formData[field], value],
       });
     }
+    setInternalCosupervisorInput("");
+    setKeywordsInput("");
   };
 
   const deleteChip = (field, value) => {
@@ -109,65 +112,52 @@ function NewProposal(props) {
   function createMessage(path, msg) {
     let errorMessage;
     let id = 0;
-    if (path.includes('supervisor')) {
-      path = 'Supervisor ID';
-      msg = 'Invalid value'
-      errorMessage = path + ': ' + msg;
+    if (path.includes("supervisor")) {
+      path = "Supervisor ID";
+      msg = "Invalid value";
+      errorMessage = path + ": " + msg;
       id = 2;
-    }
-    else if (path.includes('title')) {
-      path = 'Thesis level';
-      msg = 'Insert a value';
-      errorMessage = path + ': ' + msg;
-      if (!id)
-        id = 1;
-    }
-    else if (path.includes('level')) {
-      path = 'Thesis level';
-      msg = 'Insert a value';
-      errorMessage = path + ': ' + msg;
-      if (!id)
-        id = 3;
-    }
-    else if (path.includes('type')) {
-      path = 'Type';
-      msg = 'Insert a value';
-      errorMessage = path + ': ' + msg;
-      if (!id)
-        id = 4;
-    }
-    else if (path.includes('group')) {
-      path = 'Group';
-      msg = 'Insert a valid value';
-      errorMessage = path + ': ' + msg;
-      if (!id)
-        id = 4;
-    }
-    else if (path.includes('expiration')) {
-      path = 'Expiration date';
-      msg = 'The date is required';
-      errorMessage = path + ': ' + msg;
-      if (!id)
-        id = 5;
-    }
-    else if (path.includes('degree')) {
-      path = 'degree';
-      msg = 'Insert a value';
-      errorMessage = path + ': ' + msg;
-      if (!id)
-        id = 6;
-    }
-    else {
-      console.log(path + errorMessage)
+    } else if (path.includes("title")) {
+      path = "Thesis level";
+      msg = "Insert a value";
+      errorMessage = path + ": " + msg;
+      if (!id) id = 1;
+    } else if (path.includes("level")) {
+      path = "Thesis level";
+      msg = "Insert a value";
+      errorMessage = path + ": " + msg;
+      if (!id) id = 3;
+    } else if (path.includes("type")) {
+      path = "Type";
+      msg = "Insert a value";
+      errorMessage = path + ": " + msg;
+      if (!id) id = 4;
+    } else if (path.includes("group")) {
+      path = "Group";
+      msg = "Insert a valid value";
+      errorMessage = path + ": " + msg;
+      if (!id) id = 4;
+    } else if (path.includes("expiration")) {
+      path = "Expiration date";
+      msg = "The date is required";
+      errorMessage = path + ": " + msg;
+      if (!id) id = 5;
+    } else if (path.includes("degree")) {
+      path = "degree";
+      msg = "Insert a value";
+      errorMessage = path + ": " + msg;
+      if (!id) id = 6;
+    } else {
+      console.log(path + errorMessage);
       errorMessage = `${path ? path + ":" : ""} ${msg}`;
     }
-    return { errorMessage, id }
+    return { errorMessage, id };
   }
 
   const scrollToRef = (ref) => {
     ref.current.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
+      behavior: "smooth",
+      block: "start",
     });
   };
 
@@ -196,7 +186,6 @@ function NewProposal(props) {
     }
     return;
   };
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -205,29 +194,37 @@ function NewProposal(props) {
       keywords: formData.keywords.join(", "),
     };
     try {
+      console.log(newProp);
       const response = await API.newProposal(newProp);
-      handleToast('New proposal created successfully', 'success')
-      console.log(response)
+      handleToast("New proposal created successfully", "success");
+      console.log(response);
     } catch (error) {
-      console.log(error)
-      if(error.error){
-        const parts = error.error?.split(":")
+      console.log(error);
+      if (error.error) {
+        const parts = error.error?.split(":");
         if (parts[0] && parts[1]) {
-          let {message, id} = createMessage(parts[0], parts[1])
-          message = parts[0] + ': ' + parts[1]
-          setErrors([{type: 'field', value: '', msg: parts[1], path: parts[0], location: 'body'}])
-          handleToast(message, 'error')
-          handleRef(id)
+          let { message, id } = createMessage(parts[0], parts[1]);
+          message = parts[0] + ": " + parts[1];
+          setErrors([
+            {
+              type: "field",
+              value: "",
+              msg: parts[1],
+              path: parts[0],
+              location: "body",
+            },
+          ]);
+          handleToast(message, "error");
+          handleRef(id);
         }
-      }
-      else if (error.errors) {
-        console.log(error.errors.errors)
-        let id_min=10;
-        setErrors(error.errors.errors)
+      } else if (error.errors) {
+        console.log(error.errors.errors);
+        let id_min = 10;
+        setErrors(error.errors.errors);
         Object.values(error.errors.errors).forEach((error, index) => {
-          let {errorMessage, id} = createMessage(error.path, error.msg)
-          if(id<id_min){
-            id_min=id;
+          let { errorMessage, id } = createMessage(error.path, error.msg);
+          if (id < id_min) {
+            id_min = id;
           }
           toast.error(errorMessage, {
             position: toast.POSITION.TOP_RIGHT,
@@ -238,12 +235,9 @@ function NewProposal(props) {
             draggable: true,
             progress: undefined,
           });
-        
-        }) 
-        handleRef(id_min)
-      }
-      else
-        handleToast(error.msg ? error.msg : 'Unexpected error', 'error')
+        });
+        handleRef(id_min);
+      } else handleToast(error.msg ? error.msg : "Unexpected error", "error");
     }
   };
 
@@ -278,11 +272,10 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some(error => error?.path?.includes('title')) ?
-                          { borderColor: 'red' } :
-                          {}
+                        errors.some((error) => error?.path?.includes("title"))
+                          ? { borderColor: "red" }
+                          : {}
                       }
-
                       required
                     />
                   </Form.Group>
@@ -297,9 +290,11 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some(error => error?.path?.includes('description')) ?
-                          { borderColor: 'red' } :
-                          {}
+                        errors.some((error) =>
+                          error?.path?.includes("description")
+                        )
+                          ? { borderColor: "red" }
+                          : {}
                       }
                       required
                     />
@@ -317,9 +312,11 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some(error => error?.path?.includes('supervisor')) ?
-                          { borderColor: 'red' } :
-                          {}
+                        errors.some((error) =>
+                          error?.path?.includes("supervisor")
+                        )
+                          ? { borderColor: "red" }
+                          : {}
                       }
                       required
                     />
@@ -331,9 +328,23 @@ function NewProposal(props) {
                     <ChipsInput
                       field="cosupervisors_internal"
                       values={formData.cosupervisors_internal}
-                      add={addChip}
                       remove={deleteChip}
-                      placeholder="Enter internal co-supervisors ID and press enter"
+                    />
+                    <Form.Control
+                      id="cosupervisors_internal"
+                      type="text"
+                      placeholder="Enter an internal co-supervisor ID and press enter"
+                      autoComplete="off"
+                      value={internal_cosupervisor_input}
+                      onChange={(e) =>
+                        setInternalCosupervisorInput(e.target.value)
+                      }
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault(); // Prevent the default form submission behavior
+                          addChip("cosupervisors_internal", e.target.value);
+                        }
+                      }}
                     />
                   </Form.Group>
                   <Form.Group className="mb-3">
@@ -350,8 +361,11 @@ function NewProposal(props) {
                         checked={formData.cosupervisors_external.includes(item)}
                         onChange={(e) => {
                           const selectedItem = e.target.value;
-                          if (formData.cosupervisors_external.includes(selectedItem)) {
-
+                          if (
+                            formData.cosupervisors_external.includes(
+                              selectedItem
+                            )
+                          ) {
                             const tempArray =
                               formData.cosupervisors_external.filter(
                                 (item) => item !== selectedItem
@@ -361,7 +375,6 @@ function NewProposal(props) {
                               cosupervisors_external: [...tempArray],
                             });
                           } else {
-
                             setFormData({
                               ...formData,
                               cosupervisors_external: [
@@ -385,8 +398,11 @@ function NewProposal(props) {
                           Add a new external co-supervisor
                         </Modal.Title>
                       </Modal.Header>
-                      <Modal.Body style={{paddingTop: 0}}>
-                        <NewExternalCoSupervisor fetchData={fetchData} onClose={() => setShowForm(false)} />
+                      <Modal.Body style={{ paddingTop: 0 }}>
+                        <NewExternalCoSupervisor
+                          fetchData={fetchData}
+                          onClose={() => setShowForm(false)}
+                        />
                       </Modal.Body>
                     </Modal>
                   </Form.Group>
@@ -399,9 +415,9 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some(error => error?.path?.includes('level')) ?
-                          { borderColor: 'red' } :
-                          {}
+                        errors.some((error) => error?.path?.includes("level"))
+                          ? { borderColor: "red" }
+                          : {}
                       }
                       required
                     >
@@ -414,10 +430,22 @@ function NewProposal(props) {
                     <Form.Label htmlFor="keywords">Keywords</Form.Label>
                     <ChipsInput
                       field="keywords"
-                      values={formData.keywords}
-                      add={addChip}
                       remove={deleteChip}
+                      values={formData.keywords}
+                    />
+                    <Form.Control
+                      id="keywords"
+                      type="text"
                       placeholder="Enter a keyword and press enter"
+                      autoComplete="off"
+                      value={keywords_input}
+                      onChange={(e) => setKeywordsInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault(); // Prevent the default form submission behavior
+                          addChip("keywords", e.target.value);
+                        }
+                      }}
                     />
                   </Form.Group>
                   <Form.Group className="mb-3" ref={typeRef}>
@@ -431,9 +459,9 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some(error => error?.path?.includes('type')) ?
-                          { borderColor: 'red' } :
-                          {}
+                        errors.some((error) => error?.path?.includes("type"))
+                          ? { borderColor: "red" }
+                          : {}
                       }
                       required
                     />
@@ -449,9 +477,9 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some(error => error?.path?.includes('group')) ?
-                          { borderColor: 'red' } :
-                          {}
+                        errors.some((error) => error?.path?.includes("group"))
+                          ? { borderColor: "red" }
+                          : {}
                       }
                       required
                     />
@@ -469,9 +497,11 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some(error => error?.path?.includes('required_knowledge')) ?
-                          { borderColor: 'red' } :
-                          {}
+                        errors.some((error) =>
+                          error?.path?.includes("required_knowledge")
+                        )
+                          ? { borderColor: "red" }
+                          : {}
                       }
                       required
                     />
@@ -487,14 +517,14 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some(error => error?.path?.includes('notes')) ?
-                          { borderColor: 'red' } :
-                          {}
+                        errors.some((error) => error?.path?.includes("notes"))
+                          ? { borderColor: "red" }
+                          : {}
                       }
                       required
                     />
                   </Form.Group>
-                  <Form.Group className="mb-3" expirationRef>
+                  <Form.Group className="mb-3" ref={expirationRef}>
                     <Form.Label htmlFor="expiration">Expiration</Form.Label>
                     <Form.Control
                       type="date"
@@ -504,15 +534,17 @@ function NewProposal(props) {
                       onChange={handleChangeDate}
                       style={
                         errors &&
-                          errors.some(error => error?.path?.includes('expiration')) ?
-                          { borderColor: 'red' } :
-                          {}
+                        errors.some((error) =>
+                          error?.path?.includes("expiration")
+                        )
+                          ? { borderColor: "red" }
+                          : {}
                       }
                       required
                     />
                   </Form.Group>
 
-                  <Form.Group className="mb-3" degreeRef>
+                  <Form.Group className="mb-3" ref={degreeRef}>
                     <Form.Label htmlFor="cod_degree">Degree</Form.Label>
                     <Form.Control
                       type="text"
@@ -523,9 +555,9 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some(error => error?.path?.includes('degree')) ?
-                          { borderColor: 'red' } :
-                          {}
+                        errors.some((error) => error?.path?.includes("degree"))
+                          ? { borderColor: "red" }
+                          : {}
                       }
                       required
                     />
@@ -533,11 +565,16 @@ function NewProposal(props) {
                   <Form.Group className="mb-3">
                     <Row className="align-items-center">
                       <Col xs="auto">
-                        <span style={{ fontSize: 18 }}>Insert this thesis as archived</span>
+                        <span style={{ fontSize: 18 }}>
+                          Insert this thesis as archived
+                        </span>
                       </Col>
                       <Col xs="auto" className="d-flex align-items-center">
                         {/* Add d-flex and align-items-center to vertically align the Toggle */}
-                        <Toggle formData={formData} handleChange={handleChange} />
+                        <ToggleComponent
+                          formData={formData}
+                          handleChange={handleChange}
+                        />
                       </Col>
                     </Row>
                   </Form.Group>
@@ -555,7 +592,6 @@ function NewProposal(props) {
                       </Button>
                     </Col>
                   </Row>
-
                 </Form>
               </Card.Body>
             </Card>

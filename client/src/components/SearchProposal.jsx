@@ -13,16 +13,17 @@ import {
 } from "react-bootstrap";
 import { useState, useEffect, useContext } from "react";
 import MessageContext from '../messageCtx'
+import { Dice1, Funnel, FunnelFill, Search } from "react-bootstrap-icons";
 import dayjs from "dayjs";
 
 import API from "../API";
-import { HoverIconButton } from "./HoverIconButton";
-import { Search } from "react-bootstrap-icons";
+
+import { FilterCard } from "./FilterCard";
 
 function SearchProposalRoute(props) {
   const [thesisProposals, setThesisProposals] = useState([]);
-  const {handleToast} = useContext(MessageContext)
-  //const [dirtyThesisProposals, setDirtyThesisProposals] = useState(true);
+  const { handleToast } = useContext(MessageContext)
+
 
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
@@ -32,6 +33,7 @@ function SearchProposalRoute(props) {
       //if (dirtyThesisProposals) 
       API.getThesisProposals(props.virtualClock)
         .then((list) => {
+          console.log(list)
           setThesisProposals(list);
           //setDirtyThesisProposals(false);
           props.setLoading(false);
@@ -50,6 +52,9 @@ function SearchProposalRoute(props) {
         <SearchProposalComponent
           thesisProposals={thesisProposals}
           isMobile={isMobile}
+          setLoading={props.setLoading}
+          loadind={props.loading}
+          virtualClock={props.virtualClock}
         />
       )}
     </>
@@ -58,172 +63,199 @@ function SearchProposalRoute(props) {
 
 function SearchProposalComponent(props) {
   const [filter, setFilter] = useState("");
+  const [showFilters, setShowFilters] = useState(false)
+  const [advancedFilters, setAdvancedFilters] = useState(false)
+  const [titleFilters, setTitleFilters] = useState(false)
   const [filteredThesisProposals, setFilteredThesisProposals] = useState([
     ...props.thesisProposals,
   ]);
+  const [filteredByTitle, setFilteredByTitle] = useState([]);
+
+  const [selectedGroups, setSelectedGroups] = useState([])
+  const [selectedType, setSelectedType] = useState([])
+  const [selectedDate, setSelectedDate] = useState(null)
+  const [selectedCosupervisor, setSelectedCosupervisor] = useState([])
+  const [selectedKeywords, setSelectedKeywords] = useState([])
+  const [selectedSupervisor, setSelectedSupervisor] = useState([])
+  const [selectedTitlesWords, setSelectedTitlesWords] = useState([])
+
+
 
   useEffect(() => {
     setFilteredThesisProposals([...props.thesisProposals]);
   }, [props.thesisProposals]);
 
-  const handleSubmit = (event) => {
-    if(event){
-      event.preventDefault();
-    }
-
-    setFilteredThesisProposals(
-      props.thesisProposals.filter((proposal) => {
-        const filterLowerCase = filter.toLowerCase();
-
-        return Object.entries(proposal).some(([key, value]) => {
-          if (key === "id") {
-            return false; // Exclude the "id" field
-          }
-
-          if (Array.isArray(value)) {
-            // If the value is an array, check if the filter is present in at least one of the elements
-            return value.some((item) => {
-              if (typeof item === "object" && item !== null) {
-                // If the item is an object, search within its properties
-                return Object.values(item).some((nestedValue) => {
-                  if (
-                    typeof nestedValue === "string" ||
-                    typeof nestedValue === "number"
-                  ) {
-                    return nestedValue
-                      .toString()
-                      .toLowerCase()
-                      .includes(filterLowerCase);
-                  } else if (dayjs.isDayjs(nestedValue)) {
-                    return dayjs(nestedValue)
-                      .format("YYYY-MM-DD")
-                      .includes(filterLowerCase);
-                  }
-                  return false;
-                });
-              } else if (typeof item === "string" || typeof item === "number") {
-                // If the item is a string or number, handle the normal search
-                return item.toString().toLowerCase().includes(filterLowerCase);
-              } else if (dayjs.isDayjs(item)) {
-                // If the item is a date handled by dayjs
-                return dayjs(item)
-                  .format("YYYY-MM-DD")
-                  .includes(filterLowerCase);
-              }
-            });
-          } else if (typeof value === "string" || typeof value === "number") {
-            // If the value is a string or number, handle the normal search
-            return value.toString().toLowerCase().includes(filterLowerCase);
-          } else if (dayjs.isDayjs(value)) {
-            // If the value is a date handled by dayjs
-            return dayjs(value).format("YYYY-MM-DD").includes(filterLowerCase);
-          }
-
-          return false;
-        });
-      })
-    );
-  };
-
   const handleCancel = () => {
     setFilter("");
     setFilteredThesisProposals([...props.thesisProposals]);
   };
+  const handleChangeFilter = () => {
+    const f = !showFilters
+    setShowFilters(f)
+  }
 
-  
-    {/*<Container>
-       <Row>
-        <h1>Thesis Proposals</h1>
-      </Row>
-      <Row className="mt-3">
-        <Col>
-          <Form className="d-flex" onSubmit={handleSubmit}>
-            <Form.Group className="mb-3 me-2 d-flex align-items-center">
-              <Form.Label className="me-2 mb-0">Filter: </Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Insert a filter"
-                value={filter}
-                onChange={(event) => setFilter(event.target.value)}
-              />
-            </Form.Group>
-            <Button className="mb-3 mx-3" variant="success" type="submit">
-              Search
-            </Button>
-            <Button className="mb-3" variant="secondary" onClick={handleCancel}>
-              Cancel
-            </Button>
-          </Form>
-        </Col>
-      </Row> */}
-return(
-<>
-<div className="d-flex justify-content-center">
+  const handleFilterTitle = (event) => {
+    const value = event.target.value;
+    setFilter(value);
+
+    let filtered = []
+
+    filtered = [...props.thesisProposals];
+
+    if (value.trim() !== '') {
+      const lowercaseFilter = value.toLowerCase();
+
+      filtered = filtered.filter(thesis =>
+        thesis.title.toLowerCase().includes(lowercaseFilter)
+      );
+      setFilteredByTitle(filtered);
+    }
+    else {
+      setFilteredByTitle([])
+    }
+  };
+
+
+  return (
+    <>
+      <div className="d-flex justify-content-center">
         <Container className="width-80 margin-custom">
-          <Row className="align-items-center">
-            <Col xs={12} className="d-flex justify-content-between align-items-center">
+          <Row className="d-flex align-items-center">
+            <Col xs={4} className="d-flex justify-content-between align-items-center">
               <h1 className={`margin-titles-custom ${props.isMobile ? 'smaller-heading' : ''}`}>
                 Thesis Proposals
               </h1>
-              <Form className="d-flex" onSubmit={(e) => e.preventDefault()}>
-              <Form.Group className="mb-3 me-2 d-flex align-items-center position-relative">
-                <Form.Control
-                  type="text"
-                  placeholder="Insert a filter"
-                  value={filter}
-                  onChange={(event) => setFilter(event.target.value)}
-                  onKeyDown={(event) => {
-                    console.log(event.key)
-                    if (event.key === 'Enter') {
-                      event.preventDefault()
-                      handleSubmit();
-                    }
-                  }}
-                  className="custom-input" 
-                />
-                {filter && (
-                  <button className="clear-btn" onClick={handleCancel}>
-                    <span>&times;</span>
-                  </button>
-                )}
-                <Search className="search-button" onClick={handleSubmit} />
-              </Form.Group>
-            </Form>
-          </Col>
-        </Row>
-       {!props.isMobile ? (
-        <Row>
-          <Col>
-            {filteredThesisProposals.length == 0 ? (
-              <h2>No proposal found</h2>
-            ) : (
-              <Table hover>
-                <thead>
-                  <tr>
-                    <th>Title</th>
-                    <th>Supervisor</th>
-                    <th>Expiration Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[...filteredThesisProposals].map((element) => (
-                    <ProposalTableRow key={element.id} proposal={element} />
-                  ))}
-                </tbody>
-              </Table>
-            )}
-          </Col>
-        </Row>):(
-          <Row>
-        <Accordion>
-          {[...filteredThesisProposals].map((element) => (
-            <ProposalAccordion key={element.id} proposal={element} />
-          ))}
-        </Accordion>
-      </Row>
+            </Col>
+            <Col xs={8} className="d-flex justify-content-end">
+              <Col xs={6} className="d-flex justify-content-end align-items-end">
+                {!advancedFilters && 
+                  <Form.Group className="d-flex align-items-center position-relative">
+                    <Form.Control
+                      type="text"
+                      placeholder= {props.isMobile ? "Search.." : "Search by name"}
+                      value={filter}
+                      onChange={(e) => { handleFilterTitle(e) }}
+                      className="custom-input"
+                    />
+                    {filter && (
+                      <button className="clear-btn" onClick={handleCancel} disabled={showFilters}>
+                        <span>&times;</span>
+                      </button>
+                    )}
+                </Form.Group>}
+              </Col>
+
+              <Col xs={2} className="d-flex px-2 justify-content-start align-items-center">
+              <Form.Group>
+    <div style={{ position: 'relative', display: 'inline-block' }}>
+        {!showFilters && !advancedFilters && <Funnel className={"button-style-filter"} onClick={handleChangeFilter} />}
+        {showFilters && !advancedFilters && <FunnelFill className={"button-style-filter"} onClick={handleChangeFilter} />}
+        {advancedFilters && (
+            <>
+                <FunnelFill className={"button-style-filter"} onClick={handleChangeFilter} />
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: '-2px',
+                        right: '-4px',
+                        borderRadius: '50%',
+                        width: '10px',
+                        height: '10px',
+                        backgroundColor: 'orange',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'white',
+                    }}
+                >
+                    <span>
+                    </span>
+                </div>
+            </>
         )}
-      </Container>
     </div>
+</Form.Group>
+
+              </Col>
+            </Col>
+          </Row>
+          {showFilters &&
+            <Container >
+              <Row >
+                <Col xs={12} style={{ marginBottom: '0.5em' }}>
+                  <FilterCard
+                    virtualClock={props.virtualClock}
+                    thesisList={props.thesisProposals}
+                    loading={props.loading}
+                    setLoading={props.setLoading}
+                    showFilters={showFilters}
+                    setProposals={setFilteredThesisProposals}
+                    selectedGroups={selectedGroups}
+                    setSelectedGroups={setSelectedGroups}
+                    selectedType={selectedType}
+                    setSelectedType={setSelectedType}
+                    selectedDate={selectedDate}
+                    setSelectedDate={setSelectedDate}
+                    selectedCosupervisor={selectedCosupervisor}
+                    setSelectedCosupervisor={setSelectedCosupervisor}
+                    selectedKeywords={selectedKeywords}
+                    setSelectedKeywords={setSelectedKeywords}
+                    selectedSupervisor={selectedSupervisor}
+                    setSelectedSupervisor={setSelectedSupervisor}
+                    selectedTitlesWords={selectedTitlesWords}
+                    setSelectedTitlesWords={setSelectedTitlesWords}
+                    setAdvancedFilters={setAdvancedFilters}
+                    setShowFilters={setShowFilters}
+                  />
+
+                </Col >
+              </Row>
+            </Container>
+          }
+
+          {!props.isMobile ? (
+            <Row>
+              <Col>
+                {filteredThesisProposals.length == 0 ? (
+                  <h2>No proposal found</h2>
+                ) : (
+                  <Table hover>
+                    <thead>
+                      <tr>
+                        <th>Title</th>
+                        <th>Supervisor</th>
+                        <th>Expiration Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredByTitle.length <= 0 && filter === '' && [...filteredThesisProposals].map((element) => (
+                        <ProposalTableRow key={element.id} proposal={element} />
+                      ))}
+                      {filteredByTitle.length <= 0 && filter !== '' && <h2 className="mt-3"> no proposals found</h2>}
+                      {filteredByTitle.length > 0 && [...filteredByTitle].map((element) => (
+                        <ProposalTableRow key={element.id} proposal={element} />
+                      ))}
+
+                    </tbody>
+                  </Table>
+                )}
+              </Col>
+            </Row>) : (
+            <Row>
+              <Accordion>
+              {filteredByTitle.length <= 0 && filter === '' && [...filteredThesisProposals].map((element) => (
+                  <ProposalAccordion key={element.id} proposal={element} />
+                ))}
+                {filteredByTitle.length <= 0 && filter !== '' && <h2 className="mt-3"> no proposals found</h2>}
+                {filteredByTitle.length > 0 && [...filteredByTitle].map((element) => (
+                  <ProposalAccordion key={element.id} proposal={element} />
+                ))}
+              
+              </Accordion>
+            </Row>
+          )}
+        </Container>
+      </div >
     </>)
 }
 
@@ -232,7 +264,7 @@ function ProposalAccordion(props) {
     <Accordion.Item eventKey={props.proposal.id.toString()}>
       <Accordion.Header>
         <span className="my-3">
-          <Link style={{color:'#4682B4', fontSize:18}} to={`/proposals/${props.proposal.id}`}>
+          <Link style={{ color: '#4682B4', fontSize: 18 }} to={`/proposals/${props.proposal.id}`}>
             {props.proposal.title}
           </Link>
         </span>
@@ -250,17 +282,19 @@ function ProposalAccordion(props) {
   );
 }
 
+
+
 function ProposalTableRow(props) {
   const navigation = useNavigate()
   return (
-    <tr onClick={()=>navigation(`/proposals/${props.proposal.id}`)}>
+    <tr onClick={() => navigation(`/proposals/${props.proposal.id}`)}>
       <td>
-        <Link style={{color:'#4682B4', fontSize:18}} to={`/proposals/${props.proposal.id}`}>
+        <Link style={{ color: '#4682B4', fontSize: 18 }} to={`/proposals/${props.proposal.id}`}>
           {props.proposal.title}
         </Link>
       </td>
-      <td style={{fontSize:18}}>{props.proposal.supervisor}</td>
-      <td style={{fontSize:18}}>{dayjs(props.proposal.expiration).format("YYYY-MM-DD")}</td>
+      <td style={{ fontSize: 18 }}>{props.proposal.supervisor}</td>
+      <td style={{ fontSize: 18 }}>{dayjs(props.proposal.expiration).format("YYYY-MM-DD")}</td>
     </tr>
   );
 }

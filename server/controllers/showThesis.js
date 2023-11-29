@@ -1,5 +1,5 @@
 const dao = require("../dao");
-const {validationResult} = require("express-validator");
+const { validationResult } = require("express-validator");
 
 
 async function getProposals (req, res) {
@@ -25,4 +25,4 @@ async function getProposal (req,res){
     }
 }
 
-module.exports = {getProposals, getProposal}
+module.exports = { getProposals, getProposal };

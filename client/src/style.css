@@ -82,6 +82,7 @@
   padding: 5px;
 }
 
+
 /*Loading*/
 .loader-container {
   position: fixed;
@@ -182,8 +183,26 @@ table.table-rounded thead tr {
   border-color: transparent;
   color:#e19861;
   margin-left: 0.2em;
-}
 
+}
+.button-style-filter {
+  background-color: transparent;
+  border-color: transparent;
+  color:black;
+  font-size: x-large;
+}
+.button-style-filter:hover {
+  background-color: transparent;
+  border-color: transparent;
+  color: black;
+  font-size: x-large;
+}
+.button-style-filter:active {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  color: black;
+  font-size: x-large;
+}
 .button-style-cancel:hover {
   background-color: #f27e25;
   border-color: #f27e25;
@@ -321,12 +340,13 @@ table.table-rounded thead tr {
   position: absolute;
   right: 0;
   height: 100%;
-  margin-right: 3rem;
+  margin-right: 0.5rem;
 }
 
 .Form.Group {
   position: relative;
 }
+
 .clear-btn span {
   font-size: 18px;
   color: #999;
@@ -351,8 +371,6 @@ table.table-rounded thead tr {
   border-color:black
 }
 
-
-
 /* Style for the custom slider */
 .custom-checkbox {
   display: inline-block;
@@ -373,6 +391,7 @@ table.table-rounded thead tr {
   border-radius: 26px; /* Round shape to create slider appearance */
   transition: 0.4s;
 }
+
 
 /* Slider knob appearance */
 .slider::before {
@@ -401,12 +420,36 @@ input:checked + .slider::before {
   box-shadow: none ;
 }
 
-
-
 .modal-dialog {
   display: flex;
   align-items: center;
   min-height: calc(100% - 60px); /* Adjust based on your layout */
+}
+
+.dropdown-container {
+  position: relative;
+}
+
+.dropdown-content {
+  position: absolute;
+  top: 100%; 
+  left: 35%;
+  width: 65%; 
+  z-index: 100;
+  background: white;
+  padding: 0%;
+  border: 2px;
+  border-radius: 5%;
+  max-height: 135px;
+  overflow-y: auto;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2)
+}
+
+.custom-rounded {
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.5);
+  padding: 20px; /* Adjust padding as needed */
 }
 
 @media (min-width: 576px) {

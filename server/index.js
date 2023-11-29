@@ -1,10 +1,15 @@
 "use strict";
 
+
+const dotenv = require('dotenv');
+dotenv.config();
+
 const {isStudent, isProfessor, isLoggedIn} = require("./controllers/middleware")
 const {getProposals, getProposal} = require("./controllers/showThesis")
-const {newApplication} = require("./controllers/manageApplication")
+const {newApplication,getApplicationStudent,updateApplicationStatus,
+  getApplications} = require("./controllers/manageApplication")
 const {addFiles, getAllFiles, getStudentFilesList, getFile} = require("./controllers/manageFiles")
-const {newThesis} = require("./controllers/manageThesis")
+const {newThesis, updateThesesArchivation} = require("./controllers/manageThesis")
 const {listExternalCosupervisors, createExternalCosupervisor} = require("./controllers/others")
 
 
@@ -15,12 +20,13 @@ const passport = require("passport");
 const { check, validationResult, body } = require("express-validator");
 const dao = require("./dao");
 const cors = require("cors");
-const multer = require('multer');
-const LocalStrategy = require("passport-local").Strategy;
+const multer = require("multer");
+//const LocalStrategy = require("passport-local").Strategy;
+const SamlStrategy = require("@node-saml/passport-saml").Strategy;
 const session = require("express-session");
-const fs = require('fs')
-const zipdir = require('zip-dir');
-
+const fs = require("fs");
+const zipdir = require("zip-dir");
+const bodyParser = require("body-parser");
 
 const app = express();
 const port = 3001;
@@ -28,7 +34,7 @@ const port = 3001;
 app.use(morgan("dev"));
 app.use(express.json());
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: `http://localhost:5173`,
   credentials: true,
 };
 app.use(cors(corsOptions));
@@ -42,39 +48,38 @@ app.use(
   })
 );
 
-// Activate the server
-app.listen(port, () => {
-  console.log(`Server listening at http://localhost:${port}`);
+passport.serializeUser((expressUser, done) => {
+  done(null, expressUser);
 });
 
-
+passport.deserializeUser((expressUser, done) => {
+  done(null, expressUser);
+});
 passport.use(
-  new LocalStrategy(function (username, password, done) {
-    dao.getUser(username, password).then((user) => {
-      if (!user)
-        return done(null, false, {
-          message: "Incorrect username and/or password.",
-        });
-
-      return done(null, user);
-    });
-  })
+  new SamlStrategy(
+    {
+      path: "/login/callback",
+      entryPoint:
+        "https://dev-alc65i0s4u7pc5m2.us.auth0.com/samlp/NIBQ40Cep9RJAwUIviRdgPCAPMhY7iG8",
+      issuer: "http:localhost:3001",
+      cert: fs.readFileSync("./SAML2.0/dev-alc65i0s4u7pc5m2.pem", "utf-8"),
+      logoutUrl:
+        "https://dev-alc65i0s4u7pc5m2.us.auth0.com/samlp/NIBQ40Cep9RJAwUIviRdgPCAPMhY7iG8/logout",
+      wantAssertionsSigned: false,
+      wantAuthnResponseSigned: false,
+    },
+    function (profile, done) {
+      profile.user_type = profile["http://schemas.auth0.com/user_type"];
+      profile.username =
+        profile[
+          "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+        ];
+      profile.name =
+        profile["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
+      done(null, profile);
+    }
+  )
 );
-
-passport.serializeUser((user, done) => {
-  done(null, user.username);
-});
-
-passport.deserializeUser((username, done) => {
-  dao
-    .getUserByEmail(username)
-    .then((user) => {
-      done(null, user);
-    })
-    .catch((err) => {
-      done(err, null);
-    });
-});
 
 const storage = multer.diskStorage({
   destination: async (req, file, cb) => {
@@ -95,15 +100,15 @@ const storage = multer.diskStorage({
     const uniqueSuffix = file.originalname;
     let filename;
 
-    if (uniqueSuffix.endsWith('.pdf')) {
+    if (uniqueSuffix.endsWith(".pdf")) {
       filename = uniqueSuffix;
     } else {
-      filename = uniqueSuffix + '.pdf';
+      filename = uniqueSuffix + ".pdf";
     }
 
     filename = filename.replace(/\s/g, "_");
     cb(null, filename);
-  }
+  },
 });
 
 const upload = multer({
@@ -116,77 +121,147 @@ const upload = multer({
     } else {
       cb("Error: Solo file PDF sono ammessi!");
     }
-  }
+  },
 });
-
-
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-
 /***USER - API***/
-// login
-app.post("/api/session/login", function (req, res, next) {
-  passport.authenticate("local", (err, user, info) => {
-    if (err) return next(err);
-    if (!user) {
-      return res.status(401).json(info);
-    }
-    req.login(user, (err) => {
-      if (err) return next(err);
+//Session user info
+app.get(
+  "/login",
+  passport.authenticate("saml", { failureRedirect: "/", failureFlash: true }),
+  (req, res) => {
+    res.redirect("http://localhost:5173");
+  }
+);
 
-      return res.json(req.user);
-    });
-  })(req, res, next);
+// login
+app.post(
+  "/login/callback",
+  bodyParser.urlencoded({ extended: false }),
+  passport.authenticate("saml", {
+    failureRedirect: "/",
+    failureFlash: true,
+  }),
+  function (req, res) {
+    res.redirect("http://localhost:5173");
+  }
+);
+
+app.get("/whoami", (req, res) => {
+  try {
+    if (req.isAuthenticated()) {
+      res.status(200).json(req.user);
+    } else res.status(401).json({ error: "Unauthenticated user!" });
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 // logout
-app.delete("/api/session/logout", (req, res) => {
-  req.logout(() => {
-    res.end();
+app.post("/logout", (req, res, next) => {
+  res.clearCookie("connect.sid");
+  req.logout(function (err) {
+    console.log(err);
+    req.session.destroy(function (err) {
+      res.send();
+    });
   });
 });
-//Session user info
-app.get("/api/session/userinfo", (req, res) => {
-  if (req.isAuthenticated()) {
-    res.status(200).json(req.user);
-  } else res.status(401).json({ error: "Unauthenticated user!" });
-});
-
-
 
 /***API***/
-
+app.get('/api/student/applications', isStudent, getApplicationStudent);
 //GET PROPOSALS
 app.get("/api/proposals", isLoggedIn, getProposals);
 
 //GET PROPOSAL BY ID
-app.get('/api/proposal/:id', isLoggedIn, getProposal);
+app.get("/api/proposal/:id", isLoggedIn, getProposal);
 //DO AN APPLICATION FOR A PROPOSAL
-app.post('/api/newApplication/:thesis_id', isStudent, newApplication);
+app.post("/api/newApplication/:thesis_id", isStudent, newApplication);
 //ADD FILES
-app.post('/api/newFiles/:thesis_id', isStudent, addFiles)
+app.post("/api/newFiles/:thesis_id", isStudent, addFiles);
 
-app.get('/api/getAllFiles/:student_id/:thesis_id', isProfessor, getAllFiles);
+app.get("/api/getAllFiles/:student_id/:thesis_id", isProfessor, getAllFiles);
 
-app.get('/api/getStudentFilesList/:student_id/:thesis_id', isProfessor, getStudentFilesList);
+app.get(
+  "/api/getStudentFilesList/:student_id/:thesis_id",
+  isProfessor,
+  getStudentFilesList
+);
 
-app.get('/api/getFile/:student_id/:thesis_id/:file_name', isProfessor, getFile);
+app.get("/api/getFile/:student_id/:thesis_id/:file_name", isProfessor, getFile);
 
 //CREATES NEW THESIS AND RELATED INT/EXTERNAL COSUPERVISORS
-app.post('/api/newThesis', isProfessor, [
-  // Various checks of syntax of given data
-  check('title').isLength({ min: 1, max: 100 }),
-  check('supervisor_id').isLength({ min: 1, max: 7 }),
-  check('thesis_level').isIn(['Bachelor', 'Master', 'bachelor', 'master']),
-  check('type_name').isLength({ min: 1, max: 50 }),
-  check('expiration').isISO8601().toDate().withMessage("Date time must be in format YYYY-MM-DD HH:MM:SS"), // TODO check if given date is NOT earlier than today
-  check('cod_degree').isLength({ min: 1, max: 10 }),
-  check('is_archived').isBoolean()], newThesis);
+app.post(
+  "/api/newThesis",
+  isProfessor,
+  [
+    // Various checks of syntax of given data
+    check("title").isLength({ min: 1, max: 100 }),
+    check("supervisor_id").isLength({ min: 1, max: 7 }),
+    check("thesis_level").isIn(["Bachelor", "Master", "bachelor", "master"]),
+    check("type_name").isLength({ min: 1, max: 50 }),
+    check("expiration")
+      .isISO8601()
+      .toDate()
+      .withMessage("Date time must be in format YYYY-MM-DD HH:MM:SS"), // TODO check if given date is NOT earlier than today
+    check("cod_degree").isLength({ min: 1, max: 10 }),
+    check("is_archived").isBoolean(),
+  ],
+  newThesis
+);
 
 //RETURNS LIST OF EVERY EXTERNAL COSUPERVISORS
-app.get('/api/listExternalCosupervisors',isProfessor,listExternalCosupervisors);
+
+
+
+app.get(
+  "/api/listExternalCosupervisors",
+  isProfessor,
+  listExternalCosupervisors
+);
+
+//CREATES NEW EXTERNAL COSUPERVISOR
+app.post(
+  "/api/newExternalCosupervisor",
+  isProfessor,
+  [
+    // Various checks of syntax of given data
+    check("email").isEmail(),
+    check("surname").isLength({ min: 1, max: 50 }),
+    check("name").isLength({ min: 1, max: 50 }),
+  ],
+  createExternalCosupervisor
+);
+
+//UPDATE THESES WITH NEW VIRTUALCLOCK TIME
+app.put(
+  "/api/updateThesesArchivation",
+  [
+    // Check if valid date
+    check("expiration").isISO8601().toDate(),
+  ],
+  updateThesesArchivation
+);
+
+//ACCEPT/REJECT APPLICATION
+app.put(
+  "/api/updateApplicationStatus",
+  isProfessor,
+  [check("status").isIn(["Accepted", "Refused"])],
+  updateApplicationStatus
+);
+
+//this is for getting all the ACTIVE applications related to all the proposals of a specific professor (which makes this request)
+app.get("/api/getApplications", isProfessor, getApplications);
+
+// Activate the server
+app.listen(port, () => {
+  console.log(`Server listening at http://localhost:${port}`);
+});
+
 
 //CREATES NEW EXTERNAL COSUPERVISOR 
 app.post('/api/newExternalCosupervisor', isProfessor, [
@@ -195,3 +270,4 @@ app.post('/api/newExternalCosupervisor', isProfessor, [
   check('surname').isLength({ min: 1, max: 50 }),
   check('name').isLength({ min: 1, max: 50 })
 ], createExternalCosupervisor);
+

@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Button, Card, Col, Container, Row } from "react-bootstrap";
+import API from "../API";
 
 const VirtualClock = (props) => {
+  const [tempTime, setTempTime] = useState(props.virtualClock);
+
   const updateTime = (amount, unit) => {
-    const newDateTime = new Date(props.virtualClock);
+    const newDateTime = new Date(tempTime);
 
     if (unit === "hour") {
       newDateTime.setHours(newDateTime.getHours() + amount);
@@ -15,9 +18,42 @@ const VirtualClock = (props) => {
       newDateTime.setFullYear(newDateTime.getFullYear() + amount);
     }
 
-    props.setVirtualClock(newDateTime);
+    setTempTime(newDateTime);
   };
-  const formattedDateTime = props.virtualClock.toLocaleString();
+  const handleVirtualTime = async (newTime) => {
+    props.setVirtualClock(newTime);
+    localStorage.setItem("virtualclock", JSON.stringify(newTime));
+    await API.updateExpiration(newTime)
+      .then((response) => {
+        if (response && "errors" in response) {
+          //setErrors(response.errors);
+        } else {
+          //props.setVirtualClock(newTime);
+          //setErrors(null);
+        }
+      })
+      .catch((error) => {
+        //setErrors([{ msg: error.message }]);
+      });
+  };
+  const handleRealTime = async () => {
+    setTempTime(new Date());
+    props.setVirtualClock(new Date());
+    localStorage.removeItem("virtualclock");
+    await API.updateExpiration(tempTime)
+      .then((response) => {
+        if (response && "errors" in response) {
+          //setErrors(response.errors);
+        } else {
+          props.setVirtualClock(tempTime);
+          //setErrors(null);
+        }
+      })
+      .catch((error) => {
+        //setErrors([{ msg: error.message }]);
+      });
+  };
+  const formattedDateTime = tempTime.toLocaleString();
   return (
     <Container className="mt-4">
       <Card className="text-center">
@@ -80,6 +116,28 @@ const VirtualClock = (props) => {
                   <Card.Text className="custom-virtual-clock">
                     <span>{formattedDateTime}</span>
                   </Card.Text>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <Button
+                    variant="danger"
+                    className="w-50 mb-1"
+                    onClick={() => handleVirtualTime(tempTime)}
+                  >
+                    Use VirtualTime
+                  </Button>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <Button
+                    variant="primary"
+                    className="w-50 mb-1"
+                    onClick={() => handleRealTime()}
+                  >
+                    Use real time
+                  </Button>
                 </Col>
               </Row>
             </Col>
