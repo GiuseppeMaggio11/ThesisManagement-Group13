@@ -16,24 +16,38 @@
 
 ![Home page for guest users](./images/IMG_00_01.jpg)
 *Home page for guest users*
+<br/>
+<br/>
 
 ![Login form](./images/IMG_00_02.jpg)
 *Login form*
+<br/>
+<br/>
 
 ![Student login](./images/IMG_00_03.jpg)
 *Student login*
+<br/>
+<br/>
 
 ![Home page for autenticated students](./images/IMG_00_04.jpg)
 *Home page for autenticated students*
+<br/>
+<br/>
 
 ![Professor login](./images/IMG_00_05.jpg)
 *Professor login*
+<br/>
+<br/>
 
 ![Home page for autenticated professors](./images/IMG_00_06.jpg)
 *Home page for autenticated professors*
+<br/>
+<br/>
 
 ![Log out](./images/IMG_00_07.jpg)
 *Log out*
+<br/>
+<br/>
 
 
 
