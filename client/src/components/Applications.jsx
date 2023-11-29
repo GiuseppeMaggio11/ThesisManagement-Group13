@@ -43,6 +43,12 @@ function Applications(props) {
         student_id,
         status
       );
+      handleToast(
+        "Student application " +
+          (status === "Accepted" ? " accepted " : " rejected ") +
+          "correctly",
+        status === "Accepted" ? "success" : "error"
+      );
       const result = await API.getPendingApplications();
       const uniqueThesisTitles = [
         ...new Set(result.map((entry) => entry.thesis_title)),

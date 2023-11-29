@@ -3,14 +3,11 @@ import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
 import ErrorAlert from "./components/ErrorAlert";
 import HomePage from "./components/HomePage";
-import { ToastContainer } from 'react-toastify';
-
-import LoginForm from "./components/LoginForm";
+import { ToastContainer } from "react-toastify";
 import TeacherPage from "./components/TeacherPage";
 import NewProposal from "./components/NewProposal";
-
 import ThesisPage from "./components/ThesisPage";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import "./style.css";
 import { Button, Container } from "react-bootstrap";
 import Header from "./components/Header";
@@ -19,7 +16,7 @@ import VirtualClock from "./components/VirtualClock";
 import MessageContext from "./messageCtx";
 import Applications from "./components/Applications";
 import SearchProposalRoute from "./components/SearchProposal";
-import Toasts from "./components/Toasts";
+//import Toasts from "./components/Toasts";
 import StudentApplications from "./components/StudentApplications";
 
 function App() {
@@ -45,28 +42,26 @@ function App() {
     else setType("error");
     setMessage(msg); */
 
-    if (type === 'success') {
+    if (type === "success") {
       toast.success(msg, {
         //position: toast.POSITION.RIGHT,
         position: "top-right",
-        autoClose: 5000, // Adjust as needed
+        autoClose: 5000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-       
       });
-    } else if (type === 'error'){
+    } else if (type === "error") {
       toast.error(msg, {
-        position: toast.POSITION.TOP_CENTER,
-        autoClose: 5000, // Adjust as needed
+        position: "top-right",
+        autoClose: 5000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        
       });
     }
   };
@@ -89,11 +84,6 @@ function App() {
     checkAuth();
   }, []);
 
-  const loginSuccessful = (user) => {
-    setUser(user);
-    setLoggedIn(true);
-    setLoading(false);
-  };
   const logOut = async () => {
     await API.logOut();
     setLoggedIn(false);
@@ -102,10 +92,10 @@ function App() {
 
   return (
     <BrowserRouter>
-      <MessageContext.Provider value={{ handleToast }}>        
+      <MessageContext.Provider value={{ handleToast }}>
         <div className="wrapper">
           <Header user={user} logout={logOut} />
-          <ToastContainer/>
+          <ToastContainer />
           <Routes>
             <Route
               path="/"
@@ -182,20 +172,12 @@ function App() {
             <Route
               path="/proposals/:id"
               element={
-                loggedIn ? (
-                  <ThesisPage
-                    loading={loading}
-                    virtualClock={virtualClock}
-                    setLoading={setLoading}
-                  />
-                ) : (
-                  <LoginForm
-                    loginSuccessful={loginSuccessful}
-                    logOut={logOut}
-                    loading={loading}
-                    setLoading={setLoading}
-                  />
-                )
+                <ThesisPage
+                  loading={loading}
+                  virtualClock={virtualClock}
+                  setLoading={setLoading}
+                  loggedIn={loggedIn}
+                />
               }
             ></Route>
             <Route

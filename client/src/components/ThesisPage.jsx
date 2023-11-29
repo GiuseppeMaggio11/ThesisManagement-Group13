@@ -31,6 +31,10 @@ function ThesisPage(props) {
   const { state } = useLocation();
   const from = state?.from;
 
+  if (!props.loggedIn) {
+    return API.redirectToLogin();
+  }
+
   function formatDate(date) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0"); // Aggiunge lo zero iniziale se necessario
