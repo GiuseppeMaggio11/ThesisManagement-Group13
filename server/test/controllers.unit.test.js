@@ -9,8 +9,10 @@ const { listExternalCosupervisors, createExternalCosupervisor } = require("../co
 
 const dao = require("../dao");
 const dayjs = require("dayjs");
+const { validationResult } = require("express-validator");
 
 jest.mock("../dao");
+jest.mock("express-validator");
 
 
 
@@ -306,6 +308,811 @@ describe("getProposal", () => {
         expect(dao.getProposalById).toHaveBeenCalledTimes(1)
         expect(mockRes.status).toHaveBeenCalledWith(500);
         expect(mockRes.json).toHaveBeenCalledWith("Database error");
+    });
+
+});
+
+describe("newApplication", () => {
+
+    test("Should create a new application if the thesis is valid and the student hasn't already applied for it", async () => {
+        const mockReq = {
+            user: {
+                username: "username"
+            },
+            params: {
+                thesis_id: 1
+            },
+            body: {
+                date: dayjs()
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        dao.getUserID.mockResolvedValue("S123456");
+        dao.isThesisValid.mockResolvedValue(true);
+        dao.isAlreadyExisting.mockResolvedValue(false);
+        dao.newApply.mockResolvedValue(true);
+
+        await newApplication(mockReq, mockRes);
+
+        expect(dao.getUserID).toHaveBeenCalledTimes(1);
+        expect(dao.isThesisValid).toHaveBeenCalledTimes(1);
+        expect(dao.isAlreadyExisting).toHaveBeenCalledTimes(1);
+        expect(dao.newApply).toHaveBeenCalledTimes(1);
+        expect(mockRes.status).toHaveBeenCalledWith(200);
+        expect(mockRes.json).toHaveBeenCalledWith("Application created successfully");
+    });
+
+    test("Should return 422 - \"thesis_id\" is not an integer", async () => {
+        const mockReq = {
+            user: {
+                username: "username"
+            },
+            params: {
+                thesis_id: "Not a number"
+            },
+            body: {
+                date: dayjs()
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        await newApplication(mockReq, mockRes);
+
+        expect(dao.getUserID).not.toHaveBeenCalled();
+        expect(dao.isThesisValid).not.toHaveBeenCalled();
+        expect(dao.isAlreadyExisting).not.toHaveBeenCalled();
+        expect(dao.newApply).not.toHaveBeenCalled();
+        expect(mockRes.status).toHaveBeenCalledWith(422);
+        expect(mockRes.json).toHaveBeenCalledWith("Thesis ID must be an integer");
+    });
+
+    test("Should return 422 - The thesis is not valid", async () => {
+        const mockReq = {
+            user: {
+                username: "username"
+            },
+            params: {
+                thesis_id: 1
+            },
+            body: {
+                date: dayjs()
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        dao.getUserID.mockResolvedValue("S123456");
+        dao.isThesisValid.mockResolvedValue(false);
+
+        await newApplication(mockReq, mockRes);
+
+        expect(dao.getUserID).toHaveBeenCalledTimes(1);
+        expect(dao.isThesisValid).toHaveBeenCalledTimes(1);
+        expect(dao.isAlreadyExisting).not.toHaveBeenCalled();
+        expect(dao.newApply).not.toHaveBeenCalled();
+        expect(mockRes.status).toHaveBeenCalledWith(422);
+        expect(mockRes.json).toHaveBeenCalledWith("This thesis is not valid");
+    });
+
+    test("Should return 422 - The student is already applie for the thesis", async () => {
+        const mockReq = {
+            user: {
+                username: "username"
+            },
+            params: {
+                thesis_id: 1
+            },
+            body: {
+                date: dayjs()
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        dao.getUserID.mockResolvedValue("S123456");
+        dao.isThesisValid.mockResolvedValue(true);
+        dao.isAlreadyExisting.mockResolvedValue(true);
+
+        await newApplication(mockReq, mockRes);
+
+        expect(dao.getUserID).toHaveBeenCalledTimes(1);
+        expect(dao.isThesisValid).toHaveBeenCalledTimes(1);
+        expect(dao.isAlreadyExisting).toHaveBeenCalledTimes(1);
+        expect(dao.newApply).not.toHaveBeenCalled();
+        expect(mockRes.status).toHaveBeenCalledWith(422);
+        expect(mockRes.json).toHaveBeenCalledWith("You are already applied for this thesis");
+    });
+
+    test("Should return 500 - Internal server error", async () => {
+        const mockReq = {
+            user: {
+                username: "username"
+            },
+            params: {
+                thesis_id: 1
+            },
+            body: {
+                date: dayjs()
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        dao.getUserID.mockRejectedValue("Database error");
+
+        await newApplication(mockReq, mockRes);
+
+        expect(dao.getUserID).toHaveBeenCalledTimes(1);
+        expect(dao.isThesisValid).not.toHaveBeenCalled();
+        expect(dao.isAlreadyExisting).not.toHaveBeenCalled();
+        expect(dao.newApply).not.toHaveBeenCalled();
+        expect(mockRes.status).toHaveBeenCalledWith(500);
+        expect(mockRes.json).toHaveBeenCalledWith("Database error");
+    });
+
+});
+
+describe("newThesis", () => {
+
+    test("Should create a new thesis proposal", async () => {
+        const mockReq = {
+            body: {
+                title: "title",
+                description: "description",
+                supervisor_id: "P111111",
+                thesis_level: "thesis_level",
+                type_name: "type_name",
+                required_knowledge: "required_knowledge",
+                notes: "notes",
+                expiration: "2025-01-01 00:00:00",
+                cod_degree: "DEGR01",
+                is_archived: false,
+                keywords: "keywords",
+                cod_group: "GRP001",
+                cosupervisors_internal: [
+                    "P222222",
+                    "P333333"
+                ],
+                cosupervisors_external: [
+                    "cos.ext1@mail.com",
+                    "cos.ext2@mail.com",
+                    "cos.ext3@mail.com"
+                ],
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        const mockedValidationResult = {
+            isEmpty: jest.fn(() => true),
+        };
+        const thesis_group = {
+            thesis_id: 1,
+            group_id: mockReq.body.cod_group
+        };
+        const thesis_internal_cosupervisors = [
+            {
+                thesis_id: 1,
+                thesis_cosupervisor: mockReq.body.cosupervisors_external[0]
+            },
+            {
+                thesis_id: 1,
+                thesis_cosupervisor: mockReq.body.cosupervisors_external[1]
+            },
+            {
+                thesis_id: 1,
+                thesis_cosupervisor: mockReq.body.cosupervisors_external[2]
+            }
+        ];
+        const thesis_external_cosupervisors = [
+            {
+                thesis_id: 1,
+                thesis_cosupervisor: mockReq.body.cosupervisors_internal[0]
+            },
+            {
+                thesis_id: 1,
+                thesis_cosupervisor: mockReq.body.cosupervisors_internal[1]
+            }
+        ];
+        const thesis = { id: 1, ...mockReq.body };
+
+        validationResult.mockReturnValue(mockedValidationResult);
+        dao.beginTransaction.mockResolvedValue(true);
+        dao.getTeachers.mockResolvedValue(["P111111", "P222222", "P333333"]);
+        dao.getExternal_cosupervisors_emails.mockResolvedValue(["cos.ext1@mail.com", "cos.ext2@mail.com", "cos.ext3@mail.com"]);
+        dao.getDegrees.mockResolvedValue(["DEGR01"]);
+        dao.getCodes_group.mockResolvedValue(["GRP001"]);
+        dao.createThesis.mockResolvedValue(thesis);
+        dao.createThesis_group.mockResolvedValue(thesis_group);
+        dao.createThesis_cosupervisor_teacher.mockResolvedValueOnce(thesis_internal_cosupervisors[0]);
+        dao.createThesis_cosupervisor_teacher.mockResolvedValueOnce(thesis_internal_cosupervisors[1]);
+        dao.createThesis_cosupervisor_external.mockResolvedValueOnce(thesis_external_cosupervisors[0]);
+        dao.createThesis_cosupervisor_external.mockResolvedValueOnce(thesis_external_cosupervisors[1]);
+        dao.createThesis_cosupervisor_external.mockResolvedValueOnce(thesis_external_cosupervisors[2]);
+        dao.commit.mockResolvedValue(true);
+
+        await newThesis(mockReq, mockRes);
+
+        expect(validationResult).toHaveBeenCalledTimes(1);
+        expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
+        expect(dao.getTeachers).toHaveBeenCalledTimes(1);
+        expect(dao.getExternal_cosupervisors_emails).toHaveBeenCalledTimes(1);
+        expect(dao.getDegrees).toHaveBeenCalledTimes(1);
+        expect(dao.getCodes_group).toHaveBeenCalledTimes(1);
+        expect(dao.createThesis).toHaveBeenCalledTimes(1);
+        expect(dao.createThesis_group).toHaveBeenCalledTimes(1);
+        expect(dao.createThesis_cosupervisor_teacher).toHaveBeenCalledTimes(2);
+        expect(dao.createThesis_cosupervisor_external).toHaveBeenCalledTimes(3);
+        expect(dao.commit).toHaveBeenCalledTimes(1);
+        expect(dao.rollback).not.toHaveBeenCalled();
+        expect(mockRes.status).toHaveBeenCalledWith(200);
+        expect(mockRes.json).toHaveBeenCalledWith(thesis);
+    });
+
+    test("Should return 422 - express-validator has found some errors", async () => {
+        const mockReq = {};
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        const mockedValidationResult = {
+            isEmpty: jest.fn(() => false)
+        };
+
+        validationResult.mockReturnValue(mockedValidationResult);
+
+        await newThesis(mockReq, mockRes);
+
+        expect(validationResult).toHaveBeenCalledTimes(1);
+        expect(dao.beginTransaction).not.toHaveBeenCalled();
+        expect(dao.getTeachers).not.toHaveBeenCalled();
+        expect(dao.getExternal_cosupervisors_emails).not.toHaveBeenCalled();
+        expect(dao.getDegrees).not.toHaveBeenCalled();
+        expect(dao.getCodes_group).not.toHaveBeenCalled();
+        expect(dao.createThesis).not.toHaveBeenCalled();
+        expect(dao.createThesis_group).not.toHaveBeenCalled();
+        expect(dao.createThesis_cosupervisor_teacher).not.toHaveBeenCalled();
+        expect(dao.createThesis_cosupervisor_external).not.toHaveBeenCalled();
+        expect(dao.commit).not.toHaveBeenCalled();
+        expect(dao.rollback).not.toHaveBeenCalled();
+        expect(mockRes.status).toHaveBeenCalledWith(422);
+        expect(mockRes.json.mock.calls[0][0]).toHaveProperty("errors");
+    });
+
+    test("Should return 400 - The provided \"supervisor_id\" doesn't represent a teacher", async () => {
+        const mockReq = {
+            body: {
+                title: "title",
+                description: "description",
+                supervisor_id: "P444444",
+                thesis_level: "thesis_level",
+                type_name: "type_name",
+                required_knowledge: "required_knowledge",
+                notes: "notes",
+                expiration: "2025-01-01 00:00:00",
+                cod_degree: "DEGR01",
+                is_archived: false,
+                keywords: "keywords",
+                cod_group: "GRP001",
+                cosupervisors_internal: [
+                    "P222222",
+                    "P333333"
+                ],
+                cosupervisors_external: [
+                    "cos.ext1@mail.com",
+                    "cos.ext2@mail.com",
+                    "cos.ext3@mail.com"
+                ],
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        const mockedValidationResult = {
+            isEmpty: jest.fn(() => true),
+        };
+
+        validationResult.mockReturnValue(mockedValidationResult);
+        dao.beginTransaction.mockResolvedValue(true);
+        dao.getTeachers.mockResolvedValue(["P111111", "P222222", "P333333"]);
+        dao.rollback.mockResolvedValue(true);
+
+        await newThesis(mockReq, mockRes);
+
+        expect(validationResult).toHaveBeenCalledTimes(1);
+        expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
+        expect(dao.getTeachers).toHaveBeenCalledTimes(1);
+        expect(dao.getExternal_cosupervisors_emails).not.toHaveBeenCalled();
+        expect(dao.getDegrees).not.toHaveBeenCalled();
+        expect(dao.getCodes_group).not.toHaveBeenCalled();
+        expect(dao.createThesis).not.toHaveBeenCalled();
+        expect(dao.createThesis_group).not.toHaveBeenCalled();
+        expect(dao.createThesis_cosupervisor_teacher).not.toHaveBeenCalled();
+        expect(dao.createThesis_cosupervisor_external).not.toHaveBeenCalled();
+        expect(dao.commit).not.toHaveBeenCalled();
+        expect(dao.rollback).toHaveBeenCalledTimes(1);
+        expect(mockRes.status).toHaveBeenCalledWith(400);
+        expect(mockRes.json).toHaveBeenCalledWith({ error: `Supervisor_id: ${mockReq.body.supervisor_id} is not a teacher` });
+    });
+
+    test("Should return 400 - At least one of the provided internal cosupervisors is not a teacher", async () => {
+        const mockReq = {
+            body: {
+                title: "title",
+                description: "description",
+                supervisor_id: "P111111",
+                thesis_level: "thesis_level",
+                type_name: "type_name",
+                required_knowledge: "required_knowledge",
+                notes: "notes",
+                expiration: "2025-01-01 00:00:00",
+                cod_degree: "DEGR01",
+                is_archived: false,
+                keywords: "keywords",
+                cod_group: "GRP001",
+                cosupervisors_internal: [
+                    "P222222",
+                    "P333333",
+                    "P444444"
+                ],
+                cosupervisors_external: [
+                    "cos.ext1@mail.com",
+                    "cos.ext2@mail.com",
+                    "cos.ext3@mail.com"
+                ],
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        const mockedValidationResult = {
+            isEmpty: jest.fn(() => true),
+        };
+
+        validationResult.mockReturnValue(mockedValidationResult);
+        dao.beginTransaction.mockResolvedValue(true);
+        dao.getTeachers.mockResolvedValue(["P111111", "P222222", "P333333"]);
+        dao.rollback.mockResolvedValue(true);
+
+        await newThesis(mockReq, mockRes);
+
+        expect(validationResult).toHaveBeenCalledTimes(1);
+        expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
+        expect(dao.getTeachers).toHaveBeenCalledTimes(1);
+        expect(dao.getExternal_cosupervisors_emails).not.toHaveBeenCalled();
+        expect(dao.getDegrees).not.toHaveBeenCalled();
+        expect(dao.getCodes_group).not.toHaveBeenCalled();
+        expect(dao.createThesis).not.toHaveBeenCalled();
+        expect(dao.createThesis_group).not.toHaveBeenCalled();
+        expect(dao.createThesis_cosupervisor_teacher).not.toHaveBeenCalled();
+        expect(dao.createThesis_cosupervisor_external).not.toHaveBeenCalled();
+        expect(dao.commit).not.toHaveBeenCalled();
+        expect(dao.rollback).toHaveBeenCalledTimes(1);
+        expect(mockRes.status).toHaveBeenCalledWith(400);
+        expect(mockRes.json).toHaveBeenCalledWith({ error: `Internal cosupervisor_id: P444444 is not a teacher` });
+    });
+
+    test("Should return 400 - At least one of the provided external cosupervisors is not a valid cosupervisor", async () => {
+        const mockReq = {
+            body: {
+                title: "title",
+                description: "description",
+                supervisor_id: "P111111",
+                thesis_level: "thesis_level",
+                type_name: "type_name",
+                required_knowledge: "required_knowledge",
+                notes: "notes",
+                expiration: "2025-01-01 00:00:00",
+                cod_degree: "DEGR01",
+                is_archived: false,
+                keywords: "keywords",
+                cod_group: "GRP001",
+                cosupervisors_internal: [
+                    "P222222",
+                    "P333333"
+                ],
+                cosupervisors_external: [
+                    "cos.ext1@mail.com",
+                    "cos.ext2@mail.com",
+                    "cos.ext4@mail.com"
+                ],
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        const mockedValidationResult = {
+            isEmpty: jest.fn(() => true),
+        };
+
+        validationResult.mockReturnValue(mockedValidationResult);
+        dao.beginTransaction.mockResolvedValue(true);
+        dao.getTeachers.mockResolvedValue(["P111111", "P222222", "P333333"]);
+        dao.getExternal_cosupervisors_emails.mockResolvedValue(["cos.ext1@mail.com", "cos.ext2@mail.com", "cos.ext3@mail.com"]);
+        dao.rollback.mockResolvedValue(true);
+
+        await newThesis(mockReq, mockRes);
+
+        expect(validationResult).toHaveBeenCalledTimes(1);
+        expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
+        expect(dao.getTeachers).toHaveBeenCalledTimes(1);
+        expect(dao.getExternal_cosupervisors_emails).toHaveBeenCalledTimes(1);
+        expect(dao.getDegrees).not.toHaveBeenCalled();
+        expect(dao.getCodes_group).not.toHaveBeenCalled();
+        expect(dao.createThesis).not.toHaveBeenCalled();
+        expect(dao.createThesis_group).not.toHaveBeenCalled();
+        expect(dao.createThesis_cosupervisor_teacher).not.toHaveBeenCalled();
+        expect(dao.createThesis_cosupervisor_external).not.toHaveBeenCalled();
+        expect(dao.commit).not.toHaveBeenCalled();
+        expect(dao.rollback).toHaveBeenCalledTimes(1);
+        expect(mockRes.status).toHaveBeenCalledWith(400);
+        expect(mockRes.json).toHaveBeenCalledWith({ error: `External cosupervisor email: cos.ext4@mail.com is not a valid external cosupervisor email` });
+    });
+
+    test("Should return 400 - The provided \"cod_degree\" doesn't represent a degree", async () => {
+        const mockReq = {
+            body: {
+                title: "title",
+                description: "description",
+                supervisor_id: "P111111",
+                thesis_level: "thesis_level",
+                type_name: "type_name",
+                required_knowledge: "required_knowledge",
+                notes: "notes",
+                expiration: "2025-01-01 00:00:00",
+                cod_degree: "DEGR02",
+                is_archived: false,
+                keywords: "keywords",
+                cod_group: "GRP001",
+                cosupervisors_internal: [
+                    "P222222",
+                    "P333333"
+                ],
+                cosupervisors_external: [
+                    "cos.ext1@mail.com",
+                    "cos.ext2@mail.com",
+                    "cos.ext3@mail.com"
+                ],
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        const mockedValidationResult = {
+            isEmpty: jest.fn(() => true),
+        };
+
+        validationResult.mockReturnValue(mockedValidationResult);
+        dao.beginTransaction.mockResolvedValue(true);
+        dao.getTeachers.mockResolvedValue(["P111111", "P222222", "P333333"]);
+        dao.getExternal_cosupervisors_emails.mockResolvedValue(["cos.ext1@mail.com", "cos.ext2@mail.com", "cos.ext3@mail.com"]);
+        dao.getDegrees.mockResolvedValue(["DEGR01"]);
+        dao.rollback.mockResolvedValue(true);
+
+        await newThesis(mockReq, mockRes);
+
+        expect(validationResult).toHaveBeenCalledTimes(1);
+        expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
+        expect(dao.getTeachers).toHaveBeenCalledTimes(1);
+        expect(dao.getExternal_cosupervisors_emails).toHaveBeenCalledTimes(1);
+        expect(dao.getDegrees).toHaveBeenCalledTimes(1);
+        expect(dao.getCodes_group).not.toHaveBeenCalled();
+        expect(dao.createThesis).not.toHaveBeenCalled();
+        expect(dao.createThesis_group).not.toHaveBeenCalled();
+        expect(dao.createThesis_cosupervisor_teacher).not.toHaveBeenCalled();
+        expect(dao.createThesis_cosupervisor_external).not.toHaveBeenCalled();
+        expect(dao.commit).not.toHaveBeenCalled();
+        expect(dao.rollback).toHaveBeenCalledTimes(1);
+        expect(mockRes.status).toHaveBeenCalledWith(400);
+        expect(mockRes.json).toHaveBeenCalledWith({ error: `Cod_degree: ${mockReq.body.cod_degree} is not a valid degree code` });
+    });
+
+    test("Should return 400 - The provided \"cod_group\" doesn't represent a group", async () => {
+        const mockReq = {
+            body: {
+                title: "title",
+                description: "description",
+                supervisor_id: "P111111",
+                thesis_level: "thesis_level",
+                type_name: "type_name",
+                required_knowledge: "required_knowledge",
+                notes: "notes",
+                expiration: "2025-01-01 00:00:00",
+                cod_degree: "DEGR01",
+                is_archived: false,
+                keywords: "keywords",
+                cod_group: "GRP002",
+                cosupervisors_internal: [
+                    "P222222",
+                    "P333333"
+                ],
+                cosupervisors_external: [
+                    "cos.ext1@mail.com",
+                    "cos.ext2@mail.com",
+                    "cos.ext3@mail.com"
+                ],
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        const mockedValidationResult = {
+            isEmpty: jest.fn(() => true),
+        };
+
+        validationResult.mockReturnValue(mockedValidationResult);
+        dao.beginTransaction.mockResolvedValue(true);
+        dao.getTeachers.mockResolvedValue(["P111111", "P222222", "P333333"]);
+        dao.getExternal_cosupervisors_emails.mockResolvedValue(["cos.ext1@mail.com", "cos.ext2@mail.com", "cos.ext3@mail.com"]);
+        dao.getDegrees.mockResolvedValue(["DEGR01"]);
+        dao.getCodes_group.mockResolvedValue(["GRP001"]);
+        dao.rollback.mockResolvedValue(true);
+
+        await newThesis(mockReq, mockRes);
+
+        expect(validationResult).toHaveBeenCalledTimes(1);
+        expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
+        expect(dao.getTeachers).toHaveBeenCalledTimes(1);
+        expect(dao.getExternal_cosupervisors_emails).toHaveBeenCalledTimes(1);
+        expect(dao.getDegrees).toHaveBeenCalledTimes(1);
+        expect(dao.getCodes_group).toHaveBeenCalledTimes(1);
+        expect(dao.createThesis).not.toHaveBeenCalled();
+        expect(dao.createThesis_group).not.toHaveBeenCalled();
+        expect(dao.createThesis_cosupervisor_teacher).not.toHaveBeenCalled();
+        expect(dao.createThesis_cosupervisor_external).not.toHaveBeenCalled();
+        expect(dao.commit).not.toHaveBeenCalled();
+        expect(dao.rollback).toHaveBeenCalledTimes(1);
+        expect(mockRes.status).toHaveBeenCalledWith(400);
+        expect(mockRes.json).toHaveBeenCalledWith({ error: `Cod_group: ${mockReq.body.cod_group} is not a valid research group code` });
+    });
+
+    test("Should return 500 - Internal server error", async () => {
+        const mockReq = {
+            body: {
+                title: "title",
+                description: "description",
+                supervisor_id: "P111111",
+                thesis_level: "thesis_level",
+                type_name: "type_name",
+                required_knowledge: "required_knowledge",
+                notes: "notes",
+                expiration: "2025-01-01 00:00:00",
+                cod_degree: "DEGR01",
+                is_archived: false,
+                keywords: "keywords",
+                cod_group: "GRP001",
+                cosupervisors_internal: [
+                    "P222222",
+                    "P333333"
+                ],
+                cosupervisors_external: [
+                    "cos.ext1@mail.com",
+                    "cos.ext2@mail.com",
+                    "cos.ext3@mail.com"
+                ],
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        const mockedValidationResult = {
+            isEmpty: jest.fn(() => true),
+        };
+
+        validationResult.mockReturnValue(mockedValidationResult);
+        dao.beginTransaction.mockRejectedValue("Database error");
+        dao.rollback.mockResolvedValue(true);
+
+        await newThesis(mockReq, mockRes);
+
+        expect(validationResult).toHaveBeenCalledTimes(1);
+        expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
+        expect(dao.getTeachers).not.toHaveBeenCalled();
+        expect(dao.getExternal_cosupervisors_emails).not.toHaveBeenCalled();
+        expect(dao.getDegrees).not.toHaveBeenCalled();
+        expect(dao.getCodes_group).not.toHaveBeenCalled();
+        expect(dao.createThesis).not.toHaveBeenCalled();
+        expect(dao.createThesis_group).not.toHaveBeenCalled();
+        expect(dao.createThesis_cosupervisor_teacher).not.toHaveBeenCalled();
+        expect(dao.createThesis_cosupervisor_external).not.toHaveBeenCalled();
+        expect(dao.commit).not.toHaveBeenCalled();
+        expect(dao.rollback).toHaveBeenCalledTimes(1);
+        expect(mockRes.status).toHaveBeenCalledWith(503);
+        expect(mockRes.json).toHaveBeenCalledWith({ error: "Database error" });
+    });
+
+});
+
+describe("listExternalCosupervisors", () => {
+
+    test("Should retrieve the list of all the external cosupervisors", async () => {
+        const mockReq = {};
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        const output = ["cos_ext_1", "cos_ext_2", "cos_ext_3"];
+
+        dao.getExternal_cosupervisors.mockResolvedValue(output);
+
+        await listExternalCosupervisors(mockReq, mockRes);
+
+        expect(dao.getExternal_cosupervisors).toHaveBeenCalledTimes(1);
+        expect(mockRes.status).toHaveBeenCalledWith(200);
+        expect(mockRes.json).toHaveBeenCalledWith(output);
+    });
+
+    test("Should return 500 - Internal server error", async () => {
+        const mockReq = {};
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        dao.getExternal_cosupervisors.mockRejectedValue("Database error");
+
+        await listExternalCosupervisors(mockReq, mockRes);
+
+        expect(dao.getExternal_cosupervisors).toHaveBeenCalledTimes(1);
+        expect(mockRes.status).toHaveBeenCalledWith(500);
+        expect(mockRes.json).toHaveBeenCalledWith("Database error");
+    });
+
+});
+
+describe("createExternalCosupervisor", () => {
+
+    test("Should create a new external cosupervisor", async () => {
+        const mockReq = {
+            body: {
+                name: "cos",
+                surname: "ext",
+                email: "cos.ext4@mail.com"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        const mockedValidationResult = {
+            isEmpty: jest.fn(() => true),
+        };
+
+        validationResult.mockReturnValue(mockedValidationResult);
+        dao.beginTransaction.mockResolvedValue(true);
+        dao.getExternal_cosupervisors_emails.mockResolvedValue(["cos.ext1@mail.com", "cos.ext2@mail.com", "cos.ext3@mail.com"]);
+        dao.create_external_cosupervisor.mockResolvedValue({ ...mockReq.body })
+        dao.commit.mockResolvedValue(true);
+
+        await createExternalCosupervisor(mockReq, mockRes);
+
+        expect(validationResult).toHaveBeenCalledTimes(1);
+        expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
+        expect(dao.getExternal_cosupervisors_emails).toHaveBeenCalledTimes(1);
+        expect(dao.create_external_cosupervisor).toHaveBeenCalledTimes(1);
+        expect(dao.commit).toHaveBeenCalledTimes(1);
+        expect(dao.rollback).not.toHaveBeenCalled();
+        expect(mockRes.status).toHaveBeenCalledWith(200);
+        expect(mockRes.json).toHaveBeenCalledWith({ ...mockReq.body });
+    });
+
+    test("Should return 422 - express-validator has found some errors", async () => {
+        const mockReq = {
+            body: {
+                name: "cos",
+                surname: "ext",
+                email: "cos.ext4@mail.com"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        const mockedValidationResult = {
+            isEmpty: jest.fn(() => false),
+        };
+
+        validationResult.mockReturnValue(mockedValidationResult);
+
+        await createExternalCosupervisor(mockReq, mockRes);
+
+        expect(validationResult).toHaveBeenCalledTimes(1);
+        expect(dao.beginTransaction).not.toHaveBeenCalled();
+        expect(dao.getExternal_cosupervisors_emails).not.toHaveBeenCalled();
+        expect(dao.create_external_cosupervisor).not.toHaveBeenCalled();
+        expect(dao.commit).not.toHaveBeenCalled();
+        expect(dao.rollback).not.toHaveBeenCalled();
+        expect(mockRes.status).toHaveBeenCalledWith(422);
+        expect(mockRes.json.mock.calls[0][0]).toHaveProperty("errors");
+    });
+
+    test("Should return 400 - The provided \"email\" belongs to an already existing external cosupervisor", async () => {
+        const mockReq = {
+            body: {
+                name: "cos",
+                surname: "ext",
+                email: "cos.ext1@mail.com"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        const mockedValidationResult = {
+            isEmpty: jest.fn(() => true),
+        };
+
+        validationResult.mockReturnValue(mockedValidationResult);
+        dao.beginTransaction.mockResolvedValue(true);
+        dao.getExternal_cosupervisors_emails.mockResolvedValue(["cos.ext1@mail.com", "cos.ext2@mail.com", "cos.ext3@mail.com"]);
+        dao.rollback.mockResolvedValue(true);
+
+        await createExternalCosupervisor(mockReq, mockRes);
+
+        expect(validationResult).toHaveBeenCalledTimes(1);
+        expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
+        expect(dao.getExternal_cosupervisors_emails).toHaveBeenCalledTimes(1);
+        expect(dao.create_external_cosupervisor).not.toHaveBeenCalled();
+        expect(dao.commit).not.toHaveBeenCalled();
+        expect(dao.rollback).toHaveBeenCalledTimes(1);
+        expect(mockRes.status).toHaveBeenCalledWith(400);
+        expect(mockRes.json).toHaveBeenCalledWith({ error: `External cosupervisor email: ${mockReq.body.email} is already present in db` });
+    });
+
+    test("Should return 500 - Internal server error", async () => {
+        const mockReq = {
+            body: {
+                name: "cos",
+                surname: "ext",
+                email: "cos.ext1@mail.com"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        const mockedValidationResult = {
+            isEmpty: jest.fn(() => true),
+        };
+
+        validationResult.mockReturnValue(mockedValidationResult);
+        dao.beginTransaction.mockRejectedValue("Database error");
+        dao.rollback.mockResolvedValue(true);
+
+        await createExternalCosupervisor(mockReq, mockRes);
+
+        expect(validationResult).toHaveBeenCalledTimes(1);
+        expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
+        expect(dao.getExternal_cosupervisors_emails).not.toHaveBeenCalled();
+        expect(dao.create_external_cosupervisor).not.toHaveBeenCalled();
+        expect(dao.commit).not.toHaveBeenCalled();
+        expect(dao.rollback).toHaveBeenCalledTimes(1);
+        expect(mockRes.status).toHaveBeenCalledWith(503);
+        expect(mockRes.json).toHaveBeenCalledWith({ error: "Database error" });
     });
 
 });

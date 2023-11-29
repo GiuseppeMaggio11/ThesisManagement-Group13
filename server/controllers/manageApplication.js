@@ -59,7 +59,7 @@ async function newApplication(req, res) {
   const date = req.body.date;
   try {
     if (!Number.isInteger(Number(thesis_id))) {
-      throw new Error("Thesis ID must be an integer");
+      return res.status(422).json("Thesis ID must be an integer");
     }
     const userID = await dao.getUserID(req.user.username);
     const isValid = await dao.isThesisValid(thesis_id, date);
@@ -74,7 +74,7 @@ async function newApplication(req, res) {
 
     res.status(200).json("Application created successfully");
   } catch (error) {
-    res.status(500).json(error.message + " ");
+    res.status(500).json(error);
   }
 }
 

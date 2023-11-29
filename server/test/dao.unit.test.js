@@ -830,11 +830,11 @@ describe("getProposalById", () => {
         };
         const mockOutput =
         {
-            cosupervisors: ["name surname", "undefined undefined"],
+            cosupervisors: ["name1 surname1", "name2 surname2"],
             department_name: "department_name",
             description: 1,
             expiration: "2022-01-01 00:00:00",
-            group_name: [{ department: "department_name", group: "group_name" }, { department: undefined, group: undefined }],
+            group_name: [{ department: "department_name", group: "group_name" }, { department: "department_name2", group: "group_name2" }],
             id: 1,
             is_archived: true,
             keywords: ["keywords"],
@@ -872,15 +872,15 @@ describe("getProposalById", () => {
             .mockResolvedValueOnce([[{
                 id: 1,
                 cosupevisor_id: 1,
-                name: "name",
-                surname: "surname"
+                name: "name1",
+                surname: "surname1"
             }]])
             .mockResolvedValueOnce([[{
                 id: 1,
-                name: "name",
-                surname: "surname",
-                group_name: "group_name",
-                department_name: "department_name"
+                name: "name2",
+                surname: "surname2",
+                group_name: "group_name2",
+                department_name: "department_name2"
             }]]);
 
         const result = await dao.getProposalById(mockInput.requested_thesis_id, mockInput.user_type, mockInput.username);
