@@ -278,7 +278,7 @@ function SearchProposalComponent(props) {
               </Col>
             </Row>
           ) : (
-            <Row>
+            <Row style={{ marginBottom: "5rem" }}>
               <Accordion>
                 {filteredByTitle.length <= 0 &&
                   filter === "" &&
