@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # expose client port
-EXPOSE ${CLIENT_PORT}
+EXPOSE 5173
 
 # Set the default command to run when the container starts
 ENTRYPOINT [ "npm"]

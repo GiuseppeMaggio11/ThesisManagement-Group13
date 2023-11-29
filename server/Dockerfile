@@ -1,4 +1,4 @@
-FROM cypress/browsers:node16.16.0-chrome107-ff107-edge
+FROM node:18-alpine
 
 # Define the application's working directory.
 WORKDIR /usr/src/app
@@ -13,8 +13,11 @@ RUN npm install
 # copy source code and npm files
 COPY . .
 
+# Adjust permissions for the index.js file if needed
+RUN chmod +x /usr/src/app
+
 # expose server port
-EXPOSE ${SERVER_PORT}
+EXPOSE 3001
 
 # Run this command when the container is started
 CMD ["node", "index.js"]
