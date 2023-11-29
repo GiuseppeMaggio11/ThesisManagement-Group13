@@ -628,7 +628,7 @@ describe("create_external_cosupervisor", () => {
             "INSERT INTO external_supervisor (email, surname, name) VALUES (?,?,?)",
             [mockInput.email, mockInput.surname, mockInput.name]
         );
-        expect(result).toEqual(mockInput);
+        expect(result).toStrictEqual(mockInput);
     });
 
     test("Should handle database error and reject", async () => {
@@ -1009,4 +1009,335 @@ describe("rollback", () => {
         expect(mockConnection.release).toHaveBeenCalledTimes(1);
     });
 
-})
+});
+
+// SPRINT 2
+
+describe("updateThesesArchivation", () => {
+
+    test("Should update \"isArchived\" for every thesis when the virtual clock date is after their expiration date", async () => {
+        const mockInput = {
+            virtualDateTime: dayjs()
+        };
+        const mockRows = {
+            info: "ok"
+        };
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.updateThesesArchivation(mockInput.virtualDateTime);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            ` 
+                UPDATE thesis
+                SET is_archived = CASE
+                    WHEN expiration < STR_TO_DATE(?, '%Y-%m-%dT%H:%i:%s.%fZ') THEN 1
+                    ELSE 0
+                END;
+                `,
+            [mockInput.virtualDateTime]
+        );
+        expect(result).toStrictEqual(mockRows.info);
+    });
+
+    test("Should handle database errors", async () => {
+        const mockInput = {
+            virtualDateTime: dayjs()
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.updateThesesArchivation(mockInput.virtualDateTime)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+    });
+
+});
+
+describe("updateApplicationStatus", () => {
+
+    test("Should update the status of an application", async () => {
+        const mockInput = {
+            status: "status",
+            student_id: "S123456",
+            thesis_id: 1
+        };
+        
+        mockPool.execute.mockResolvedValue([true]);
+
+        const result = await dao.updateApplicationStatus(mockInput);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            `UPDATE application
+                 SET status = ?
+                 WHERE student_id = ? AND thesis_id = ?;`,
+            [mockInput.status, mockInput.student_id, mockInput.thesis_id]
+        );
+        expect(result).toStrictEqual(mockInput);
+    });
+
+    test("Should handle database errors", async () => {
+        const mockInput = {
+            status: "status",
+            student_id: "S123456",
+            thesis_id: 1
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.updateApplicationStatus(mockInput)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+    });
+
+});
+
+describe("rejectApplicationsExcept", () => {
+
+    test("Should reject an application", async () => {
+        const mockInput = {
+            thesis_id: 1,
+            student_id: "S123456"
+        };
+
+        mockPool.execute.mockResolvedValue([true]);
+
+        const result = await dao.rejectApplicationsExcept(mockInput);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            ` 
+                  UPDATE application
+                  SET status = "Rejected"
+                  WHERE  thesis_id = ?
+                  AND student_id <> ?
+                `,
+            [mockInput.thesis_id, mockInput.student_id]
+        );
+        expect(result).toStrictEqual(mockInput);
+    });
+
+    test("Should handle database errors", async () => {
+        const mockInput = {
+            thesis_id: 1,
+            student_id: "S123456"
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.rejectApplicationsExcept(mockInput)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe("cancelStudentApplications", () => {
+
+    test("Should cancel a student application", async () => {
+        const mockInput = {
+            student_id: "S123456",
+            thesis_id: 1
+        };
+
+        mockPool.execute.mockResolvedValue([true]);
+
+        const result = await dao.cancelStudentApplications(mockInput);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            ` 
+                  DELETE FROM application
+                  WHERE student_id = ?
+                  AND thesis_id <> ?;
+                `,
+            [mockInput.student_id, mockInput.thesis_id]
+        );
+        expect(result).toStrictEqual(mockInput);
+    });
+
+    test("Should handle database errors", async () => {
+        const mockInput = {
+            student_id: "S123456",
+            thesis_id: 1
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.cancelStudentApplications(mockInput)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+    });
+
+});
+
+describe("getApplications", () => {
+
+    test("Should return the list of all applications", async () => {
+        const mockRows = [
+            {
+                student_id: "S111111",
+                thesis_id: 1,
+                application_date: dayjs(),
+                status: "status"
+            },
+            {
+                student_id: "S222222",
+                thesis_id: 1,
+                application_date: dayjs(),
+                status: "status"
+            }
+        ];
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.getApplications();
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM application",
+            []
+        );
+        expect(result).toStrictEqual(mockRows);
+    });
+
+    test("Should handle database errors", async () => {
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getApplications()).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+    });
+
+});
+
+describe("getApplicationsForProfessor", () => {
+
+    test("Should return all applications offered by a professor that are still pending", async () => {
+        const mockInput = {
+            profId: "name.surname@polito.it"
+        };
+        const mockRows = [
+            {
+                student_id: "S111111",
+                name: "name1",
+                surname: "surname1",
+                thesis_id: 1,
+                title: "title1",
+                application_date: dayjs().format("YYYY-MM-DD")
+            },
+            {
+                student_id: "S222222",
+                name: "name2",
+                surname: "surname2",
+                thesis_id: 1,
+                title: "title1",
+                application_date: dayjs().format("YYYY-MM-DD")
+            },
+            {
+                student_id: "S111111",
+                name: "name1",
+                surname: "surname1",
+                thesis_id: 2,
+                title: "title2",
+                application_date: dayjs().format("YYYY-MM-DD")
+            }
+        ];
+        const mockOutput = [
+            {
+                student_id: "S111111",
+                student_name: "name1 surname1",
+                thesis_id: 1,
+                thesis_title: "title1",
+                application_date: dayjs().format("YYYY-MM-DD")
+            },
+            {
+                student_id: "S222222",
+                student_name: "name2 surname2",
+                thesis_id: 1,
+                thesis_title: "title1",
+                application_date: dayjs().format("YYYY-MM-DD")
+            },
+            {
+                student_id: "S111111",
+                student_name: "name1 surname1",
+                thesis_id: 2,
+                thesis_title: "title2",
+                application_date: dayjs().format("YYYY-MM-DD")
+            }
+        ];
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.getApplicationsForProfessor(mockInput.profId);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            `SELECT a.student_id ,s.name ,s.surname ,a.thesis_id ,t.title ,a.application_date
+                 FROM application a join student s on s.id = a.student_id join thesis t on t.id = a.thesis_id join teacher tch on t.supervisor_id = tch.id 
+                 WHERE a.status = 'Pending' and tch.email = ?  ORDER BY t.title`,
+            [mockInput.profId]
+        );
+        expect(result).toStrictEqual(mockOutput);
+    });
+
+    test("Should handle database errors", async () => {
+        const mockInput = {
+            profId: "name.surname@polito.it"
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getApplicationsForProfessor(mockInput.profId)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+    });
+
+});
+
+describe("getStudentApplication", () => {
+
+    test("Should return all applications submitted by a student", async () => {
+        const mockInput = {
+            studentId: "S123456"
+        };
+
+        const mockRows = [
+            {
+                field1: "field1",
+                field2: 1,
+                field3: dayjs().format("YYYY-MM-DD")
+            },
+            {
+                field1: "field2",
+                field2: 2,
+                field3: dayjs().format("YYYY-MM-DD")
+            }
+        ];
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.getStudentApplication(mockInput.studentId);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM application WHERE student_id = ?",
+            [mockInput.studentId]
+        );
+        expect(result).toStrictEqual(mockRows);
+    });
+
+    test("Should handle database errors", async () => {
+        const mockInput = {
+            studentId: "S123456"
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getStudentApplication(mockInput.studentId)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+    });
+
+});
