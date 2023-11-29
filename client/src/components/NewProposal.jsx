@@ -334,7 +334,7 @@ function NewProposal(props) {
                     <Form.Control
                       id="cosupervisors_internal"
                       type="text"
-                      placeholder="Enter a keyword and press enter"
+                      placeholder="Enter an internal co-supervisor ID and press enter"
                       autoComplete="off"
                       value={internal_cosupervisor_input}
                       onChange={(e) =>
