@@ -17,8 +17,10 @@ import "react-toastify/dist/ReactToastify.css";
 import ToggleComponent from "./Toggle";
 import dayjs from "dayjs";
 import MessageContext from "../messageCtx";
+import { useNavigate } from "react-router-dom";
 
 function NewProposal(props) {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -75,7 +77,7 @@ function NewProposal(props) {
     const { id, name, value, checked } = e.target;
     setFormData({
       ...formData,
-      [name]: id==="is_archived" ? checked : value,
+      [name]: id === "is_archived" ? checked : value,
     });
   };
 
@@ -194,10 +196,9 @@ function NewProposal(props) {
       keywords: formData.keywords.join(", "),
     };
     try {
-      console.log(newProp);
       const response = await API.newProposal(newProp);
       handleToast("New proposal created successfully", "success");
-      console.log(response);
+      //navigate("/teacher");
     } catch (error) {
       console.log(error);
       if (error.error) {
@@ -228,7 +229,7 @@ function NewProposal(props) {
           }
           toast.error(errorMessage, {
             position: toast.POSITION.TOP_RIGHT,
-            autoClose: 10000, // Adjust as needed
+            autoClose: 5000,
             hideProgressBar: false,
             closeOnClick: true,
             pauseOnHover: true,

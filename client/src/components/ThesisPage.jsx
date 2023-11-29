@@ -39,40 +39,40 @@ function ThesisPage(props) {
     return `${year}-${month}-${day}`;
   }
 
-    useEffect(()=>{
-        const init = async() => {
-            try{
-                props.setLoading(true)
-                const thesisData = await API.getThesisProposalsById(params.id);
-                console.log(thesisData.cosupervisors)
-                setPageData({
-                    title:thesisData.title,
-                    description:thesisData.description,
-                    supervisor:`${thesisData.name} ${thesisData.surname}`,
-                    coSupervisor: thesisData.cosupervisors,
-                    keywords: thesisData.keywords.length!== 0 && thesisData.keywords,
-                    type: thesisData.thesis_type,
-                    groups: thesisData.group_name.map((element)=>{return element.group}),
-                    requiredKnowledge: thesisData.required_knowledge,
-                    ...(thesisData.notes !== 'None' && { notes: thesisData.notes }),
-                    expiration: formatDate(new Date(thesisData.expiration)),
-                    level: thesisData.thesis_level
-                })
-                console.log(thesisData)
-                setIsLoading(false)
-            } catch (error){
-               handleToast(error, 'center', 'error')
-            }
-        }
-        init()
-       
-    },[])
-                
-    const handleApplication = () => {
-        submitApplication(params.id, props.virtualClock);
-        handleUpload(params.id);
-    }
+  useEffect(() => {
+    const init = async () => {
+      try {
+        props.setLoading(true);
+        const thesisData = await API.getThesisProposalsById(params.id);
+        console.log(thesisData.cosupervisors);
+        setPageData({
+          title: thesisData.title,
+          description: thesisData.description,
+          supervisor: `${thesisData.name} ${thesisData.surname}`,
+          coSupervisor: thesisData.cosupervisors,
+          keywords: thesisData.keywords.length !== 0 && thesisData.keywords,
+          type: thesisData.thesis_type,
+          groups: thesisData.group_name.map((element) => {
+            return element.group;
+          }),
+          requiredKnowledge: thesisData.required_knowledge,
+          ...(thesisData.notes !== "None" && { notes: thesisData.notes }),
+          expiration: formatDate(new Date(thesisData.expiration)),
+          level: thesisData.thesis_level,
+        });
+        console.log(thesisData);
+        setIsLoading(false);
+      } catch (error) {
+        handleToast(error, "center", "error");
+      }
+    };
+    init();
+  }, []);
 
+  const handleApplication = () => {
+    submitApplication(params.id, props.virtualClock);
+    handleUpload(params.id);
+  };
 
   const handleUpload = (thesis_id) => {
     const formData = new FormData();
@@ -181,7 +181,7 @@ function ThesisPage(props) {
 
                 {isMobile && pageData.description && (
                   <tr>
-                    <td colSpan="3" className="accordion-td">
+                    <td colSpan="3" className="custom-accordion-td">
                       <Accordion defaultActiveKey="1">
                         <Accordion.Item eventKey="0">
                           <Accordion.Header>Description</Accordion.Header>
@@ -213,7 +213,7 @@ function ThesisPage(props) {
                 )}
                 {isMobile && pageData.notes && (
                   <tr>
-                    <td colSpan="3" className="accordion-td">
+                    <td colSpan="3" className="custom-accordion-td">
                       <Accordion defaultActiveKey="1">
                         <Accordion.Item eventKey="0">
                           <Accordion.Header>Notes</Accordion.Header>
@@ -282,4 +282,4 @@ function ThesisPage(props) {
   );
 }
 
-export default ThesisPage
+export default ThesisPage;

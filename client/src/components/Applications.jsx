@@ -73,7 +73,9 @@ function Applications(props) {
               return (
                 <Accordion.Item key={i} eventKey={i}>
                   <Accordion.Header>
-                    <span className="fw-bold">{title}</span>
+                    <span style={{ color: "#4682B4", fontSize: 18 }}>
+                      {title}
+                    </span>
                   </Accordion.Header>
                   <Accordion.Body>
                     <Table>
@@ -124,7 +126,6 @@ function StudentApplication(props) {
     }${minutes}`;
   }
 
-  //return !props.isMobile && props.title === props.application.thesis_title ? (
   return props.title === props.application.thesis_title ? (
     <tr>
       {!props.isMobile && <td>{props.application.student_id}</td>}

@@ -1,30 +1,31 @@
-import React, { useEffect } from 'react';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useEffect } from "react";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Toasts = ({ message, type, onClose }) => {
   useEffect(() => {
-    if (type === 'success') {
+    debugger;
+    if (type === "success") {
       toast.success(message, {
         position: toast.POSITION.TOP_CENTER,
-        autoClose: 5000, // Adjust as needed
+        autoClose: 5000,
         hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        onClose: onClose
+        onClose: onClose,
       });
-    } else if (type === 'error'){
+    } else if (type === "error") {
       toast.error(message, {
         position: toast.POSITION.TOP_CENTER,
-        autoClose: 5000, // Adjust as needed
+        autoClose: 5000,
         hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        onClose: onClose
+        onClose: onClose,
       });
     }
   }, [message, type]);
