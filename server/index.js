@@ -67,6 +67,7 @@ passport.use(
         "https://dev-alc65i0s4u7pc5m2.us.auth0.com/samlp/NIBQ40Cep9RJAwUIviRdgPCAPMhY7iG8/logout",
       wantAssertionsSigned: false,
       wantAuthnResponseSigned: false,
+      acceptedClockSkewMs: -1,
     },
     function (profile, done) {
       profile.user_type = profile["http://schemas.auth0.com/user_type"];
