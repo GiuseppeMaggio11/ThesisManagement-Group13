@@ -17,9 +17,9 @@ dayjs.extend(timezone)
 // open the database
 const dbConfig = {
   host: "127.0.0.1",
-  port: process.env.DB_PORT,
+  port: 3306,
   user: "root",
-  password: process.env.MYSQL_PASSWORD,
+  password: "root",
   database: "db_se_thesismanagement",
 };
 
