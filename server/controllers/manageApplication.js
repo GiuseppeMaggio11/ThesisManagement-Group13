@@ -72,7 +72,7 @@ async function newApplication(req, res) {
     }
     const applications = await dao.getApplications();
     for( const application of applications){
-      if( userID == application.student_id && application.status === "Accepted"){
+      if( userID == application.student_id && application.status !== "Refused"){
         return res.status(422).json("You are already applied for a thesis");
       }
     }
@@ -121,7 +121,7 @@ async function isApplied(req, res) {
     const userID = await dao.getUserID(req.user.username);
     const applications = await dao.getApplications();
     for( const application of applications){
-      if( userID== application.student_id && application.status === "Accepted"){
+      if( userID== application.student_id && application.status !== "Refused"){
 
         return res.status(200).json(1);
       }

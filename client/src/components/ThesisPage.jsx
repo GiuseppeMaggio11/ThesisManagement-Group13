@@ -88,6 +88,7 @@ function ThesisPage(props) {
     }
     API.sendFiles(formData, thesis_id)
       .then(() => {
+        handleToast("Application submitted correctly", "success")
         navigate("/proposal");
       })
       .catch((err) => {
