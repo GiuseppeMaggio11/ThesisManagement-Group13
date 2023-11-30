@@ -133,7 +133,7 @@ exports.getProposals = async (user_type, username, date) => {
     const [thesisResults] = await pool.execute(sql, [formattedDate]);
 
     if (thesisResults.length === 0) {
-      return { error: "no entry" };
+      return thesisResults;
     }
     let thesisFromSameDegreeOfStudent = thesisResults;
 
