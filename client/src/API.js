@@ -209,6 +209,16 @@ async function getStudentApplications() {
   );
 }
 
+async function isApplied() {
+  return getJson(
+    fetch(`${URL}/isApplied`, {
+      credentials: "include",
+    })
+  );
+}
+
+
+
 const API = {
   logOut,
   getUserInfo,
@@ -224,5 +234,6 @@ const API = {
   updateApplictionStatus,
   redirectToLogin,
   getStudentApplications,
+  isApplied
 };
 export default API;

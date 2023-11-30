@@ -29,6 +29,7 @@ function ThesisPage(props) {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const { state } = useLocation();
+  const [flag, setFlag] = useState(0);
   const from = state?.from;
 
   if (!props.loggedIn) {
@@ -64,6 +65,8 @@ function ThesisPage(props) {
           expiration: formatDate(new Date(thesisData.expiration)),
           level: thesisData.thesis_level,
         });
+        const isApplied = await API.isApplied();
+        setFlag(isApplied)
         // console.log(thesisData);
         setIsLoading(false);
       } catch (error) {
@@ -245,12 +248,12 @@ function ThesisPage(props) {
                       {!(from === "applications") && (
                         <Col>
                           <div className="button-apply">
-                            <Button
+                            { flag=== 0 ? <Button
                               className="button-style"
                               onClick={() => setOpenPanel(true)}
                             >
                               APPLY
-                            </Button>
+                            </Button> : <></>}
                           </div>
                         </Col>
                       )}

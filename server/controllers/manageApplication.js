@@ -29,15 +29,15 @@ async function updateApplicationStatus(req, res) {
               a.student_id == req.body.student_id &&
               a.thesis_id !== req.body.thesis_id
             ) {
-              let dir = `studentFiles/${a.student_id}/${a.thesis_id}`;
+              /*let dir = `studentFiles/${a.student_id}/${a.thesis_id}`;
               console.log(dir);
-              fs.rmSync(dir, { recursive: true, force: true });
+              fs.rmSync(dir, { recursive: true, force: true });*/
             }
           }
-          //reject every other student applications for that thesis
+          //cancel every other student applications for that thesis
           const result_reject = await dao.rejectApplicationsExcept(decision);
           //cancels every other application of that student
-          const result_cancel = await dao.cancelStudentApplications(decision);
+          //const result_cancel = await dao.cancelStudentApplications(decision);
         }
         await dao.commit();
         return res.json(updated_application);
@@ -69,6 +69,12 @@ async function newApplication(req, res) {
     const existing = await dao.isAlreadyExisting(userID, thesis_id);
     if (existing) {
       return res.status(422).json("You are already applied for this thesis");
+    }
+    const applications = await dao.getApplications();
+    for( const application of applications){
+      if( userID == application.student_id && application.status === "Accepted"){
+        return res.status(422).json("You are already applied for a thesis");
+      }
     }
     const result = await dao.newApply(userID, thesis_id, date);
 
@@ -110,7 +116,22 @@ async function getApplications(req, res) {
   }
 }
 
+async function isApplied(req, res) {
+  try {
+    const userID = await dao.getUserID(req.user.username);
+    const applications = await dao.getApplications();
+    for( const application of applications){
+      if( userID== application.student_id && application.status === "Accepted"){
 
-module.exports = { newApplication, updateApplicationStatus, getApplications,getApplicationStudent };
+        return res.status(200).json(1);
+      }
+    }
+    return res.status(200).json(0);
+  } catch (err) {
+    return res.status(500).json(`error: ${err} `);
+  }
+}
 
 
+
+module.exports = { newApplication, updateApplicationStatus, getApplications,getApplicationStudent, isApplied };

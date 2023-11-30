@@ -14,6 +14,7 @@ const {
   getApplicationStudent,
   updateApplicationStatus,
   getApplications,
+  isApplied,
 } = require("./controllers/manageApplication");
 const {
   addFiles,
@@ -246,3 +247,5 @@ app.post(
   ],
   createExternalCosupervisor
 );
+
+app.get('/api/isApplied',isStudent, isApplied);
