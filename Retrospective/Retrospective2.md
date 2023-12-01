@@ -69,13 +69,13 @@ sections:
 
 - What lessons did you learn (both positive and negative) in this sprint?
   + POSITIVE: Technical meetings are essential for improve communication, collaboration, and problem-solving within a team.
-  + NEGATIVE: Allowing a too-large technical debt to accumulate becomes counterproductive in the long run.
+  + NEGATIVE: We have to improve our exposition and give us more time to prepare for the demo better.
 
 - Which improvement goals set in the previous retrospective were you able to achieve?
   + During this sprint, we were able to manage the Git repository much more effectively. The insight we gained in the last retrospective proved to be correct: minimizing the number of branches to work on saved us numerous hours of work.
   + We have greatly optimized the writing of tests
 	* As for unit tests, we have modified the entire structure of our code to make functions more modular, composed of separate and small portions that are easier to test.
-	* Regarding end-to-end (e2e) tests, we have identified a simple and effective template that allows us to run a substantial number of them in a short amount of time.
+	* Regarding end-to-end (e2e) tests, we have made a simple and effective template that allows us to run a substantial number of them in a short amount of time.
   + We understood what didn't work in the time tracking on YouTrack and promptly corrected the faulty configuration.
  
 - Which ones you were not able to achieve? Why?
