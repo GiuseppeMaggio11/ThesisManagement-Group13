@@ -83,7 +83,7 @@ sections:
 
 - Improvement goals for the next sprint and how to achieve them (technical tasks, team coordination, etc.)
   + Complete the refactoring of the e2e tests
-	> During the next sprint, we will need to allocate a task of several hours to complete the writing of e2e tests following the template identified in this iteration. Alternatively, if the workload is again very high, we can decide not to address this technical debt.
+	> During the next sprint, we will need to allocate a task of several hours to complete the writing of e2e tests following the template identified in this iteration. Alternatively, if the workload is again very high, we can decide not to repay this technical debt.
   + Commit more story points
 	> In this sprint, we committed only 6 story points compared to the 15 in the last iteration. This is because we had to refactor a significant portion of our back-end, implement SAML 2.0 authentication, dockerize the application and handle many uncategorized tasks. In the next sprint there should be fewer cross-functional tasks, allowing us to focus more on the development of new user stories.
   + Increasing the frequency of technical meetings
