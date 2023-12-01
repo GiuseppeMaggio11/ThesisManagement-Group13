@@ -18,11 +18,10 @@ const Chips2 = ({ items, selectedItems, setItems, setSelectedItems }) => {
   return (
     <div>
       {selectedItems.map((item, index) => (
-        <span key={index} className="chip" style={{ fontSize: 12, alignContent:"center"}}>
+        <span key={index} className="chip" style={{ fontSize: 12, alignContent:'center'}}>
           {item}
           <span
-            className="chip"
-            style={{border:'none', alignContent:"center", paddingLeft:5, marginLeft:'0.5em', backgroundColor: '#21588434'}}
+            className="chip-x"
             onClick={() => {
               const updatedItem = items.concat(item);
               const updatedSelectedItem = selectedItems.filter(
