@@ -69,6 +69,7 @@ sections:
 
 - What lessons did you learn (both positive and negative) in this sprint?
   + POSITIVE: Technical meetings are essential for improve communication, collaboration, and problem-solving within a team.
+  + NEGATIVE: Allowing a too-large technical debt to accumulate becomes counterproductive in the long run.
 
 - Which improvement goals set in the previous retrospective were you able to achieve?
   + During this sprint, we were able to manage the Git repository much more effectively. The insight we gained in the last retrospective proved to be correct: minimizing the number of branches to work on saved us numerous hours of work.
