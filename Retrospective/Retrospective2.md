@@ -90,4 +90,4 @@ sections:
 	> In the last sprint, we utilized technical meetings only once to determine the structure of our database. In this sprint, however, we held only one meeting to address some urgent front-end issues. In the upcoming sprint, we will need to increase the number and frequency of technical meetings to better organize code writing and minimize the introduction of bugs.
 
 - One thing you are proud of as a Team!!
-  + We have learned to organize ourselves efficiently and functionally, to interact better with each other, and to manage performance anxiety before and during the demo more effectively.
+  + We have learned to organize ourselves efficiently and functionally, to interact better with each other and to manage performance anxiety before and during the demo more effectively.
