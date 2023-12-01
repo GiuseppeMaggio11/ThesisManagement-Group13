@@ -34,9 +34,6 @@
   border-radius: 5px;
   display: inline-block;
 }
-
-/*Chips input */
-
 .chip-list {
   list-style: none;
   margin: 0px;
@@ -47,11 +44,13 @@
 .chip {
   display: inline-block;
   white-space: 'nowrap';
-  background: #555;
-  color: white;
-  padding: 3px 5px 3px 10px;
+  background: #21588410;
+  color: rgb(0, 0, 0);
+  padding: 1px 5px 1px 10px;
   border-radius: 15px;
   margin: 2px;
+  border: 0.5px solid;
+  border-color: #21588461;
   align-items: center;
 }
 
@@ -362,6 +361,7 @@ table.table-rounded thead tr {
   transition: box-shadow 0.3s ease;
   outline: none;
   box-shadow: none;
+  margin-right: 0.5em;
 
   &:focus {
     box-shadow: 0 0 0px 0.5px #4682B4;

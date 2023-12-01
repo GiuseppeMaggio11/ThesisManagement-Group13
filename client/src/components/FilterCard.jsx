@@ -4,21 +4,25 @@ import { Button, Card, Col, Form, FormGroup, Row } from "react-bootstrap";
 import MessageContext from "../messageCtx";
 import { ToastContainer } from "react-toastify";
 import {
+  Border,
   ChevronCompactDown,
   ChevronCompactUp,
   Search,
 } from "react-bootstrap-icons";
 import Loading from "./Loading";
 import dayjs from "dayjs";
+import { useMediaQuery } from "react-responsive";
+
 
 const Chips2 = ({ items, selectedItems, setItems, setSelectedItems }) => {
   return (
     <div>
       {selectedItems.map((item, index) => (
-        <span key={index} className="chip" style={{ fontSize: 10 }}>
+        <span key={index} className="chip" style={{ fontSize: 12, alignContent:"center"}}>
           {item}
           <span
             className="chip"
+            style={{border:'none', alignContent:"center", paddingLeft:5, marginLeft:'0.5em', backgroundColor: '#21588434'}}
             onClick={() => {
               const updatedItem = items.concat(item);
               const updatedSelectedItem = selectedItems.filter(
@@ -26,6 +30,7 @@ const Chips2 = ({ items, selectedItems, setItems, setSelectedItems }) => {
               );
               setItems(updatedItem);
               setSelectedItems(updatedSelectedItem);
+              
             }}
           >
             X
@@ -102,7 +107,7 @@ const SearchDropdown = ({
   };
 
   return (
-    <div className="mt-0 p-2" style={{ marginBottom: "0.5em" }}>
+    <div className="mt-0 p-2 py-0" style={{ marginBottom: "0.5em" }}>
       <Row>
         <Col
           xs={4}
@@ -220,7 +225,7 @@ const FilterCard = ({
   const [cosupervisors, setCosupervisors] = useState(null);
   const [groups, setGroups] = useState([]);
   const [type, setType] = useState([]);
-
+  const isMobile = useMediaQuery({ maxWidth: 767 });
   useEffect(() => {
     const setFilters = async () => {
       let keywords_theses = [];
@@ -374,7 +379,7 @@ const FilterCard = ({
   return (
     <Card
       className="container mt-6 custom-rounded"
-      style={{ marginBottom: "0.5em" }}
+      style={{ marginBottom: "0.5em", paddingTop:"0.5em" }}
     >
       <Form>
         <div
@@ -385,11 +390,10 @@ const FilterCard = ({
           }}
         >
           <div
-            className="mt-0 p-2"
+            className="mt-0 p-0"
             style={{
               display: "flex",
               flexDirection: "column",
-              marginBottom: "0.5em",
             }}
           >
             <div style={{ width: "100%" }}>
@@ -402,6 +406,8 @@ const FilterCard = ({
                     overflowX: "auto",
                     whiteSpace: "nowrap",
                     scrollBehavior: "smooth",
+                    height: "2.5em",
+                    overflowY: "auto"
                   }}
                   ref={(labelRef) => {
                     if (labelRef) {
@@ -432,14 +438,13 @@ const FilterCard = ({
                 xs={4}
                 className="d-flex align-items-center justify-content-start"
               >
-                {" "}
-                <p style={{ margin: "0px" }}>Title: </p>
+                <p style={{ margin: "0px", paddingLeft:'0.5em' }}>Title: </p>
               </Col>
-              <Col xs={8} className="d-flex">
-                <Form.Group style={{ width: "100%" }}>
+              <Col xs={8} className="d-flex justify-content-end">
+                <Form.Group style={{ width: "95%", paddingRight:'0.5em'}}>
                   <Form.Control
                     type="text"
-                    placeholder="insert a text and press enter"
+                    placeholder={isMobile?"insert a text...":"insert a text and press enter"}
                     value={titleFilter}
                     onChange={(e) => {
                       setTitleFilters(e.target.value);
@@ -468,6 +473,8 @@ const FilterCard = ({
                     overflowX: "auto",
                     whiteSpace: "nowrap",
                     scrollBehavior: "smooth",
+                    height: "2.5em",
+                    overflowY: "auto"
                   }}
                   ref={(labelRef) => {
                     if (labelRef) {
@@ -510,6 +517,8 @@ const FilterCard = ({
                         overflowX: "auto",
                         whiteSpace: "nowrap",
                         scrollBehavior: "smooth",
+                        height: "2.5em",
+                        overflowY: "auto"
                       }}
                       ref={(labelRef) => {
                         if (labelRef) {
@@ -555,6 +564,8 @@ const FilterCard = ({
                         overflowX: "auto",
                         whiteSpace: "nowrap",
                         scrollBehavior: "smooth",
+                        height: "2.5em",
+                        overflowY: "auto"
                       }}
                       ref={(labelRef) => {
                         if (labelRef) {
@@ -586,7 +597,7 @@ const FilterCard = ({
             />
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column" }}>
+          <div style={{ display: "flex", flexDirection: "column"}}>
             <div style={{ width: "100%" }}>
               <Form.Group>
                 <Row className="align-items-center">
@@ -599,6 +610,8 @@ const FilterCard = ({
                         overflowX: "auto",
                         whiteSpace: "nowrap",
                         scrollBehavior: "smooth",
+                        height: "2.5em",
+                        overflowY: "auto"
                       }}
                       ref={(labelRef) => {
                         if (labelRef) {
@@ -643,6 +656,8 @@ const FilterCard = ({
                         overflowX: "auto",
                         whiteSpace: "nowrap",
                         scrollBehavior: "smooth",
+                        height: "2.5em",
+                        overflowY: "auto"
                       }}
                       ref={(labelRef) => {
                         if (labelRef) {
@@ -695,10 +710,10 @@ const FilterCard = ({
                 xs={4}
                 className="d-flex align-items-center justify-content-start"
               >
-                <p style={{ margin: "0px" }}>Valid until:</p>
+                <p style={{ margin: "0px", paddingTop: isMobile? "0.5": "1.5em" }}>Valid until:</p>
               </Col>
               <Col xs={8} className="d-flex">
-                <Form.Group style={{ width: "100%", paddingInline: "0.5em" }}>
+                <Form.Group style={{ width: "100%", paddingInline: "0.5em", paddingTop:isMobile? "0.5em": "2em"}}>
                   <Form.Control
                     type="date"
                     id="expiration"
