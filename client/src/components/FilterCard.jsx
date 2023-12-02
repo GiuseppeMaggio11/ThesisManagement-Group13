@@ -12,13 +12,15 @@ import {
 import Loading from "./Loading";
 import dayjs from "dayjs";
 import { useMediaQuery } from "react-responsive";
+import PerfectScrollbar from 'react-perfect-scrollbar';
+import 'react-perfect-scrollbar/dist/css/styles.css';
 
 
 const Chips2 = ({ items, selectedItems, setItems, setSelectedItems }) => {
   return (
     <div>
       {selectedItems.map((item, index) => (
-        <span key={index} className="chip" style={{ fontSize: 12, alignContent:'center'}}>
+        <span key={index} className="chip" style={{ fontSize: 12, alignItems:'center', paddingTop:0, paddingBottom:0}}>
           {item}
           <span
             className="chip-x"
@@ -32,7 +34,7 @@ const Chips2 = ({ items, selectedItems, setItems, setSelectedItems }) => {
               
             }}
           >
-            X
+            x
           </span>
         </span>
       ))}
@@ -115,15 +117,16 @@ const SearchDropdown = ({
           <p style={{ margin: "0px" }}>{placeholder}: </p>
         </Col>
         <Col xs={8} className="position-relative">
-          <div className="input-group">
+          <div className="input-group ">
             <input
               type="text"
-              className="form-control"
+              className="form-control custom-input-text"
               placeholder={placeholder}
               onChange={handleChange}
               value={input}
+              style={{borderRight:'none'}}
             />
-            <span className="input-group-text">
+            <span className="input-group-text custom-input-text" style={{background:'white'}}>
               {!showDropdown && (
                 <ChevronCompactDown
                   onClick={() => {
@@ -158,7 +161,7 @@ const SearchDropdown = ({
                       key={index}
                       onClick={() => handleItemClick(item)}
                     >
-                      {item}
+                      {item.charAt(0).toUpperCase() + item.slice(1).toLowerCase()}
                     </li>
                   ))}
                 </ul>
@@ -171,7 +174,7 @@ const SearchDropdown = ({
                       key={index}
                       onClick={() => handleItemClick(item)}
                     >
-                      {item}
+                      {item.charAt(0).toUpperCase() + item.slice(1).toLowerCase()}
                     </li>
                   ))}
                 </ul>
@@ -232,7 +235,7 @@ const FilterCard = ({
       let type_theses = [];
       let supervisors_theses = [];
       let cosupervisors = [];
-      //let external_cosupervisors = []
+ 
       try {
         if (thesisList) {
           thesisList.forEach((item) => {
@@ -259,12 +262,10 @@ const FilterCard = ({
             }
 
             if (item?.cosupervisors?.length > 0) {
-              //console.log(item);
 
-              item?.cosupervisors.forEach((element) => {
-                // Check if the element doesn't exist in the first array
+              item?.cosupervisors.forEach((element) => {            
                 if (!cosupervisors.includes(element)) {
-                  cosupervisors.push(element); // Add the element to the new array
+                  cosupervisors.push(element)
                 }
               });
             }
@@ -275,9 +276,7 @@ const FilterCard = ({
               });
             }
           });
-
-          //setExternalCosupervisor(external_cosupervisors);
-          //console.log(cosupervisors);
+          
           setCosupervisors(cosupervisors);
           setType(type_theses);
           setKeywords(keywords_theses);
@@ -374,6 +373,16 @@ const FilterCard = ({
     setTitleFilters("");
     setSelectedTitlesWords(words);
   };
+  
+  const scrollbarRef = useRef(null);
+
+  useEffect(() => {
+    if (scrollbarRef.current) {
+      const ps = scrollbarRef.current;
+      ps.scrollTo(ps.scrollWidth, 0);
+    }
+  }, [selectedTitlesWords]);
+
 
   return (
     <Card
@@ -406,22 +415,18 @@ const FilterCard = ({
                     whiteSpace: "nowrap",
                     scrollBehavior: "smooth",
                     height: "2.5em",
-                    overflowY: "auto"
-                  }}
-                  ref={(labelRef) => {
-                    if (labelRef) {
-                      labelRef.scrollLeft =
-                        labelRef.scrollWidth - labelRef.clientWidth;
-                    }
+                    overflowY: "hidden"
                   }}
                 >
                   {selectedTitlesWords && selectedTitlesWords.length > 0 && (
-                    <Chips2
-                      items={titles}
-                      selectedItems={selectedTitlesWords}
-                      setItems={setTitles}
-                      setSelectedItems={setSelectedTitlesWords}
-                    />
+                    <PerfectScrollbar containerRef={(ref) => (scrollbarRef.current = ref)}>
+                      <Chips2
+                        items={titles}
+                        selectedItems={selectedTitlesWords}
+                        setItems={setTitles}
+                        setSelectedItems={setSelectedTitlesWords}
+                      />
+                    </PerfectScrollbar>
                   )}
                 </Form.Label>
               </Form.Group>
@@ -439,6 +444,7 @@ const FilterCard = ({
               >
                 <p style={{ margin: "0px", paddingLeft:'0.5em' }}>Title: </p>
               </Col>
+              
               <Col xs={8} className="d-flex justify-content-end">
                 <Form.Group style={{ width: "95%", paddingRight:'0.5em'}}>
                   <Form.Control
@@ -541,7 +547,7 @@ const FilterCard = ({
               </Form.Group>
             </div>
             <SearchDropdown
-              placeholder={"Co-Supervisors"}
+              placeholder={"CoSupervisors"}
               position={"start"}
               items={cosupervisors}
               setItems={setCosupervisors}
