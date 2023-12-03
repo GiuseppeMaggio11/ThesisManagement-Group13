@@ -96,9 +96,7 @@ const SearchDropdown = ({
   };
 
   const handleItemClick = (item) => {
-    //console.log(selectedItems)
     let newSelectedItems = [...selectedItems, item];
-    //console.log(item)
     let is = items.filter((i) => !newSelectedItems?.includes(i));
 
     setItems(is);
@@ -108,7 +106,7 @@ const SearchDropdown = ({
   };
 
   return (
-    <div className="mt-0 p-2 py-0" style={{ marginBottom: "0.5em" }}>
+    <div className="mt-0 px-0 py-0" style={{ marginBottom: "0.5em" }}>
       <Row>
         <Col
           xs={4}
@@ -228,6 +226,8 @@ const FilterCard = ({
   const [groups, setGroups] = useState([]);
   const [type, setType] = useState([]);
   const isMobile = useMediaQuery({ maxWidth: 767 });
+  const scrollbarRef = useRef(null);
+
   useEffect(() => {
     const setFilters = async () => {
       let keywords_theses = [];
@@ -374,15 +374,12 @@ const FilterCard = ({
     setSelectedTitlesWords(words);
   };
   
-  const scrollbarRef = useRef(null);
-
   useEffect(() => {
     if (scrollbarRef.current) {
       const ps = scrollbarRef.current;
       ps.scrollTo(ps.scrollWidth, 0);
     }
-  }, [selectedTitlesWords]);
-
+  }, [selectedTitlesWords,selectedKeywords, selectedGroups, selectedCosupervisor, selectedType]);
 
   return (
     <Card
@@ -442,11 +439,11 @@ const FilterCard = ({
                 xs={4}
                 className="d-flex align-items-center justify-content-start"
               >
-                <p style={{ margin: "0px", paddingLeft:'0.5em' }}>Title: </p>
+                <p style={{ margin: "0px" }}>Title: </p>
               </Col>
               
               <Col xs={8} className="d-flex justify-content-end">
-                <Form.Group style={{ width: "95%", paddingRight:'0.5em'}}>
+                <Form.Group style={{ width: "95%"}}>
                   <Form.Control
                     type="text"
                     placeholder={isMobile?"insert a text...":"insert a text and press enter"}
@@ -481,20 +478,16 @@ const FilterCard = ({
                     height: "2.5em",
                     overflowY: "auto"
                   }}
-                  ref={(labelRef) => {
-                    if (labelRef) {
-                      labelRef.scrollLeft =
-                        labelRef.scrollWidth - labelRef.clientWidth;
-                    }
-                  }}
                 >
                   {selectedSupervisor && selectedSupervisor.length > 0 && (
+                     <PerfectScrollbar containerRef={(ref) => (scrollbarRef.current = ref)}>
                     <Chips2
                       items={supervisors}
                       selectedItems={selectedSupervisor}
                       setItems={setSupervisors}
                       setSelectedItems={setSelectedSupervisor}
                     />
+                    </PerfectScrollbar>
                   )}
                 </Form.Label>
               </Form.Group>
@@ -572,20 +565,17 @@ const FilterCard = ({
                         height: "2.5em",
                         overflowY: "auto"
                       }}
-                      ref={(labelRef) => {
-                        if (labelRef) {
-                          labelRef.scrollLeft =
-                            labelRef.scrollWidth - labelRef.clientWidth;
-                        }
-                      }}
                     >
+
                       {selectedType && selectedType.length > 0 && (
-                        <Chips2
-                          items={type}
-                          selectedItems={selectedType}
-                          setItems={setType}
-                          setSelectedItems={setSelectedType}
-                        />
+                        <PerfectScrollbar containerRef={(ref) => (scrollbarRef.current = ref)}>
+                          <Chips2
+                            items={type}
+                            selectedItems={selectedType}
+                            setItems={setType}
+                            setSelectedItems={setSelectedType}
+                          />
+                        </PerfectScrollbar>
                       )}
                     </Form.Label>
                   </Col>
@@ -593,7 +583,7 @@ const FilterCard = ({
               </Form.Group>
             </div>
             <SearchDropdown
-              placeholder={"type"}
+              placeholder={"Type"}
               position={"end"}
               items={type}
               setItems={setType}
@@ -618,20 +608,17 @@ const FilterCard = ({
                         height: "2.5em",
                         overflowY: "auto"
                       }}
-                      ref={(labelRef) => {
-                        if (labelRef) {
-                          labelRef.scrollLeft =
-                            labelRef.scrollWidth - labelRef.clientWidth;
-                        }
-                      }}
+
                     >
                       {selectedKeywords && selectedKeywords.length > 0 && (
+                        <PerfectScrollbar containerRef={(ref) => (scrollbarRef.current = ref)}>
                         <Chips2
                           items={keywords}
                           selectedItems={selectedKeywords}
                           setItems={setKeywords}
                           setSelectedItems={setSelectedKeywords}
                         />
+                        </PerfectScrollbar>
                       )}
                     </Form.Label>
                   </Col>
@@ -664,20 +651,16 @@ const FilterCard = ({
                         height: "2.5em",
                         overflowY: "auto"
                       }}
-                      ref={(labelRef) => {
-                        if (labelRef) {
-                          labelRef.scrollLeft =
-                            labelRef.scrollWidth - labelRef.clientWidth;
-                        }
-                      }}
                     >
                       {selectedGroups && selectedGroups.length > 0 && (
+                         <PerfectScrollbar containerRef={(ref) => (scrollbarRef.current = ref)}>
                         <Chips2
                           items={groups}
                           selectedItems={selectedGroups}
                           setItems={setGroups}
                           setSelectedItems={setSelectedGroups}
                         />
+                         </PerfectScrollbar>
                       )}
                     </Form.Label>
                   </Col>
@@ -695,7 +678,7 @@ const FilterCard = ({
           </div>
 
           <div
-            className="mt-0 p-2"
+            className="mt-0 py-2"
             style={{
               display: "flex",
               flexDirection: "column",
@@ -715,10 +698,10 @@ const FilterCard = ({
                 xs={4}
                 className="d-flex align-items-center justify-content-start"
               >
-                <p style={{ margin: "0px", paddingTop: isMobile? "0.5": "1.5em" }}>Valid until:</p>
+                <p style={{ margin: "0px", paddingTop: isMobile? "0.5": "1.3em" }}>Valid until:</p>
               </Col>
-              <Col xs={8} className="d-flex">
-                <Form.Group style={{ width: "100%", paddingInline: "0.5em", paddingTop:isMobile? "0.5em": "2em"}}>
+              <Col xs={8} className="d-flex align-items-center justify-content-end">
+                <Form.Group style={{ width: "97%", paddingTop:isMobile? "0.5em": "0.9em"}}>
                   <Form.Control
                     type="date"
                     id="expiration"
@@ -732,6 +715,7 @@ const FilterCard = ({
                         handleToast("Date must be in the future", "error");
                       }
                     }}
+                    style={{borderRadius:"10px"}}
                   />
                 </Form.Group>
               </Col>

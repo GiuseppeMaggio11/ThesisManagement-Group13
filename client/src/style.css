@@ -336,6 +336,7 @@ table.table-rounded thead tr {
 /* Margin for tables and alerts - SearchProposal*/
 .margin-custom {
   margin: 2rem;
+  padding: 0;
 }
 
 /* Margin for Titles */
@@ -514,7 +515,7 @@ input:checked+.slider::before {
 }
 
 .ps__rail-x {
-  height: 10px;
+  height: 10px !important;
 }
 
 

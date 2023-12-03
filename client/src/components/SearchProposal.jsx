@@ -111,7 +111,7 @@ function SearchProposalComponent(props) {
   return (
     <>
       <div className="d-flex justify-content-center">
-        <Container className="width-80 margin-custom">
+        <Container className="width-100 margin-custom">
           <Row className="d-flex align-items-center">
             <Col
               xs={4}
