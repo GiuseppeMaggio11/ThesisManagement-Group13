@@ -1,6 +1,6 @@
 const dao = require("../dao");
 const { validationResult } = require("express-validator");
-const fs = require("node:fs");
+const fs = require("fs");
 // accept one student application, cancels all other applications for that student,
 //rejects every other student application to that same thesis
 async function updateApplicationStatus(req, res) {
@@ -40,9 +40,11 @@ async function updateApplicationStatus(req, res) {
           //const result_cancel = await dao.cancelStudentApplications(decision);
         }
         await dao.commit();
-        return res.json(updated_application);
+        return res.status(200).json(updated_application);
       }
     }
+
+    await dao.rollback();
             return res
       .status(400)
       .json(
@@ -50,7 +52,7 @@ async function updateApplicationStatus(req, res) {
       );
   } catch (err) {
     await dao.rollback();
-    return res.status(503).json(` error: ${err} `);
+    return res.status(503).json(err);
   }
 }
 
@@ -59,7 +61,7 @@ async function newApplication(req, res) {
   const date = req.body.date;
   try {
     if (!Number.isInteger(Number(thesis_id))) {
-      throw new Error("Thesis ID must be an integer");
+      return res.status(422).json("Thesis ID must be an integer");
     }
     const userID = await dao.getUserID(req.user.username);
     const isValid = await dao.isThesisValid(thesis_id, date);
@@ -80,16 +82,13 @@ async function newApplication(req, res) {
 
     res.status(200).json("Application created successfully");
   } catch (error) {
-    res.status(500).json(error.message + " ");
+    res.status(500).json(error);
   }
 }
 
 async function getApplicationStudent (req,res){
-    //const studentId = req.params.student_id;
     try{
       let ThesisInfo;
-      //DEVO CONTROLLARE SE L'ID E' DELL'UTENTE LOGGATO!!
-      await dao.beginTransaction();
       const userID = await dao.getUserID(req.user.username);
       const Application = await dao.getStudentApplication(userID);
       let Result = await Promise.all(Application.map(async (thesis)=>{
@@ -97,12 +96,10 @@ async function getApplicationStudent (req,res){
         return {...ThesisInfo, status: thesis.status}
       }))
       
-      await dao.commit()
       return res.status(200).json(Result);
     } catch (error){
       
-      await dao.rollback()
-      res.status(500).json(error.message + ' ');
+      res.status(500).json(error);
     }
 };
 
@@ -112,7 +109,7 @@ async function getApplications(req, res) {
     const results = await dao.getApplicationsForProfessor(req.user.username);
     res.status(200).json(results);
   } catch (err) {
-    return res.status(500).json(`error: ${err} `);
+    return res.status(500).json(err);
   }
 }
 
