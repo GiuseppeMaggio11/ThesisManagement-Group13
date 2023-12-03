@@ -4,6 +4,7 @@ import { Button, Card, Col, Form, FormGroup, Row } from "react-bootstrap";
 import MessageContext from "../messageCtx";
 import { ToastContainer } from "react-toastify";
 import {
+  ArrowReturnLeft,
   Border,
   ChevronCompactDown,
   ChevronCompactUp,
@@ -20,7 +21,7 @@ const Chips2 = ({ items, selectedItems, setItems, setSelectedItems }) => {
   return (
     <div>
       {selectedItems.map((item, index) => (
-        <span key={index} className="chip" style={{ fontSize: 12, alignItems:'center', paddingTop:0, paddingBottom:0}}>
+        <span key={index} className="chip" style={{ fontSize: 12, alignItems: 'center', paddingTop: 0, paddingBottom: 0 }}>
           {item}
           <span
             className="chip-x"
@@ -31,7 +32,6 @@ const Chips2 = ({ items, selectedItems, setItems, setSelectedItems }) => {
               );
               setItems(updatedItem);
               setSelectedItems(updatedSelectedItem);
-              
             }}
           >
             x
@@ -105,6 +105,7 @@ const SearchDropdown = ({
     setShowDropdown(false);
   };
 
+
   return (
     <div className="mt-0 px-0 py-0" style={{ marginBottom: "0.5em" }}>
       <Row>
@@ -122,9 +123,9 @@ const SearchDropdown = ({
               placeholder={placeholder}
               onChange={handleChange}
               value={input}
-              style={{borderRight:'none'}}
+              style={{ borderRight: 'none' }}
             />
-            <span className="input-group-text custom-input-text" style={{background:'white'}}>
+            <span className="input-group-text custom-input-text" style={{ background: 'white' }}>
               {!showDropdown && (
                 <ChevronCompactDown
                   onClick={() => {
@@ -159,7 +160,11 @@ const SearchDropdown = ({
                       key={index}
                       onClick={() => handleItemClick(item)}
                     >
-                      {item.charAt(0).toUpperCase() + item.slice(1).toLowerCase()}
+                      {item
+                        .toLowerCase()
+                        .split(' ')
+                        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(' ')}
                     </li>
                   ))}
                 </ul>
@@ -172,7 +177,11 @@ const SearchDropdown = ({
                       key={index}
                       onClick={() => handleItemClick(item)}
                     >
-                      {item.charAt(0).toUpperCase() + item.slice(1).toLowerCase()}
+                      {item
+                        .toLowerCase()
+                        .split(' ')
+                        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(' ')}
                     </li>
                   ))}
                 </ul>
@@ -235,7 +244,7 @@ const FilterCard = ({
       let type_theses = [];
       let supervisors_theses = [];
       let cosupervisors = [];
- 
+
       try {
         if (thesisList) {
           thesisList.forEach((item) => {
@@ -263,7 +272,7 @@ const FilterCard = ({
 
             if (item?.cosupervisors?.length > 0) {
 
-              item?.cosupervisors.forEach((element) => {            
+              item?.cosupervisors.forEach((element) => {
                 if (!cosupervisors.includes(element)) {
                   cosupervisors.push(element)
                 }
@@ -276,7 +285,7 @@ const FilterCard = ({
               });
             }
           });
-          
+
           setCosupervisors(cosupervisors);
           setType(type_theses);
           setKeywords(keywords_theses);
@@ -327,8 +336,6 @@ const FilterCard = ({
       );
     }
     if (selectedDate != null) {
-      // console.log("date diff");
-      // console.log(selectedDate);
       filtered = filtered.filter((thesis) =>
         dayjs(thesis.expiration).isAfter(selectedDate)
       );
@@ -369,22 +376,22 @@ const FilterCard = ({
     let words = [];
     if (selectedTitlesWords?.length > 0) words = [...selectedTitlesWords];
     let wordExists = words.some((w) => w === titleFilter);
-    if (!wordExists) words.push(titleFilter);
+    if (!wordExists && titleFilter !== '' || titleFilter !== ' ') words.push(titleFilter);
     setTitleFilters("");
     setSelectedTitlesWords(words);
   };
-  
+
   useEffect(() => {
     if (scrollbarRef.current) {
       const ps = scrollbarRef.current;
       ps.scrollTo(ps.scrollWidth, 0);
     }
-  }, [selectedTitlesWords,selectedKeywords, selectedGroups, selectedCosupervisor, selectedType]);
+  }, [selectedTitlesWords, selectedKeywords, selectedGroups, selectedCosupervisor, selectedType]);
 
   return (
     <Card
       className="container mt-6 custom-rounded"
-      style={{ marginBottom: "0.5em", paddingTop:"0.5em" }}
+      style={{ marginBottom: "0.5em", paddingTop: "0.5em" }}
     >
       <Form>
         <div
@@ -441,17 +448,18 @@ const FilterCard = ({
               >
                 <p style={{ margin: "0px" }}>Title: </p>
               </Col>
-              
-              <Col xs={8} className="d-flex justify-content-end">
-                <Form.Group style={{ width: "95%"}}>
-                  <Form.Control
+
+              <Col xs={8} className="position-relative">
+                <div className="input-group" style={{paddingLeft:'0.4em'}}>
+                  <input
                     type="text"
-                    placeholder={isMobile?"insert a text...":"insert a text and press enter"}
+                    className="form-control custom-input-text"
+                    placeholder={"insert a text..."}
                     value={titleFilter}
                     onChange={(e) => {
                       setTitleFilters(e.target.value);
                     }}
-                    className="custom-input"
+                    style={{ borderRight: 'none' }}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         e.preventDefault();
@@ -459,7 +467,10 @@ const FilterCard = ({
                       }
                     }}
                   />
-                </Form.Group>
+                  <span className="input-group-text custom-input-text" style={{ background: 'white' }}>
+                    <ArrowReturnLeft onClick={titleFilter!=='' && addWord}  />
+                  </span>
+                </div>
               </Col>
             </div>
           </div>
@@ -480,13 +491,13 @@ const FilterCard = ({
                   }}
                 >
                   {selectedSupervisor && selectedSupervisor.length > 0 && (
-                     <PerfectScrollbar containerRef={(ref) => (scrollbarRef.current = ref)}>
-                    <Chips2
-                      items={supervisors}
-                      selectedItems={selectedSupervisor}
-                      setItems={setSupervisors}
-                      setSelectedItems={setSelectedSupervisor}
-                    />
+                    <PerfectScrollbar containerRef={(ref) => (scrollbarRef.current = ref)}>
+                      <Chips2
+                        items={supervisors}
+                        selectedItems={selectedSupervisor}
+                        setItems={setSupervisors}
+                        setSelectedItems={setSelectedSupervisor}
+                      />
                     </PerfectScrollbar>
                   )}
                 </Form.Label>
@@ -592,7 +603,7 @@ const FilterCard = ({
             />
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column"}}>
+          <div style={{ display: "flex", flexDirection: "column" }}>
             <div style={{ width: "100%" }}>
               <Form.Group>
                 <Row className="align-items-center">
@@ -612,12 +623,12 @@ const FilterCard = ({
                     >
                       {selectedKeywords && selectedKeywords.length > 0 && (
                         <PerfectScrollbar containerRef={(ref) => (scrollbarRef.current = ref)}>
-                        <Chips2
-                          items={keywords}
-                          selectedItems={selectedKeywords}
-                          setItems={setKeywords}
-                          setSelectedItems={setSelectedKeywords}
-                        />
+                          <Chips2
+                            items={keywords}
+                            selectedItems={selectedKeywords}
+                            setItems={setKeywords}
+                            setSelectedItems={setSelectedKeywords}
+                          />
                         </PerfectScrollbar>
                       )}
                     </Form.Label>
@@ -653,14 +664,14 @@ const FilterCard = ({
                       }}
                     >
                       {selectedGroups && selectedGroups.length > 0 && (
-                         <PerfectScrollbar containerRef={(ref) => (scrollbarRef.current = ref)}>
-                        <Chips2
-                          items={groups}
-                          selectedItems={selectedGroups}
-                          setItems={setGroups}
-                          setSelectedItems={setSelectedGroups}
-                        />
-                         </PerfectScrollbar>
+                        <PerfectScrollbar containerRef={(ref) => (scrollbarRef.current = ref)}>
+                          <Chips2
+                            items={groups}
+                            selectedItems={selectedGroups}
+                            setItems={setGroups}
+                            setSelectedItems={setSelectedGroups}
+                          />
+                        </PerfectScrollbar>
                       )}
                     </Form.Label>
                   </Col>
@@ -698,10 +709,10 @@ const FilterCard = ({
                 xs={4}
                 className="d-flex align-items-center justify-content-start"
               >
-                <p style={{ margin: "0px", paddingTop: isMobile? "0.5": "1.3em" }}>Valid until:</p>
+                <p style={{ margin: "0px", paddingTop: isMobile ? "0.5" : "1.3em" }}>Valid until:</p>
               </Col>
               <Col xs={8} className="d-flex align-items-center justify-content-end">
-                <Form.Group style={{ width: "97%", paddingTop:isMobile? "0.5em": "0.9em"}}>
+                <Form.Group style={{ width: "97%", paddingTop: isMobile ? "0.5em" : "0.9em" }}>
                   <Form.Control
                     type="date"
                     id="expiration"
@@ -715,7 +726,7 @@ const FilterCard = ({
                         handleToast("Date must be in the future", "error");
                       }
                     }}
-                    style={{borderRadius:"10px"}}
+                    style={{ borderRadius: "10px" }}
                   />
                 </Form.Group>
               </Col>
