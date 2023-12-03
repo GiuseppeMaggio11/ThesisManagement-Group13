@@ -29,6 +29,7 @@ function ThesisPage(props) {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const { state } = useLocation();
+  const [flag, setFlag] = useState(0);
   const from = state?.from;
 
   if (!props.loggedIn) {
@@ -48,7 +49,7 @@ function ThesisPage(props) {
       try {
         props.setLoading(true);
         const thesisData = await API.getThesisProposalsById(params.id);
-        console.log(thesisData.cosupervisors);
+        //console.log(thesisData.cosupervisors);
         setPageData({
           title: thesisData.title,
           description: thesisData.description,
@@ -64,7 +65,9 @@ function ThesisPage(props) {
           expiration: formatDate(new Date(thesisData.expiration)),
           level: thesisData.thesis_level,
         });
-        console.log(thesisData);
+        const isApplied = await API.isApplied();
+        setFlag(isApplied)
+        // console.log(thesisData);
         setIsLoading(false);
       } catch (error) {
         handleToast(error, "center", "error");
@@ -85,6 +88,7 @@ function ThesisPage(props) {
     }
     API.sendFiles(formData, thesis_id)
       .then(() => {
+        handleToast("Application submitted correctly", "success")
         navigate("/proposal");
       })
       .catch((err) => {
@@ -100,7 +104,7 @@ function ThesisPage(props) {
   const submitApplication = (idThesis, date) => {
     API.applicationThesis(idThesis, date)
       .then(() => {
-        console.log("tutto ok");
+        // console.log("tutto ok");
       })
       .catch((err) => {
         handleToast(err, "error");
@@ -245,12 +249,12 @@ function ThesisPage(props) {
                       {!(from === "applications") && (
                         <Col>
                           <div className="button-apply">
-                            <Button
+                            { flag=== 0 ? <Button
                               className="button-style"
                               onClick={() => setOpenPanel(true)}
                             >
                               APPLY
-                            </Button>
+                            </Button> : <></>}
                           </div>
                         </Col>
                       )}

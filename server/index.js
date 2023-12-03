@@ -1,18 +1,35 @@
 "use strict";
 
-
-const dotenv = require('dotenv');
+const dotenv = require("dotenv");
 dotenv.config();
 
-const {isStudent, isProfessor, isLoggedIn} = require("./controllers/middleware")
-const {getProposals, getProposal} = require("./controllers/showThesis")
-const {newApplication,getApplicationStudent,updateApplicationStatus,
-  getApplications} = require("./controllers/manageApplication")
-const {addFiles, getAllFiles, getStudentFilesList, getFile} = require("./controllers/manageFiles")
-const {newThesis, updateThesesArchivation} = require("./controllers/manageThesis")
-const {listExternalCosupervisors, createExternalCosupervisor} = require("./controllers/others")
-
-
+const {
+  isStudent,
+  isProfessor,
+  isLoggedIn,
+} = require("./controllers/middleware");
+const { getProposals, getProposal } = require("./controllers/showThesis");
+const {
+  newApplication,
+  getApplicationStudent,
+  updateApplicationStatus,
+  getApplications,
+  isApplied,
+} = require("./controllers/manageApplication");
+const {
+  addFiles,
+  getAllFiles,
+  getStudentFilesList,
+  getFile,
+} = require("./controllers/manageFiles");
+const {
+  newThesis,
+  updateThesesArchivation,
+} = require("./controllers/manageThesis");
+const {
+  listExternalCosupervisors,
+  createExternalCosupervisor,
+} = require("./controllers/others");
 
 const express = require("express");
 const morgan = require("morgan");
@@ -82,8 +99,6 @@ passport.use(
   )
 );
 
-
-
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -132,7 +147,7 @@ app.post("/logout", (req, res, next) => {
 });
 
 /***API***/
-app.get('/api/student/applications', isStudent, getApplicationStudent);
+app.get("/api/student/applications", isStudent, getApplicationStudent);
 //GET PROPOSALS
 app.get("/api/proposals", isLoggedIn, getProposals);
 
@@ -174,8 +189,6 @@ app.post(
 );
 
 //RETURNS LIST OF EVERY EXTERNAL COSUPERVISORS
-
-
 
 app.get(
   "/api/listExternalCosupervisors",
@@ -222,12 +235,17 @@ app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
 });
 
+//CREATES NEW EXTERNAL COSUPERVISOR
+app.post(
+  "/api/newExternalCosupervisor",
+  isProfessor,
+  [
+    // Various checks of syntax of given data
+    check("email").isEmail(),
+    check("surname").isLength({ min: 1, max: 50 }),
+    check("name").isLength({ min: 1, max: 50 }),
+  ],
+  createExternalCosupervisor
+);
 
-//CREATES NEW EXTERNAL COSUPERVISOR 
-app.post('/api/newExternalCosupervisor', isProfessor, [
-  // Various checks of syntax of given data
-  check('email').isEmail(),
-  check('surname').isLength({ min: 1, max: 50 }),
-  check('name').isLength({ min: 1, max: 50 })
-], createExternalCosupervisor);
-
+app.get('/api/isApplied',isStudent, isApplied);

@@ -133,7 +133,7 @@ exports.getProposals = async (user_type, username, date) => {
     const [thesisResults] = await pool.execute(sql, [formattedDate]);
 
     if (thesisResults.length === 0) {
-      return { error: "no entry" };
+      return thesisResults;
     }
     let thesisFromSameDegreeOfStudent = thesisResults;
 
@@ -311,8 +311,7 @@ exports.getProposalById = async (requested_thesis_id, user_type, username) => {
       });
     }
     //check for cosupervisors which are university professor and add their name and department's name and group to finalresult
-    sql =
-      `SELECT t.id, tch.name, tch.surname, g.group_name, d.department_name
+    sql = `SELECT t.id, tch.name, tch.surname, g.group_name, d.department_name
       FROM thesis t
       JOIN thesis_cosupervisor_teacher csvt ON t.id = csvt.thesis_id
       JOIN teacher tch ON csvt.cosupevisor_id = tch.id
@@ -345,7 +344,7 @@ exports.getProposalById = async (requested_thesis_id, user_type, username) => {
             { group: item.group_name, department: item.department_name },
           ];
         }
-      };
+      }
     }
     return finalResult;
   } catch (error) {
