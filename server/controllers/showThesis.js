@@ -1,40 +1,44 @@
 const dao = require("../dao");
 const { validationResult } = require("express-validator");
 
-
-async function getProposals (req, res) {
-    try {
-        const proposals = await dao.getProposals(req.user.user_type, req.user.username, req.query.date);
-        res.status(200).json(proposals);
-      } catch (err) {
-        res.status(500).json(err);
-      }
-}
-
-async function getProposal (req,res){
-    const thesis_id = req.params.id; // Extract thesis_id from the URL
-    try {
-      if (!Number.isInteger(Number(thesis_id))) {
-        throw new Error('Thesis ID must be an integer');
-      }
-  
-      const proposal = await dao.getProposalById(thesis_id, req.user.user_type, req.user.username);
-      res.status(200).json(proposal);
-    } catch (error) {
-      res.status(500).json(error);
-    }
-}
-
-async function getProposalsProfessor (req,res){
+async function getProposals(req, res) {
   try {
-    const proposals = await dao.getProposalsProfessor(req.user.username)
-    if(proposals.length > 0){
-      return res.status(200).json(proposals);
+    const proposals = await dao.getProposals(
+      req.user.user_type,
+      req.user.username,
+      req.query.date
+    );
+    res.status(200).json(proposals);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+}
+
+async function getProposal(req, res) {
+  const thesis_id = req.params.id; // Extract thesis_id from the URL
+  try {
+    if (!Number.isInteger(Number(thesis_id))) {
+      throw new Error("Thesis ID must be an integer");
     }
-    res.status(404).json(" No data found")
+
+    const proposal = await dao.getProposalById(
+      thesis_id,
+      req.user.user_type,
+      req.user.username
+    );
+    res.status(200).json(proposal);
   } catch (error) {
     res.status(500).json(error);
   }
 }
 
-module.exports = { getProposals, getProposal,getProposalsProfessor };
+async function getProposalsProfessor(req, res) {
+  try {
+    const proposals = await dao.getProposalsProfessor(req.user.username);
+    return res.status(200).json(proposals);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+}
+
+module.exports = { getProposals, getProposal, getProposalsProfessor };

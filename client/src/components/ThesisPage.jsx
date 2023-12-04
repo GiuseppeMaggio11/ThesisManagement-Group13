@@ -32,7 +32,7 @@ function ThesisPage(props) {
   const [flag, setFlag] = useState(0);
   const from = state?.from;
 
-  if (!props.loggedIn) {
+  if (!props.loggedIn || !props.user.user_type === "PROF") {
     return API.redirectToLogin();
   }
 
@@ -66,7 +66,7 @@ function ThesisPage(props) {
           level: thesisData.thesis_level,
         });
         const isApplied = await API.isApplied();
-        setFlag(isApplied)
+        setFlag(isApplied);
         // console.log(thesisData);
         setIsLoading(false);
       } catch (error) {
@@ -88,7 +88,7 @@ function ThesisPage(props) {
     }
     API.sendFiles(formData, thesis_id)
       .then(() => {
-        handleToast("Application submitted correctly", "success")
+        handleToast("Application submitted correctly", "success");
         navigate("/proposal");
       })
       .catch((err) => {
@@ -249,12 +249,16 @@ function ThesisPage(props) {
                       {!(from === "applications") && (
                         <Col>
                           <div className="button-apply">
-                            { flag=== 0 ? <Button
-                              className="button-style"
-                              onClick={() => setOpenPanel(true)}
-                            >
-                              APPLY
-                            </Button> : <></>}
+                            {flag === 0 ? (
+                              <Button
+                                className="button-style"
+                                onClick={() => setOpenPanel(true)}
+                              >
+                                APPLY
+                              </Button>
+                            ) : (
+                              <></>
+                            )}
                           </div>
                         </Col>
                       )}

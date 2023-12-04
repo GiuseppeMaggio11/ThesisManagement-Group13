@@ -323,7 +323,7 @@ exports.getProposalById = async (requested_thesis_id, user_type, username) => {
 
     if (results.length === 0) {
     } else {
-      for ( const item of results[0]) {
+      for (const item of results[0]) {
         finalResult.cosupervisors = [
           ...finalResult.cosupervisors,
           "" + item.name + " " + item.surname,
@@ -754,10 +754,12 @@ exports.getStudentApplication = async (studentId) => {
 
 // get student application
 exports.getProposalsProfessor = async (professor_id) => {
+  console.log(professor_id);
   try {
-    const sql = "SELECT * FROM thesis WHERE supervisor_id = ?";
+    const sql =
+      "SELECT * FROM thesis t inner join teacher p on p.id = t.supervisor_id WHERE p.email  = ? order by t.title";
     const [rows] = await pool.execute(sql, [professor_id]);
-    console.log(rows)
+    console.log(rows);
     return rows;
   } catch (error) {
     console.error("Error in getExternal_cosupervisors_emails: ", error);

@@ -8,7 +8,11 @@ const {
   isProfessor,
   isLoggedIn,
 } = require("./controllers/middleware");
-const { getProposals, getProposal, getProposalsProfessor } = require("./controllers/showThesis");
+const {
+  getProposals,
+  getProposal,
+  getProposalsProfessor,
+} = require("./controllers/showThesis");
 const {
   newApplication,
   getApplicationStudent,
@@ -91,7 +95,7 @@ passport.use(
       profile.user_type = profile["http://schemas.auth0.com/user_type"];
       profile.username =
         profile[
-        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+          "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
         ];
       profile.name =
         profile["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
@@ -249,12 +253,12 @@ app.post(
   createExternalCosupervisor
 );
 
-app.get('/api/isApplied', isStudent, isApplied);
+app.get("/api/isApplied", isStudent, isApplied);
 
-app.get('/api/getProposalsProfessor', isStudent, getProposalsProfessor);
+app.get("/api/getProposalsProfessor", isProfessor, getProposalsProfessor);
 
 app.put(
-  '/api/archiveProposalManual',
+  "/api/archiveProposalManual",
   isProfessor,
   updateThesesArchivationManual
 );

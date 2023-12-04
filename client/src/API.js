@@ -217,7 +217,13 @@ async function isApplied() {
   );
 }
 
-
+async function getProposalsProfessor() {
+  return getJson(
+    fetch(`${URL}/getProposalsProfessor`, {
+      credentials: "include",
+    })
+  );
+}
 
 const API = {
   logOut,
@@ -234,6 +240,7 @@ const API = {
   updateApplictionStatus,
   redirectToLogin,
   getStudentApplications,
-  isApplied
+  isApplied,
+  getProposalsProfessor,
 };
 export default API;

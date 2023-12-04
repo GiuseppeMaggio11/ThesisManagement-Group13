@@ -16,6 +16,7 @@ import VirtualClock from "./components/VirtualClock";
 import MessageContext from "./messageCtx";
 import Applications from "./components/Applications";
 import SearchProposalRoute from "./components/SearchProposal";
+import ProfessorActiveProposals from "./components/ProfessorActiveProposals";
 //import Toasts from "./components/Toasts";
 import StudentApplications from "./components/StudentApplications";
 
@@ -177,9 +178,22 @@ function App() {
                   virtualClock={virtualClock}
                   setLoading={setLoading}
                   loggedIn={loggedIn}
+                  user={user}
                 />
               }
-            ></Route>
+            />
+            <Route
+              path="/activeproposals"
+              element={
+                <ProfessorActiveProposals
+                  loading={loading}
+                  virtualClock={virtualClock}
+                  setLoading={setLoading}
+                  loggedIn={loggedIn}
+                  user={user}
+                />
+              }
+            />
             <Route
               path="/studentapplications"
               element={
