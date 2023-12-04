@@ -111,7 +111,7 @@ const SearchDropdown = ({
       <Row>
         <Col
           xs={4}
-          className={`d-flex align-items-center justify-content-start`}
+          className={`d-flex align-items-center justify-content-center`}
         >
           <p style={{ margin: "0px" }}>{placeholder}: </p>
         </Col>
@@ -221,7 +221,11 @@ const FilterCard = ({
   setSelectedSupervisor,
   selectedTitlesWords,
   setSelectedTitlesWords,
+  selectedDescriptionsWords,
+  setSelectedDescriptionsWords,
   setAdvancedFilters,
+  selectedKnowledgeWords, 
+  setSelectedKnowledgeWords,
   setShowFilters,
 }) => {
   const { handleToast } = useContext(MessageContext);
@@ -229,6 +233,10 @@ const FilterCard = ({
 
   const [titles, setTitles] = useState([]);
   const [titleFilter, setTitleFilters] = useState("");
+  const [descriptions, setDescriptions] = useState([])
+  const [descriptionFilter, setDescriptionFilter] = useState("");
+  const [knowledge, setKnowledge] = useState([])
+  const [knowledgeFilter, setKnowledgeFilter] = useState("");
   const [supervisors, setSupervisors] = useState(null);
   const [keywords, setKeywords] = useState([]);
   const [cosupervisors, setCosupervisors] = useState(null);
@@ -313,6 +321,7 @@ const FilterCard = ({
     setSelectedType([]);
     setSelectedDate(dayjs(virtualClock));
     setSelectedTitlesWords([]);
+    setSelectedDescriptionsWords([])
     setReset(true);
     setProposals(thesisList);
     setAdvancedFilters(false);
@@ -372,13 +381,13 @@ const FilterCard = ({
     setShowFilters(false);
   };
 
-  const addWord = () => {
+  const addWord = (value, setValue, selectedItems, setSelectedItems) => {
     let words = [];
-    if (selectedTitlesWords?.length > 0) words = [...selectedTitlesWords];
-    let wordExists = words.some((w) => w === titleFilter);
-    if (!wordExists && titleFilter !== '' || titleFilter !== ' ') words.push(titleFilter);
-    setTitleFilters("");
-    setSelectedTitlesWords(words);
+    if (selectedItems?.length > 0) words = [...selectedItems];
+    let wordExists = words.some((w) => w === value);
+    if (!wordExists && (value !== '' && value !== ' ')) words.push(value);
+    setValue("");
+    setSelectedItems(words);
   };
 
   useEffect(() => {
@@ -386,7 +395,7 @@ const FilterCard = ({
       const ps = scrollbarRef.current;
       ps.scrollTo(ps.scrollWidth, 0);
     }
-  }, [selectedTitlesWords, selectedKeywords, selectedGroups, selectedCosupervisor, selectedType]);
+  }, [selectedTitlesWords, selectedKnowledgeWords, selectedDescriptionsWords, selectedKeywords, selectedGroups, selectedCosupervisor, selectedType]);
 
   return (
     <Card
@@ -401,6 +410,7 @@ const FilterCard = ({
             gridGap: "10px",
           }}
         >
+          {/* title */}
           <div
             className="mt-0 p-0"
             style={{
@@ -419,7 +429,7 @@ const FilterCard = ({
                     whiteSpace: "nowrap",
                     scrollBehavior: "smooth",
                     height: "2.5em",
-                    overflowY: "hidden"
+                    overflowY: "auto"
                   }}
                 >
                   {selectedTitlesWords && selectedTitlesWords.length > 0 && (
@@ -444,13 +454,13 @@ const FilterCard = ({
             >
               <Col
                 xs={4}
-                className="d-flex align-items-center justify-content-start"
+                className="d-flex align-items-center justify-content-center"
               >
                 <p style={{ margin: "0px" }}>Title: </p>
               </Col>
 
               <Col xs={8} className="position-relative">
-                <div className="input-group" style={{paddingLeft:'0.4em'}}>
+                <div className="input-group" style={{ paddingLeft: '0.4em' }}>
                   <input
                     type="text"
                     className="form-control custom-input-text"
@@ -462,19 +472,173 @@ const FilterCard = ({
                     style={{ borderRight: 'none' }}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
+                        console.log(e.key)
                         e.preventDefault();
-                        addWord();
+                        addWord(titleFilter, setTitleFilters, selectedTitlesWords, setSelectedTitlesWords);
                       }
                     }}
                   />
                   <span className="input-group-text custom-input-text" style={{ background: 'white' }}>
-                    <ArrowReturnLeft onClick={titleFilter!=='' && addWord}  />
+                    <ArrowReturnLeft onClick={() => { addWord(titleFilter, setTitleFilters, selectedTitlesWords, setSelectedTitlesWords) }} />
                   </span>
                 </div>
               </Col>
             </div>
           </div>
 
+          {/* description */}
+          <div
+            className="mt-0 p-0"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <div style={{ width: "100%" }}>
+              <Form.Group>
+              <Form.Label
+                  className="chip-list"
+                  style={{
+                    maxWidth: "100%",
+                    width: "100%",
+                    overflowX: "auto",
+                    whiteSpace: "nowrap",
+                    scrollBehavior: "smooth",
+                    height: "2.5em",
+                    overflowY: "auto"
+                  }}
+                >
+                  {selectedDescriptionsWords && selectedDescriptionsWords.length > 0 && (
+                    <PerfectScrollbar containerRef={(ref) => (scrollbarRef.current = ref)}>
+                      <Chips2
+                        items={descriptions}
+                        selectedItems={selectedDescriptionsWords}
+                        setItems={setDescriptions}
+                        setSelectedItems={setSelectedDescriptionsWords}
+                      />
+                    </PerfectScrollbar>
+                  )}
+                </Form.Label>
+              </Form.Group>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+              }}
+            >
+              <Col
+                xs={4}
+                className="d-flex align-items-center justify-content-center"
+              >
+                <p style={{ margin: "0px" }}>Description: </p>
+              </Col>
+
+              <Col xs={8} className="position-relative">
+                <div className="input-group" style={{ paddingLeft: '0.4em' }}>
+                  <input
+                    type="text"
+                    className="form-control custom-input-text"
+                    placeholder={"Search in description..."}
+                    value={descriptionFilter}
+                    onChange={(e) => {
+                      setDescriptionFilter(e.target.value);
+                    }}
+                    style={{ borderRight: 'none' }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addWord(descriptionFilter, setDescriptionFilter, selectedDescriptionsWords, setSelectedDescriptionsWords);
+                      }
+                    }}
+                  />
+                  <span className="input-group-text custom-input-text" style={{ background: 'white' }}>
+                    <ArrowReturnLeft onClick={() => { addWord(descriptionFilter, setDescriptionFilter, selectedDescriptionsWords, setSelectedDescriptionsWords) }} />
+                  </span>
+                </div>
+              </Col>
+            </div>
+          </div>
+
+           {/* knowledge */}
+           <div
+            className="mt-0 p-0"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <div style={{ width: "100%" }}>
+              <Form.Group>
+              <Form.Label
+                  className="chip-list"
+                  style={{
+                    maxWidth: "100%",
+                    width: "100%",
+                    overflowX: "auto",
+                    whiteSpace: "nowrap",
+                    scrollBehavior: "smooth",
+                    height: "2.5em",
+                    overflowY: "auto"
+                  }}
+                >
+                  {selectedKnowledgeWords && selectedKnowledgeWords.length > 0 && (
+                    <PerfectScrollbar containerRef={(ref) => (scrollbarRef.current = ref)}>
+                      <Chips2
+                        items={knowledge}
+                        selectedItems={selectedKnowledgeWords}
+                        setItems={setKnowledge}
+                        setSelectedItems={setSelectedKnowledgeWords}
+                      />
+                    </PerfectScrollbar>
+                  )}
+                </Form.Label>
+              </Form.Group>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+              }}
+            >
+              <Col
+                xs={4}
+                className="d-flex align-items-center justify-content-center"
+              >
+                <p style={{ margin: "0px" }}>Knowledge: </p>
+              </Col>
+
+              <Col xs={8} className="position-relative">
+                <div className="input-group" style={{ paddingLeft: '0.4em' }}>
+                  <input
+                    type="text"
+                    className="form-control custom-input-text"
+                    placeholder={"Search in description..."}
+                    value={knowledgeFilter}
+                    onChange={(e) => {
+                      setKnowledgeFilter(e.target.value);
+                    }}
+                    style={{ borderRight: 'none' }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addWord(knowledgeFilter, setKnowledgeFilter, selectedKnowledgeWords, setSelectedKnowledgeWords);
+                      }
+                    }}
+                  />
+                  <span className="input-group-text custom-input-text" style={{ background: 'white' }}>
+                    <ArrowReturnLeft onClick={() => { addWord(knowledgeFilter, setKnowledgeFilter, selectedKnowledgeWords, setSelectedKnowledgeWords)}} />
+                  </span>
+                </div>
+              </Col>
+            </div>
+          </div>
+
+
+
+          {/* supervisor */}
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div style={{ width: "100%" }}>
               <Form.Group>
@@ -512,7 +676,7 @@ const FilterCard = ({
               setSelectedItems={setSelectedSupervisor}
             />
           </div>
-
+          {/* Co-Supervisor */}
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div style={{ width: "100%" }}>
               <Form.Group>
@@ -559,7 +723,7 @@ const FilterCard = ({
               setSelectedItems={setSelectedCosupervisor}
             />
           </div>
-
+          {/* Type */}
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div style={{ width: "100%" }}>
               <Form.Group>
@@ -602,7 +766,7 @@ const FilterCard = ({
               setSelectedItems={setSelectedType}
             />
           </div>
-
+          {/* Keywords */}
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div style={{ width: "100%" }}>
               <Form.Group>
@@ -645,7 +809,7 @@ const FilterCard = ({
               setSelectedItems={setSelectedKeywords}
             />
           </div>
-
+          {/* Groups */}
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div style={{ width: "100%" }}>
               <Form.Group>
@@ -687,7 +851,7 @@ const FilterCard = ({
               setSelectedItems={setSelectedGroups}
             />
           </div>
-
+          {/* Date */}
           <div
             className="mt-0 py-2"
             style={{
@@ -707,7 +871,7 @@ const FilterCard = ({
             >
               <Col
                 xs={4}
-                className="d-flex align-items-center justify-content-start"
+                className="d-flex align-items-center justify-content-center"
               >
                 <p style={{ margin: "0px", paddingTop: isMobile ? "0.5" : "1.3em" }}>Valid until:</p>
               </Col>

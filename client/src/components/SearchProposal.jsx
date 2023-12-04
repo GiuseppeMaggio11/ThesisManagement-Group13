@@ -74,6 +74,9 @@ function SearchProposalComponent(props) {
   const [selectedKeywords, setSelectedKeywords] = useState([]);
   const [selectedSupervisor, setSelectedSupervisor] = useState([]);
   const [selectedTitlesWords, setSelectedTitlesWords] = useState([]);
+  const [selectedDescriptionsWords, setSelectedDescriptionsWords] = useState([]);
+  const [selectedKnowledgeWords, setSelectedKnowledgeWords] = useState([]);
+  
 
   useEffect(() => {
     setFilteredThesisProposals([...props.thesisProposals]);
@@ -121,6 +124,7 @@ function SearchProposalComponent(props) {
                 className={`margin-titles-custom ${
                   props.isMobile ? "smaller-heading" : ""
                 }`}
+                style={{paddingLeft: props.isMobile? "0.5em": "0" }}
               >
                 Thesis Proposals
               </h1>
@@ -231,8 +235,12 @@ function SearchProposalComponent(props) {
                     setSelectedSupervisor={setSelectedSupervisor}
                     selectedTitlesWords={selectedTitlesWords}
                     setSelectedTitlesWords={setSelectedTitlesWords}
+                    selectedDescriptionsWords={selectedDescriptionsWords}
+                    setSelectedDescriptionsWords={setSelectedDescriptionsWords}
                     setAdvancedFilters={setAdvancedFilters}
                     setShowFilters={setShowFilters}
+                    selectedKnowledgeWords={selectedKnowledgeWords}
+                    setSelectedKnowledgeWords={setSelectedKnowledgeWords}
                   />
                 </Col>
               </Row>
