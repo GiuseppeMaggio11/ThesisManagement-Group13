@@ -129,4 +129,20 @@ async function updateThesesArchivation(req, res) {
   };
 }
 
-module.exports = {newThesis,updateThesesArchivation}
+//updates is_archived value of choosen thesis manually
+async function updateThesesArchivationManual(req, res) {
+
+  try {
+    await dao.beginTransaction();
+    const response_msg = await dao.updateThesesArchivationManual(req.body.thesis_id);
+    await dao.commit();
+    res.status(200).json(response_msg);
+    
+  }
+  catch (err) {
+    await dao.rollback();
+    res.status(500).json(err)
+  };
+}
+
+module.exports = {newThesis,updateThesesArchivation, updateThesesArchivationManual}

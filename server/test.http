@@ -63,3 +63,14 @@ Content-Type: application/json
 ###
 GET http://localhost:3001/api/student/S123456/applications
 ###
+
+GET http://localhost:3001/api/getProposalsProfessor
+###
+
+PUT http://localhost:3001/api/archiveProposalManual
+Content-Type: application/json
+
+{   
+    "thesis_id": 3
+}
+###

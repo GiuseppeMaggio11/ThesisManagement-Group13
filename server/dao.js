@@ -604,6 +604,21 @@ exports.updateThesesArchivation = async (virtualDateTime) => {
   }
 };
 
+exports.updateThesesArchivationManual = async (thesis_id) => {
+  try {
+    const sql = ` 
+                UPDATE thesis
+                SET is_archived = 1
+                WHERE id = ?
+                `;
+    const [rows] = await pool.execute(sql, [thesis_id]);
+    return rows.info;
+  } catch (err) {
+    console.error("Error in updateThesesArchivation: ", err);
+    throw err;
+  }
+};
+
 // updates is archived value to 1 if date has passed
 exports.updateApplicationStatus = async (decision) => {
   try {
@@ -737,6 +752,18 @@ exports.getStudentApplication = async (studentId) => {
   }
 };
 
+// get student application
+exports.getProposalsProfessor = async (professor_id) => {
+  try {
+    const sql = "SELECT * FROM thesis WHERE supervisor_id = ?";
+    const [rows] = await pool.execute(sql, [professor_id]);
+    console.log(rows)
+    return rows;
+  } catch (error) {
+    console.error("Error in getExternal_cosupervisors_emails: ", error);
+    throw error;
+  }
+};
 //begin transaction function
 exports.beginTransaction = async () => {
   let connection;

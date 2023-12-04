@@ -25,4 +25,16 @@ async function getProposal (req,res){
     }
 }
 
-module.exports = { getProposals, getProposal };
+async function getProposalsProfessor (req,res){
+  try {
+    const proposals = await dao.getProposalsProfessor(req.user.username)
+    if(proposals.length > 0){
+      return res.status(200).json(proposals);
+    }
+    res.status(404).json(" No data found")
+  } catch (error) {
+    res.status(500).json(error);
+  }
+}
+
+module.exports = { getProposals, getProposal,getProposalsProfessor };
