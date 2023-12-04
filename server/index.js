@@ -108,7 +108,7 @@ app.get(
   "/login",
   passport.authenticate("saml", { failureRedirect: "/", failureFlash: true }),
   (req, res) => {
-    res.redirect("http://localhost:5173");
+    res.redirect("http://localhost:5173/proposals");
   }
 );
 
@@ -121,7 +121,7 @@ app.post(
     failureFlash: true,
   }),
   function (req, res) {
-    res.redirect("http://localhost:5173");
+    res.redirect("http://localhost:5173/proposals");
   }
 );
 

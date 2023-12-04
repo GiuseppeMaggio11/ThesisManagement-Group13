@@ -4,7 +4,7 @@ import {
   Container,
   Dropdown,
   Nav,
-  NavDropdown,
+  Image,
   Navbar,
   Row,
 } from "react-bootstrap";
@@ -38,7 +38,16 @@ function Header(props) {
     >
       <Container>
         <Navbar.Brand as={NavLink} to="/" className="fs-1">
-          Thesis management
+          <Image
+            src="https://upload.wikimedia.org/wikipedia/it/archive/4/47/20210407201938%21Logo_PoliTo_dal_2021_blu.png"
+            alt="logo polito"
+            width={200} 
+            height={200}
+            style={{
+              filter: 'grayscale(100%) brightness(0) invert(100%)',
+            }}
+            fluid
+          />
         </Navbar.Brand>
         <Navbar.Toggle
           aria-controls="responsive-navbar-nav"
@@ -50,21 +59,9 @@ function Header(props) {
           <Nav className="me-auto">
             <Nav.Link
               as={NavLink}
-              to="/"
-              onClick={() => {
-                if (isSmallScreen) setExpanded((old) => !old);
-              }}
-              className="fs-5"
-            >
-              Home
-            </Nav.Link>
-            <Nav.Link
-              as={NavLink}
               to={
-                props.user && props.user.user_type === "STUD"
-                  ? "proposal"
-                  : props.user && props.user.user_type === "PROF"
-                  ? "teacher"
+                props.user && (props.user.user_type === "STUD" || props.user.user_type === "PROF")
+                  ? "proposals"
                   : "/"
               }
               onClick={() => {
@@ -72,17 +69,17 @@ function Header(props) {
               }}
               className="fs-5"
             >
-              {props.user && props.user.user_type === "STUD"
-                ? "Thesis proposals"
-                : props.user && props.user.user_type === "PROF"
-                ? "Teacher Dashboard"
-                : ""}
+              {props.user && (props.user.user_type === 'STUD' || props.user.user_type === 'PROF') ? (
+                "Thesis proposals"
+              ) : ""}
             </Nav.Link>
             <Nav.Link
               as={NavLink}
               to={
                 props.user && props.user.user_type === "STUD"
                   ? "studentapplications"
+                  : props.user && props.user.user_type === "PROF"
+                  ? "applications"
                   : "/"
               }
               onClick={() => {
@@ -92,6 +89,8 @@ function Header(props) {
             >
               {props.user && props.user.user_type === "STUD"
                 ? "My applications"
+                : props.user && props.user.user_type === "PROF"
+                ? "Applications"
                 : ""}
             </Nav.Link>
           </Nav>

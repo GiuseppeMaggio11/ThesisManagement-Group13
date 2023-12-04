@@ -3,7 +3,6 @@ import {
   Accordion,
   Alert,
   Button,
-  Card,
   Col,
   Container,
   Row,
@@ -62,11 +61,22 @@ function Applications(props) {
   };
 
   return (
-    <>
+    <div className="d-flex justify-content-center">
       {props.loading && <Loading />}
-      <Container>
-        <Row className="mb-3">
-          <Col className="fs-2">Students Pending Applications</Col>
+        <Container className="width-80 margin-custom">
+          <Row className="d-flex align-items-center">
+            <Col
+              xs={4}
+              className="d-flex justify-content-between align-items-center"
+            >
+            <h1
+              className={`margin-titles-custom ${
+                props.isMobile ? "smaller-heading" : ""
+              }`}
+            >
+              Applications
+            </h1>
+          </Col>
         </Row>
 
         {!applications || applications.length === 0 ? (
@@ -115,7 +125,7 @@ function Applications(props) {
           </Accordion>
         )}
       </Container>
-    </>
+    </div>
   );
 }
 

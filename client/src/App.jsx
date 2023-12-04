@@ -117,7 +117,7 @@ function App() {
               }
             />
             <Route
-              path="/teacher"
+              path="/proposals"
               element={
                 loggedIn && user.user_type === "PROF" ? (
                   <TeacherPage
@@ -126,15 +126,7 @@ function App() {
                     error={error}
                     setError={setError}
                   />
-                ) : (
-                  <Navigate replace to="/" />
-                )
-              }
-            />
-            <Route
-              path="/proposal"
-              element={
-                loggedIn && user.user_type === "STUD" ? (
+                ) : loggedIn && user.user_type === "STUD" ? (
                   <SearchProposalRoute
                     loading={loading}
                     setLoading={setLoading}
