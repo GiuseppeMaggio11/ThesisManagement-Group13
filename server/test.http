@@ -63,3 +63,25 @@ Content-Type: application/json
 ###
 GET http://localhost:3001/api/student/S123456/applications
 ###
+
+
+PUT http://localhost:3001/api/updateThesis
+Content-Type: application/json
+
+{   
+    "thesis_id": 1,
+    "title": "PROVA",
+    "description": "PROVA",
+    "supervisor_id" : "P654321",
+    "thesis_level": "Bachelor",
+    "type_name": "PROVA",
+    "required_knowledge": "PROVA",
+    "notes": "PROVA",
+    "expiration": "2050-01-01T00:00:00.000Z",
+    "cod_degree": "DEGR02",
+    "is_archived": false,
+    "keywords": "PROVA, PROVA",
+    "cosupervisors_internal": ["P123456"],
+    "cosupervisors_external": ["elena.conti@email.net"],
+    "cod_group": "GRP02"
+}

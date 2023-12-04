@@ -335,6 +335,7 @@ describe("newApplication", () => {
         dao.getUserID.mockResolvedValue("S123456");
         dao.isThesisValid.mockResolvedValue(true);
         dao.isAlreadyExisting.mockResolvedValue(false);
+        dao.getApplications.mockResolvedValue([]);
         dao.newApply.mockResolvedValue(true);
 
         await newApplication(mockReq, mockRes);
@@ -342,6 +343,7 @@ describe("newApplication", () => {
         expect(dao.getUserID).toHaveBeenCalledTimes(1);
         expect(dao.isThesisValid).toHaveBeenCalledTimes(1);
         expect(dao.isAlreadyExisting).toHaveBeenCalledTimes(1);
+        expect(dao.getApplications).toHaveBeenCalledTimes(1);
         expect(dao.newApply).toHaveBeenCalledTimes(1);
         expect(mockRes.status).toHaveBeenCalledWith(200);
         expect(mockRes.json).toHaveBeenCalledWith("Application created successfully");
