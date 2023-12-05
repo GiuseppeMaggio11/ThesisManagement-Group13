@@ -13,7 +13,7 @@ import Loading from "./Loading";
 import { useMediaQuery } from "react-responsive";
 import API from "../API";
 import MessageContext from "../messageCtx";
-import { CheckLg, XLg } from "react-bootstrap-icons";
+import { CheckLg, XLg, Download } from "react-bootstrap-icons";
 
 function Applications(props) {
   const [applications, setApplications] = useState(undefined);
@@ -61,6 +61,14 @@ function Applications(props) {
     }
   };
 
+  const handleDownload = async (student_id, thesis_id) => {
+    try {
+      await API.downloadStudentApplicationFiles(student_id, thesis_id);
+    } catch (err) {
+      handleToast(err, "error");
+    } 
+  };
+
   return (
     <>
       {props.loading && <Loading />}
@@ -92,6 +100,7 @@ function Applications(props) {
                           <th>Application Date</th>
                           <th></th>
                           <th></th>
+                          <th></th>
                         </tr>
                       </thead>
                       <tbody>
@@ -101,6 +110,7 @@ function Applications(props) {
                               application={appl}
                               key={i}
                               handleApplication={handleApplication}
+                              handleDownload={handleDownload}
                               isMobile={isMobile}
                               title={title}
                             />
@@ -137,6 +147,19 @@ function StudentApplication(props) {
       {!props.isMobile && <td>{props.application.student_id}</td>}
       <td>{props.application.student_name}</td>
       <td>{formatDate(props.application.application_date)}</td>
+      <td>
+        <Button
+          variant="secondary"
+          onClick={() =>
+            props.handleDownload(
+              props.application.student_id,
+              props.application.thesis_id
+            )
+          }
+        >
+          <Download size={20} />
+        </Button>
+      </td>
       <td>
         <Button
           variant="success"

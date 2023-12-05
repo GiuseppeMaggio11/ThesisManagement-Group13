@@ -83,7 +83,7 @@ async function getAllFiles (req,res) {
           if (err) {
             res.status(500).json('An error occurred while creating the zip archive.');
           } else {
-            res.download(zipFilePath, () => {
+            res.status(200).download(zipFilePath, () => {
               // Delete the file after the download is complete
               fs.unlink(zipFilePath, (err) => {
                 if (err) {

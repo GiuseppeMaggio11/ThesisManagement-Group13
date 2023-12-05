@@ -217,6 +217,29 @@ async function isApplied() {
   );
 }
 
+async function downloadStudentApplicationFiles(student_id, thesis_id) {
+    const response = await fetch(URL + `/getAllFiles/${student_id}/${thesis_id}`, {
+      credentials: "include",
+      headers: {
+        "Accept": "application/zip"
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to download files. Status: ${response.status}`);
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const downloadLink  = document.createElement('a');
+    downloadLink.href = url;
+    downloadLink.download = `student_files_${student_id}.zip`;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+    window.URL.revokeObjectURL(url);
+}
+
 
 
 const API = {
@@ -234,6 +257,7 @@ const API = {
   updateApplictionStatus,
   redirectToLogin,
   getStudentApplications,
-  isApplied
+  isApplied,
+  downloadStudentApplicationFiles
 };
 export default API;
