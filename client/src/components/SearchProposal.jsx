@@ -320,7 +320,7 @@ function ProposalAccordion(props) {
         </p>
         <p>
           Expiration date:{" "}
-          <b>{dayjs(props.proposal.expiration).format("YYYY-MM-DD")}</b>
+          <b>{dayjs(props.proposal.expiration).format("DD/MM/YYYY")}</b>
         </p>
       </Accordion.Body>
     </Accordion.Item>
@@ -341,7 +341,7 @@ function ProposalTableRow(props) {
       </td>
       <td style={{ fontSize: 18 }}>{props.proposal.supervisor}</td>
       <td style={{ fontSize: 18 }}>
-        {dayjs(props.proposal.expiration).format("YYYY-MM-DD")}
+        {dayjs(props.proposal.expiration).format("DD/MM/YYYY")}
       </td>
     </tr>
   );
