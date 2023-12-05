@@ -63,6 +63,7 @@ function ActiveProposalsLargeScreen(props) {
             borderRadius: "8px",
             fontWeight: "bold",
             background: "rgb(245, 245, 245)",
+            fontSize: "larger",
           }}
           className="py-3"
         >
