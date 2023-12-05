@@ -178,6 +178,8 @@ app.post(
     check("supervisor_id").isString().isLength({ min: 1, max: 7 }),
     check("thesis_level").isString().isIn(["Bachelor", "Master", "bachelor", "master"]),
     check("type_name").isString().isLength({ min: 1, max: 50 }),
+    check("required_knowledge").isString(),
+    check("notes").isString(),
     check("expiration")
       .isISO8601()
       .toDate()
