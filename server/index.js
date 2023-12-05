@@ -184,7 +184,8 @@ app.post(
     check("expiration")
       .isISO8601()
       .toDate()
-      .withMessage("Date time must be in format YYYY-MM-DD HH:MM:SS"), // TODO check if given date is NOT earlier than today
+      .isAfter()
+      .withMessage("Date time must be in format YYYY-MM-DD HH:MM:SS and in the future"),
     check("cod_degree").isString().isLength({ min: 1, max: 10 }),
     check("is_archived").isBoolean(),
     check("keywords").isString(),
@@ -262,7 +263,7 @@ app.get('/api/isApplied',isStudent, isApplied);
 //UPDATES AN EXISTING THESIS
 app.put(
   "/api/updateThesis",
-  /* isProfessor, */
+  isProfessor,
   [
     // Various checks of syntax of given data
     check("thesis_id").isInt({ gt: 0 }),
@@ -275,7 +276,8 @@ app.put(
     check("expiration")
       .isISO8601()
       .toDate()
-      .withMessage("Date time must be in format YYYY-MM-DD HH:MM:SS"), // TODO check if given date is NOT earlier than today
+      .isAfter()
+      .withMessage("Date time must be in format YYYY-MM-DD HH:MM:SS and in the future"),
     check("cod_degree").isString().isLength({ min: 1, max: 10 }),
     check("is_archived").isBoolean(),
     check("keywords").isString(),
