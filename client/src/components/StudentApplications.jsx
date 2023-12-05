@@ -15,6 +15,7 @@ import MessageContext from "../messageCtx";
 import API from "../API";
 
 import dayjs from "dayjs";
+import NoFileFound from "./NoFileFound";
 
 function StudentApplications(props) {
   const [applications, setApplications] = useState(undefined);
@@ -54,9 +55,7 @@ function StudentApplications(props) {
           </Col>
         </Row>
         {!applications || applications.length === 0 ? (
-          <Alert variant="danger" style={{ maxWidth: "300px" }}>
-            No applications yet
-          </Alert>
+            <NoFileFound message={'No application found'}/>    
         ) : !isMobile ? (
           <Table>
             <thead>

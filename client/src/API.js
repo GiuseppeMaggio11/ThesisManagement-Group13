@@ -122,7 +122,7 @@ async function getThesisProposals(date) {
     credentials: "include",
   });
   const proposals = await response.json();
-  if (response.ok) {
+  if (response.ok && proposals.length>0) {
     return proposals.map((element) => ({
       id: element.id,
       title: element.title,
@@ -139,7 +139,7 @@ async function getThesisProposals(date) {
       cosupervisors: element.cosupervisors,
     }));
   } else {
-    throw proposals;
+    throw [];
   }
 }
 

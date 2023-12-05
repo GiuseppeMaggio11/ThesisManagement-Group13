@@ -19,6 +19,7 @@ import API from "../API";
 
 import { FilterCard } from "./FilterCard";
 import Loading from "./Loading";
+import NoFileFound from "./NoFileFound";
 
 function SearchProposalRoute(props) {
   const [thesisProposals, setThesisProposals] = useState([]);
@@ -251,7 +252,7 @@ function SearchProposalComponent(props) {
             <Row>
               <Col>
                 {filteredThesisProposals.length == 0 ? (
-                  <h2>No proposal found</h2>
+                    <NoFileFound message={'No proposal found'}/>
                 ) : (
                   <Table hover>
                     <thead>
@@ -286,6 +287,9 @@ function SearchProposalComponent(props) {
               </Col>
             </Row>
           ) : (
+            filteredThesisProposals.length == 0 ? (
+              <NoFileFound message={'No proposal found'}/>
+              ) : (
             <Row style={{ marginBottom: "5rem" }}>
               <Accordion>
                 {filteredByTitle.length <= 0 &&
@@ -302,6 +306,7 @@ function SearchProposalComponent(props) {
                   ))}
               </Accordion>
             </Row>
+              )
           )}
         </Container>
       </div>
