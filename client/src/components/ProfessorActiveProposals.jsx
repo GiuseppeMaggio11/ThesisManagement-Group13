@@ -57,22 +57,43 @@ function ActiveProposalsLargeScreen(props) {
   return (
     <Row>
       <Col>
-        <Table hover>
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Level</th>
-              <th>Type</th>
-              <th>Expiration Date</th>
-              {/*ADD COLUMNS FOR BUTTONS HERE*/}
-            </tr>
-          </thead>
-          <tbody>
+        <Row
+          style={{
+            border: "1px solid rgb(240,240,240)",
+            borderRadius: "8px",
+            fontWeight: "bold",
+            background: "rgb(245, 245, 245)",
+          }}
+          className="py-3"
+        >
+          <Col md={6} lg={6} xl={6} xxl={6}>
+            Title
+          </Col>
+          <Col md={2} lg={2} xl={2} xxl={2}>
+            Level
+          </Col>
+          <Col md={2} lg={2} xl={2} xxl={2}>
+            Type
+          </Col>
+          <Col md={2} lg={2} xl={2} xxl={2}>
+            Expiration Date
+          </Col>
+          {/*ADD COLUMNS FOR BUTTONS HERE (fix md, lg, xl, xxl)*/}
+        </Row>
+        <Row
+          className="mt-2"
+          style={{
+            border: "1px solid rgb(240,240,240)",
+            borderRadius: "8px",
+            boxShadow: "5px 10px rgb(245, 245, 245)",
+          }}
+        >
+          <Col>
             {props.activeProposals.map((proposal, i) => {
               return <ElementProposalLargeScreen proposal={proposal} key={i} />;
             })}
-          </tbody>
-        </Table>
+          </Col>
+        </Row>
       </Col>
     </Row>
   );
@@ -81,12 +102,13 @@ function ActiveProposalsLargeScreen(props) {
 function ElementProposalLargeScreen(props) {
   const navigation = useNavigate();
   return (
-    <tr
+    <Row
+      className="py-3 active-proposal-row-custom"
       onClick={() => {
         /*REDIRECT TO THESIS' PAGE*/
       }}
     >
-      <td>
+      <Col md={6} lg={6} xl={6} xxl={6}>
         <div
           style={{
             color: "#4682B4",
@@ -96,14 +118,18 @@ function ElementProposalLargeScreen(props) {
         >
           <span style={{ cursor: "pointer" }}>{props.proposal.title}</span>
         </div>
-      </td>
-      <td style={{ fontSize: 18 }}>{props.proposal.thesis_level}</td>
-      <td style={{ fontSize: 18 }}>{props.proposal.thesis_type}</td>
-      <td style={{ fontSize: 18 }}>
+      </Col>
+      <Col md={2} lg={2} xl={2} xxl={2} style={{ fontSize: 18 }}>
+        {props.proposal.thesis_level}
+      </Col>
+      <Col md={2} lg={2} xl={2} xxl={2} style={{ fontSize: 18 }}>
+        {props.proposal.thesis_type}
+      </Col>
+      <Col md={2} lg={2} xl={2} xxl={2} style={{ fontSize: 18 }}>
         {dayjs(props.proposal.expiration).format("DD/MM/YYYY")}
-      </td>
-      {/*ADD COLUMNS FOR BUTTONS HERE*/}
-    </tr>
+      </Col>
+      {/*ADD COLUMNS FOR BUTTONS HERE (fix md, lg, xl, xxl)*/}
+    </Row>
   );
 }
 

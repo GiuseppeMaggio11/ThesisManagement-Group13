@@ -475,3 +475,11 @@ input:checked+.slider::before {
     /* Add a border for testing */
   }
 }
+
+.active-proposal-row-custom {
+  border-bottom: 1px solid lightgray;
+}
+
+.active-proposal-row-custom:hover {
+  background: rgb(245, 245, 245);
+}
