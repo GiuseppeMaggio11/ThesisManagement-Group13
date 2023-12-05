@@ -257,6 +257,15 @@ docker compose down
       }
     ```
 
+#### 8. **Download student's application files**: `GET /api/getAllFiles/:student_id/:thesis_id`
+
+  - **Description**: Download all files associated with an application 
+  - **Middleware**: `isProfessor`
+  - **Request Body**: None,
+  - **Response**:
+    - `200` with a zip folder inside res.download containing all the files of the application
+    - `500` if an unexpected error occurs
+
 #### OTHER 1 Server
 
 #### OTHER 2 Server
@@ -389,6 +398,15 @@ docker compose down
 ```
 "Rows matched: 6  Changed: 3  Warnings: 0"
 ```
+
+#### downloadStudentApplicationFiles
+
+- Description: Asks the server to download a zip folder containing all the files associated with an application
+- API server called:  GET `/api/getAllFiles/:student_id/:thesis_id`
+- Input: 
+  + `student_id`: The id of the student who submitted the application 
+  + `thesis_id`: The id of the thesis for which the student submitted the application.
+- Output: _None_
 
 #### OTHER 2 Client
 

@@ -81,7 +81,7 @@ async function getAllFiles (req,res) {
     
         zipdir(userFolderPath, { saveTo: zipFilePath }, function (err, buffer) {
           if (err) {
-            res.status(500).json('An error occurred while creating the zip archive.');
+            throw err;
           } else {
             res.status(200).download(zipFilePath, () => {
               // Delete the file after the download is complete
