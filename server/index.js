@@ -183,7 +183,8 @@ app.post(
     check("expiration")
       .isISO8601()
       .toDate()
-      .withMessage("Date time must be in format YYYY-MM-DD HH:MM:SS"), // TODO check if given date is NOT earlier than today
+      .isAfter()
+      .withMessage("Date time must be in format YYYY-MM-DD HH:MM:SS and in the future"),
     check("cod_degree").isString().isLength({ min: 1, max: 10 }),
     check("is_archived").isBoolean(),
     check("keywords").isString(),
