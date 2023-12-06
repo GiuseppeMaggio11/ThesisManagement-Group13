@@ -1,8 +1,11 @@
 import { Button, Container, Row, Col } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
-import Loading from "./Loading";
+import { Link } from "react-router-dom";
+import API from "../API";
 
 function TeacherPage(props) {
+  if (!props.loggedIn || props.user.user_type !== "PROF")
+    return API.redirectToLogin();
+
   return (
     <Container>
       <Row>

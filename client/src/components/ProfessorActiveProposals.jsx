@@ -86,7 +86,7 @@ function ActiveProposalsLargeScreen(props) {
           style={{
             border: "1px solid rgb(240,240,240)",
             borderRadius: "8px",
-            boxShadow: "5px 10px rgb(245, 245, 245)",
+            boxShadow: "5px 5px rgb(245, 245, 245)",
           }}
         >
           <Col>

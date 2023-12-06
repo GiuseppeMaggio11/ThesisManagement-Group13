@@ -23,8 +23,10 @@ import Loading from "./Loading";
 function SearchProposalRoute(props) {
   const [thesisProposals, setThesisProposals] = useState([]);
   const { handleToast } = useContext(MessageContext);
-
   const isMobile = useMediaQuery({ maxWidth: 767 });
+
+  if (!props.loggedIn || props.user.user_type !== "STUD")
+    return API.redirectToLogin();
 
   useEffect(() => {
     props.setLoading(true);

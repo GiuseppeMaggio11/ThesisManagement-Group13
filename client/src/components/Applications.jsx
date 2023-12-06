@@ -20,6 +20,10 @@ function Applications(props) {
   const [thesisTitles, setThesisTitles] = useState(undefined);
   const { handleToast } = useContext(MessageContext);
   const isMobile = useMediaQuery({ maxWidth: 767 });
+
+  if (!props.loggedIn || props.user.user_type !== "PROF")
+    return API.redirectToLogin();
+
   useEffect(() => {
     props.setLoading(true);
     //API CALL

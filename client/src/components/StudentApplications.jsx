@@ -21,6 +21,9 @@ function StudentApplications(props) {
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const { handleToast } = useContext(MessageContext);
 
+  if (!props.loggedIn || props.user.user_type !== "STUD")
+    return API.redirectToLogin();
+
   useEffect(() => {
     props.setLoading(true);
     try {

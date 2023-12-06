@@ -120,54 +120,49 @@ function App() {
             <Route
               path="/teacher"
               element={
-                loggedIn && user.user_type === "PROF" ? (
-                  <TeacherPage
-                    loading={loading}
-                    setLoading={setLoading}
-                    error={error}
-                    setError={setError}
-                  />
-                ) : (
-                  <Navigate replace to="/" />
-                )
+                <TeacherPage
+                  loading={loading}
+                  setLoading={setLoading}
+                  error={error}
+                  setError={setError}
+                  loggedIn={loggedIn}
+                  user={user}
+                />
               }
             />
             <Route
               path="/proposal"
               element={
-                loggedIn && user.user_type === "STUD" ? (
-                  <SearchProposalRoute
-                    loading={loading}
-                    setLoading={setLoading}
-                    virtualClock={virtualClock}
-                  />
-                ) : (
-                  <Navigate replace to="/" />
-                )
+                <SearchProposalRoute
+                  loading={loading}
+                  setLoading={setLoading}
+                  virtualClock={virtualClock}
+                  loggedIn={loggedIn}
+                  user={user}
+                />
               }
             />
             <Route
               path="/newproposal"
               element={
-                loggedIn && user.user_type === "PROF" ? (
-                  <NewProposal
-                    loading={loading}
-                    virtualClock={virtualClock}
-                    setLoading={setLoading}
-                  />
-                ) : (
-                  <ErrorAlert />
-                )
+                <NewProposal
+                  loading={loading}
+                  virtualClock={virtualClock}
+                  setLoading={setLoading}
+                  loggedIn={loggedIn}
+                  user={user}
+                />
               }
             />
             <Route
               path="/applications"
               element={
-                loggedIn && user.user_type === "PROF" ? (
-                  <Applications loading={loading} setLoading={setLoading} />
-                ) : (
-                  <ErrorAlert />
-                )
+                <Applications
+                  loading={loading}
+                  setLoading={setLoading}
+                  loggedIn={loggedIn}
+                  user={user}
+                />
               }
             />
             <Route
@@ -197,15 +192,13 @@ function App() {
             <Route
               path="/studentapplications"
               element={
-                loggedIn && user.user_type === "STUD" ? (
-                  <StudentApplications
-                    loading={loading}
-                    setLoading={setLoading}
-                    virtualClock={virtualClock}
-                  />
-                ) : (
-                  <ErrorAlert />
-                )
+                <StudentApplications
+                  loading={loading}
+                  setLoading={setLoading}
+                  virtualClock={virtualClock}
+                  loggedIn={loggedIn}
+                  user={user}
+                />
               }
             ></Route>
 
