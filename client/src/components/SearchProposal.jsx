@@ -74,6 +74,7 @@ function SearchProposalComponent(props) {
   const [selectedCosupervisor, setSelectedCosupervisor] = useState([]);
   const [selectedKeywords, setSelectedKeywords] = useState([]);
   const [selectedSupervisor, setSelectedSupervisor] = useState([]);
+  const [selectedNotesWords, setSelectedNotesWords] = useState([]);
   const [selectedTitlesWords, setSelectedTitlesWords] = useState([]);
   const [selectedDescriptionsWords, setSelectedDescriptionsWords] = useState([]);
   const [selectedKnowledgeWords, setSelectedKnowledgeWords] = useState([]);
@@ -239,6 +240,8 @@ function SearchProposalComponent(props) {
                     setSelectedDescriptionsWords={setSelectedDescriptionsWords}
                     setAdvancedFilters={setAdvancedFilters}
                     setShowFilters={setShowFilters}
+                    selectedNotesWords={selectedNotesWords}
+                    setSelectedNotesWords={setSelectedNotesWords}
                     selectedKnowledgeWords={selectedKnowledgeWords}
                     setSelectedKnowledgeWords={setSelectedKnowledgeWords}
                   />

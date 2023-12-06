@@ -15,7 +15,7 @@ import dayjs from "dayjs";
 import { useMediaQuery } from "react-responsive";
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
-
+import SearchDropdown from "./SearchDropdown";
 
 const Chips2 = ({ items, selectedItems, setItems, setSelectedItems }) => {
   return (
@@ -42,163 +42,7 @@ const Chips2 = ({ items, selectedItems, setItems, setSelectedItems }) => {
   );
 };
 
-const SearchDropdown = ({
-  placeholder,
-  position,
-  items,
-  setItems,
-  selectedItems,
-  setSelectedItems,
-}) => {
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [filteredItems, setFilteredItems] = useState([]);
-  const [highlightedItem, setHighlightedItem] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const dropdownRef = useRef(null);
-  const [input, setInput] = useState("");
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowDropdown(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  const handleChange = (e) => {
-    const value = e.target.value.toLowerCase();
-
-    if (value === "") {
-      setFilteredItems([]);
-      setInput("");
-    } else {
-      setInput(value);
-      setFilteredItems(
-        items.filter((item) => {
-          const fullName = `${item}`.toLowerCase();
-
-          if (fullName.includes(" ")) {
-            const parts = fullName.split(" ");
-            return parts.some((part) => part.startsWith(value));
-          } else {
-            return fullName.startsWith(value);
-          }
-        })
-      );
-    }
-    setShowDropdown(true);
-  };
-
-  const handleItemClick = (item) => {
-    let newSelectedItems = [...selectedItems, item];
-    let is = items.filter((i) => !newSelectedItems?.includes(i));
-
-    setItems(is);
-    setSelectedItems(newSelectedItems);
-    setInput("");
-    setShowDropdown(false);
-  };
-
-
-  return (
-    <div className="mt-0 px-0 py-0" style={{ marginBottom: "0.5em" }}>
-      <Row>
-        <Col
-          xs={4}
-          className={`d-flex align-items-center justify-content-center`}
-        >
-          <p style={{ margin: "0px" }}>{placeholder}: </p>
-        </Col>
-        <Col xs={8} className="position-relative">
-          <div className="input-group ">
-            <input
-              type="text"
-              className="form-control custom-input-text"
-              placeholder={placeholder}
-              onChange={handleChange}
-              value={input}
-              style={{ borderRight: 'none' }}
-            />
-            <span className="input-group-text custom-input-text" style={{ background: 'white' }}>
-              {!showDropdown && (
-                <ChevronCompactDown
-                  onClick={() => {
-                    setShowDropdown(true);
-                  }}
-                />
-              )}
-              {showDropdown && (
-                <ChevronCompactUp
-                  onClick={() => {
-                    setShowDropdown(false);
-                  }}
-                />
-              )}
-            </span>
-          </div>
-        </Col>
-      </Row>
-      {showDropdown && (
-        <div className="dropdown-container">
-          <Row>
-            <Col
-              xs={4}
-              className="d-flex justify-content-start align-items-center"
-            ></Col>
-            <Col ref={dropdownRef} xs={8} className="ml-4 dropdown-content">
-              {filteredItems.length > 0 && (
-                <ul className="list-group mt-2">
-                  {filteredItems.map((item, index) => (
-                    <li
-                      className={`list-group-item`}
-                      key={index}
-                      onClick={() => handleItemClick(item)}
-                    >
-                      {item
-                        .toLowerCase()
-                        .split(' ')
-                        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                        .join(' ')}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {input === "" && items.length > 0 && (
-                <ul className="list-group mt-2">
-                  {items.map((item, index) => (
-                    <li
-                      className={`list-group-item`}
-                      key={index}
-                      onClick={() => handleItemClick(item)}
-                    >
-                      {item
-                        .toLowerCase()
-                        .split(' ')
-                        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                        .join(' ')}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {filteredItems.length <= 0 && input.length !== 0 && (
-                <ul className="list-group mt-2">
-                  <li className={`list-group-item`}>No results</li>
-                </ul>
-              )}
-            </Col>
-          </Row>
-        </div>
-      )}
-      <ToastContainer />
-    </div>
-  );
-};
 
 const FilterCard = ({
   virtualClock,
@@ -224,17 +68,22 @@ const FilterCard = ({
   selectedDescriptionsWords,
   setSelectedDescriptionsWords,
   setAdvancedFilters,
-  selectedKnowledgeWords, 
+  selectedKnowledgeWords,
   setSelectedKnowledgeWords,
+  setSelectedNotesWords,
+  selectedNotesWords,
   setShowFilters,
 }) => {
   const { handleToast } = useContext(MessageContext);
   const [reset, setReset] = useState(true);
-
   const [titles, setTitles] = useState([]);
   const [titleFilter, setTitleFilters] = useState("");
   const [descriptions, setDescriptions] = useState([])
   const [descriptionFilter, setDescriptionFilter] = useState("");
+
+  const [notes, setNotes] = useState([])
+  const [notesFilter, setNotesFilters] = useState("");
+
   const [knowledge, setKnowledge] = useState([])
   const [knowledgeFilter, setKnowledgeFilter] = useState("");
   const [supervisors, setSupervisors] = useState(null);
@@ -318,6 +167,7 @@ const FilterCard = ({
     setSelectedSupervisor([]);
     setSelectedGroups([]);
     setSelectedKeywords([]);
+    setSelectedNotesWords([]);
     setSelectedKnowledgeWords([])
     setSelectedType([]);
     setSelectedDate(dayjs(virtualClock));
@@ -342,18 +192,26 @@ const FilterCard = ({
 
     if (selectedKnowledgeWords?.length > 0) {
       filtered = filtered.filter((thesis) => {
-        const knowledgeLowerCase = thesis.required_knowledge.toLowerCase();
+        const knowledgeLowerCase = thesis.required_knowledge?.toLowerCase();
         return selectedKnowledgeWords.some((word) =>
-        knowledgeLowerCase.includes(word.toLowerCase())
+          knowledgeLowerCase.includes(word.toLowerCase())
         );
       });
     }
 
     if (selectedDescriptionsWords?.length > 0) {
       filtered = filtered.filter((thesis) => {
-        const descriptionLowerCase = thesis.description.toLowerCase();
+        const descriptionLowerCase = thesis.description?.toLowerCase();
         return selectedDescriptionsWords.some((word) =>
-        descriptionLowerCase.includes(word.toLowerCase())
+          descriptionLowerCase.includes(word.toLowerCase())
+        );
+      });
+    }
+    if (selectedNotesWords?.length > 0) {
+      filtered = filtered.filter((thesis) => {
+        const notesLowerCase = thesis.notes?.toLowerCase();
+        return selectedNotesWords.some((word) =>
+          notesLowerCase.includes(word.toLowerCase())
         );
       });
     }
@@ -414,7 +272,7 @@ const FilterCard = ({
       const ps = scrollbarRef.current;
       ps.scrollTo(ps.scrollWidth, 0);
     }
-  }, [selectedTitlesWords, selectedKnowledgeWords, selectedDescriptionsWords, selectedKeywords, selectedGroups, selectedCosupervisor, selectedType]);
+  }, [selectedTitlesWords, selectedKnowledgeWords, selectedDescriptionsWords, selectedKeywords, selectedGroups, selectedCosupervisor, selectedType, selectedNotesWords]);
 
   return (
     <Card
@@ -483,7 +341,7 @@ const FilterCard = ({
                   <input
                     type="text"
                     className="form-control custom-input-text"
-                    placeholder={"insert a text..."}
+                    placeholder={"Search by title..."}
                     value={titleFilter}
                     onChange={(e) => {
                       setTitleFilters(e.target.value);
@@ -515,7 +373,7 @@ const FilterCard = ({
           >
             <div style={{ width: "100%" }}>
               <Form.Group>
-              <Form.Label
+                <Form.Label
                   className="chip-list"
                   style={{
                     maxWidth: "100%",
@@ -580,8 +438,8 @@ const FilterCard = ({
             </div>
           </div>
 
-           {/* knowledge */}
-           <div
+          {/* knowledge */}
+          <div
             className="mt-0 p-0"
             style={{
               display: "flex",
@@ -590,7 +448,7 @@ const FilterCard = ({
           >
             <div style={{ width: "100%" }}>
               <Form.Group>
-              <Form.Label
+                <Form.Label
                   className="chip-list"
                   style={{
                     maxWidth: "100%",
@@ -634,7 +492,7 @@ const FilterCard = ({
                   <input
                     type="text"
                     className="form-control custom-input-text"
-                    placeholder={"Search in description..."}
+                    placeholder={"Search in knowledge..."}
                     value={knowledgeFilter}
                     onChange={(e) => {
                       setKnowledgeFilter(e.target.value);
@@ -648,7 +506,84 @@ const FilterCard = ({
                     }}
                   />
                   <span className="input-group-text custom-input-text" style={{ background: 'white' }}>
-                    <ArrowReturnLeft onClick={() => { addWord(knowledgeFilter, setKnowledgeFilter, selectedKnowledgeWords, setSelectedKnowledgeWords)}} />
+                    <ArrowReturnLeft onClick={() => { addWord(knowledgeFilter, setKnowledgeFilter, selectedKnowledgeWords, setSelectedKnowledgeWords) }} />
+                  </span>
+                </div>
+              </Col>
+            </div>
+          </div>
+
+
+
+          {/* notes */}
+          <div
+            className="mt-0 p-0"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <div style={{ width: "100%" }}>
+              <Form.Group>
+                <Form.Label
+                  className="chip-list"
+                  style={{
+                    maxWidth: "100%",
+                    width: "100%",
+                    overflowX: "auto",
+                    whiteSpace: "nowrap",
+                    scrollBehavior: "smooth",
+                    height: "2.5em",
+                    overflowY: "auto"
+                  }}
+                >
+                  {selectedNotesWords && selectedNotesWords.length > 0 && (
+                    <PerfectScrollbar containerRef={(ref) => (scrollbarRef.current = ref)}>
+                      <Chips2
+                        items={notes}
+                        selectedItems={selectedNotesWords}
+                        setItems={setNotes}
+                        setSelectedItems={setSelectedNotesWords}
+                      />
+                    </PerfectScrollbar>
+                  )}
+                </Form.Label>
+              </Form.Group>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+              }}
+            >
+              <Col
+                xs={4}
+                className="d-flex align-items-center justify-content-center"
+              >
+                <p style={{ margin: "0px" }}>Notes: </p>
+              </Col>
+
+              <Col xs={8} className="position-relative">
+                <div className="input-group" style={{ paddingLeft: '0.4em' }}>
+                  <input
+                    type="text"
+                    className="form-control custom-input-text"
+                    placeholder={"Search in notes..."}
+                    value={notesFilter}
+                    onChange={(e) => {
+                      setNotesFilters(e.target.value);
+                    }}
+                    style={{ borderRight: 'none' }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addWord(notesFilter, setNotesFilters, selectedNotesWords, setSelectedNotesWords);
+                      }
+                    }}
+                  />
+                  <span className="input-group-text custom-input-text" style={{ background: 'white' }}>
+                    <ArrowReturnLeft onClick={() => { addWord(notesFilter, setNotesFilters, selectedNotesWords, setSelectedNotesWords)}} />
                   </span>
                 </div>
               </Col>
@@ -892,7 +827,7 @@ const FilterCard = ({
                 xs={4}
                 className="d-flex align-items-center justify-content-center"
               >
-                <p style={{ margin: "0px", paddingTop: isMobile ? "0.5" : "1.3em" }}>Valid until:</p>
+                <p style={{ margin: "0px", paddingTop: isMobile ? "0.5" : "1.3em" }}>Expirate after:</p>
               </Col>
               <Col xs={8} className="d-flex align-items-center justify-content-end">
                 <Form.Group style={{ width: "97%", paddingTop: isMobile ? "0.5em" : "0.9em" }}>
