@@ -77,7 +77,7 @@ function SearchProposalComponent(props) {
   const [selectedTitlesWords, setSelectedTitlesWords] = useState([]);
   const [selectedDescriptionsWords, setSelectedDescriptionsWords] = useState([]);
   const [selectedKnowledgeWords, setSelectedKnowledgeWords] = useState([]);
-  
+
 
   useEffect(() => {
     setFilteredThesisProposals([...props.thesisProposals]);
@@ -122,10 +122,9 @@ function SearchProposalComponent(props) {
               className="d-flex justify-content-between align-items-center"
             >
               <h1
-                className={`margin-titles-custom ${
-                  props.isMobile ? "smaller-heading" : ""
-                }`}
-                style={{paddingLeft: props.isMobile? "0.5em": "0" }}
+                className={`margin-titles-custom ${props.isMobile ? "smaller-heading" : ""
+                  }`}
+                style={{ paddingLeft: props.isMobile ? "0.5em" : "0" }}
               >
                 Thesis Proposals
               </h1>
@@ -252,7 +251,7 @@ function SearchProposalComponent(props) {
             <Row>
               <Col>
                 {filteredThesisProposals.length == 0 ? (
-                    <NoFileFound message={'No proposal found'}/>
+                  advancedFilters? <NoFileFound message={'No proposal found with these parameters'} /> : <NoFileFound message={'No proposal found'} />
                 ) : (
                   <Table hover>
                     <thead>
@@ -271,9 +270,6 @@ function SearchProposalComponent(props) {
                             proposal={element}
                           />
                         ))}
-                      {filteredByTitle.length <= 0 && filter !== "" && (
-                        <h2 className="mt-3"> no proposals found</h2>
-                      )}
                       {filteredByTitle.length > 0 &&
                         [...filteredByTitle].map((element) => (
                           <ProposalTableRow
@@ -285,28 +281,29 @@ function SearchProposalComponent(props) {
                   </Table>
                 )}
               </Col>
+              {filteredByTitle.length <= 0 && filter !== "" && (
+                <NoFileFound message={'No proposal found with this name'} />
+              )}
             </Row>
           ) : (
             filteredThesisProposals.length == 0 ? (
-              <NoFileFound message={'No proposal found'}/>
-              ) : (
-            <Row style={{ marginBottom: "5rem" }}>
-              <Accordion>
-                {filteredByTitle.length <= 0 &&
-                  filter === "" &&
-                  [...filteredThesisProposals].map((element) => (
-                    <ProposalAccordion key={element.id} proposal={element} />
-                  ))}
-                {filteredByTitle.length <= 0 && filter !== "" && (
-                  <h2 className="mt-3"> no proposals found</h2>
-                )}
-                {filteredByTitle.length > 0 &&
-                  [...filteredByTitle].map((element) => (
-                    <ProposalAccordion key={element.id} proposal={element} />
-                  ))}
-              </Accordion>
-            </Row>
-              )
+              advancedFilters? <NoFileFound message={'No proposal found with these parameters'} /> : <NoFileFound message={'No proposal found'} />
+
+            ) : (
+              <Row style={{ marginBottom: "5rem" }}>
+                <Accordion>
+                  {filteredByTitle.length <= 0 &&
+                    filter === "" &&
+                    [...filteredThesisProposals].map((element) => (
+                      <ProposalAccordion key={element.id} proposal={element} />
+                    ))}
+                  {filteredByTitle.length > 0 &&
+                    [...filteredByTitle].map((element) => (
+                      <ProposalAccordion key={element.id} proposal={element} />
+                    ))}
+                </Accordion>
+              </Row>
+            )
           )}
         </Container>
       </div>

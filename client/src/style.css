@@ -361,7 +361,7 @@ table.table-rounded thead tr {
   position: absolute;
   right: 0;
   height: 100%;
-  margin-right: 0.5rem;
+  margin-right: 1rem;
 }
 
 .Form.Group {
@@ -433,15 +433,13 @@ table.table-rounded thead tr {
   transition: 0.4s;
 }
 
-/* Move the knob when checkbox is checked */
 input:checked+.slider {
   background-color: #2196F3;
-  /* Change background color when checked */
+
 }
 
 input:checked+.slider::before {
   transform: translateX(24px);
-  /* Move knob to the right when checked */
 }
 
 .react-toggle:active:not(.react-toggle--disabled) .react-toggle-thumb {
