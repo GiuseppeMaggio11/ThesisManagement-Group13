@@ -318,6 +318,7 @@ const FilterCard = ({
     setSelectedSupervisor([]);
     setSelectedGroups([]);
     setSelectedKeywords([]);
+    setSelectedKnowledgeWords([])
     setSelectedType([]);
     setSelectedDate(dayjs(virtualClock));
     setSelectedTitlesWords([]);
@@ -335,6 +336,24 @@ const FilterCard = ({
         const titleLowerCase = thesis.title.toLowerCase();
         return selectedTitlesWords.some((word) =>
           titleLowerCase.includes(word.toLowerCase())
+        );
+      });
+    }
+
+    if (selectedKnowledgeWords?.length > 0) {
+      filtered = filtered.filter((thesis) => {
+        const knowledgeLowerCase = thesis.required_knowledge.toLowerCase();
+        return selectedKnowledgeWords.some((word) =>
+        knowledgeLowerCase.includes(word.toLowerCase())
+        );
+      });
+    }
+
+    if (selectedDescriptionsWords?.length > 0) {
+      filtered = filtered.filter((thesis) => {
+        const descriptionLowerCase = thesis.description.toLowerCase();
+        return selectedDescriptionsWords.some((word) =>
+        descriptionLowerCase.includes(word.toLowerCase())
         );
       });
     }
