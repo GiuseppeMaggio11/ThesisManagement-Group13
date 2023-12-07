@@ -46,6 +46,7 @@ function NewProposal(props) {
 
   const [errors, setErrors] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [cosupervisors_external_obj, setCoSupervisorExternal_obj] = useState([]);
   const [cosupervisors_external, setCoSupervisorExternal] = useState([]);
   const [cosupervisors_internal, setCoSupervisorInternal] = useState([]);
   const [degrees, setDegrees] = useState([]);
@@ -73,7 +74,9 @@ function NewProposal(props) {
       /*   let in_cosup = await API.getTeachers()
         let groups_f = await API.getGroups()
         let degrees_f = await API.getDegrees() */
+      
       const formatted_ex_cosup = ex_cosup.map(({ name, surname }) => `${name} ${surname}`);
+      setCoSupervisorExternal_obj(ex_cosup)
       setCoSupervisorExternal(formatted_ex_cosup);
       /* setCoSupervisorInternal(in_cosup)
       setDegrees(degrees_f)
@@ -211,13 +214,30 @@ function NewProposal(props) {
     return;
   };
 
+  function findEmails(externalNames, objList) {
+    const emails = [];
+    externalNames.forEach(name => {
+      const [firstName, lastName] = name.split(' ');
+      const foundObj = objList.find(obj => obj.name === firstName && obj.surname === lastName);
+      if (foundObj) {
+        emails.push(foundObj.email);
+      } else {
+        emails.push(null);
+      }
+    });
+    return emails;
+  }
+
   const handleSubmit = async (e) => {
+    const cosupervisorExternalEmails = findEmails(formData.cosupervisors_external, cosupervisors_external_obj);
     e.preventDefault();
     const newProp = {
       ...formData,
+      cosupervisors_external: cosupervisorExternalEmails,
       keywords: formData.keywords.join(", "),
     };
-    try {
+    
+     try {
       const response = await API.newProposal(newProp);
       handleToast("New proposal created successfully", "success");
       navigate("/teacher");
@@ -261,7 +281,7 @@ function NewProposal(props) {
         });
         handleRef(id_min);
       } else handleToast(error.msg ? error.msg : "Unexpected error", "error");
-    }
+    } 
   };
 
   return (
