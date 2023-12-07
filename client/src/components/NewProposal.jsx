@@ -10,7 +10,7 @@ import {
 } from "react-bootstrap";
 import API from "../API";
 import Loading from "./Loading";
-import {ChipsInput} from "./ChipsInput";
+import { Chips2, ChipsInput } from "./ChipsInput";
 import NewExternalCoSupervisor from "./NewExternalCosupervisor";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -18,6 +18,9 @@ import ToggleComponent from "./Toggle";
 import dayjs from "dayjs";
 import MessageContext from "../messageCtx";
 import { useNavigate } from "react-router-dom";
+import SearchDropdown from "./SearchDropdown";
+import { PersonAdd, PersonFillAdd } from "react-bootstrap-icons";
+import { HoverIconButton } from "./HoverIconButton";
 
 function NewProposal(props) {
   const navigate = useNavigate();
@@ -44,6 +47,9 @@ function NewProposal(props) {
   const [errors, setErrors] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [cosupervisors_external, setCoSupervisorExternal] = useState([]);
+  const [cosupervisors_internal, setCoSupervisorInternal] = useState([]);
+  const [degrees, setDegrees] = useState([]);
+  const [gtoups, setGroups] = useState([]);
   const { handleToast } = useContext(MessageContext);
   const titleRef = useRef(null);
   const supervisorRef = useRef(null);
@@ -55,15 +61,25 @@ function NewProposal(props) {
 
   const fetchData = async () => {
     try {
-      await API.getListExternalCosupervisors()
+      /* await API.getListExternalCosupervisors()
         .then((list) => {
           setCoSupervisorExternal(list.map((item) => item.email));
         })
         .catch((err) => {
           console.log(err);
-        });
+        }); */
+
+      let ex_cosup = await API.getListExternalCosupervisors();
+      /*   let in_cosup = await API.getTeachers()
+        let groups_f = await API.getGroups()
+        let degrees_f = await API.getDegrees() */
+      const formatted_ex_cosup = ex_cosup.map(({ name, surname }) => `${name} ${surname}`);
+      setCoSupervisorExternal(formatted_ex_cosup);
+      /* setCoSupervisorInternal(in_cosup)
+      setDegrees(degrees_f)
+      setGroups(groups_f) */
     } catch (error) {
-      console.error("Error fetching external co-supervisors:", error);
+      console.error("Error fetching data:", error);
     }
   };
 
@@ -85,7 +101,6 @@ function NewProposal(props) {
     const { name, value } = event.target;
     const today = props.virtualClock;
     const selectedDate = dayjs(value);
-    //console.log(today);
     if (selectedDate < today) {
       handleToast("Please select a date in the future", "error");
     } else {
@@ -109,6 +124,13 @@ function NewProposal(props) {
       ...formData,
       [field]: formData[field].filter((item) => item !== value),
     });
+  };
+
+  const updateCosupervisorsExternal = (updatedCosupervisors) => {
+    setFormData(prevState => ({
+      ...prevState,
+      cosupervisors_external: updatedCosupervisors,
+    }));
   };
 
   function createMessage(path, msg) {
@@ -273,7 +295,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                        errors.some((error) => error?.path?.includes("title"))
+                          errors.some((error) => error?.path?.includes("title"))
                           ? { borderColor: "red" }
                           : {}
                       }
@@ -291,9 +313,9 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                        errors.some((error) =>
-                          error?.path?.includes("description")
-                        )
+                          errors.some((error) =>
+                            error?.path?.includes("description")
+                          )
                           ? { borderColor: "red" }
                           : {}
                       }
@@ -313,14 +335,15 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                        errors.some((error) =>
-                          error?.path?.includes("supervisor")
-                        )
+                          errors.some((error) =>
+                            error?.path?.includes("supervisor")
+                          )
                           ? { borderColor: "red" }
                           : {}
                       }
                       required
                     />
+
                   </Form.Group>
                   <Form.Group className="mb-3">
                     <Form.Label htmlFor="cosupervisors_internal">
@@ -347,12 +370,20 @@ function NewProposal(props) {
                         }
                       }}
                     />
+
+                    {/*     <SearchDropdown
+                      placeholder={"Enter an internal co-supervisor"}
+                      items={cosupervisors_internal}
+                      setItems={setCoSupervisorInternal}
+                      selectedItems={formData.cosupervisors_internal}
+                      setSelectedItems={updateCosupervisorsInternal}
+                    /> */}
                   </Form.Group>
                   <Form.Group className="mb-3">
                     <Form.Label htmlFor="cosupervisors_external">
                       External Co-supervisors
                     </Form.Label>
-                    {cosupervisors_external.map((item, index) => (
+                    {/*  {cosupervisors_external.map((item, index) => (
                       <Form.Check
                         type="checkbox"
                         id={`${index}`}
@@ -386,13 +417,27 @@ function NewProposal(props) {
                           }
                         }}
                       />
-                    ))}
-                    <Button
-                      className="button-style mt-3"
-                      onClick={() => setShowForm(true)}
-                    >
-                      Add new external co-supervisor
-                    </Button>
+                    ))} */}
+                    <Chips2
+                      items={cosupervisors_external}
+                      selectedItems={formData.cosupervisors_external}
+                      setItems={setCoSupervisorExternal}
+                      setSelectedItems={updateCosupervisorsExternal}
+                    />
+                    <Row className="d-flex align-items-center">
+                      <Col xs={10}>
+                        <SearchDropdown
+                          placeholder={''}
+                          items={cosupervisors_external}
+                          setItems={setCoSupervisorExternal}
+                          selectedItems={formData.cosupervisors_external}
+                          setSelectedItems={updateCosupervisorsExternal}
+                        />
+                      </Col>
+                      <Col xs={2}>
+                         <HoverIconButton defaultIcon={PersonAdd} hoverIcon={PersonFillAdd} className={"button-style-person"} onClick={() => setShowForm(true)} />
+                      </Col>
+                    </Row>
                     <Modal show={showForm} onHide={() => setShowForm(false)}>
                       <Modal.Header closeButton>
                         <Modal.Title>
@@ -416,7 +461,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                        errors.some((error) => error?.path?.includes("level"))
+                          errors.some((error) => error?.path?.includes("level"))
                           ? { borderColor: "red" }
                           : {}
                       }
@@ -460,7 +505,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                        errors.some((error) => error?.path?.includes("type"))
+                          errors.some((error) => error?.path?.includes("type"))
                           ? { borderColor: "red" }
                           : {}
                       }
@@ -478,7 +523,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                        errors.some((error) => error?.path?.includes("group"))
+                          errors.some((error) => error?.path?.includes("group"))
                           ? { borderColor: "red" }
                           : {}
                       }
@@ -498,9 +543,9 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                        errors.some((error) =>
-                          error?.path?.includes("required_knowledge")
-                        )
+                          errors.some((error) =>
+                            error?.path?.includes("required_knowledge")
+                          )
                           ? { borderColor: "red" }
                           : {}
                       }
@@ -518,7 +563,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                        errors.some((error) => error?.path?.includes("notes"))
+                          errors.some((error) => error?.path?.includes("notes"))
                           ? { borderColor: "red" }
                           : {}
                       }
@@ -535,9 +580,9 @@ function NewProposal(props) {
                       onChange={handleChangeDate}
                       style={
                         errors &&
-                        errors.some((error) =>
-                          error?.path?.includes("expiration")
-                        )
+                          errors.some((error) =>
+                            error?.path?.includes("expiration")
+                          )
                           ? { borderColor: "red" }
                           : {}
                       }
@@ -556,7 +601,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                        errors.some((error) => error?.path?.includes("degree"))
+                          errors.some((error) => error?.path?.includes("degree"))
                           ? { borderColor: "red" }
                           : {}
                       }

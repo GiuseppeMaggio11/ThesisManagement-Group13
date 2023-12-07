@@ -208,6 +208,28 @@ table.table-rounded thead tr {
 
 }
 
+.button-style-person {
+  background-color: transparent;
+  border-color: transparent;
+  color: #000000;
+  padding-bottom: 1em;
+  font-size: x-large;
+}
+
+.button-style-person:hover {
+  background-color: transparent;
+  border-color: transparent;
+  color: #000000;
+  font-size: x-large;
+}
+
+.button-style-persone+:active {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  color: black;
+  font-size: x-large;
+}
+
 .button-style-filter {
   background-color: transparent;
   border-color: transparent;
@@ -466,6 +488,20 @@ input:checked+.slider::before {
   top: calc(100%);
   left: 36%;
   width: calc(64%);
+  z-index: 99;
+  background: white;
+  border-radius: 5px;
+  max-height: 200px; 
+  overflow-y: auto;
+  box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.2);
+  padding:0; 
+}
+
+.dropdown-content-noPlaceholder {
+  position: absolute;
+  top: calc(100%);
+  left: 0%;
+  width: calc(100%);
   z-index: 99;
   background: white;
   border-radius: 5px;

@@ -73,6 +73,42 @@ async function getListExternalCosupervisors() {
   );
 }
 
+async function getTeachers() {
+  return getJson(
+    fetch(URL + `/teachers`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    })
+  );
+}
+async function getDegrees() {
+  return getJson(
+    fetch(URL + `/degrees`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    })
+  );
+}
+
+async function getGrops() {
+  return getJson(
+    fetch(URL + `/groups`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    })
+  );
+}
+
+
 async function newExternalCosupervisor(external_cosupervisor) {
   return getJson(
     fetch(URL + `/newExternalCosupervisor`, {
@@ -234,6 +270,7 @@ const API = {
   updateApplictionStatus,
   redirectToLogin,
   getStudentApplications,
-  isApplied
+  isApplied,
+  getTeachers,
 };
 export default API;

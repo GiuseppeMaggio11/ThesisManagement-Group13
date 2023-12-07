@@ -15,6 +15,7 @@ const SearchDropdown = ({
     const dropdownRef = useRef(null);
     const [input, setInput] = useState("");
   
+    console.log(items)
     useEffect(() => {
       const handleClickOutside = (event) => {
         if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -67,13 +68,13 @@ const SearchDropdown = ({
     return (
       <div className="mt-0 px-0 py-0" style={{ marginBottom: "0.5em" }}>
         <Row>
-          <Col
+          {placeholder !== '' && <Col
             xs={4}
             className={`d-flex align-items-center justify-content-center`}
           >
             <p style={{ margin: "0px" }}>{placeholder}: </p>
-          </Col>
-          <Col xs={8} className="position-relative">
+          </Col>}
+          <Col xs={placeholder===''? 12:8} className="position-relative">
             <div className="input-group ">
               <input
                 type="text"
@@ -105,13 +106,13 @@ const SearchDropdown = ({
         {showDropdown && (
           <div className="dropdown-container">
             <Row>
-              <Col
+              {placeholder!=='' && <Col
                 xs={4}
                 className="d-flex justify-content-start align-items-center"
-              ></Col>
-              <Col ref={dropdownRef} xs={8} className="ml-4 dropdown-content">
+              ></Col>}
+              <Col ref={dropdownRef} xs={placeholder===''?12:8} className={placeholder===''? "dropdown-content-noPlaceholder": "dropdown-content"}>
                 {filteredItems.length > 0 && (
-                  <ul className="list-group mt-2">
+                  <ul className="list-group">
                     {filteredItems.map((item, index) => (
                       <li
                         className={`list-group-item`}
