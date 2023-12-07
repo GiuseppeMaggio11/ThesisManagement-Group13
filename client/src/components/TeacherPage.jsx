@@ -1,6 +1,7 @@
 import { Button, Container, Row, Col } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import API from "../API";
+import { useEffect } from "react";
 
 function TeacherPage(props) {
   if (!props.loggedIn || props.user.user_type !== "PROF")

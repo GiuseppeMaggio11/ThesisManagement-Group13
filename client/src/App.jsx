@@ -155,6 +155,18 @@ function App() {
               }
             />
             <Route
+              path="/newproposal/:id"
+              element={
+                <NewProposal
+                  loading={loading}
+                  virtualClock={virtualClock}
+                  setLoading={setLoading}
+                  loggedIn={loggedIn}
+                  user={user}
+                />
+              }
+            />
+            <Route
               path="/applications"
               element={
                 <Applications

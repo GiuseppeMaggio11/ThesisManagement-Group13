@@ -1,11 +1,21 @@
 import { useContext, useEffect, useState } from "react";
 import API from "../API";
 import Loading from "./Loading";
-import { Accordion, Alert, Col, Container, Row, Table } from "react-bootstrap";
+import {
+  Accordion,
+  Alert,
+  Col,
+  Container,
+  OverlayTrigger,
+  Row,
+  Table,
+  Tooltip,
+} from "react-bootstrap";
 import MessageContext from "../messageCtx";
 import { useMediaQuery } from "react-responsive";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
+import { Clipboard2Check } from "react-bootstrap-icons";
 
 function ProfessorActiveProposals(props) {
   const [activeProposals, setActiveProposals] = useState(undefined);
@@ -21,7 +31,6 @@ function ProfessorActiveProposals(props) {
       try {
         props.setLoading(true);
         const response = await API.getProposalsProfessor();
-        console.log(response);
         setActiveProposals(response);
         props.setLoading(false);
       } catch (err) {
@@ -67,7 +76,7 @@ function ActiveProposalsLargeScreen(props) {
           }}
           className="py-3"
         >
-          <Col md={6} lg={6} xl={6} xxl={6}>
+          <Col md={5} lg={5} xl={5} xxl={5}>
             Title
           </Col>
           <Col md={2} lg={2} xl={2} xxl={2}>
@@ -79,6 +88,7 @@ function ActiveProposalsLargeScreen(props) {
           <Col md={2} lg={2} xl={2} xxl={2}>
             Expiration Date
           </Col>
+          <Col md={1} lg={1} xl={1} xxl={1}></Col>
           {/*ADD COLUMNS FOR BUTTONS HERE (fix md, lg, xl, xxl)*/}
         </Row>
         <Row
@@ -102,6 +112,11 @@ function ActiveProposalsLargeScreen(props) {
 
 function ElementProposalLargeScreen(props) {
   const navigation = useNavigate();
+  const renderTooltip = (props) => (
+    <Tooltip id="button-tooltip" {...props}>
+      Copy Thesis
+    </Tooltip>
+  );
   return (
     <Row
       className="py-3 active-proposal-row-custom"
@@ -109,7 +124,7 @@ function ElementProposalLargeScreen(props) {
         /*REDIRECT TO THESIS' PAGE*/
       }}
     >
-      <Col md={6} lg={6} xl={6} xxl={6}>
+      <Col md={5} lg={5} xl={5} xxl={5}>
         <div
           style={{
             color: "#4682B4",
@@ -128,6 +143,17 @@ function ElementProposalLargeScreen(props) {
       </Col>
       <Col md={2} lg={2} xl={2} xxl={2} style={{ fontSize: 18 }}>
         {dayjs(props.proposal.expiration).format("DD/MM/YYYY")}
+      </Col>
+      <Col md={1} lg={1} xl={1} xxl={1}>
+        <Link to={"/newproposal/" + props.proposal.id}>
+          <OverlayTrigger
+            placement="bottom"
+            delay={{ show: 250, hide: 400 }}
+            overlay={renderTooltip}
+          >
+            <Clipboard2Check />
+          </OverlayTrigger>
+        </Link>
       </Col>
       {/*ADD COLUMNS FOR BUTTONS HERE (fix md, lg, xl, xxl)*/}
     </Row>

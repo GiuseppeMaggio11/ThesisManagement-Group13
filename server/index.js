@@ -30,6 +30,7 @@ const {
   newThesis,
   updateThesesArchivation,
   updateThesesArchivationManual,
+  getThesisToCopy,
 } = require("./controllers/manageThesis");
 const {
   listExternalCosupervisors,
@@ -262,3 +263,5 @@ app.put(
   isProfessor,
   updateThesesArchivationManual
 );
+
+app.get("/api/getThesisToCopy/:id", isProfessor, getThesisToCopy);

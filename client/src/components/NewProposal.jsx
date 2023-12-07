@@ -17,10 +17,11 @@ import "react-toastify/dist/ReactToastify.css";
 import ToggleComponent from "./Toggle";
 import dayjs from "dayjs";
 import MessageContext from "../messageCtx";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 function NewProposal(props) {
   const navigate = useNavigate();
+  const { id } = useParams();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -70,9 +71,20 @@ function NewProposal(props) {
     }
   };
 
+  const fetchThesisCopy = async (thesisId) => {
+    try {
+      const response = await API.getThesisToCopy(thesisId);
+      console.log(response);
+      //set state
+    } catch (err) {
+      handleToast("Error while fetching Thesis to copy", "error");
+    }
+  };
+
   useEffect(() => {
     props.setLoading(true);
     fetchData();
+    if (id) fetchThesisCopy(id);
     props.setLoading(false);
   }, []);
 

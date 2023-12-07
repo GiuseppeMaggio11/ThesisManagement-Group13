@@ -225,6 +225,14 @@ async function getProposalsProfessor() {
   );
 }
 
+async function getThesisToCopy(id) {
+  return getJson(
+    fetch(`${URL}/getThesisToCopy/${id}`, {
+      credentials: "include",
+    })
+  );
+}
+
 const API = {
   logOut,
   getUserInfo,
@@ -242,5 +250,6 @@ const API = {
   getStudentApplications,
   isApplied,
   getProposalsProfessor,
+  getThesisToCopy,
 };
 export default API;
