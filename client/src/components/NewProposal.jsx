@@ -10,7 +10,7 @@ import {
 } from "react-bootstrap";
 import API from "../API";
 import Loading from "./Loading";
-import ChipsInput from "./ChipsInput";
+import {ChipsInput} from "./ChipsInput";
 import NewExternalCoSupervisor from "./NewExternalCosupervisor";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

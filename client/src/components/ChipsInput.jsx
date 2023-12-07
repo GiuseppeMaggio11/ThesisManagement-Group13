@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { Form } from "react-bootstrap";
 
 function ChipsInput(props){
@@ -16,4 +15,28 @@ function ChipsInput(props){
   );
 }
 
-export default ChipsInput;
+const Chips2 = ({ items, selectedItems, setItems, setSelectedItems }) => {
+  return (
+    <div>
+      {selectedItems.map((item, index) => (
+        <span key={index} className="chip" style={{ fontSize: 12, alignItems: 'center', paddingTop: 0, paddingBottom: 0 }}>
+          {item}
+          <span
+            className="chip-x"
+            onClick={() => {
+              const updatedItem = items.concat(item);
+              const updatedSelectedItem = selectedItems.filter(
+                (selectedItem) => selectedItem !== item
+              );
+              setItems(updatedItem);
+              setSelectedItems(updatedSelectedItem);
+            }}
+          >
+            x
+          </span>
+        </span>
+      ))}
+    </div>
+  );
+};
+export {ChipsInput, Chips2};

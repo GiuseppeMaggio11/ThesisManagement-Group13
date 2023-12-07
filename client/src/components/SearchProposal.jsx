@@ -220,7 +220,6 @@ function SearchProposalComponent(props) {
                     thesisList={props.thesisProposals}
                     loading={props.loading}
                     setLoading={props.setLoading}
-                    showFilters={showFilters}
                     setProposals={setFilteredThesisProposals}
                     selectedGroups={selectedGroups}
                     setSelectedGroups={setSelectedGroups}

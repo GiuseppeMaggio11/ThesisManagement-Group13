@@ -1,14 +1,10 @@
 import React, { useContext, useEffect, useState, useRef } from "react";
 import API from "../API";
-import { Button, Card, Col, Form, FormGroup, Row } from "react-bootstrap";
+import { Button, Card, Col, Form, Row } from "react-bootstrap";
 import MessageContext from "../messageCtx";
 import { ToastContainer } from "react-toastify";
 import {
   ArrowReturnLeft,
-  Border,
-  ChevronCompactDown,
-  ChevronCompactUp,
-  Search,
 } from "react-bootstrap-icons";
 import Loading from "./Loading";
 import dayjs from "dayjs";
@@ -16,40 +12,13 @@ import { useMediaQuery } from "react-responsive";
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import SearchDropdown from "./SearchDropdown";
-
-const Chips2 = ({ items, selectedItems, setItems, setSelectedItems }) => {
-  return (
-    <div>
-      {selectedItems.map((item, index) => (
-        <span key={index} className="chip" style={{ fontSize: 12, alignItems: 'center', paddingTop: 0, paddingBottom: 0 }}>
-          {item}
-          <span
-            className="chip-x"
-            onClick={() => {
-              const updatedItem = items.concat(item);
-              const updatedSelectedItem = selectedItems.filter(
-                (selectedItem) => selectedItem !== item
-              );
-              setItems(updatedItem);
-              setSelectedItems(updatedSelectedItem);
-            }}
-          >
-            x
-          </span>
-        </span>
-      ))}
-    </div>
-  );
-};
-
-
+import { Chips2 } from "./ChipsInput";
 
 const FilterCard = ({
   virtualClock,
   thesisList,
   loading,
   setLoading,
-  showFilters,
   setProposals,
   selectedGroups,
   setSelectedGroups,
@@ -86,9 +55,9 @@ const FilterCard = ({
 
   const [knowledge, setKnowledge] = useState([])
   const [knowledgeFilter, setKnowledgeFilter] = useState("");
-  const [supervisors, setSupervisors] = useState(null);
+  const [supervisors, setSupervisors] = useState([]);
   const [keywords, setKeywords] = useState([]);
-  const [cosupervisors, setCosupervisors] = useState(null);
+  const [cosupervisors, setCosupervisors] = useState([]);
   const [groups, setGroups] = useState([]);
   const [type, setType] = useState([]);
   const isMobile = useMediaQuery({ maxWidth: 767 });
@@ -275,7 +244,7 @@ const FilterCard = ({
   }, [selectedTitlesWords, selectedKnowledgeWords, selectedDescriptionsWords, selectedKeywords, selectedGroups, selectedCosupervisor, selectedType, selectedNotesWords]);
 
   return (
-    <Card
+    loading? <Loading/> : (<Card
       className="container mt-6 custom-rounded"
       style={{ marginBottom: "0.5em", paddingTop: "0.5em" }}
     >
@@ -871,7 +840,7 @@ const FilterCard = ({
         <ToastContainer />
       </Form>
     </Card>
-  );
+  ));
 };
 
 export { FilterCard };
