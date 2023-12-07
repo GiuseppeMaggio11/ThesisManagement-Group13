@@ -217,7 +217,7 @@ async function isApplied() {
   );
 }
 
-async function downloadStudentApplicationFiles(student_id, thesis_id) {
+async function downloadStudentApplicationAllFiles(student_id, thesis_id) {
     const response = await fetch(URL + `/getAllFiles/${student_id}/${thesis_id}`, {
       credentials: "include",
       headers: {
@@ -226,18 +226,49 @@ async function downloadStudentApplicationFiles(student_id, thesis_id) {
     });
     
     if (!response.ok) {
-      throw new Error(`Failed to download files. Status: ${response.status}`);
+      throw new Error(`Failed to download zip folder. Status: ${response.status}`);
     }
 
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
     const downloadLink  = document.createElement('a');
     downloadLink.href = url;
-    downloadLink.download = `student_files_${student_id}.zip`;
+    downloadLink.download = `${student_id}_${thesis_id}.zip`;
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
     window.URL.revokeObjectURL(url);
+}
+
+async function downloadStudentApplicationFile (student_id, thesis_id, file_name) {
+  const response = await fetch(URL + `/getFile/${student_id}/${thesis_id}/${file_name}`, {
+    credentials: "include",
+    headers: {
+      "Accept": "application/pdf"
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to download PDF file. Status: ${response.status}`);
+  }
+
+  const blob = await response.blob();
+  const url = window.URL.createObjectURL(blob);
+  const downloadLink = document.createElement('a');
+  downloadLink.href = url;
+  downloadLink.download = `${file_name}.pdf`;
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+  window.URL.revokeObjectURL(url);
+}
+
+async function listApplicationFiles (student_id, thesis_id) {
+  return getJson(
+    fetch(`${URL}/getStudentFilesList/${student_id}/${thesis_id}`, {
+      credentials: "include",
+    })
+  );
 }
 
 
@@ -258,6 +289,8 @@ const API = {
   redirectToLogin,
   getStudentApplications,
   isApplied,
-  downloadStudentApplicationFiles
+  downloadStudentApplicationAllFiles,
+  downloadStudentApplicationFile,
+  listApplicationFiles
 };
 export default API;

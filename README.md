@@ -257,13 +257,31 @@ docker compose down
       }
     ```
 
-#### 8. **Download student's application files**: `GET /api/getAllFiles/:student_id/:thesis_id`
+#### 8. **Download all student's application files**: `GET /api/getAllFiles/:student_id/:thesis_id`
 
   - **Description**: Download all files associated with an application 
   - **Middleware**: `isProfessor`
   - **Request Body**: None,
   - **Response**:
     - `200` with a zip folder inside res.download containing all the files of the application
+    - `500` if an unexpected error occurs
+
+#### 9. **Download a single student's application file**: `GET /api/getFile/:student_id/:thesis_id/:file_name`
+
+  - **Description**: Download a single file associated with an application 
+  - **Middleware**: `isProfessor`
+  - **Request Body**: None,
+  - **Response**:
+    - `200` with a pdf file inside res.download 
+    - `500` if an unexpected error occurs
+
+#### 10. **Show the list of all files related to an application**: `GET /api/getStudentFilesList/:student_id/:thesis_id`
+
+  - **Description**: Get the list of the names of all the PDF files linked to an application 
+  - **Middleware**: `isProfessor`
+  - **Request Body**: None,
+  - **Response**:
+    - `200` with a list of strings representing files' name 
     - `500` if an unexpected error occurs
 
 #### OTHER 1 Server
@@ -399,7 +417,7 @@ docker compose down
 "Rows matched: 6  Changed: 3  Warnings: 0"
 ```
 
-#### downloadStudentApplicationFiles
+#### downloadStudentApplicationAllFiles
 
 - Description: Asks the server to download a zip folder containing all the files associated with an application
 - API server called:  GET `/api/getAllFiles/:student_id/:thesis_id`
@@ -407,6 +425,34 @@ docker compose down
   + `student_id`: The id of the student who submitted the application 
   + `thesis_id`: The id of the thesis for which the student submitted the application.
 - Output: _None_
+
+#### downloadStudentApplicationFile
+
+- Description: Asks the server to download one of the PDF files associated with an application
+- API server called:  GET `/api/getFile/:student_id/:thesis_id/:file_name`
+- Input: 
+  + `student_id`: The id of the student who submitted the application 
+  + `thesis_id`: The id of the thesis for which the student submitted the application.
+  + `file_name`: The name of the file to be downloaded
+- Output: _None_
+
+#### listApplicationFiles
+
+- Description: Asks the server for the list of files' name associated with an application
+- API server called:  GET `/api/getStudentFilesList/:student_id/:thesis_id`
+- Input: 
+  + `student_id`: The id of the student who submitted the application 
+  + `thesis_id`: The id of the thesis for which the student submitted the application.
+- Output: A vector of strings, each representing the name of one of the files associated with the application
+- Example:
+```json
+[
+  "file_1.pdf",
+  "file_2.pdf",
+  "file_3.pdf",
+  ...
+]
+```
 
 #### OTHER 2 Client
 

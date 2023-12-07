@@ -88,8 +88,6 @@ async function getAllFiles (req,res) {
               fs.unlink(zipFilePath, (err) => {
                 if (err) {
                   console.error('Error deleting the zip file:', err);
-                } else {
-                  console.log('Zip file deleted successfully.');
                 }
               });
             });
