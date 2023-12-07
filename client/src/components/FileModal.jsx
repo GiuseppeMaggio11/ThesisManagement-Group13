@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Modal, Form, Button } from "react-bootstrap";
 import {
   Trash,
@@ -7,6 +7,7 @@ import {
   TrashFill,
 } from "react-bootstrap-icons";
 import { HoverIconButton } from "./HoverIconButton";
+
 function FileDropModal({
   showModal,
   closeModal,
@@ -15,10 +16,13 @@ function FileDropModal({
   selectedFiles,
 }) {
   const [wrongInput, setWrongInput] = useState(false);
+  const [exceed, setExceed] = useState(false);
+
   const handleRemoveFile = (index) => {
     const newFiles = [...selectedFiles];
     newFiles.splice(index, 1);
     setSelectedFiles(newFiles);
+    setExceed(false)
   };
 
   const handleDragOver = (e) => {
@@ -27,17 +31,19 @@ function FileDropModal({
 
   const checkAndAdd = (files) => {
     let oldFiles = [...selectedFiles];
-    //console.log(files);
+    
     files.forEach((newFile) => {
       const existingFile = oldFiles.find(
         (oldFile) => oldFile.name === newFile.name
       );
-      // If not, push the new file to the old array
-      if (!existingFile) {
+      if (!existingFile && oldFiles.length<10) {
         oldFiles.push(newFile);
       }
+      else if(oldFiles.length>=10){
+        setExceed(true)
+      }
     });
-
+    console.log(exceed)
     setSelectedFiles(oldFiles);
   };
 
@@ -80,27 +86,36 @@ function FileDropModal({
   };
 
   return (
+
     <Modal show={showModal} onHide={closeModal}>
       <Modal.Header>
         <Modal.Title>Are you sure to apply to this thesis?</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <div>Upload all the files that the professor could need</div>
+        <div>Upload all the files that the professor could need (10 maximum)</div>
         <br></br>
         <div
-          className={wrongInput ? "drop-area-wrong" : "drop-area"}
+          className={(wrongInput||exceed) ? "drop-area-wrong" : "drop-area"}
           onDragOver={handleDragOver}
           onDrop={handleDrop}
           onClick={handleLabelClick}
         >
           <label htmlFor="fileInput">
             <FileEarmarkPlus size={60} style={{ marginBottom: "8px" }} />
-            {!wrongInput && <div>Drag & Drop or Click to Select PDF Files</div>}
-            {wrongInput && (
+            {!wrongInput &&  !exceed && <div>Drag & Drop or Click to Select PDF Files</div>}
+            {wrongInput && !exceed && (
               <div>
                 {" "}
                 <span className="text-wrong">Only </span>
                 <span className="text-wrong-underlined">PDF</span>
+                <span className="text-wrong"> files are allowed</span>{" "}
+              </div>
+            )}
+            {!wrongInput && exceed && (
+              <div>
+                {" "}
+                <span className="text-wrong">Only </span>
+                <span className="text-wrong-underlined">10 PDF</span>
                 <span className="text-wrong"> files are allowed</span>{" "}
               </div>
             )}
@@ -112,6 +127,7 @@ function FileDropModal({
           accept=".pdf"
           onChange={handleFileInputChange}
           multiple
+          disabled={selectedFiles.length===10?true:false}
           style={{ display: "none" }}
         />
         <div style={{ marginTop: 5 }}>
@@ -148,7 +164,9 @@ function FileDropModal({
           </Button>
         </Form>
       </Modal.Footer>
+      
     </Modal>
+
   );
 }
 

@@ -304,8 +304,6 @@ table.table-rounded thead tr {
 .file-item {
   display: flex;
   align-items: center;
-  margin-bottom: 8px;
-  padding: 8px;
   background-color: #fff;
 }
 
