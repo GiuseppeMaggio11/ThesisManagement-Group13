@@ -166,11 +166,23 @@ async function getThesisToCopy(req, res) {
   const thesis_id = req.params.id;
   try {
     let thesis = await dao.getThesisToCopy(thesis_id);
+
+    if (thesis.keywords) thesis.keywords = thesis.keywords.split(", ");
+    else thesis.keywords = [];
+
+    thesis.type_name = thesis.thesis_type;
+    delete thesis.thesis_type;
+
     let vettCosup = await dao.getThesisExCosupervisorToCopy(thesis_id);
-    if (vettCosup.length > 0) thesis.external_cosupervisors = vettCosup;
-    thesis.internal_cosupervisor = await dao.getThesisIntCosupervisorToCopy(
+    if (vettCosup.length > 0) thesis.cosupervisors_external = vettCosup;
+    else thesis.cosupervisors_external = [];
+
+    thesis.cosupervisors_internal = await dao.getThesisIntCosupervisorToCopy(
       thesis_id
     );
+
+    thesis.cod_group = await dao.getThesisGroupToCopy(thesis_id);
+
     res.status(200).json(thesis);
   } catch (err) {
     res.status(500).json(err);

@@ -824,22 +824,6 @@ exports.getThesisToCopy = async (id) => {
     const sql = "select * from thesis where id=?";
     const [row] = await pool.execute(sql, [id]);
     return row[0];
-
-    //get external cosupervisor
-    /* const sqlExt =
-      "select cosupevisor_id from thesis_cosupervisor_external where thesis_id = ?";
-    const [rowExt] = await pool.execute(sqlExt, [id]);
-
-    objThesis.external_cosupervisors = rowExt.map((item) => {
-      return item.cosupevisor_id;
-    }); */
-
-    //get internal cosupervisor
-    /* const sqlInt =
-      "select cosupevisor_id from thesis_cosupervisor_teacher where thesis_id = ?";
-    const [rowInt] = await pool.execute(sqlInt, [id]);
-    objThesis.internal_cosupervisors = rowInt[0]?.cosupevisor_id;
-    console.log(objThesis); */
   } catch (err) {
     console.error("Error in getThesisToCopy: ", err);
     throw err;
@@ -849,12 +833,6 @@ exports.getThesisToCopy = async (id) => {
 //get thesis external cosupervisor to copy for the insert of a new thesis
 exports.getThesisExCosupervisorToCopy = async (id) => {
   try {
-    //get thesis
-    /* const sql = "select * from thesis where id=?";
-    const [row] = await pool.execute(sql, [id]);
-    let objThesis = { ...row[0] }; */
-
-    //get external cosupervisor
     const sqlExt =
       "select cosupevisor_id from thesis_cosupervisor_external where thesis_id = ?";
     const [rowExt] = await pool.execute(sqlExt, [id]);
@@ -862,13 +840,6 @@ exports.getThesisExCosupervisorToCopy = async (id) => {
     return rowExt.map((item) => {
       return item.cosupevisor_id;
     });
-
-    //get internal cosupervisor
-    /*  const sqlInt =
-      "select cosupevisor_id from thesis_cosupervisor_teacher where thesis_id = ?";
-    const [rowInt] = await pool.execute(sqlInt, [id]);
-    objThesis.internal_cosupervisors = rowInt[0]?.cosupevisor_id;
-    console.log(objThesis); */
   } catch (err) {
     console.error("Error in getThesisExCosupervisorToCopy: ", err);
     throw err;
@@ -878,27 +849,26 @@ exports.getThesisExCosupervisorToCopy = async (id) => {
 //get thesis internal cosupervisor to copy for the insert of a new thesis
 exports.getThesisIntCosupervisorToCopy = async (id) => {
   try {
-    //get thesis
-    /* const sql = "select * from thesis where id=?";
-    const [row] = await pool.execute(sql, [id]);
-    let objThesis = { ...row[0] }; */
-
-    //get external cosupervisor
-    /* const sqlExt =
-      "select cosupevisor_id from thesis_cosupervisor_external where thesis_id = ?";
-    const [rowExt] = await pool.execute(sqlExt, [id]);
-
-    objThesis.external_cosupervisors = rowExt.map((item) => {
-      return item.cosupevisor_id;
-    }); */
-
-    //get internal cosupervisor
     const sqlInt =
       "select cosupevisor_id from thesis_cosupervisor_teacher where thesis_id = ?";
     const [rowInt] = await pool.execute(sqlInt, [id]);
-    return rowInt[0]?.cosupevisor_id;
+    return rowInt.map((item) => {
+      return item.cosupevisor_id;
+    });
   } catch (err) {
     console.error("Error in getThesisIntCosupervisorToCopy: ", err);
+    throw err;
+  }
+};
+
+exports.getThesisGroupToCopy = async (id) => {
+  try {
+    //get thesis group
+    const sql = "select group_id from thesis_group where thesis_id = ?";
+    const [row] = await pool.execute(sql, [id]);
+    return row[0].group_id;
+  } catch (err) {
+    console.error("Error in getThesisGroupToCopy: ", err);
     throw err;
   }
 };

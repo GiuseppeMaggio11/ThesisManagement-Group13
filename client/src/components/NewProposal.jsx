@@ -74,8 +74,7 @@ function NewProposal(props) {
   const fetchThesisCopy = async (thesisId) => {
     try {
       const response = await API.getThesisToCopy(thesisId);
-      console.log(response);
-      //set state
+      setFormData(response);
     } catch (err) {
       handleToast("Error while fetching Thesis to copy", "error");
     }
@@ -374,7 +373,11 @@ function NewProposal(props) {
                         key={item}
                         label={item}
                         value={item}
-                        checked={formData.cosupervisors_external.includes(item)}
+                        checked={
+                          formData.cosupervisors_external
+                            ? formData.cosupervisors_external.includes(item)
+                            : false
+                        }
                         onChange={(e) => {
                           const selectedItem = e.target.value;
                           if (
@@ -546,7 +549,11 @@ function NewProposal(props) {
                       type="date"
                       id="expiration"
                       name="expiration"
-                      value={formData.expiration}
+                      value={
+                        formData.expiration
+                          ? dayjs(formData.expiration).format("YYYY-MM-DD")
+                          : ""
+                      }
                       onChange={handleChangeDate}
                       style={
                         errors &&
