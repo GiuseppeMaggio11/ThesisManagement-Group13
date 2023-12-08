@@ -820,6 +820,21 @@ exports.deleteThesisCosupervisorExternalAll = async (thesis_id) => {
   }
 };
 
+// Checks if thesis proposal exists
+exports.isThesisProposalValid = async (thesis_id) => {
+  try {
+    const sql =
+      "SELECT COUNT(*) AS count FROM thesis WHERE id=?";
+    const [rows] = await pool.execute(sql, [thesis_id])
+    
+    if (rows[0].count == 1) return true;
+    else return false;
+  } catch (error) {
+    console.error("Error in isThesisProposalValid: ", error);
+    throw error;
+  }
+}
+
 //begin transaction function
 exports.beginTransaction = async () => {
   let connection;

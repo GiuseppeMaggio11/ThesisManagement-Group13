@@ -140,6 +140,12 @@ async function updateThesis (req,res) {
     //inizio transazione
     await dao.beginTransaction();
 
+    const isValid = await dao.isThesisProposalValid(req.body.thesis_id);
+    if (!isValid) {
+      await dao.rollback();
+      return res.status(400).json({ error: `Thesis_id: ${req.body.thesis_id} is not a valid thesis proposal` });
+    }
+
     // ---MAIN SUPEVISOR is a teacher, check if given supervisor_id is in teacher table, if it isn't raise error   
     //Get every teacher id from teacher table
     const teachers = await dao.getTeachers();

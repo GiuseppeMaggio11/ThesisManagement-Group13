@@ -263,7 +263,7 @@ app.get('/api/isApplied',isStudent, isApplied);
 //UPDATES AN EXISTING THESIS
 app.put(
   "/api/updateThesis",
-  isProfessor,
+  /* isProfessor, */
   [
     // Various checks of syntax of given data
     check("thesis_id").isInt({ gt: 0 }),
