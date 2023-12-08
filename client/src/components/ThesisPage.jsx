@@ -88,6 +88,7 @@ function ThesisPage(props) {
     try {
       await API.updateThesisArchivation(params.id);
       navigate("/activeproposals");
+      handleToast("Proposal archived correctly", "success");
     } catch (err) {
       handleToast("Error while archiving a proposal", "error");
     }

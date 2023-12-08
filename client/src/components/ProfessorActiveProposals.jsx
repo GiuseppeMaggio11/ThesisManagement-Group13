@@ -2,8 +2,9 @@ import { useContext, useEffect, useState } from "react";
 import API from "../API";
 import Loading from "./Loading";
 import { Accordion, Alert, Col, Container, Row, Button } from "react-bootstrap";
-import { Trash3, Archive } from "react-bootstrap-icons";
+import { Trash3, Trash3Fill, Archive, ArchiveFill } from "react-bootstrap-icons";
 import ConfirmationModal from "./ConfirmationModal";
+import { HoverIconButton } from "./HoverIconButton";
 import MessageContext from "../messageCtx";
 import { useMediaQuery } from "react-responsive";
 import { Link } from "react-router-dom";
@@ -37,6 +38,7 @@ function ProfessorActiveProposals(props) {
   const archiveProposal = async (thesis_id) => {
     try {
       await API.updateThesisArchivation(thesis_id);
+      handleToast("Proposal archived correctly", "success");
       getActiveProposals();
     } catch (err) {
       handleToast("Error while archiving a proposal", "error");
@@ -169,6 +171,18 @@ function ElementProposalLargeScreen(props) {
           <span style={{ marginRight: '5px' }}>Archive</span>
           <Archive cursor="pointer"></Archive>
         </Button>   
+        {/*<HoverIconButton
+          defaultIcon={Archive}
+          hoverIcon={ArchiveFill}
+          className={"button-style-trash"}
+          onClick={() => setShowArchive(true)}
+        />
+        <HoverIconButton
+          defaultIcon={Trash3}
+          hoverIcon={Trash3Fill}
+          className={"button-style-trash"}
+          onClick={() => setShowDelete(true)}
+        />*/}
       </Col>
     </Row>
     <ConfirmationModal
@@ -262,6 +276,18 @@ function ElementProposalMobile(props) {
               <span style={{ marginRight: '5px' }}>Archive</span>
               <Archive cursor="pointer"></Archive>
             </Button>  
+            {/*<HoverIconButton
+              defaultIcon={Archive}
+              hoverIcon={ArchiveFill}
+              className={"button-style-trash"}
+              onClick={() => setShowArchive(true)}
+            />
+            <HoverIconButton
+              defaultIcon={Trash3}
+              hoverIcon={Trash3Fill}
+              className={"button-style-trash"}
+              onClick={() => setShowDelete(true)}
+            />*/}
           </Col>
         </Row>
       </Accordion.Body>
