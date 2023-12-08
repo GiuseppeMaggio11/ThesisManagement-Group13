@@ -121,9 +121,7 @@ function ActiveProposalsLargeScreen(props) {
 
 function ElementProposalLargeScreen(props) {
   const [showArchive, setShowArchive] = useState(false);
-
-  const handleCloseArchive = () => setShowArchive(false);
-  const handleShowArchive = () => setShowArchive(true);
+  const [showDelete, setShowDelete] = useState(false);
 
   return (
     <>
@@ -159,15 +157,14 @@ function ElementProposalLargeScreen(props) {
       <Col md={2} lg={2} xl={2} xxl={2} style={{ display:"flex", flexWrap: "wrap", padding:"1px"}}>
         <Button 
           className="button-delete" 
-          onClick={() => {
-            /*DELETE PROPOSAL API*/
-          }}>
+          onClick={() => setShowDelete(true)}
+        >
           <span style={{ marginRight: '5px' }}>Delete</span>
           <Trash3 cursor="pointer"></Trash3>
         </Button>
         <Button 
           className="button-archive"
-          onClick={handleShowArchive}
+          onClick={() => setShowArchive(true)}
         >
           <span style={{ marginRight: '5px' }}>Archive</span>
           <Archive cursor="pointer"></Archive>
@@ -176,10 +173,18 @@ function ElementProposalLargeScreen(props) {
     </Row>
     <ConfirmationModal
       show={showArchive} 
-      handleClose={handleCloseArchive} 
+      handleClose={() => setShowArchive(false)} 
       body={"Are you sure you want to archive this proposal ?"}
       action={"Archive"}
       handleAction={props.archiveProposal}
+      thesis_id={props.proposal.id}
+    />
+    <ConfirmationModal
+      show={showDelete} 
+      handleClose={() => setShowDelete(false)} 
+      body={"Are you sure you want to delete this proposal ?"}
+      action={"Delete"}
+      handleAction={{/* DELETE API */}}
       thesis_id={props.proposal.id}
     />
     </>
@@ -202,9 +207,7 @@ function ActiveProposalsMobile(props) {
 
 function ElementProposalMobile(props) {
   const [showArchive, setShowArchive] = useState(false);
-
-  const handleCloseArchive = () => setShowArchive(false);
-  const handleShowArchive = () => setShowArchive(true);
+  const [showDelete, setShowDelete] = useState(false);
 
   return (
     <>
@@ -249,15 +252,14 @@ function ElementProposalMobile(props) {
           <Col style={{display:"flex"}}>
             <Button 
               className="button-delete" 
-              onClick={() => {
-                /*DELETE PROPOSAL API*/
-              }}>
+              onClick={() => setShowDelete(true)}
+            >
               <span style={{ marginRight: '5px' }}>Delete</span>
               <Trash3 cursor="pointer"></Trash3>
             </Button>
             <Button 
               className="button-archive"
-              onClick={handleShowArchive}
+              onClick={() => setShowArchive(true)}
             >
               <span style={{ marginRight: '5px' }}>Archive</span>
               <Archive cursor="pointer"></Archive>
@@ -268,10 +270,18 @@ function ElementProposalMobile(props) {
     </Accordion.Item>
     <ConfirmationModal
       show={showArchive} 
-      handleClose={handleCloseArchive} 
+      handleClose={() => setShowArchive(false)} 
       body={"Are you sure you want to archive this proposal ?"}
       action={"Archive"}
       handleAction={props.archiveProposal}
+      thesis_id={props.proposal.id}
+    />
+    <ConfirmationModal
+      show={showDelete} 
+      handleClose={() => setShowDelete(false)} 
+      body={"Are you sure you want to delete this proposal ?"}
+      action={"Delete"}
+      handleAction={{/* DELETE API */}}
       thesis_id={props.proposal.id}
     />
     </>
