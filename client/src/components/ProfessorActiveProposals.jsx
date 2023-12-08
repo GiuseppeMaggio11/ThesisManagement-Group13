@@ -176,8 +176,7 @@ function ElementProposalLargeScreen(props) {
       handleClose={() => setShowArchive(false)} 
       body={"Are you sure you want to archive this proposal ?"}
       action={"Archive"}
-      handleAction={props.archiveProposal}
-      thesis_id={props.proposal.id}
+      handleAction={() => props.archiveProposal(props.proposal.id)}
     />
     <ConfirmationModal
       show={showDelete} 
@@ -185,7 +184,6 @@ function ElementProposalLargeScreen(props) {
       body={"Are you sure you want to delete this proposal ?"}
       action={"Delete"}
       handleAction={{/* DELETE API */}}
-      thesis_id={props.proposal.id}
     />
     </>
   );
@@ -273,8 +271,7 @@ function ElementProposalMobile(props) {
       handleClose={() => setShowArchive(false)} 
       body={"Are you sure you want to archive this proposal ?"}
       action={"Archive"}
-      handleAction={props.archiveProposal}
-      thesis_id={props.proposal.id}
+      handleAction={() => props.archiveProposal(props.proposal.id)}
     />
     <ConfirmationModal
       show={showDelete} 
@@ -282,7 +279,6 @@ function ElementProposalMobile(props) {
       body={"Are you sure you want to delete this proposal ?"}
       action={"Delete"}
       handleAction={{/* DELETE API */}}
-      thesis_id={props.proposal.id}
     />
     </>
   );

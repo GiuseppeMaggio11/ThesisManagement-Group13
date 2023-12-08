@@ -12,8 +12,8 @@ function ConfirmationModal(props) {
           Cancel
         </Button>
         <Button variant="primary" onClick={() => {
-          props.handleAction(props.thesis_id);
-          handleClose();
+          props.handleAction();
+          props.handleClose();
         }}>
           {props.action}
         </Button>

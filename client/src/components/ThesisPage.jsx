@@ -3,8 +3,6 @@ import {
   Table,
   Accordion,
   Button,
-  Modal,
-  Form,
   Row,
   Col,
 } from "react-bootstrap";
@@ -13,7 +11,9 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import React, { useEffect, useState, useContext } from "react";
 import API from "../API";
 import MessageContext from "../messageCtx";
+import ConfirmationModal from "./ConfirmationModal";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import { Trash3, Archive } from "react-bootstrap-icons";
 import "../style.css";
 import { useMediaQuery } from "react-responsive";
 import Loading from "./Loading";
@@ -31,6 +31,9 @@ function ThesisPage(props) {
   const { state } = useLocation();
   const [flag, setFlag] = useState(0);
   const from = state?.from;
+
+  const [showArchive, setShowArchive] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
 
   if (!props.loggedIn || !props.user.user_type === "PROF") {
     return API.redirectToLogin();
@@ -80,6 +83,15 @@ function ThesisPage(props) {
     };
     init();
   }, []);
+
+  const archiveProposal = async () => {
+    try {
+      await API.updateThesisArchivation(params.id);
+      navigate("/activeproposals");
+    } catch (err) {
+      handleToast("Error while archiving a proposal", "error");
+    }
+  }
 
   const handleApplication = () => {
     submitApplication(params.id, props.virtualClock);
@@ -240,7 +252,7 @@ function ThesisPage(props) {
               <tfoot>
                 <tr>
                   <td colSpan="3" className="text-center table-footer">
-                    <Row className="justify-content-between">
+                    <Row className="justify-space-between">
                       <Col>
                         <div className="table-footer">
                           <span className="bold">{pageData.level}</span>
@@ -251,7 +263,7 @@ function ThesisPage(props) {
                           <span className="bold"> {pageData.expiration}</span>
                         </div>
                       </Col>
-                      {!(from === "applications") && (
+                      {(!(from === "applications") && props.user.user_type==="STUD") ? (
                         <Col>
                           <div className="button-apply">
                             {flag === 0 ? (
@@ -265,6 +277,23 @@ function ThesisPage(props) {
                               <></>
                             )}
                           </div>
+                        </Col>
+                      ) : (
+                        <Col style={{display:"flex", justifyContent:"right"}}>
+                          <Button 
+                            className="button-delete" 
+                            onClick={() => setShowDelete(true)}
+                          >
+                            <span style={{ marginRight: '5px' }}>Delete</span>
+                            <Trash3 cursor="pointer"></Trash3>
+                          </Button>
+                          <Button 
+                            className="button-archive"
+                            onClick={() => setShowArchive(true)}
+                          >
+                            <span style={{ marginRight: '5px' }}>Archive</span>
+                            <Archive cursor="pointer"></Archive>
+                          </Button> 
                         </Col>
                       )}
                     </Row>
@@ -292,6 +321,21 @@ function ThesisPage(props) {
             }}
             setSelectedFiles={setSelectedFiles}
             selectedFiles={selectedFiles}
+          />
+
+          <ConfirmationModal
+            show={showArchive} 
+            handleClose={() => setShowArchive(false)} 
+            body={"Are you sure you want to archive this proposal ?"}
+            action={"Archive"}
+            handleAction={() => archiveProposal(params.id)}
+          />
+          <ConfirmationModal
+            show={showDelete} 
+            handleClose={() => setShowDelete(false)} 
+            body={"Are you sure you want to delete this proposal ?"}
+            action={"Delete"}
+            handleAction={{/* DELETE API */}}
           />
         </>
       )}
