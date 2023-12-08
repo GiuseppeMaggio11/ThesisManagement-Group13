@@ -30,6 +30,7 @@ function ThesisPage(props) {
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const { state } = useLocation();
   const [flag, setFlag] = useState(0);
+  const [exceed, setExceed] = useState(false);
   const from = state?.from;
 
   if (!props.loggedIn) {
@@ -99,6 +100,7 @@ function ThesisPage(props) {
   const closeModal = () => {
     setOpenPanel(false);
     setSelectedFiles([]);
+    setExceed(false)
   };
 
   const submitApplication = (idThesis, date) => {
@@ -273,16 +275,8 @@ function ThesisPage(props) {
             }}
             setSelectedFiles={setSelectedFiles}
             selectedFiles={selectedFiles}
-          />
-
-          <FileDropModal
-            showModal={openPanel}
-            closeModal={closeModal}
-            handleSave={() => {
-              handleApplication();
-            }}
-            setSelectedFiles={setSelectedFiles}
-            selectedFiles={selectedFiles}
+            exceed={exceed}
+            setExceed={setExceed}
           />
         </>
       )}

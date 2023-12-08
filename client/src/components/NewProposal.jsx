@@ -71,9 +71,11 @@ function NewProposal(props) {
         }); */
 
       let ex_cosup = await API.getListExternalCosupervisors();
-      /*   let in_cosup = await API.getTeachers()
+      /*
+        let in_cosup = await API.getTeachers()
         let groups_f = await API.getGroups()
-        let degrees_f = await API.getDegrees() */
+        let degrees_f = await API.getDegrees() 
+      */
       
       const formatted_ex_cosup = ex_cosup.map(({ name, surname }) => `${name} ${surname}`);
       setCoSupervisorExternal_obj(ex_cosup)

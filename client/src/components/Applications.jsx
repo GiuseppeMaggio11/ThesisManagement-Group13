@@ -13,6 +13,7 @@ import { useMediaQuery } from "react-responsive";
 import API from "../API";
 import MessageContext from "../messageCtx";
 import { CheckLg, XLg } from "react-bootstrap-icons";
+import NoFileFound from "./NoFileFound";
 
 function Applications(props) {
   const [applications, setApplications] = useState(undefined);
@@ -80,9 +81,10 @@ function Applications(props) {
         </Row>
 
         {!applications || applications.length === 0 ? (
-          <Alert variant="danger" style={{ maxWidth: "300px" }}>
-            No Applications found
-          </Alert>
+          <>
+            <NoFileFound message={'No Applications found'}/>
+          </>
+       
         ) : (
           <Accordion>
             {thesisTitles.map((title, i) => {
