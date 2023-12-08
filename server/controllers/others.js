@@ -11,6 +11,16 @@ async function listExternalCosupervisors(req, res) {
   };
 }
 
+async function getTeachersList(req, res){
+  try{
+    const teachersList = await dao.getTeachersList();
+    res.status(200).json(teachersList)
+  }
+  catch(err){
+    res.status(500).json(err)
+  }
+}
+
 async function createExternalCosupervisor(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -49,4 +59,4 @@ async function createExternalCosupervisor(req, res) {
   }
 }
 
-module.exports = { listExternalCosupervisors, createExternalCosupervisor }
+module.exports = { listExternalCosupervisors, createExternalCosupervisor, getTeachersList }

@@ -75,7 +75,7 @@ async function getListExternalCosupervisors() {
 
 async function getTeachers() {
   return getJson(
-    fetch(URL + `/teachers`, {
+    fetch(URL + `/teachersList`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

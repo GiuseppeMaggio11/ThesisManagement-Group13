@@ -48,6 +48,7 @@ function NewProposal(props) {
   const [showForm, setShowForm] = useState(false);
   const [cosupervisors_external_obj, setCoSupervisorExternal_obj] = useState([]);
   const [cosupervisors_external, setCoSupervisorExternal] = useState([]);
+  const [cosupervisors_internal_obj, setCoSupervisorInternal_obj] = useState([]);
   const [cosupervisors_internal, setCoSupervisorInternal] = useState([]);
   const [degrees, setDegrees] = useState([]);
   const [gtoups, setGroups] = useState([]);
@@ -71,16 +72,19 @@ function NewProposal(props) {
         }); */
 
       let ex_cosup = await API.getListExternalCosupervisors();
+      let in_cosup = await API.getTeachers()
       /*
-        let in_cosup = await API.getTeachers()
         let groups_f = await API.getGroups()
         let degrees_f = await API.getDegrees() 
       */
       
       const formatted_ex_cosup = ex_cosup.map(({ name, surname }) => `${name} ${surname}`);
+      const formatted_in_cosup = in_cosup.map(({ name, surname }) => `${name} ${surname}`);
       setCoSupervisorExternal_obj(ex_cosup)
+      setCoSupervisorInternal_obj(in_cosup)
       setCoSupervisorExternal(formatted_ex_cosup);
-      /* setCoSupervisorInternal(in_cosup)
+      setCoSupervisorInternal(formatted_in_cosup)
+     /*
       setDegrees(degrees_f)
       setGroups(groups_f) */
     } catch (error) {
@@ -135,6 +139,12 @@ function NewProposal(props) {
     setFormData(prevState => ({
       ...prevState,
       cosupervisors_external: updatedCosupervisors,
+    }));
+  };
+  const updateCosupervisorsInternal = (updatedCosupervisors) => {
+    setFormData(prevState => ({
+      ...prevState,
+      cosupervisors_internal: updatedCosupervisors,
     }));
   };
 
@@ -229,12 +239,27 @@ function NewProposal(props) {
     });
     return emails;
   }
+  function findIDs(externalNames, objList) {
+    const ids = [];
+    externalNames.forEach(name => {
+      const [firstName, lastName] = name.split(' ');
+      const foundObj = objList.find(obj => obj.name === firstName && obj.surname === lastName);
+      if (foundObj) {
+        ids.push(foundObj.ID);
+      } else {
+        ids.push(null);
+      }
+    });
+    return ids;
+  }
 
   const handleSubmit = async (e) => {
     const cosupervisorExternalEmails = findEmails(formData.cosupervisors_external, cosupervisors_external_obj);
+    const cosupervisorInternalIDs = findIDs(formData.cosupervisors_internal, cosupervisors_internal_obj);
     e.preventDefault();
     const newProp = {
       ...formData,
+      cosupervisors_internal: cosupervisorInternalIDs,
       cosupervisors_external: cosupervisorExternalEmails,
       keywords: formData.keywords.join(", "),
     };
@@ -371,12 +396,12 @@ function NewProposal(props) {
                     <Form.Label htmlFor="cosupervisors_internal">
                       Internal Co-supervisors
                     </Form.Label>
-                    <ChipsInput
+                      {/*<ChipsInput
                       field="cosupervisors_internal"
                       values={formData.cosupervisors_internal}
                       remove={deleteChip}
                     />
-                    <Form.Control
+                   <Form.Control
                       id="cosupervisors_internal"
                       type="text"
                       placeholder="Enter an internal co-supervisor ID and press enter"
@@ -391,7 +416,24 @@ function NewProposal(props) {
                           addChip("cosupervisors_internal", e.target.value);
                         }
                       }}
+                    /> */}
+                     <Chips2
+                      items={cosupervisors_internal}
+                      selectedItems={formData.cosupervisors_internal}
+                      setItems={setCoSupervisorInternal}
+                      setSelectedItems={updateCosupervisorsInternal}
                     />
+                    <Row className="d-flex align-items-center">
+                      <Col xs={10}>
+                        <SearchDropdown
+                          placeholder={''}
+                          items={cosupervisors_internal}
+                          setItems={setCoSupervisorInternal}
+                          selectedItems={formData.cosupervisors_internal}
+                          setSelectedItems={updateCosupervisorsInternal}
+                        />
+                      </Col>
+                    </Row>
 
                     {/*     <SearchDropdown
                       placeholder={"Enter an internal co-supervisor"}

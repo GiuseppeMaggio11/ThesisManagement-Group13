@@ -464,6 +464,22 @@ exports.getTeachers = async () => {
   }
 };
 
+exports.getTeachersList = async () => {
+  try {
+    const sql = `SELECT * FROM teacher`;
+    const [rows] = await pool.execute(sql);
+
+    const teachers = [];
+    rows.map((e) => {
+      teachers.push(e);
+    });
+    return teachers;
+  } catch (error) {
+    console.error("Error in getTeachersList: ", error);
+    throw error;
+  }
+};
+
 // Selects every code of degrees from degree_table, returns array of degrees codes
 exports.getDegrees = async () => {
   try {

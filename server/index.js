@@ -29,6 +29,7 @@ const {
 const {
   listExternalCosupervisors,
   createExternalCosupervisor,
+  getTeachersList,
 } = require("./controllers/others");
 
 const express = require("express");
@@ -150,7 +151,6 @@ app.post("/logout", (req, res, next) => {
 app.get("/api/student/applications", isStudent, getApplicationStudent);
 //GET PROPOSALS
 app.get("/api/proposals", isLoggedIn, getProposals);
-
 //GET PROPOSAL BY ID
 app.get("/api/proposal/:id", isLoggedIn, getProposal);
 //DO AN APPLICATION FOR A PROPOSAL
@@ -159,6 +159,9 @@ app.post("/api/newApplication/:thesis_id", isStudent, newApplication);
 app.post("/api/newFiles/:thesis_id", isStudent, addFiles);
 
 app.get("/api/getAllFiles/:student_id/:thesis_id", isProfessor, getAllFiles);
+
+//GET TEACHERS 
+app.get("/api/teachersList", isProfessor, getTeachersList);
 
 app.get(
   "/api/getStudentFilesList/:student_id/:thesis_id",
@@ -181,7 +184,7 @@ app.post(
     check("expiration")
       .isISO8601()
       .toDate()
-      .withMessage("Date time must be in format YYYY-MM-DD HH:MM:SS"), // TODO check if given date is NOT earlier than today
+      .withMessage("Date time must be in format YYYY-MM-DD HH:MM:SS"),
     check("cod_degree").isLength({ min: 1, max: 10 }),
     check("is_archived").isBoolean(),
   ],
@@ -194,19 +197,6 @@ app.get(
   "/api/listExternalCosupervisors",
   isProfessor,
   listExternalCosupervisors
-);
-
-//CREATES NEW EXTERNAL COSUPERVISOR
-app.post(
-  "/api/newExternalCosupervisor",
-  isProfessor,
-  [
-    // Various checks of syntax of given data
-    check("email").isEmail(),
-    check("surname").isLength({ min: 1, max: 50 }),
-    check("name").isLength({ min: 1, max: 50 }),
-  ],
-  createExternalCosupervisor
 );
 
 //UPDATE THESES WITH NEW VIRTUALCLOCK TIME
