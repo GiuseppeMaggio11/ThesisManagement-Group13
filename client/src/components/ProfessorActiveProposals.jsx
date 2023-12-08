@@ -246,7 +246,7 @@ function ElementProposalMobile(props) {
           <Col>{/*ADD BUTTON HERE*/}</Col>
         </Row>
         <Row>
-          <Col>
+          <Col style={{display:"flex"}}>
             <Button 
               className="button-delete" 
               onClick={() => {
@@ -255,8 +255,6 @@ function ElementProposalMobile(props) {
               <span style={{ marginRight: '5px' }}>Delete</span>
               <Trash3 cursor="pointer"></Trash3>
             </Button>
-          </Col>
-          <Col>
             <Button 
               className="button-archive"
               onClick={handleShowArchive}
