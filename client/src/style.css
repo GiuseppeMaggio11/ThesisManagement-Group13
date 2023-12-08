@@ -483,3 +483,45 @@ input:checked+.slider::before {
 .active-proposal-row-custom:hover {
   background: rgb(245, 245, 245);
 }
+
+.button-archive {
+  display: flex;
+  align-items: center;
+  margin: 1px;
+  background: rgb(255, 177, 75);
+  border-color: transparent;
+  
+}
+
+.button-archive:hover {
+  background-color: white;
+  border-color: rgb(255, 177, 75);
+  color: rgb(255, 177, 75);
+}
+
+.button-archive:active {
+  background-color: white !important;
+  border-color: rgb(255, 177, 75) !important;
+  color: rgb(255, 177, 75);
+}
+
+.button-delete {
+  display: flex;
+  align-items: center;
+  background: rgb(237, 89, 89);
+  border-color: transparent;
+  margin: 1px;
+  width: 100px;
+}
+
+.button-delete:hover {
+  background-color: white;
+  border-color: rgb(237, 89, 89);
+  color: rgb(237, 89, 89);
+}
+
+.button-delete:active {
+  background-color: white !important;
+  border-color: rgb(237, 89, 89) !important;
+  color: rgb(237, 89, 89);
+}

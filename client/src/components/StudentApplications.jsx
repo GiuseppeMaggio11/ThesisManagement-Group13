@@ -178,24 +178,4 @@ function ApplicationStatus(props) {
   );
 }
 
-/*<tr key={index}>
-  <td>
-    <Accordion.Item eventKey={index}>
-      <Accordion.Header style={{ fontSize: 18 }}>
-        {element.title}
-      </Accordion.Header>
-      <Accordion.Body style={{ position: "relative" }}>
-        <p>
-          Supervisor: <b>{element.supervisor}</b>
-        </p>
-        <p>
-          Expiration date:{" "}
-          <b>{dayjs(element.expiration).format("YYYY-MM-DD")}</b>
-        </p>
-      </Accordion.Body>
-    </Accordion.Item>
-  </td>
-  <td style={{ fontSize: 18 }}>{element.status}</td>
-</tr>*/
-
 export default StudentApplications;

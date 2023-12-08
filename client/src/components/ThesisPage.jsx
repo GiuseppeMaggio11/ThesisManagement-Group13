@@ -65,8 +65,13 @@ function ThesisPage(props) {
           expiration: formatDate(new Date(thesisData.expiration)),
           level: thesisData.thesis_level,
         });
-        const isApplied = await API.isApplied();
-        setFlag(isApplied);
+        if(props.user.user_type === "STUD"){
+          const isApplied = await API.isApplied();
+          setFlag(isApplied);
+        }
+        else{
+          setFlag(1);
+        }
         // console.log(thesisData);
         setIsLoading(false);
       } catch (error) {

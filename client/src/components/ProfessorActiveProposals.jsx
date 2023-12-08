@@ -1,10 +1,12 @@
 import { useContext, useEffect, useState } from "react";
 import API from "../API";
 import Loading from "./Loading";
-import { Accordion, Alert, Col, Container, Row, Table } from "react-bootstrap";
+import { Accordion, Alert, Col, Container, Row, Button } from "react-bootstrap";
+import { Trash3, Archive } from "react-bootstrap-icons";
+import ConfirmationModal from "./ConfirmationModal";
 import MessageContext from "../messageCtx";
 import { useMediaQuery } from "react-responsive";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import dayjs from "dayjs";
 
 function ProfessorActiveProposals(props) {
@@ -16,21 +18,30 @@ function ProfessorActiveProposals(props) {
     return API.redirectToLogin();
   }
 
-  useEffect(() => {
-    const getActiveProposals = async () => {
-      try {
-        props.setLoading(true);
-        const response = await API.getProposalsProfessor();
-        console.log(response);
-        setActiveProposals(response);
-        props.setLoading(false);
-      } catch (err) {
-        handleToast("Error while fetching active proposals", "error");
-      }
-    };
+  const getActiveProposals = async () => {
+    try {
+      props.setLoading(true);
+      const response = await API.getProposalsProfessor();
+      console.log(response);
+      setActiveProposals(response);
+      props.setLoading(false);
+    } catch (err) {
+      handleToast("Error while fetching active proposals", "error");
+    }
+  };
 
+  useEffect(() => {
     getActiveProposals();
   }, []);
+
+  const archiveProposal = async (thesis_id) => {
+    try {
+      await API.updateThesisArchivation(thesis_id);
+      getActiveProposals();
+    } catch (err) {
+      handleToast("Error while archiving a proposal", "error");
+    }
+  }
 
   return props.loading ? (
     <Loading />
@@ -45,9 +56,15 @@ function ProfessorActiveProposals(props) {
           No active thesis proposals found
         </Alert>
       ) : !isMobile ? (
-        <ActiveProposalsLargeScreen activeProposals={activeProposals} />
+        <ActiveProposalsLargeScreen 
+          activeProposals={activeProposals} 
+          archiveProposal={archiveProposal}
+        />
       ) : (
-        <ActiveProposalsMobile activeProposals={activeProposals} />
+        <ActiveProposalsMobile 
+          activeProposals={activeProposals}
+          archiveProposal={archiveProposal}
+        />
       )}
     </Container>
   );
@@ -67,7 +84,7 @@ function ActiveProposalsLargeScreen(props) {
           }}
           className="py-3"
         >
-          <Col md={6} lg={6} xl={6} xxl={6}>
+          <Col md={4} lg={4} xl={4} xxl={4}>
             Title
           </Col>
           <Col md={2} lg={2} xl={2} xxl={2}>
@@ -79,7 +96,9 @@ function ActiveProposalsLargeScreen(props) {
           <Col md={2} lg={2} xl={2} xxl={2}>
             Expiration Date
           </Col>
-          {/*ADD COLUMNS FOR BUTTONS HERE (fix md, lg, xl, xxl)*/}
+          <Col md={2} lg={2} xl={2} xxl={2}>
+            Actions
+          </Col>
         </Row>
         <Row
           className="mt-2"
@@ -91,7 +110,7 @@ function ActiveProposalsLargeScreen(props) {
         >
           <Col>
             {props.activeProposals.map((proposal, i) => {
-              return <ElementProposalLargeScreen proposal={proposal} key={i} />;
+              return <ElementProposalLargeScreen proposal={proposal} key={i} archiveProposal={props.archiveProposal}/>;
             })}
           </Col>
         </Row>
@@ -101,24 +120,31 @@ function ActiveProposalsLargeScreen(props) {
 }
 
 function ElementProposalLargeScreen(props) {
-  const navigation = useNavigate();
+  const [showArchive, setShowArchive] = useState(false);
+
+  const handleCloseArchive = () => setShowArchive(false);
+  const handleShowArchive = () => setShowArchive(true);
+
   return (
+    <>
     <Row
       className="py-3 active-proposal-row-custom"
       onClick={() => {
         /*REDIRECT TO THESIS' PAGE*/
       }}
     >
-      <Col md={6} lg={6} xl={6} xxl={6}>
-        <div
+      <Col md={4} lg={4} xl={4} xxl={4}>
+        <Link
           style={{
             color: "#4682B4",
             fontSize: 18,
             textDecoration: "none",
           }}
+          to={`/proposals/${props.proposal.id}`}
+          state={{ from: "applications" }}
         >
-          <span style={{ cursor: "pointer" }}>{props.proposal.title}</span>
-        </div>
+          {props.proposal.title}
+        </Link>
       </Col>
       <Col md={2} lg={2} xl={2} xxl={2} style={{ fontSize: 18 }}>
         {props.proposal.thesis_level}
@@ -130,7 +156,33 @@ function ElementProposalLargeScreen(props) {
         {dayjs(props.proposal.expiration).format("DD/MM/YYYY")}
       </Col>
       {/*ADD COLUMNS FOR BUTTONS HERE (fix md, lg, xl, xxl)*/}
+      <Col md={2} lg={2} xl={2} xxl={2} style={{ display:"flex", flexWrap: "wrap", padding:"1px"}}>
+        <Button 
+          className="button-delete" 
+          onClick={() => {
+            /*DELETE PROPOSAL API*/
+          }}>
+          <span style={{ marginRight: '5px' }}>Delete</span>
+          <Trash3 cursor="pointer"></Trash3>
+        </Button>
+        <Button 
+          className="button-archive"
+          onClick={handleShowArchive}
+        >
+          <span style={{ marginRight: '5px' }}>Archive</span>
+          <Archive cursor="pointer"></Archive>
+        </Button>   
+      </Col>
     </Row>
+    <ConfirmationModal
+      show={showArchive} 
+      handleClose={handleCloseArchive} 
+      body={"Are you sure you want to archive this proposal ?"}
+      action={"Archive"}
+      handleAction={props.archiveProposal}
+      thesis_id={props.proposal.id}
+    />
+    </>
   );
 }
 
@@ -149,21 +201,22 @@ function ActiveProposalsMobile(props) {
 }
 
 function ElementProposalMobile(props) {
-  const navigation = useNavigate();
+  const [showArchive, setShowArchive] = useState(false);
+
+  const handleCloseArchive = () => setShowArchive(false);
+  const handleShowArchive = () => setShowArchive(true);
+
   return (
+    <>
     <Accordion.Item eventKey={props.index}>
       <Accordion.Header>
-        <span
-          onClick={() => {
-            /*REDIRECT TO THESIS' PAGE*/
-          }}
-        >
-          <div
-            style={{ color: "#4682B4", fontSize: 18, textDecoration: "none" }}
-          >
-            {props.proposal.title}
-          </div>
-        </span>
+        <Link
+              style={{ color: "#4682B4", fontSize: 18, textDecoration: "none" }}
+              to={`/proposals/${props.proposal.id}`}
+              state={{ from: "applications" }}
+            >
+              {props.proposal.title}
+          </Link>
       </Accordion.Header>
       <Accordion.Body>
         <Row>
@@ -192,8 +245,38 @@ function ElementProposalMobile(props) {
           </Col>
           <Col>{/*ADD BUTTON HERE*/}</Col>
         </Row>
+        <Row>
+          <Col>
+            <Button 
+              className="button-delete" 
+              onClick={() => {
+                /*DELETE PROPOSAL API*/
+              }}>
+              <span style={{ marginRight: '5px' }}>Delete</span>
+              <Trash3 cursor="pointer"></Trash3>
+            </Button>
+          </Col>
+          <Col>
+            <Button 
+              className="button-archive"
+              onClick={handleShowArchive}
+            >
+              <span style={{ marginRight: '5px' }}>Archive</span>
+              <Archive cursor="pointer"></Archive>
+            </Button>  
+          </Col>
+        </Row>
       </Accordion.Body>
     </Accordion.Item>
+    <ConfirmationModal
+      show={showArchive} 
+      handleClose={handleCloseArchive} 
+      body={"Are you sure you want to archive this proposal ?"}
+      action={"Archive"}
+      handleAction={props.archiveProposal}
+      thesis_id={props.proposal.id}
+    />
+    </>
   );
 }
 

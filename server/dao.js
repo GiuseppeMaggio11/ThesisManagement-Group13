@@ -102,7 +102,7 @@ exports.getUserID = async (username) => {
     const userRow = results[0];
     return userRow.id;
   } catch (error) {
-    console.error("Error in getUserIDByEmail: ", error);
+    console.error("Error in getUserIDByID: ", error);
     throw error;
   }
 };
@@ -757,7 +757,7 @@ exports.getProposalsProfessor = async (professor_id) => {
   console.log(professor_id);
   try {
     const sql =
-      "SELECT * FROM thesis t inner join teacher p on p.id = t.supervisor_id WHERE p.email  = ? and is_archived = 0 order by t.title";
+      "SELECT t.* FROM thesis t inner join teacher p on p.id = t.supervisor_id WHERE p.email  = ? and is_archived = 0 order by t.title";
     const [rows] = await pool.execute(sql, [professor_id]);
     console.log(rows);
     return rows;

@@ -225,6 +225,21 @@ async function getProposalsProfessor() {
   );
 }
 
+async function updateThesisArchivation(thesis_id) {
+  return getJson(
+    fetch(URL + `/archiveProposalManual`, {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        thesis_id,
+      }),
+    })
+  );
+}
+
 const API = {
   logOut,
   getUserInfo,
@@ -242,5 +257,6 @@ const API = {
   getStudentApplications,
   isApplied,
   getProposalsProfessor,
+  updateThesisArchivation
 };
 export default API;

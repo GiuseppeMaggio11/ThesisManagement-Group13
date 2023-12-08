@@ -253,7 +253,7 @@ app.post(
   createExternalCosupervisor
 );
 
-app.get("/api/isApplied", isStudent, isApplied);
+app.get("/api/isApplied", isLoggedIn, isApplied);
 
 app.get("/api/getProposalsProfessor", isProfessor, getProposalsProfessor);
 
