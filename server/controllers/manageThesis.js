@@ -51,10 +51,11 @@ async function newThesis (req,res) {
     // Get every cod_group from group_table table in db
     const codes_group = await dao.getCodes_group();
     // If given cod_group is not in list  raise error
-    if (!codes_group.includes(req.body.cod_group)) {
-      return res.status(400).json({ error: `Cod_group: ${req.body.cod_group} is not a valid research group code` });
+    for (const cod_group of req.body.cod_group) {
+      if (!codes_group.includes(cod_group)) {
+        return res.status(400).json({ error: `Cod_group: ${cod_group} is not a valid research group code` });
+      }
     }
-
 
     //Create thesis object which contains data from front end
     const thesis = {
@@ -75,8 +76,13 @@ async function newThesis (req,res) {
     //Insert new thesis in db
     const result_thesis = await dao.createThesis(thesis);
 
-    //Create a new thesis_group row which links thesis to its research group
-    const result_thesis_group = await dao.createThesis_group(result_thesis.id, req.body.cod_group);
+    //Create new rows which link thesis to its research group
+    if (req.body.cod_group != null) {
+      for (const cod_group of req.body.cod_group) {
+        const result_groups = [];
+        result_groups.push(await dao.createThesis_group(result_thesis.id, cod_group))
+      }
+    }
 
     //Create new rows which link thesis to interal cosupervisor
     if (req.body.cosupervisors_internal != null) {
