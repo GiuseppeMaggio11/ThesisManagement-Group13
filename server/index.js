@@ -30,7 +30,7 @@ const {
   newThesis,
   updateThesesArchivation,
   updateThesesArchivationManual,
-  getThesisToCopy,
+  getThesisForProfessorById,
   updateThesis,
 } = require("./controllers/manageThesis");
 const {
@@ -278,7 +278,11 @@ app.put(
   updateThesesArchivationManual
 );
 
-app.get("/api/getThesisToCopy/:id", isProfessor, getThesisToCopy);
+app.get(
+  "/api/getThesisForProfessorById/:id",
+  isProfessor,
+  getThesisForProfessorById
+);
 
 //UPDATES AN EXISTING THESIS
 app.put(

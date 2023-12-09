@@ -19,6 +19,7 @@ import SearchProposalRoute from "./components/SearchProposal";
 import ProfessorActiveProposals from "./components/ProfessorActiveProposals";
 //import Toasts from "./components/Toasts";
 import StudentApplications from "./components/StudentApplications";
+import ViewProposal from "./components/ViewProposal";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -155,11 +156,34 @@ function App() {
               }
             />
             <Route
-              path="/newproposal/:id"
+              path="/copyproposal/:idCopy"
               element={
                 <NewProposal
                   loading={loading}
                   virtualClock={virtualClock}
+                  setLoading={setLoading}
+                  loggedIn={loggedIn}
+                  user={user}
+                />
+              }
+            />
+            <Route
+              path="/updateproposal/:idUpd"
+              element={
+                <NewProposal
+                  loading={loading}
+                  virtualClock={virtualClock}
+                  setLoading={setLoading}
+                  loggedIn={loggedIn}
+                  user={user}
+                />
+              }
+            />
+            <Route
+              path="/viewproposal/:idView"
+              element={
+                <ViewProposal
+                  loading={loading}
                   setLoading={setLoading}
                   loggedIn={loggedIn}
                   user={user}

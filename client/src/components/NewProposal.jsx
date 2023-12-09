@@ -21,7 +21,8 @@ import { useNavigate, useParams } from "react-router-dom";
 
 function NewProposal(props) {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { idCopy, idUpd } = useParams();
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -36,7 +37,7 @@ function NewProposal(props) {
     notes: "",
     expiration: "",
     cod_degree: "",
-    is_archived: false,
+    is_archived: 0,
   });
   const [internal_cosupervisor_input, setInternalCosupervisorInput] =
     useState("");
@@ -71,19 +72,19 @@ function NewProposal(props) {
     }
   };
 
-  const fetchThesisCopy = async (thesisId) => {
+  const fetchThesis = async (thesisId) => {
     try {
-      const response = await API.getThesisToCopy(thesisId);
+      const response = await API.getThesisForProfessorById(thesisId);
       setFormData(response);
     } catch (err) {
-      handleToast("Error while fetching Thesis to copy", "error");
+      handleToast("Error while fetching Thesis", "error");
     }
   };
 
   useEffect(() => {
     props.setLoading(true);
     fetchData();
-    if (id) fetchThesisCopy(id);
+    if (idCopy || idUpd) fetchThesis(idCopy || idUpd);
     props.setLoading(false);
   }, []);
 
@@ -268,11 +269,11 @@ function NewProposal(props) {
             }}
           >
             <Card
-              className="mt-3"
+              className="my-3"
               style={{ maxWidth: "1000px", margin: "0 auto" }}
             >
               <Card.Header className="fs-4">
-                Create a new thesis proposal
+                {idUpd ? "Update proposal" : "Create a new thesis proposal"}
               </Card.Header>
               <Card.Body>
                 <Form>
@@ -601,9 +602,7 @@ function NewProposal(props) {
                       </Col>
                     </Row>
                   </Form.Group>
-
                   <ToastContainer />
-
                   <Row className="justify-content-end">
                     <Col xs="auto">
                       <Button
@@ -611,7 +610,7 @@ function NewProposal(props) {
                         type="button"
                         onClick={handleSubmit}
                       >
-                        Create
+                        {idUpd ? "Confirm Update" : "Create"}
                       </Button>
                     </Col>
                   </Row>

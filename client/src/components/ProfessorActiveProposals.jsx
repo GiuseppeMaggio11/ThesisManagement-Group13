@@ -41,6 +41,12 @@ function ProfessorActiveProposals(props) {
     getActiveProposals();
   }, []);
 
+  const renderTooltip = (props) => (
+    <Tooltip id="button-tooltip" {...props}>
+      Copy Thesis
+    </Tooltip>
+  );
+
   return props.loading ? (
     <Loading />
   ) : (
@@ -54,9 +60,17 @@ function ProfessorActiveProposals(props) {
           No active thesis proposals found
         </Alert>
       ) : !isMobile ? (
-        <ActiveProposalsLargeScreen activeProposals={activeProposals} />
+        <ActiveProposalsLargeScreen
+          activeProposals={activeProposals}
+          handleToast={handleToast}
+          renderTooltip={renderTooltip}
+        />
       ) : (
-        <ActiveProposalsMobile activeProposals={activeProposals} />
+        <ActiveProposalsMobile
+          activeProposals={activeProposals}
+          handleToast={handleToast}
+          renderTooltip={renderTooltip}
+        />
       )}
     </Container>
   );
@@ -101,7 +115,14 @@ function ActiveProposalsLargeScreen(props) {
         >
           <Col>
             {props.activeProposals.map((proposal, i) => {
-              return <ElementProposalLargeScreen proposal={proposal} key={i} />;
+              return (
+                <ElementProposalLargeScreen
+                  proposal={proposal}
+                  key={i}
+                  handleToast={props.handleToast}
+                  renderTooltip={props.renderTooltip}
+                />
+              );
             })}
           </Col>
         </Row>
@@ -111,12 +132,7 @@ function ActiveProposalsLargeScreen(props) {
 }
 
 function ElementProposalLargeScreen(props) {
-  const navigation = useNavigate();
-  const renderTooltip = (props) => (
-    <Tooltip id="button-tooltip" {...props}>
-      Copy Thesis
-    </Tooltip>
-  );
+  const navigate = useNavigate();
   return (
     <Row
       className="py-3 active-proposal-row-custom"
@@ -132,7 +148,14 @@ function ElementProposalLargeScreen(props) {
             textDecoration: "none",
           }}
         >
-          <span style={{ cursor: "pointer" }}>{props.proposal.title}</span>
+          <span
+            onClick={() => {
+              navigate("/viewproposal/" + props.proposal.id);
+            }}
+            style={{ cursor: "pointer" }}
+          >
+            {props.proposal.title}
+          </span>
         </div>
       </Col>
       <Col md={2} lg={2} xl={2} xxl={2} style={{ fontSize: 18 }}>
@@ -145,13 +168,17 @@ function ElementProposalLargeScreen(props) {
         {dayjs(props.proposal.expiration).format("DD/MM/YYYY")}
       </Col>
       <Col md={1} lg={1} xl={1} xxl={1}>
-        <Link to={"/newproposal/" + props.proposal.id}>
+        <Link to={"/copyproposal/" + props.proposal.id}>
           <OverlayTrigger
             placement="bottom"
             delay={{ show: 250, hide: 400 }}
-            overlay={renderTooltip}
+            overlay={props.renderTooltip}
           >
-            <Clipboard2Check />
+            <Clipboard2Check
+              onClick={() => {
+                props.handleToast("Thesis copied successfully", "success");
+              }}
+            />
           </OverlayTrigger>
         </Link>
       </Col>
@@ -166,7 +193,13 @@ function ActiveProposalsMobile(props) {
       <Accordion>
         {props.activeProposals.map((proposal, i) => {
           return (
-            <ElementProposalMobile proposal={proposal} key={i} index={i} />
+            <ElementProposalMobile
+              proposal={proposal}
+              key={i}
+              index={i}
+              handleToast={props.handleToast}
+              renderTooltip={props.renderTooltip}
+            />
           );
         })}
       </Accordion>
@@ -175,21 +208,26 @@ function ActiveProposalsMobile(props) {
 }
 
 function ElementProposalMobile(props) {
-  const navigation = useNavigate();
+  const navigate = useNavigate();
   return (
     <Accordion.Item eventKey={props.index}>
       <Accordion.Header>
-        <span
-          onClick={() => {
-            /*REDIRECT TO THESIS' PAGE*/
+        <div
+          style={{
+            color: "#4682B4",
+            fontSize: 18,
+            textDecoration: "none",
           }}
         >
-          <div
-            style={{ color: "#4682B4", fontSize: 18, textDecoration: "none" }}
+          <span
+            onClick={() => {
+              navigate("/viewproposal/" + props.proposal.id);
+            }}
+            style={{ cursor: "pointer" }}
           >
             {props.proposal.title}
-          </div>
-        </span>
+          </span>
+        </div>
       </Accordion.Header>
       <Accordion.Body>
         <Row>
@@ -198,7 +236,21 @@ function ElementProposalMobile(props) {
               Level: <b>{props.proposal.thesis_level}</b>
             </p>
           </Col>
-          <Col>{/*ADD BUTTON HERE*/}</Col>
+          <Col className="text-end">
+            <Link to={"/copyproposal/" + props.proposal.id}>
+              <OverlayTrigger
+                placement="bottom"
+                delay={{ show: 250, hide: 400 }}
+                overlay={props.renderTooltip}
+              >
+                <Clipboard2Check
+                  onClick={() => {
+                    props.handleToast("Thesis copied successfully", "success");
+                  }}
+                />
+              </OverlayTrigger>
+            </Link>
+          </Col>
         </Row>
         <Row>
           <Col>

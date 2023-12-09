@@ -1006,20 +1006,20 @@ exports.rollback = async () => {
 };
 
 //get thesis data to copy for the insert of a new thesis
-exports.getThesisToCopy = async (id) => {
+exports.getThesisForProfessorById = async (id) => {
   try {
     //get thesis
     const sql = "select * from thesis where id=?";
     const [row] = await pool.execute(sql, [id]);
     return row[0];
   } catch (err) {
-    console.error("Error in getThesisToCopy: ", err);
+    console.error("Error in getThesisForProfessorById: ", err);
     throw err;
   }
 };
 
 //get thesis external cosupervisor to copy for the insert of a new thesis
-exports.getThesisExCosupervisorToCopy = async (id) => {
+exports.getThesisExCosupervisorForProfessorById = async (id) => {
   try {
     const sqlExt =
       "select cosupevisor_id from thesis_cosupervisor_external where thesis_id = ?";
@@ -1029,13 +1029,13 @@ exports.getThesisExCosupervisorToCopy = async (id) => {
       return item.cosupevisor_id;
     });
   } catch (err) {
-    console.error("Error in getThesisExCosupervisorToCopy: ", err);
+    console.error("Error in getThesisExCosupervisorForProfessorById: ", err);
     throw err;
   }
 };
 
 //get thesis internal cosupervisor to copy for the insert of a new thesis
-exports.getThesisIntCosupervisorToCopy = async (id) => {
+exports.getThesisIntCosupervisorForProfessor = async (id) => {
   try {
     const sqlInt =
       "select cosupevisor_id from thesis_cosupervisor_teacher where thesis_id = ?";
@@ -1044,19 +1044,19 @@ exports.getThesisIntCosupervisorToCopy = async (id) => {
       return item.cosupevisor_id;
     });
   } catch (err) {
-    console.error("Error in getThesisIntCosupervisorToCopy: ", err);
+    console.error("Error in getThesisIntCosupervisorForProfessor: ", err);
     throw err;
   }
 };
 
-exports.getThesisGroupToCopy = async (id) => {
+exports.getThesisGroupForProfessor = async (id) => {
   try {
     //get thesis group
     const sql = "select group_id from thesis_group where thesis_id = ?";
     const [row] = await pool.execute(sql, [id]);
-    return row[0].group_id;
+    return row[0]?.group_id;
   } catch (err) {
-    console.error("Error in getThesisGroupToCopy: ", err);
+    console.error("Error in getThesisGroupForProfessor: ", err);
     throw err;
   }
 };
