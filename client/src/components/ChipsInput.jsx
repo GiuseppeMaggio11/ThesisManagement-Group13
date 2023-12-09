@@ -19,7 +19,7 @@ const Chips2 = ({ items, selectedItems, setItems, setSelectedItems }) => {
   return (
     <div>
       {selectedItems.map((item, index) => (
-        <span key={index} className="chip" style={{ fontSize: 12, alignItems: 'center', paddingTop: 0, paddingBottom: 0 }}>
+        <span key={index} className="chip" style={{ fontSize: 15, alignItems: 'center', paddingTop: 0, paddingBottom: 0 }}>
           {item}
           <span
             className="chip-x"

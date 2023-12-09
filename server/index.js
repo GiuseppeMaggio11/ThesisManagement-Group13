@@ -30,6 +30,8 @@ const {
   listExternalCosupervisors,
   createExternalCosupervisor,
   getTeachersList,
+  listGroups,
+  listDegrees,
 } = require("./controllers/others");
 
 const express = require("express");
@@ -239,3 +241,18 @@ app.post(
 );
 
 app.get('/api/isApplied',isStudent, isApplied);
+
+app.get("/api/groups",
+  isProfessor,
+  listGroups
+);
+
+app.get("/api/degrees",
+  isProfessor,
+  listDegrees
+);
+
+app.get("/api/teachersList",
+  isProfessor,
+  getTeachersList
+);

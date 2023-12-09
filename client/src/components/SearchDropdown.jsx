@@ -15,7 +15,6 @@ const SearchDropdown = ({
     const dropdownRef = useRef(null);
     const [input, setInput] = useState("");
   
-    console.log(items)
     useEffect(() => {
       const handleClickOutside = (event) => {
         if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -66,7 +65,7 @@ const SearchDropdown = ({
   
   
     return (
-      <div className="mt-0 px-0 py-0" style={{ marginBottom: "0.5em" }}>
+      <div className="px-0 py-0" style={{ marginTop: "0.5em", marginBottom: "0.5em" }}>
         <Row>
           {placeholder !== '' && <Col
             xs={4}
@@ -118,6 +117,7 @@ const SearchDropdown = ({
                         className={`list-group-item`}
                         key={index}
                         onClick={() => handleItemClick(item)}
+                        style={{cursor:"pointer"}}
                       >
                         {item
                           .toLowerCase()
@@ -134,6 +134,7 @@ const SearchDropdown = ({
                       <li
                         className={`list-group-item`}
                         key={index}
+                        style={{cursor:"pointer"}}
                         onClick={() => handleItemClick(item)}
                       >
                         {item

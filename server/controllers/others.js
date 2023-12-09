@@ -21,6 +21,26 @@ async function getTeachersList(req, res){
   }
 }
 
+async function listGroups(req, res) {
+  try {
+    const groups = await dao.getGroups()
+    res.status(200).json(groups);
+  }
+  catch (err) {
+    res.status(500).json(err)
+  };
+}
+
+async function listDegrees(req, res) {
+  try {
+    const degrees = await dao.getDegrees()
+    res.status(200).json(degrees);
+  }
+  catch (err) {
+    res.status(500).json(err)
+  };
+}
+
 async function createExternalCosupervisor(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -59,4 +79,4 @@ async function createExternalCosupervisor(req, res) {
   }
 }
 
-module.exports = { listExternalCosupervisors, createExternalCosupervisor, getTeachersList }
+module.exports = { listExternalCosupervisors, createExternalCosupervisor, getTeachersList, listGroups, listDegrees, }

@@ -84,6 +84,7 @@ async function getTeachers() {
     })
   );
 }
+
 async function getDegrees() {
   return getJson(
     fetch(URL + `/degrees`, {
@@ -96,7 +97,7 @@ async function getDegrees() {
   );
 }
 
-async function getGrops() {
+async function getGroups() {
   return getJson(
     fetch(URL + `/groups`, {
       method: "GET",
@@ -272,5 +273,7 @@ const API = {
   getStudentApplications,
   isApplied,
   getTeachers,
+  getGroups,
+  getDegrees,
 };
 export default API;

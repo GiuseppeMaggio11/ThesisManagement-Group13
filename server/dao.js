@@ -481,7 +481,7 @@ exports.getTeachersList = async () => {
 };
 
 // Selects every code of degrees from degree_table, returns array of degrees codes
-exports.getDegrees = async () => {
+exports.getCodDegrees = async () => {
   try {
     const sql = `SELECT cod_degree FROM degree_table`;
     const [rows] = await pool.execute(sql);
@@ -489,6 +489,27 @@ exports.getDegrees = async () => {
     const degrees = [];
     rows.map((e) => {
       degrees.push(e.cod_degree);
+    });
+    return degrees;
+  } catch (error) {
+    console.error("Error in getCodDegrees: ", error);
+    throw error;
+  }
+};
+
+// Selects every degrees from degree_table, returns array of degrees
+exports.getDegrees = async () => {
+  try {
+    const sql = `SELECT * FROM degree_table`;
+    const [rows] = await pool.execute(sql);
+
+    const degrees = [];
+    rows.map((e) => {
+      const degree = {
+        name: e.title_degree,
+        cod: e.cod_degree,
+      };
+      degrees.push(degree);
     });
     return degrees;
   } catch (error) {
@@ -602,6 +623,27 @@ exports.getExternal_cosupervisors_emails = async () => {
     return external_cosupervisor_emails;
   } catch (error) {
     console.error("Error in getExternal_cosupervisors_emails: ", error);
+    throw error;
+  }
+};
+
+// Selects every group from group_table, returns array of groups
+exports.getGroups = async () => {
+  try {
+    const sql = `SELECT * FROM group_table`;
+    const [rows] = await pool.execute(sql);
+
+    const groups = [];
+    rows.map((e) => {
+      const group = {
+        name: e.group_name,
+        cod: e.cod_group,
+      };
+      groups.push(group);
+    });
+    return groups;
+  } catch (error) {
+    console.error("Error in getGroups: ", error);
     throw error;
   }
 };

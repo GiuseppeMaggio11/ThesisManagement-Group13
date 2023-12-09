@@ -377,14 +377,14 @@ describe("getTeacher", () => {
     });
 })
 
-describe("getDegrees", () => {
+describe("getCodDegrees", () => {
 
     test("Should return the arrays of degrees id", async () => {
         const mockRows = [[{ cod_degree: "DEGR01" }, { cod_degree: "DEGR02" }, { cod_degree: "DEGR03" }]];
         const mockOutput = ["DEGR01", "DEGR02", "DEGR03"];
         mockPool.execute.mockResolvedValue(mockRows);
 
-        const result = await dao.getDegrees();
+        const result = await dao.getCodDegrees();
 
         expect(mockPool.execute).toHaveBeenCalledTimes(1);
         expect(mockPool.execute).toHaveBeenCalledWith(
@@ -396,7 +396,7 @@ describe("getDegrees", () => {
     test("Should handle database error and reject", async () => {
         mockPool.execute.mockRejectedValue("Database error");
 
-        await expect(dao.getDegrees()).rejects.toStrictEqual("Database error");
+        await expect(dao.getCodDegrees()).rejects.toStrictEqual("Database error");
 
         expect(mockPool.execute).toHaveBeenCalledTimes(1);
         expect(mockPool.execute).toHaveBeenCalledWith(

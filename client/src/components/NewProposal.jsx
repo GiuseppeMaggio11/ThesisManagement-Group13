@@ -10,7 +10,7 @@ import {
 } from "react-bootstrap";
 import API from "../API";
 import Loading from "./Loading";
-import { Chips2, ChipsInput } from "./ChipsInput";
+import { Chips2 } from "./ChipsInput";
 import NewExternalCoSupervisor from "./NewExternalCosupervisor";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -33,26 +33,34 @@ function NewProposal(props) {
     thesis_level: "",
     keywords: [],
     type_name: "",
-    cod_group: "",
+    cod_group: [],
     required_knowledge: "",
     notes: "",
     expiration: "",
     cod_degree: "",
     is_archived: false,
   });
-  const [internal_cosupervisor_input, setInternalCosupervisorInput] =
-    useState("");
+
   const [keywords_input, setKeywordsInput] = useState("");
 
   const [errors, setErrors] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [cosupervisors_external_obj, setCoSupervisorExternal_obj] = useState([]);
-  const [cosupervisors_external, setCoSupervisorExternal] = useState([]);
-  const [cosupervisors_internal_obj, setCoSupervisorInternal_obj] = useState([]);
+
   const [cosupervisors_internal, setCoSupervisorInternal] = useState([]);
+  const [cosupervisors_internal_obj, setCoSupervisorInternal_obj] = useState([]);
+
+  const [cosupervisors_external, setCoSupervisorExternal] = useState([]);
+  const [cosupervisors_external_obj, setCoSupervisorExternal_obj] = useState([]);
+
+  const [groups, setGroups] = useState([]);
+  const [groups_obj, setGroups_obj] = useState([]);
+
+  const [keywords, setKeywords] = useState([]);
+  const [teachers, setTeachers] = useState([]);
   const [degrees, setDegrees] = useState([]);
-  const [gtoups, setGroups] = useState([]);
+
   const { handleToast } = useContext(MessageContext);
+
   const titleRef = useRef(null);
   const supervisorRef = useRef(null);
   const levelRef = useRef(null);
@@ -63,30 +71,25 @@ function NewProposal(props) {
 
   const fetchData = async () => {
     try {
-      /* await API.getListExternalCosupervisors()
-        .then((list) => {
-          setCoSupervisorExternal(list.map((item) => item.email));
-        })
-        .catch((err) => {
-          console.log(err);
-        }); */
-
       let ex_cosup = await API.getListExternalCosupervisors();
-      let in_cosup = await API.getTeachers()
-      /*
-        let groups_f = await API.getGroups()
-        let degrees_f = await API.getDegrees() 
-      */
+      let in_cosup = await API.getTeachers();
+      let groups = await API.getGroups();
+      let degrees = await API.getDegrees();
       
       const formatted_ex_cosup = ex_cosup.map(({ name, surname }) => `${name} ${surname}`);
       const formatted_in_cosup = in_cosup.map(({ name, surname }) => `${name} ${surname}`);
-      setCoSupervisorExternal_obj(ex_cosup)
-      setCoSupervisorInternal_obj(in_cosup)
+      const formatted_group = groups.map(e => e.name);
+
+      setCoSupervisorExternal_obj(ex_cosup);
+      setCoSupervisorInternal_obj(in_cosup);
+      setGroups_obj(groups);
+      setTeachers(in_cosup);
+      setDegrees(degrees);
+
       setCoSupervisorExternal(formatted_ex_cosup);
-      setCoSupervisorInternal(formatted_in_cosup)
-     /*
-      setDegrees(degrees_f)
-      setGroups(groups_f) */
+      setCoSupervisorInternal(formatted_in_cosup);
+      setGroups(formatted_group);
+
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -124,27 +127,13 @@ function NewProposal(props) {
         [field]: [...formData[field], value],
       });
     }
-    setInternalCosupervisorInput("");
     setKeywordsInput("");
   };
 
-  const deleteChip = (field, value) => {
-    setFormData({
-      ...formData,
-      [field]: formData[field].filter((item) => item !== value),
-    });
-  };
-
-  const updateCosupervisorsExternal = (updatedCosupervisors) => {
+  const updateChips = (field, value) => {
     setFormData(prevState => ({
       ...prevState,
-      cosupervisors_external: updatedCosupervisors,
-    }));
-  };
-  const updateCosupervisorsInternal = (updatedCosupervisors) => {
-    setFormData(prevState => ({
-      ...prevState,
-      cosupervisors_internal: updatedCosupervisors,
+      [field]: value,
     }));
   };
 
@@ -187,7 +176,6 @@ function NewProposal(props) {
       errorMessage = path + ": " + msg;
       if (!id) id = 6;
     } else {
-      //console.log(path + errorMessage);
       errorMessage = `${path ? path + ":" : ""} ${msg}`;
     }
     return { errorMessage, id };
@@ -239,13 +227,27 @@ function NewProposal(props) {
     });
     return emails;
   }
+
   function findIDs(externalNames, objList) {
     const ids = [];
     externalNames.forEach(name => {
       const [firstName, lastName] = name.split(' ');
       const foundObj = objList.find(obj => obj.name === firstName && obj.surname === lastName);
       if (foundObj) {
-        ids.push(foundObj.ID);
+        ids.push(foundObj.id);
+      } else {
+        ids.push(null);
+      }
+    });
+    return ids;
+  }
+
+  function findGroupIDs(groupNames, objList) {
+    const ids = [];
+    groupNames.forEach(name => {
+      const foundObj = objList.find(obj => obj.name === name);
+      if (foundObj) {
+        ids.push(foundObj.cod);
       } else {
         ids.push(null);
       }
@@ -256,18 +258,20 @@ function NewProposal(props) {
   const handleSubmit = async (e) => {
     const cosupervisorExternalEmails = findEmails(formData.cosupervisors_external, cosupervisors_external_obj);
     const cosupervisorInternalIDs = findIDs(formData.cosupervisors_internal, cosupervisors_internal_obj);
+    const groupIDS = findGroupIDs(formData.cod_group, groups_obj);
     e.preventDefault();
     const newProp = {
       ...formData,
       cosupervisors_internal: cosupervisorInternalIDs,
       cosupervisors_external: cosupervisorExternalEmails,
       keywords: formData.keywords.join(", "),
+      cod_group: groupIDS,
     };
     
      try {
       const response = await API.newProposal(newProp);
       handleToast("New proposal created successfully", "success");
-      navigate("/teacher");
+      navigate("/proposals");
     } catch (error) {
       console.log(error);
       if (error.error) {
@@ -373,133 +377,70 @@ function NewProposal(props) {
                     <Form.Label htmlFor="supervisor_id" ref={supervisorRef}>
                       Supervisor ID
                     </Form.Label>
-                    <Form.Control
-                      type="text"
+                    <Form.Select
                       id="supervisor_id"
                       name="supervisor_id"
                       value={formData.supervisor_id}
-                      placeholder="Supervisor ID"
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some((error) =>
-                            error?.path?.includes("supervisor")
-                          )
+                          errors.some((error) => error?.path?.includes("supervisor"))
                           ? { borderColor: "red" }
                           : {}
                       }
                       required
-                    />
-
+                    >
+                      <option>Select a supervisor</option>
+                      {teachers.map((teacher, index) => 
+                        <option key={index} value={teacher.id}>{`${teacher.name} ${teacher.surname}`}</option>
+                      )}
+                    </Form.Select>
                   </Form.Group>
                   <Form.Group className="mb-3">
                     <Form.Label htmlFor="cosupervisors_internal">
                       Internal Co-supervisors
                     </Form.Label>
-                      {/*<ChipsInput
-                      field="cosupervisors_internal"
-                      values={formData.cosupervisors_internal}
-                      remove={deleteChip}
-                    />
-                   <Form.Control
-                      id="cosupervisors_internal"
-                      type="text"
-                      placeholder="Enter an internal co-supervisor ID and press enter"
-                      autoComplete="off"
-                      value={internal_cosupervisor_input}
-                      onChange={(e) =>
-                        setInternalCosupervisorInput(e.target.value)
-                      }
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault(); // Prevent the default form submission behavior
-                          addChip("cosupervisors_internal", e.target.value);
-                        }
-                      }}
-                    /> */}
-                     <Chips2
+                    <Chips2
                       items={cosupervisors_internal}
                       selectedItems={formData.cosupervisors_internal}
                       setItems={setCoSupervisorInternal}
-                      setSelectedItems={updateCosupervisorsInternal}
+                      setSelectedItems={(value) => updateChips("cosupervisors_internal", value)}
                     />
-                    <Row className="d-flex align-items-center">
-                      <Col xs={10}>
-                        <SearchDropdown
-                          placeholder={''}
-                          items={cosupervisors_internal}
-                          setItems={setCoSupervisorInternal}
-                          selectedItems={formData.cosupervisors_internal}
-                          setSelectedItems={updateCosupervisorsInternal}
-                        />
-                      </Col>
-                    </Row>
-
-                    {/*     <SearchDropdown
-                      placeholder={"Enter an internal co-supervisor"}
+                    <SearchDropdown
+                      placeholder={""}
                       items={cosupervisors_internal}
                       setItems={setCoSupervisorInternal}
                       selectedItems={formData.cosupervisors_internal}
-                      setSelectedItems={updateCosupervisorsInternal}
-                    /> */}
+                      setSelectedItems={(value) => updateChips("cosupervisors_internal", value)}
+                    />
                   </Form.Group>
                   <Form.Group className="mb-3">
                     <Form.Label htmlFor="cosupervisors_external">
                       External Co-supervisors
                     </Form.Label>
-                    {/*  {cosupervisors_external.map((item, index) => (
-                      <Form.Check
-                        type="checkbox"
-                        id={`${index}`}
-                        key={item}
-                        label={item}
-                        value={item}
-                        checked={formData.cosupervisors_external.includes(item)}
-                        onChange={(e) => {
-                          const selectedItem = e.target.value;
-                          if (
-                            formData.cosupervisors_external.includes(
-                              selectedItem
-                            )
-                          ) {
-                            const tempArray =
-                              formData.cosupervisors_external.filter(
-                                (item) => item !== selectedItem
-                              );
-                            setFormData({
-                              ...formData,
-                              cosupervisors_external: [...tempArray],
-                            });
-                          } else {
-                            setFormData({
-                              ...formData,
-                              cosupervisors_external: [
-                                ...formData.cosupervisors_external,
-                                selectedItem,
-                              ],
-                            });
-                          }
-                        }}
-                      />
-                    ))} */}
                     <Chips2
                       items={cosupervisors_external}
                       selectedItems={formData.cosupervisors_external}
                       setItems={setCoSupervisorExternal}
-                      setSelectedItems={updateCosupervisorsExternal}
+                      setSelectedItems={(value) => updateChips("cosupervisors_external", value)}
                     />
                     <Row className="d-flex align-items-center">
                       <Col xs={10}>
                         <SearchDropdown
-                          placeholder={''}
+                          placeholder={""}
                           items={cosupervisors_external}
                           setItems={setCoSupervisorExternal}
                           selectedItems={formData.cosupervisors_external}
-                          setSelectedItems={updateCosupervisorsExternal}
+                          setSelectedItems={(value) => updateChips("cosupervisors_external", value)}
                         />
                       </Col>
                       <Col xs={2}>
-                         <HoverIconButton defaultIcon={PersonAdd} hoverIcon={PersonFillAdd} className={"button-style-person"} onClick={() => setShowForm(true)} />
+                         <HoverIconButton 
+                            defaultIcon={PersonAdd} 
+                            hoverIcon={PersonFillAdd} 
+                            className={"button-style-person"} 
+                            onClick={() => setShowForm(true)} 
+                          />
                       </Col>
                     </Row>
                     <Modal show={showForm} onHide={() => setShowForm(false)}>
@@ -531,21 +472,23 @@ function NewProposal(props) {
                       }
                       required
                     >
-                      <option>Choose a thesis level</option>
+                      <option>Select a thesis level</option>
                       <option value="Bachelor">Bachelor</option>
                       <option value="Master">Master</option>
                     </Form.Select>
                   </Form.Group>
                   <Form.Group className="mb-3">
                     <Form.Label htmlFor="keywords">Keywords</Form.Label>
-                    <ChipsInput
-                      field="keywords"
-                      remove={deleteChip}
-                      values={formData.keywords}
+                    <Chips2
+                      items={keywords}
+                      selectedItems={formData.keywords}
+                      setItems={setKeywords}
+                      setSelectedItems={(value) => updateChips("keywords", value)}
                     />
                     <Form.Control
                       id="keywords"
                       type="text"
+                      style={{ marginTop: "0.5em" }}
                       placeholder="Enter a keyword and press enter"
                       autoComplete="off"
                       value={keywords_input}
@@ -578,20 +521,18 @@ function NewProposal(props) {
                   </Form.Group>
                   <Form.Group className="mb-3" ref={groupRef}>
                     <Form.Label htmlFor="cod_group">Group</Form.Label>
-                    <Form.Control
-                      type="text"
-                      id="cod_group"
-                      name="cod_group"
-                      value={formData.cod_group}
-                      placeholder="Group"
-                      onChange={handleChange}
-                      style={
-                        errors &&
-                          errors.some((error) => error?.path?.includes("group"))
-                          ? { borderColor: "red" }
-                          : {}
-                      }
-                      required
+                    <Chips2
+                      items={groups}
+                      selectedItems={formData.cod_group}
+                      setItems={setGroups}
+                      setSelectedItems={(value) => updateChips("cod_group", value)}
+                    />
+                    <SearchDropdown
+                      placeholder={""}
+                      items={groups}
+                      setItems={setGroups}
+                      selectedItems={formData.cod_group}
+                      setSelectedItems={(value) => updateChips("cod_group", value)}
                     />
                   </Form.Group>
                   <Form.Group className="mb-3">
@@ -656,12 +597,10 @@ function NewProposal(props) {
 
                   <Form.Group className="mb-3" ref={degreeRef}>
                     <Form.Label htmlFor="cod_degree">Degree</Form.Label>
-                    <Form.Control
-                      type="text"
+                    <Form.Select
                       id="cod_degree"
                       name="cod_degree"
                       value={formData.cod_degree}
-                      placeholder="Degree"
                       onChange={handleChange}
                       style={
                         errors &&
@@ -670,7 +609,12 @@ function NewProposal(props) {
                           : {}
                       }
                       required
-                    />
+                    >
+                      <option>Select a degree</option>
+                      {degrees.map((degree, index) => 
+                        <option key={index} value={degree.cod}>{degree.name}</option>
+                      )}
+                    </Form.Select>
                   </Form.Group>
                   <Form.Group className="mb-3">
                     <Row className="align-items-center">

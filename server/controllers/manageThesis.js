@@ -41,7 +41,7 @@ async function newThesis (req,res) {
 
     // ---DEGREE CODE should be an actual degree, must be in degree table
     //Get every cod_degree from degree_table table in db
-    const degrees = await dao.getDegrees()
+    const degrees = await dao.getCodDegrees()
     //If given cod_degre si not in list raise error
     if (!degrees.includes(req.body.cod_degree)) {
       return res.status(400).json({ error: `Cod_degree: ${req.body.cod_degree} is not a valid degree code` });
