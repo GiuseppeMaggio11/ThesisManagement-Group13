@@ -1,529 +1,56 @@
-/*Wrapper App*/
-.wrapper {
-  margin: 0;
-  padding: 0;
+/* Flip clock container */
+.flip-clock-container {
   display: flex;
-  flex-direction: column;
-}
-
-/*Loading*/
-.loader-container {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 9999;
-}
-
-/*Header dropdown*/
-@media (max-width: 768px) {
-  .custom-navdropdown {
-    max-width: 30%;
-  }
-
-}
-
-/*Virtual clock*/
-.custom-virtual-clock {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #333;
-  background-color: #f5f5f5;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  display: inline-block;
-}
-
-/*Chips input */
-
-.chip-list {
-  list-style: none;
-  margin: 0px;
-  padding: 5px;
-  max-width: 85%;
-}
-
-.chip {
-  display: inline-block;
-  white-space: 'nowrap';
-  background: #555;
-  color: white;
-  padding: 3px 5px 3px 10px;
-  border-radius: 15px;
-  margin: 2px;
   align-items: center;
+  height: 100vh;
 }
 
-.chip a {
-  color: white;
-  text-decoration: none;
-  margin: 5px;
-  font-size: 13px;
-  background: #333;
-  width: 15px;
-  height: 15px;
-  border-radius: 50%;
-  display: inline-flex;
-  text-align: center;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.chips-input {
-  display: inline-flex;
-  border: 0px;
-  border-radius: 15px;
-  background: none;
-  flex-grow: 1;
-  min-width: 50px;
-  margin: 3px;
-  padding: 5px;
-}
-
-
-/*Loading*/
-.loader-container {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 9999;
-}
-
-.navbarMargin {
-  margin-top: 1rem;
-}
-
-.colorStyle {
-  color: white;
-}
-
-.footer_application {
-  color: black;
-  justify-content: space-between;
-}
-
-.margin_left_accordition {
-  margin-left: 2rem;
-}
-
-.button-apply {
-  text-align: end;
-  margin-right: 2em;
-}
-
-.confirmation_application_div {
+/* Flip clock styling */
+.flip-clock {
   width: 100%;
 }
 
-table.table-rounded {
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
-
-table.table-rounded thead tr {
-  background-color: #4682B4 !important;
-  text-align: center;
-  color: #fff;
-  /* Specify your custom text color if needed */
-}
-
-.leftText {
-  padding-inline-start: 0.8rem;
-  font-weight: 680;
-}
-
-
-.table-footer {
-  text-align: left;
-  font-size: 13px;
-  margin-left: 2rem;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.button-apply {
-  margin-right: 1em;
-}
-
-
-.rightText {
-  text-align: center;
-  vertical-align: middle;
-}
-
-.button-style {
-  background-color: #4682B4;
-  border-color: #4682B4;
-}
-
-.button-style:hover {
-  background-color: #215884;
-  border-color: #215884;
-}
-
-.button-style-cancel {
-  background-color: #e19861;
-  border-color: #e19861;
-  margin-right: 0.5em;
-}
-
-.button-style-trash {
-  background-color: transparent;
-  border-color: transparent;
-  color: #e19861;
-  margin-left: 0.2em;
-}
-
-.button-style-trash:hover {
-  background-color: transparent;
-  border-color: transparent;
-  color: #e19861;
-  margin-left: 0.2em;
-
-}
-
-.button-style-filter {
-  background-color: transparent;
-  border-color: transparent;
-  color: black;
-  font-size: x-large;
-}
-
-.button-style-filter:hover {
-  background-color: transparent;
-  border-color: transparent;
-  color: black;
-  font-size: x-large;
-}
-
-.button-style-filter:active {
-  background-color: transparent !important;
-  border-color: transparent !important;
-  color: black;
-  font-size: x-large;
-}
-
-.button-style-cancel:hover {
-  background-color: #f27e25;
-  border-color: #f27e25;
-  margin-right: 0.5em;
-}
-
-.link-style {
-  background-color: #ffffff;
-  border-color: #ffffff;
-}
-
-.link-style:active {
-  background-color: #4682B4;
-  border-color: #4682B4;
-}
-
-
-.custom-accordion-item {
-  border: none;
-}
-
-.custom-accordion-td {
-  vertical-align: middle;
-}
-
-.bold {
-  font-weight: 680;
-}
-
-.accordion-button:hover .accordion-button:focus {
-  box-shadow: rgb(244, 243, 243) !important;
-  border-color: rgb(244, 243, 243) !important;
-}
-
-.accordion-button:not(.collapsed) {
-  background-color: rgb(244, 243, 243) !important;
-  border-color: rgb(244, 243, 243) !important;
-  box-shadow: none !important;
-  color: rgb(0, 0, 0) !important;
-}
-
-.customLeftColumn {
-  width: 15%;
-  /* Adjust the width as needed */
-}
-
-.btn-outline-danger {
-  border-color: white !important;
-}
-
-.file-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-  padding: 8px;
-  background-color: #fff;
-}
-
-.file-item span {
-  margin-right: 8px;
-}
-
-.file-name {
-  flex-grow: 1;
-}
-
-.drop-area {
-  border: 2px dashed #ccc;
-  border-radius: 4px;
-  padding: 16px;
-  text-align: center;
-  cursor: pointer;
-}
-
-.drop-area-wrong {
-  border: 2px dashed #e19861;
-  border-radius: 4px;
-  padding: 16px;
-  text-align: center;
-  cursor: pointer;
-}
-
-.text-wrong {
-  color: black;
-  font-weight: 500;
-}
-
-.text-wrong-underlined {
-  color: rgb(0, 0, 0);
-  font-weight: 500;
-  text-decoration: underline;
-  text-decoration-color: #f27e25;
-  text-decoration-thickness: 15%;
-
-}
-
-.smaller-heading {
-  font-size: 24px;
-  /* Adjust the size as needed for mobile devices */
-}
-
-.drop-area:hover {
-  background-color: #f0f0f0;
-}
-
-/* Margin for tables and alerts - SearchProposal*/
-.margin-custom {
-  margin: 2rem;
-}
-
-/* Margin for Titles */
-.margin-titles-custom {
-  margin-bottom: 2rem;
-}
-
-/* Margin for Buttons */
-.margin-buttons-custom {
-  margin-left: 1rem;
-}
-
-.clear-btn {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  right: 0;
-  height: 100%;
-  margin-right: 0.5rem;
-}
-
-.Form.Group {
-  position: relative;
-}
-
-.clear-btn span {
-  font-size: 18px;
-  color: #999;
-}
-
-.search-button {
-  margin-left: 1em;
-  font-size: larger;
-  color: black;
-}
-
-.custom-input {
-  transition: box-shadow 0.3s ease;
-  outline: none;
-  box-shadow: none;
-
-  &:focus {
-    box-shadow: 0 0 0px 0.5px #4682B4;
-  }
-}
-
-.form-check-input {
-  border-color: black
-}
-
-/* Style for the custom slider */
-.custom-checkbox {
+/* Individual digit styling */
+.digit {
   display: inline-block;
-  width: 50px;
-  height: 26px;
-  position: relative;
+  margin-right: 0.5em;
+  perspective: 800px;
 }
 
-/* Slider appearance */
-.slider {
+/* Front and back side of the digit */
+.front,
+.back {
+  width: 40px;
+  height: 60px;
+  text-align: center;
+  line-height: 60px;
+  font-size: 48px;
+  font-weight: bold;
   position: absolute;
-  cursor: pointer;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  border-radius: 26px;
-  /* Round shape to create slider appearance */
-  transition: 0.4s;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  transition: transform 0.5s ease-in-out;
 }
 
-
-/* Slider knob appearance */
-.slider::before {
-  content: '';
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background-color: white;
-  transition: 0.4s;
+/* Front side of the digit */
+.front {
+  transform: rotateX(0deg);
 }
 
-/* Move the knob when checkbox is checked */
-input:checked+.slider {
-  background-color: #2196F3;
-  /* Change background color when checked */
+/* Back side of the digit */
+.back {
+  transform: rotateX(180deg);
 }
 
-input:checked+.slider::before {
-  transform: translateX(24px);
-  /* Move knob to the right when checked */
+/* Adjust positioning for hours, minutes, and seconds */
+.flip-clock .digit:nth-child(1),
+.flip-clock .digit:nth-child(2) {
+  margin-right: 20px; /* Separate hours from minutes */
 }
 
-.react-toggle:active:not(.react-toggle--disabled) .react-toggle-thumb {
-  box-shadow: none;
-}
-
-.react-toggle--focus .react-toggle-thumb {
-  box-shadow: none;
-}
-
-.modal-dialog {
-  display: flex;
-  align-items: center;
-  min-height: calc(100% - 60px);
-  /* Adjust based on your layout */
-}
-
-.dropdown-container {
-  position: relative;
-}
-
-.dropdown-content {
-  position: absolute;
-  top: 100%;
-  left: 35%;
-  width: 65%;
-  z-index: 100;
-  background: white;
-  padding: 0%;
-  border: 2px;
-  border-radius: 5%;
-  max-height: 135px;
-  overflow-y: auto;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2)
-}
-
-.custom-rounded {
-  border: none;
-  border-radius: 20px;
-  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.5);
-  padding: 20px;
-  /* Adjust padding as needed */
-}
-
-@media (min-width: 576px) {
-  .modal-dialog {
-    max-width: 500px;
-    /* Adjust as needed */
-    margin: auto;
-  }
-}
-
-@media (min-width: 765px) {
-  .title-mediumScreen {
-    margin-left: 2em;
-    margin-right: 2em;
-    border: 1px solid rgb(254, 252, 252);
-    /* Add a border for testing */
-  }
-}
-
-.active-proposal-row-custom {
-  border-bottom: 1px solid lightgray;
-}
-
-.active-proposal-row-custom:hover {
-  background: rgb(245, 245, 245);
-}
-
-.button-archive {
-  display: flex;
-  align-items: center;
-  margin: 1px;
-  background: rgb(255, 177, 75);
-  border-color: transparent;
-  height: 40px;
-}
-
-.button-archive:hover {
-  background-color: white;
-  border-color: rgb(255, 177, 75);
-  color: rgb(255, 177, 75);
-}
-
-.button-archive:active {
-  background-color: white !important;
-  border-color: rgb(255, 177, 75) !important;
-  color: rgb(255, 177, 75);
-}
-
-.button-delete {
-  display: flex;
-  align-items: center;
-  background: rgb(237, 89, 89);
-  border-color: transparent;
-  margin: 1px;
-  margin-right: 3px;
-  width: 100px;
-  height: 40px;
-}
-
-.button-delete:hover {
-  background-color: white;
-  border-color: rgb(237, 89, 89);
-  color: rgb(237, 89, 89);
-}
-
-.button-delete:active {
-  background-color: white !important;
-  border-color: rgb(237, 89, 89) !important;
-  color: rgb(237, 89, 89);
+.flip-clock .digit:nth-child(3),
+.flip-clock .digit:nth-child(4) {
+  margin-left: 20px; /* Separate minutes from seconds */
 }

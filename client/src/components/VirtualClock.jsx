@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Card, Col, Container, Row } from "react-bootstrap";
 import API from "../API";
+import FlipClock from "./clock";
 
 const VirtualClock = (props) => {
   const [tempTime, setTempTime] = useState(props.virtualClock);
@@ -36,6 +37,7 @@ const VirtualClock = (props) => {
         //setErrors([{ msg: error.message }]);
       });
   };
+
   const handleRealTime = async () => {
     setTempTime(new Date());
     props.setVirtualClock(new Date());
@@ -53,144 +55,34 @@ const VirtualClock = (props) => {
         //setErrors([{ msg: error.message }]);
       });
   };
+
   const formattedDateTime = tempTime.toLocaleString();
-  return (
-    <Container className="mt-4">
-      <Card className="text-center">
-        <Card.Header className="fs-3">Virtual Clock</Card.Header>
-        <Card.Body>
-          <Row>
-            <Col>
-              <Row>
-                <Col>
-                  <Button
-                    variant="info"
-                    onClick={() => updateTime(1, "hour")}
-                    className="w-50 mb-1"
-                  >
-                    +1 Hour
-                  </Button>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <Button
-                    onClick={() => updateTime(1, "day")}
-                    className="w-50 mb-1"
-                  >
-                    +1 Day
-                  </Button>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <Button
-                    variant="warning"
-                    onClick={() => updateTime(1, "month")}
-                    className="w-50 mb-1"
-                  >
-                    +1 Month
-                  </Button>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <Button
-                    variant="danger"
-                    onClick={() => updateTime(1, "year")}
-                    className="w-50 mb-1"
-                  >
-                    +1 Year
-                  </Button>
-                </Col>
-              </Row>
-            </Col>
-            <Col>
-              <Row>
-                <Col>
-                  <Card.Title>Current Time</Card.Title>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <Card.Text className="custom-virtual-clock">
-                    <span>{formattedDateTime}</span>
-                  </Card.Text>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <Button
-                    variant="danger"
-                    className="w-50 mb-1"
-                    onClick={() => handleVirtualTime(tempTime)}
-                  >
-                    Use VirtualTime
-                  </Button>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <Button
-                    variant="primary"
-                    className="w-50 mb-1"
-                    onClick={() => handleRealTime()}
-                  >
-                    Use real time
-                  </Button>
-                </Col>
-              </Row>
-            </Col>
-            <Col>
-              <Row>
-                <Col>
-                  <Button
-                    variant="info"
-                    onClick={() => updateTime(-1, "hour")}
-                    className="w-50 mb-1"
-                  >
-                    -1 Hour
-                  </Button>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <Button
-                    onClick={() => updateTime(-1, "day")}
-                    className="w-50 mb-1"
-                  >
-                    -1 Day
-                  </Button>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <Button
-                    variant="warning"
-                    onClick={() => updateTime(-1, "month")}
-                    className="w-50 mb-1"
-                  >
-                    -1 Month
-                  </Button>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <Button
-                    variant="danger"
-                    onClick={() => updateTime(-1, "year")}
-                    className="w-50 mb-1"
-                  >
-                    -1 Year
-                  </Button>
-                </Col>
-              </Row>
-            </Col>
-          </Row>
-        </Card.Body>
-      </Card>
+  const dateTimeArray = formattedDateTime.split(',');
+  const date = dateTimeArray[0]; // Extract date
+  const time = dateTimeArray.slice(1).join(','); // Extract time
+  const hour = time.split(':')[0]
+  const minute = time.split(':')[1]
+  const second = time.split(':')[2]
+  console.log(hour)
+  console.log(minute)
+  console.log(second)
+    return (
+      <Container>
+      <Row>
+        <Col>
+          <h2>{date}</h2>
+        </Col>
+      </Row>
+      <Row>
+        <Col xs={12}>
+          <FlipClock/>
+        </Col>
+      </Row>
+      {/* Other components or content */}
     </Container>
-  );
-};
+    );
+  };
+      
+  
 
 export default VirtualClock;
