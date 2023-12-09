@@ -199,7 +199,7 @@ docker compose down
     ]
     ```
 
-#### 5. **New external co-supevisors **: `POST /api/newExternalCosupervisor`
+#### 5. **New external co-supevisors**: `POST /api/newExternalCosupervisor`
 
   - **Description**: Creates new external cosupervisor 
   - **Middleware**: `isProfessor`
@@ -222,7 +222,7 @@ docker compose down
     ]
     ```
 
-#### 6. **Update archivation of proposal **: `PUT /api/updateThesesArchivation`
+#### 6. **Update archivation of proposal**: `PUT /api/updateThesesArchivation`
 
   - **Description**: Updates archivation status of thesis proposal based on new virtualclock time
   - **Middleware**: 
@@ -237,7 +237,7 @@ docker compose down
           "datetime": "2026-01-21T10:00:26.145Z"
       }
     ```
-#### 7. **New external co-supevisors **: `POST /api/updateApplicationStatus`
+#### 7. **New external co-supevisors**: `POST /api/updateApplicationStatus`
 
   - **Description**: Updates status of application
   - **Middleware**: `isProfessor`
@@ -247,7 +247,7 @@ docker compose down
     - `status` (string): The new status of the application ,
   - **Response**:
     - Some application information
-    - `400`if data is incorrect
+    - `400` if data is incorrect
   - **Example**:
     ```json
       {
@@ -255,6 +255,69 @@ docker compose down
         "thesis_id": 3,
         "status": "Accepted"
       }
+    ```
+
+#### **Update a thesis proposal**: `PUT /api/updateThesis`
+
+  - **Description**: Updates an existing thesis including its group, internal cosupervisors and external cosupervisors
+  - **Middleware**: `isProfessor`
+  - **Request Body**:
+    - `thesis_id` (unsigned non-zero integer): The id of the thesis,
+    - `title` (string): The new title of the thesis,
+    - `description` (string): The new description of the thesis,
+    - `supervisor_id` (string): The new supervisor ID of the thesis,
+    - `thesis_level` (string): The new level of the thesis,
+    - `type_name` (string): The new type of the thesis,
+    - `required_knowledge` (string): The new required knowledge of the thesis,
+    - `notes` (string): The new notes about the thesis,
+    - `expiration` (date): The new expiration date of the thesis,
+    - `cod_degree` (string): The new degree of the thesis,
+    - `is_archived` (boolean): If the updated thesis is archived,
+    - `keywords` (string): The new keywords of the thesis,
+    - `cosupervisors_internal` (array): The new internal co-supervisors of the thesis,
+    - `cosupervisors_external` (array): The new external co-supervisors of the thesis
+    - `cod_group` (string): The new code group of the thesis
+  - **Response**:
+    - In case of success, the api returns all the fields of the updated thesis as memorized inside the database
+    ```
+    {
+      "thesis_id": n (unsigned non-zero integer),
+      "title": "new title",
+      "description": "new description",
+      "supervisor_id": "new supervisor_id",
+      "thesis_level": "new thesis_level",
+      "type_name": "new type_name",
+      "required_knowledge": "new required_knowledge",
+      "notes": "new notes",
+      "expiration": "new expiration as string in the format YYYY-MM-DDThh:mm:ss.sssZ",
+      "cod_degree": "new cod_degree",
+      "is_archived": new_is_archived (boolean),
+      "keywords": "new keywords"
+    }
+    ```
+    - `422` if some inputs are wrong
+    - `400` if data is incorrect
+    - `500` if inside the group_table there was more than one entry with thesis_id equal to the one passed inside the request body
+    - `503` if a database error occurres 
+  - **Example**:
+    ```json
+    {   
+      "thesis_id": 1,
+      "title": "new title",
+      "description": "new description",
+      "supervisor_id" : "P654321",
+      "thesis_level": "Bachelor",
+      "type_name": "new type_name",
+      "required_knowledge": "new required_knowledge",
+      "notes": "new notes",
+      "expiration": "2050-01-01T00:00:00.000Z",
+      "cod_degree": "DEGR02",
+      "is_archived": false,
+      "keywords": "k1, k2",
+      "cosupervisors_internal": ["P123456"],
+      "cosupervisors_external": ["elena.conti@email.net"],
+      "cod_group": "GRP02"
+    } 
     ```
 
 #### OTHER 1 Server

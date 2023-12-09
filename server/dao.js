@@ -752,6 +752,194 @@ exports.getStudentApplication = async (studentId) => {
   }
 };
 
+// Updates an existing thesis row in thesis table, must receive every data of thesis INCLUDING irs id, returns the number of rows modified
+exports.updateThesis = async (thesis) => {
+  try {
+    const sql = `UPDATE thesis
+      SET title = ?, description = ?, supervisor_id = ?, thesis_level = ?, thesis_type = ?, required_knowledge = ?, notes = ?, expiration = ?, cod_degree = ?, is_archived = ?, keywords = ?
+      WHERE id = ?`;
+    const [rows] = await pool.execute(sql, [
+      thesis.title,
+      thesis.description,
+      thesis.supervisor_id,
+      thesis.thesis_level,
+      thesis.type_name,
+      thesis.required_knowledge,
+      thesis.notes,
+      thesis.expiration,
+      thesis.cod_degree,
+      thesis.is_archived,
+      thesis.keywords,
+      thesis.thesis_id,
+    ]);
+
+    return rows.affectedRows;
+  } catch (error) {
+    console.error("Error in updateThesis: ", error);
+    throw error;
+  }
+};
+
+// Updates an existing row in thesis_group table, must receive id of thesis and id of related group, returns number of rows modified
+exports.updateThesisGroup = async (thesis_id, group_id) => {
+  try {
+    const sql = "UPDATE thesis_group SET group_id = ? WHERE thesis_id = ?";
+    const [rows] = await pool.execute(sql, [group_id, thesis_id]);
+
+    /* const thesis_group = {
+      thesis_id: thesis_id,
+      group_id: group_id,
+    }; */
+
+    return rows.affectedRows;
+  } catch (error) {
+    console.error("Error in updateThesisGroup: ", error);
+    throw error;
+  }
+};
+
+// Deletes all the rows in thesis_cosupervisor table related to a given thesis, must receive thesis id
+exports.deleteThesisCosupervisorTeacherAll = async (thesis_id) => {
+  try {
+    const sql = "DELETE FROM thesis_cosupervisor_teacher WHERE thesis_id = ?";
+    const [rows] = await pool.execute(sql, [thesis_id]);
+
+    /* const thesis_cosupervisor = {
+      thesis_id: thesis_id,
+      thesis_cosupervisor: professor_id,
+    }; */
+    return rows.affectedRows;
+  } catch (error) {
+    console.error("Error in deleteThesisCosupervisorTeacherAll: ", error);
+    throw error;
+  }
+};
+
+// Deletes all the rows in thesis_cosupervisor_external tablerelated to a given thesis, must receive thesis id
+exports.deleteThesisCosupervisorExternalAll = async (thesis_id) => {
+  try {
+    const sql = "DELETE FROM thesis_cosupervisor_external WHERE thesis_id = ?";
+    const [rows] = await pool.execute(sql, [thesis_id]);
+
+    /* const thesis_cosupervisor = {
+      thesis_id: thesis_id,
+      thesis_cosupervisor: email,
+    }; */
+    return rows.affectedRows;
+  } catch (error) {
+    console.error("Error in deleteThesisCosupervisorExternalAll: ", error);
+    throw error;
+  }
+};
+
+// Checks if thesis proposal exists
+exports.isThesisProposalValid = async (thesis_id) => {
+  try {
+    const sql = "SELECT COUNT(*) AS count FROM thesis WHERE id=?";
+    const [rows] = await pool.execute(sql, [thesis_id]);
+
+    if (rows[0].count == 1) return true;
+    else return false;
+  } catch (error) {
+    console.error("Error in isThesisProposalValid: ", error);
+    throw error;
+  }
+};
+
+// Updates an existing thesis row in thesis table, must receive every data of thesis INCLUDING irs id, returns the number of rows modified
+exports.updateThesis = async (thesis) => {
+  try {
+    const sql = `UPDATE thesis
+      SET title = ?, description = ?, supervisor_id = ?, thesis_level = ?, thesis_type = ?, required_knowledge = ?, notes = ?, expiration = ?, cod_degree = ?, is_archived = ?, keywords = ?
+      WHERE id = ?`;
+    const [rows] = await pool.execute(sql, [
+      thesis.title,
+      thesis.description,
+      thesis.supervisor_id,
+      thesis.thesis_level,
+      thesis.type_name,
+      thesis.required_knowledge,
+      thesis.notes,
+      thesis.expiration,
+      thesis.cod_degree,
+      thesis.is_archived,
+      thesis.keywords,
+      thesis.thesis_id,
+    ]);
+
+    return rows.affectedRows;
+  } catch (error) {
+    console.error("Error in updateThesis: ", error);
+    throw error;
+  }
+};
+
+// Updates an existing row in thesis_group table, must receive id of thesis and id of related group, returns number of rows modified
+exports.updateThesisGroup = async (thesis_id, group_id) => {
+  try {
+    const sql = "UPDATE thesis_group SET group_id = ? WHERE thesis_id = ?";
+    const [rows] = await pool.execute(sql, [group_id, thesis_id]);
+
+    /* const thesis_group = {
+      thesis_id: thesis_id,
+      group_id: group_id,
+    }; */
+
+    return rows.affectedRows;
+  } catch (error) {
+    console.error("Error in updateThesisGroup: ", error);
+    throw error;
+  }
+};
+
+// Deletes all the rows in thesis_cosupervisor table related to a given thesis, must receive thesis id
+exports.deleteThesisCosupervisorTeacherAll = async (thesis_id) => {
+  try {
+    const sql = "DELETE FROM thesis_cosupervisor_teacher WHERE thesis_id = ?";
+    const [rows] = await pool.execute(sql, [thesis_id]);
+
+    /* const thesis_cosupervisor = {
+      thesis_id: thesis_id,
+      thesis_cosupervisor: professor_id,
+    }; */
+    return rows.affectedRows;
+  } catch (error) {
+    console.error("Error in deleteThesisCosupervisorTeacherAll: ", error);
+    throw error;
+  }
+};
+
+// Deletes all the rows in thesis_cosupervisor_external tablerelated to a given thesis, must receive thesis id
+exports.deleteThesisCosupervisorExternalAll = async (thesis_id) => {
+  try {
+    const sql = "DELETE FROM thesis_cosupervisor_external WHERE thesis_id = ?";
+    const [rows] = await pool.execute(sql, [thesis_id]);
+
+    /* const thesis_cosupervisor = {
+      thesis_id: thesis_id,
+      thesis_cosupervisor: email,
+    }; */
+    return rows.affectedRows;
+  } catch (error) {
+    console.error("Error in deleteThesisCosupervisorExternalAll: ", error);
+    throw error;
+  }
+};
+
+// Checks if thesis proposal exists
+exports.isThesisProposalValid = async (thesis_id) => {
+  try {
+    const sql = "SELECT COUNT(*) AS count FROM thesis WHERE id=?";
+    const [rows] = await pool.execute(sql, [thesis_id]);
+
+    if (rows[0].count == 1) return true;
+    else return false;
+  } catch (error) {
+    console.error("Error in isThesisProposalValid: ", error);
+    throw error;
+  }
+};
+
 // get student application
 exports.getProposalsProfessor = async (professor_id) => {
   console.log(professor_id);
