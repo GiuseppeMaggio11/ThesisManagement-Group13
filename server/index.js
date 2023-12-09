@@ -180,16 +180,25 @@ app.post(
   isProfessor,
   [
     // Various checks of syntax of given data
-    check("title").isLength({ min: 1, max: 100 }),
-    check("supervisor_id").isLength({ min: 1, max: 7 }),
-    check("thesis_level").isIn(["Bachelor", "Master", "bachelor", "master"]),
-    check("type_name").isLength({ min: 1, max: 50 }),
+    check("title").isString().isLength({ min: 1, max: 100 }),
+    check("supervisor_id").isString().isLength({ min: 1, max: 7 }),
+    check("thesis_level").isString().isIn(["Bachelor", "Master", "bachelor", "master"]),
+    check("type_name").isString().isLength({ min: 1, max: 50 }),
+    check("required_knowledge").isString(),
+    check("notes").isString(),
     check("expiration")
       .isISO8601()
       .toDate()
-      .withMessage("Date time must be in format YYYY-MM-DD HH:MM:SS"), // TODO check if given date is NOT earlier than today
-    check("cod_degree").isLength({ min: 1, max: 10 }),
+      .isAfter()
+      .withMessage("Date time must be in format YYYY-MM-DD HH:MM:SS and in the future"),
+    check("cod_degree").isString().isLength({ min: 1, max: 10 }),
     check("is_archived").isBoolean(),
+    check("keywords").isString(),
+    check("cosupervisors_internal").isArray(),
+    check("cosupervisors_internal.*").isString(),
+    check("cosupervisors_external").isArray(),
+    check("cosupervisors_external.*").isString(),
+    check("cod_group").isString()
   ],
   newThesis
 );
