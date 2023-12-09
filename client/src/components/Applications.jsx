@@ -14,6 +14,7 @@ import { useMediaQuery } from "react-responsive";
 import API from "../API";
 import MessageContext from "../messageCtx";
 import { CheckLg, XLg } from "react-bootstrap-icons";
+import ConfirmationModal from "./ConfirmationModal";
 
 function Applications(props) {
   const [applications, setApplications] = useState(undefined);
@@ -124,6 +125,11 @@ function Applications(props) {
 }
 
 function StudentApplication(props) {
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [action, setAction] = useState('');
+  const [studentId, setStudentId] = useState('');
+  const [thesisId, setThesisId] = useState('');
+
   function formatDate(dateString) {
     var date = new Date(dateString);
     var day = date.getDate();
@@ -136,6 +142,20 @@ function StudentApplication(props) {
     }${minutes}`;
   }
 
+  function handleConfirmation(studentId, thesisId, action) {
+    setStudentId(studentId);
+    setThesisId(thesisId);
+    setAction(action);
+    setShowConfirmation(true);
+  }
+
+  
+  function confirmAction() {
+    props.handleApplication(studentId, thesisId, action);
+    setShowConfirmation(false);
+  }
+
+
   return props.title === props.application.thesis_title ? (
     <tr>
       {!props.isMobile && <td>{props.application.student_id}</td>}
@@ -145,10 +165,10 @@ function StudentApplication(props) {
         <Button
           variant="success"
           onClick={() =>
-            props.handleApplication(
+            handleConfirmation(
               props.application.student_id,
               props.application.thesis_id,
-              "Accepted"
+              'Accepted'
             )
           }
         >
@@ -159,16 +179,23 @@ function StudentApplication(props) {
         <Button
           variant="danger"
           onClick={() =>
-            props.handleApplication(
+            handleConfirmation(
               props.application.student_id,
               props.application.thesis_id,
-              "Refused"
+              'Refused'
             )
           }
         >
           <XLg size={20} />
         </Button>
       </td>
+      <ConfirmationModal
+        show={showConfirmation}
+        handleClose={() => setShowConfirmation(false)}
+        handleAction={confirmAction}
+        action={action}
+        body={`Are you sure you want to ${action.toLowerCase()} this application?`}
+      />
     </tr>
   ) : null;
 }
