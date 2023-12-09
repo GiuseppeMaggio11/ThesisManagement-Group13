@@ -51,7 +51,7 @@ function Applications(props) {
         "Student application " +
           (status === "Accepted" ? " accepted " : " rejected ") +
           "correctly",
-        status === "Accepted" ? "success" : "error"
+        "success"
       );
       const result = await API.getPendingApplications();
       const uniqueThesisTitles = [
