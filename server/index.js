@@ -31,7 +31,7 @@ const {
   updateThesesArchivation,
   updateThesesArchivationManual,
   getThesisToCopy,
-  updateThesis
+  updateThesis,
 } = require("./controllers/manageThesis");
 const {
   listExternalCosupervisors,
@@ -183,13 +183,9 @@ app.post(
     // Various checks of syntax of given data
     check("title").isString().isLength({ min: 1, max: 100 }),
     check("supervisor_id").isString().isLength({ min: 1, max: 7 }),
-    check("thesis_level").isString().isIn(["Bachelor", "Master", "bachelor", "master"]),
-    check("type_name").isString().isLength({ min: 1, max: 50 }),
-    check("required_knowledge").isString(),
-    check("notes").isString(),
-    check("title").isString().isLength({ min: 1, max: 100 }),
-    check("supervisor_id").isString().isLength({ min: 1, max: 7 }),
-    check("thesis_level").isString().isIn(["Bachelor", "Master", "bachelor", "master"]),
+    check("thesis_level")
+      .isString()
+      .isIn(["Bachelor", "Master", "bachelor", "master"]),
     check("type_name").isString().isLength({ min: 1, max: 50 }),
     check("required_knowledge").isString(),
     check("notes").isString(),
@@ -197,10 +193,9 @@ app.post(
       .isISO8601()
       .toDate()
       .isAfter()
-      .withMessage("Date time must be in format YYYY-MM-DD HH:MM:SS and in the future"),
-    check("cod_degree").isString().isLength({ min: 1, max: 10 }),
-      .isAfter()
-      .withMessage("Date time must be in format YYYY-MM-DD HH:MM:SS and in the future"),
+      .withMessage(
+        "Date time must be in format YYYY-MM-DD HH:MM:SS and in the future"
+      ),
     check("cod_degree").isString().isLength({ min: 1, max: 10 }),
     check("is_archived").isBoolean(),
     check("keywords").isString(),
@@ -208,13 +203,7 @@ app.post(
     check("cosupervisors_internal.*").isString(),
     check("cosupervisors_external").isArray(),
     check("cosupervisors_external.*").isString(),
-    check("cod_group").isString()
-    check("keywords").isString(),
-    check("cosupervisors_internal").isArray(),
-    check("cosupervisors_internal.*").isString(),
-    check("cosupervisors_external").isArray(),
-    check("cosupervisors_external.*").isString(),
-    check("cod_group").isString()
+    check("cod_group").isString(),
   ],
   newThesis
 );
@@ -291,11 +280,10 @@ app.put(
 
 app.get("/api/getThesisToCopy/:id", isProfessor, getThesisToCopy);
 
-
 //UPDATES AN EXISTING THESIS
 app.put(
   "/api/updateThesis",
-   isProfessor,
+  isProfessor,
   [
     // Various checks of syntax of given data
     check("thesis_id").isInt({ gt: 0 }),
@@ -309,7 +297,9 @@ app.put(
       .isISO8601()
       .toDate()
       .isAfter()
-      .withMessage("Date time must be in format YYYY-MM-DD HH:MM:SS and in the future"),
+      .withMessage(
+        "Date time must be in format YYYY-MM-DD HH:MM:SS and in the future"
+      ),
     check("cod_degree").isString().isLength({ min: 1, max: 10 }),
     check("is_archived").isBoolean(),
     check("keywords").isString(),
@@ -317,7 +307,7 @@ app.put(
     check("cosupervisors_internal.*").isString(),
     check("cosupervisors_external").isArray(),
     check("cosupervisors_external.*").isString(),
-    check("cod_group").isString()
+    check("cod_group").isString(),
   ],
   updateThesis
 );
