@@ -73,6 +73,43 @@ async function getListExternalCosupervisors() {
   );
 }
 
+async function getTeachers() {
+  return getJson(
+    fetch(URL + `/teachersList`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    })
+  );
+}
+
+async function getDegrees() {
+  return getJson(
+    fetch(URL + `/degrees`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    })
+  );
+}
+
+async function getGroups() {
+  return getJson(
+    fetch(URL + `/groups`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    })
+  );
+}
+
+
 async function newExternalCosupervisor(external_cosupervisor) {
   return getJson(
     fetch(URL + `/newExternalCosupervisor`, {
@@ -122,7 +159,7 @@ async function getThesisProposals(date) {
     credentials: "include",
   });
   const proposals = await response.json();
-  if (response.ok) {
+  if (response.ok && proposals.length>0) {
     return proposals.map((element) => ({
       id: element.id,
       title: element.title,
@@ -139,7 +176,7 @@ async function getThesisProposals(date) {
       cosupervisors: element.cosupervisors,
     }));
   } else {
-    throw proposals;
+    throw [];
   }
 }
 
@@ -257,6 +294,9 @@ const API = {
   getStudentApplications,
   isApplied,
   getProposalsProfessor,
-  updateThesisArchivation
+  updateThesisArchivation,
+  getTeachers,
+  getGroups,
+  getDegrees,
 };
 export default API;

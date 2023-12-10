@@ -40,22 +40,45 @@
 .chip-list {
   list-style: none;
   margin: 0px;
-  padding: 5px;
   max-width: 85%;
 }
 
 .chip {
-  display: inline-block;
-  white-space: 'nowrap';
-  background: #555;
-  color: white;
-  padding: 3px 5px 3px 10px;
+  display: inline-flex;
+  align-items: center; 
+  white-space: nowrap;
+  background: #21588410;
+  color: rgb(0, 0, 0);
+  padding: 1px 5px 1px 10px;
   border-radius: 15px;
   margin: 2px;
-  align-items: center;
+  border: 0.5px solid;
+  border-color: #21588461;
 }
 
-.chip a {
+.chip-x {
+  display: inline-flex;
+  align-items: center;   
+  font-size: xx-small;
+  white-space:nowrap;
+  padding: 0px 5px 0px 5px;
+  border:none ; 
+  padding-left:5 ;
+  margin-left:0.5em;
+  background-color: '#21588410';
+}
+
+.chip-x:hover{
+  border:none;
+  cursor: pointer;
+  padding: 0px 5px 0px 5px;
+  border-radius: 15px;
+  padding-left:5;
+  margin-left:0.5em;
+  background-color: #21588443
+}
+
+/* .chip a {
   color: white;
   text-decoration: none;
   margin: 5px;
@@ -69,7 +92,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-}
+} */
 
 .chips-input {
   display: inline-flex;
@@ -188,11 +211,34 @@ table.table-rounded thead tr {
 
 }
 
+.button-style-person {
+  background-color: transparent;
+  border-color: transparent;
+  color: #000000;
+  padding-bottom: 1em;
+  font-size: x-large;
+}
+
+.button-style-person:hover {
+  background-color: transparent;
+  border-color: transparent;
+  color: #000000;
+  font-size: x-large;
+}
+
+.button-style-persone+:active {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  color: black;
+  font-size: x-large;
+}
+
 .button-style-filter {
   background-color: transparent;
   border-color: transparent;
   color: black;
   font-size: x-large;
+  cursor: pointer;
 }
 
 .button-style-filter:hover {
@@ -262,8 +308,6 @@ table.table-rounded thead tr {
 .file-item {
   display: flex;
   align-items: center;
-  margin-bottom: 8px;
-  padding: 8px;
   background-color: #fff;
 }
 
@@ -317,6 +361,7 @@ table.table-rounded thead tr {
 /* Margin for tables and alerts - SearchProposal*/
 .margin-custom {
   margin: 2rem;
+  padding: 0;
 }
 
 /* Margin for Titles */
@@ -340,7 +385,7 @@ table.table-rounded thead tr {
   position: absolute;
   right: 0;
   height: 100%;
-  margin-right: 0.5rem;
+  margin-right: 1rem;
 }
 
 .Form.Group {
@@ -362,11 +407,17 @@ table.table-rounded thead tr {
   transition: box-shadow 0.3s ease;
   outline: none;
   box-shadow: none;
+  margin-right: 0.5em;
 
   &:focus {
     box-shadow: 0 0 0px 0.5px #4682B4;
   }
 }
+.custom-input {
+  border-radius: 10px;
+  padding: 5px; 
+}
+
 
 .form-check-input {
   border-color: black
@@ -406,15 +457,13 @@ table.table-rounded thead tr {
   transition: 0.4s;
 }
 
-/* Move the knob when checkbox is checked */
 input:checked+.slider {
   background-color: #2196F3;
-  /* Change background color when checked */
+
 }
 
 input:checked+.slider::before {
   transform: translateX(24px);
-  /* Move knob to the right when checked */
 }
 
 .react-toggle:active:not(.react-toggle--disabled) .react-toggle-thumb {
@@ -438,17 +487,45 @@ input:checked+.slider::before {
 
 .dropdown-content {
   position: absolute;
-  top: 100%;
-  left: 35%;
-  width: 65%;
-  z-index: 100;
+  top: calc(100%);
+  left: 36%;
+  width: calc(64%);
+  z-index: 99;
   background: white;
-  padding: 0%;
-  border: 2px;
-  border-radius: 5%;
-  max-height: 135px;
+  border-radius: 5px;
+  max-height: 200px; 
   overflow-y: auto;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2)
+  box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.2);
+  padding:0; 
+}
+
+.dropdown-content-noPlaceholder {
+  position: absolute;
+  top: calc(100%);
+  left: 0%;
+  width: calc(100%);
+  z-index: 99;
+  background: white;
+  border-radius: 5px;
+  max-height: 200px; 
+  overflow-y: auto;
+  box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.2);
+  padding:0; 
+}
+
+.dropdown-content ul {
+  list-style: none; /* Remove bullet points from list */
+  padding-left: 0.2em;
+  margin: 0;
+}
+
+.dropdown-content li {
+  cursor: pointer; 
+  width: 100%;
+}
+
+.dropdown-content li:hover {
+  background-color: #4683b43c; /* Add hover background color */
 }
 
 .custom-rounded {
@@ -456,8 +533,28 @@ input:checked+.slider::before {
   border-radius: 20px;
   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.5);
   padding: 20px;
-  /* Adjust padding as needed */
 }
+
+.custom-input-text {
+  border-radius: 10px;
+  padding: 5px; 
+}
+
+.list-group-item {
+  padding: 0.2em;
+  border:none;
+}
+.ps__rail-x:hover > .ps__thumb-x,
+.ps__rail-x:focus > .ps__thumb-x,
+.ps__rail-x.ps--clicking .ps__thumb-x {
+    background-color: #999 !important;
+    height: 6px !important;
+}
+
+.ps__rail-x {
+  height: 10px !important;
+}
+
 
 @media (min-width: 576px) {
   .modal-dialog {
