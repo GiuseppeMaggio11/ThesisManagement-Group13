@@ -22,7 +22,7 @@ function ProfessorActiveProposals(props) {
   const { handleToast } = useContext(MessageContext);
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
-  if (!props.loggedIn || !props.user.user_type === "PROF") {
+  if (!props.loggedIn || props.user.user_type !== "PROF") {
     return API.redirectToLogin();
   }
 

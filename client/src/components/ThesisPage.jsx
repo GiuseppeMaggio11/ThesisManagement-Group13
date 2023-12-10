@@ -32,7 +32,7 @@ function ThesisPage(props) {
   const [flag, setFlag] = useState(0);
   const from = state?.from;
 
-  if (!props.loggedIn || !props.user.user_type === "PROF") {
+  if (!props.loggedIn || props.user.user_type !== "STUD") {
     return API.redirectToLogin();
   }
 
@@ -268,16 +268,6 @@ function ThesisPage(props) {
               </tfoot>
             </Table>
           </Container>
-
-          <FileDropModal
-            showModal={openPanel}
-            closeModal={closeModal}
-            handleSave={() => {
-              handleApplication();
-            }}
-            setSelectedFiles={setSelectedFiles}
-            selectedFiles={selectedFiles}
-          />
 
           <FileDropModal
             showModal={openPanel}
