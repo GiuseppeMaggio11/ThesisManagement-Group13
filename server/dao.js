@@ -848,18 +848,18 @@ exports.getProposalsProfessor = async (professor_id) => {
 //check if a proposal 1 has an active application or 2 is_archived or 3 is_expired. in these case we prevent deletion of that thesis
 exports.checkBeforeDeleteProposal = async (thesis_id, professorID) => {
   try {
-    //first check if the specified thesis is_archived or is_expired. if yes, we cant delete that thesis, and we return an error
-    const sql = "SELECT * FROM thesis WHERE id = ? AND is_archived = 0";
+    //first check the specified thesis is_archived and is_expired and is_deleted. if anyone of those is equall to 1, we cant delete that thesis, and we return an error
+    const sql = "SELECT * FROM thesis WHERE id = ? AND is_archived = 0 AND is_deleted = 0"; //TODO: also add is_expired when merging with jacopo branch
     const [rows] = await pool.execute(sql, [thesis_id]);
     if (rows.length === 0 ){
-      return {error: "The thesis you request to delete is either not available or not removale."}
+      return "The thesis you request to delete is either not available or not removale."
     }
 
     //check if the requested proposal for delete is belongs to the professor whom we receive delete request from
     const sql2 = "SELECT supervisor_id FROM thesis WHERE id = ?";
     const [rows2] = await pool.execute(sql2, [thesis_id]);
     if (rows2[0].supervisor_id !== professorID ){
-      return {error: "You can only delete your own proposals."}
+      return "You can only delete your own proposals."
     }
     
 
@@ -867,7 +867,7 @@ exports.checkBeforeDeleteProposal = async (thesis_id, professorID) => {
     const sql3 = `SELECT * FROM application WHERE thesis_id = ? AND status = "Accepted"`;
     const [rows3] = await pool.execute(sql3, [thesis_id]);
     if (rows3.length !== 0 ){
-      return {error: "The thesis you request to delete has an active application. you can't delete it."}
+      return "The thesis you request to delete has an active application. you can't delete it."
     } else {
       return "ok";
     }

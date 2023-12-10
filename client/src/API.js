@@ -277,19 +277,18 @@ async function updateThesisArchivation(thesis_id) {
   );
 }
 
-async function deleteProposal(thesis_id) {
-  return getJson(
-    fetch(URL + `/deleteProposal`, {
-      method: "DELETE",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        thesis_id,
-      }),
-    })
-  );
+async function deleteProposal(thesisID){
+  const response = await fetch(URL + "/deleteproposal",{
+    method: "DELETE",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({thesis_id: thesisID}),
+  });
+
+  const result = await response.json();
+  return result;
 }
 
 const API = {

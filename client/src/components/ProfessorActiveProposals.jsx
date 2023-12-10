@@ -46,9 +46,16 @@ function ProfessorActiveProposals(props) {
 
   const deleteProposal = async (thesis_id) => {
     try {
-      await API.deleteProposal(thesis_id);
-      handleToast("Proposal deleted correctly", "success");
-      getActiveProposals();
+      API.deleteProposal(thesis_id).then( result => {
+        //result or deletion is not always positive. we receive a JSON object either in form {result : ... [success case]} or {error: ... [error message]}
+        //so we have to check the content of packet we received from back-end and if it's really removed from database, we can update the page
+        if (result[Object.keys(result)[0]] === "The proposal has been deleted successfully"){
+          handleToast("Proposal deleted correctly", "success");
+          getActiveProposals();    
+        } else {
+          handleToast( result[Object.keys(result)[0]] , "error");          
+        }
+      });
     } catch (err) {
       handleToast("Error while deleting a proposal", "error");
     }

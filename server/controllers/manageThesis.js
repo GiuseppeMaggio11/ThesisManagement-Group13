@@ -151,12 +151,12 @@ async function updateThesesArchivationManual(req, res) {
 async function deleteProposal(req,res){
   try { // check if the request body is in a correct format {thesis_id : INTEGER}
     if ( !("thesis_id" in req.body)){
-      return res.status(400).json({error: "bad input format"})
+      return res.status(400).json({error: "bad input format"});
     }
     const thesis_id = req.body.thesis_id;
     //check if the requested proposal id is a positive integer or not. because thesis IDs in database are positive integers
     if ( !Number.isInteger(thesis_id) || thesis_id < 0){
-      return res.status(400).json({error: "thesis_id in the body should be a positive integer"})      
+      return res.status(400).json({error: "thesis_id in the body should be a positive integer"});   
     }
 
     await dao.beginTransaction();
@@ -166,18 +166,18 @@ async function deleteProposal(req,res){
     //if a proposal has an active application or is expired or archived, we can't delete it. here we check this fact
     const response_msg = await dao.checkBeforeDeleteProposal(thesis_id, professorID);
     if (response_msg !== "ok"){
-      return res.status(400).json({error: response_msg})
+      return res.status(400).json({error: response_msg});
     }
     await dao.deleteProposal(thesis_id);
     //to set the state of all the applications related to that proposal to Cancelled
     await dao.updateApplicationsAfterProposalDeletion(thesis_id);
 
     await dao.commit();
-    return res.status(200).json({result: "The proposal has been deleted successfully"});
+    return res.status(200).json({result: `The proposal has been deleted successfully`});
   }
   catch (err) {
     await dao.rollback();
-    return res.status(500).json(err)
+    return res.status(500).json(err);
   };
 }
 
