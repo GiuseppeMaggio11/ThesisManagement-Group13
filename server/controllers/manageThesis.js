@@ -320,15 +320,34 @@ async function getThesisForProfessorById(req, res) {
     thesis.type_name = thesis.thesis_type;
     delete thesis.thesis_type;
 
-    let vettCosup = await dao.getThesisExCosupervisorForProfessorById(
+    let list_cosupervisors = []; //external + internal names
+    let vettExtCosup = await dao.getThesisExCosupervisorForProfessorById(
       thesis_id
     );
-    if (vettCosup.length > 0) thesis.cosupervisors_external = vettCosup;
-    else thesis.cosupervisors_external = [];
+    if (vettExtCosup.length > 0) {
+      thesis.cosupervisors_external = vettExtCosup.map((item) => {
+        return item.cosupevisor_id;
+      });
+      list_cosupervisors = vettExtCosup.map((item) => {
+        return item.ext_supervisor_name;
+      });
+    } else thesis.cosupervisors_external = [];
 
-    thesis.cosupervisors_internal =
-      await dao.getThesisIntCosupervisorForProfessor(thesis_id);
+    let vettIntCosup = await dao.getThesisIntCosupervisorForProfessor(
+      thesis_id
+    );
+    if (vettIntCosup.length > 0) {
+      thesis.cosupervisors_internal = vettIntCosup.map((item) => {
+        return item.cosupevisor_id;
+      });
+      list_cosupervisors = list_cosupervisors.concat(
+        vettIntCosup.map((item) => {
+          return item.ext_supervisor_name;
+        })
+      );
+    } else thesis.cosupervisors_internal = [];
 
+    thesis.list_cosupervisors = list_cosupervisors;
     thesis.cod_group = await dao.getThesisGroupForProfessor(thesis_id);
 
     res.status(200).json(thesis);

@@ -1009,7 +1009,8 @@ exports.rollback = async () => {
 exports.getThesisForProfessorById = async (id) => {
   try {
     //get thesis
-    const sql = "select * from thesis where id=?";
+    const sql =
+      "select t.*, CONCAT_WS(' ', te.name, te.surname) AS supervisor_name from thesis t inner join teacher te on t.supervisor_id  = te.id where t.id=?";
     const [row] = await pool.execute(sql, [id]);
     return row[0];
   } catch (err) {
@@ -1022,12 +1023,14 @@ exports.getThesisForProfessorById = async (id) => {
 exports.getThesisExCosupervisorForProfessorById = async (id) => {
   try {
     const sqlExt =
-      "select cosupevisor_id from thesis_cosupervisor_external where thesis_id = ?";
+      "select t.cosupevisor_id, CONCAT_WS(' ', es.name , es.surname) AS ext_supervisor_name from thesis_cosupervisor_external t " +
+      "inner join external_supervisor es on t.cosupevisor_id = es.email where t.thesis_id = ?";
     const [rowExt] = await pool.execute(sqlExt, [id]);
 
-    return rowExt.map((item) => {
+    /*  return rowExt.map((item) => {
       return item.cosupevisor_id;
-    });
+    }); */
+    return rowExt;
   } catch (err) {
     console.error("Error in getThesisExCosupervisorForProfessorById: ", err);
     throw err;
@@ -1038,11 +1041,13 @@ exports.getThesisExCosupervisorForProfessorById = async (id) => {
 exports.getThesisIntCosupervisorForProfessor = async (id) => {
   try {
     const sqlInt =
-      "select cosupevisor_id from thesis_cosupervisor_teacher where thesis_id = ?";
+      "select t.cosupevisor_id, CONCAT_WS(' ', te.name , te.surname) AS ext_supervisor_name from thesis_cosupervisor_teacher t " +
+      "inner join teacher te on t.cosupevisor_id = te.id where t.thesis_id = ?";
     const [rowInt] = await pool.execute(sqlInt, [id]);
-    return rowInt.map((item) => {
+    /* return rowInt.map((item) => {
       return item.cosupevisor_id;
-    });
+    }); */
+    return rowInt;
   } catch (err) {
     console.error("Error in getThesisIntCosupervisorForProfessor: ", err);
     throw err;

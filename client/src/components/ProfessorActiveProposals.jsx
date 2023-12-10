@@ -168,7 +168,7 @@ function ElementProposalLargeScreen(props) {
         {dayjs(props.proposal.expiration).format("DD/MM/YYYY")}
       </Col>
       <Col md={1} lg={1} xl={1} xxl={1}>
-        <Link to={"/copyproposal/" + props.proposal.id}>
+        {/* <Link to={"/copyproposal/" + props.proposal.id}>
           <OverlayTrigger
             placement="bottom"
             delay={{ show: 250, hide: 400 }}
@@ -180,7 +180,7 @@ function ElementProposalLargeScreen(props) {
               }}
             />
           </OverlayTrigger>
-        </Link>
+        </Link> */}
       </Col>
       {/*ADD COLUMNS FOR BUTTONS HERE (fix md, lg, xl, xxl)*/}
     </Row>
@@ -237,7 +237,7 @@ function ElementProposalMobile(props) {
             </p>
           </Col>
           <Col className="text-end">
-            <Link to={"/copyproposal/" + props.proposal.id}>
+            {/* <Link to={"/copyproposal/" + props.proposal.id}>
               <OverlayTrigger
                 placement="bottom"
                 delay={{ show: 250, hide: 400 }}
@@ -249,7 +249,7 @@ function ElementProposalMobile(props) {
                   }}
                 />
               </OverlayTrigger>
-            </Link>
+            </Link> */}
           </Col>
         </Row>
         <Row>

@@ -9,7 +9,7 @@ import {
   Col,
 } from "react-bootstrap";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-
+import dayjs from "dayjs";
 import React, { useEffect, useState, useContext } from "react";
 import API from "../API";
 import MessageContext from "../messageCtx";
@@ -36,14 +36,6 @@ function ThesisPage(props) {
     return API.redirectToLogin();
   }
 
-  function formatDate(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Aggiunge lo zero iniziale se necessario
-    const day = String(date.getDate()).padStart(2, "0"); // Aggiunge lo zero iniziale se necessario
-
-    return `${year}-${month}-${day}`;
-  }
-
   useEffect(() => {
     const init = async () => {
       try {
@@ -62,7 +54,7 @@ function ThesisPage(props) {
           }),
           requiredKnowledge: thesisData.required_knowledge,
           ...(thesisData.notes !== "None" && { notes: thesisData.notes }),
-          expiration: formatDate(new Date(thesisData.expiration)),
+          expiration: dayjs(thesisData.expiration).format("DD/MM/YYYY"),
           level: thesisData.thesis_level,
         });
         const isApplied = await API.isApplied();
