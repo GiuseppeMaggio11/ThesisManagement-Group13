@@ -30,6 +30,7 @@ function ThesisPage(props) {
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const { state } = useLocation();
   const [flag, setFlag] = useState(0);
+  const [exceed, setExceed] = useState(false);
   const from = state?.from;
 
   const [showArchive, setShowArchive] = useState(false);
@@ -87,7 +88,7 @@ function ThesisPage(props) {
   const archiveProposal = async () => {
     try {
       await API.updateThesisArchivation(params.id);
-      navigate("/activeproposals");
+      navigate("/proposals");
       handleToast("Proposal archived correctly", "success");
     } catch (err) {
       handleToast("Error while archiving a proposal", "error");
@@ -107,7 +108,7 @@ function ThesisPage(props) {
     API.sendFiles(formData, thesis_id)
       .then(() => {
         handleToast("Application submitted correctly", "success");
-        navigate("/proposal");
+        navigate("/proposals");
       })
       .catch((err) => {
         handleToast(err, "error");
@@ -117,6 +118,7 @@ function ThesisPage(props) {
   const closeModal = () => {
     setOpenPanel(false);
     setSelectedFiles([]);
+    setExceed(false)
   };
 
   const submitApplication = (idThesis, date) => {
@@ -312,16 +314,8 @@ function ThesisPage(props) {
             }}
             setSelectedFiles={setSelectedFiles}
             selectedFiles={selectedFiles}
-          />
-
-          <FileDropModal
-            showModal={openPanel}
-            closeModal={closeModal}
-            handleSave={() => {
-              handleApplication();
-            }}
-            setSelectedFiles={setSelectedFiles}
-            selectedFiles={selectedFiles}
+            exceed={exceed}
+            setExceed={setExceed}
           />
 
           <ConfirmationModal

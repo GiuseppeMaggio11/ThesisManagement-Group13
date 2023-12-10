@@ -23,7 +23,6 @@ function ProfessorActiveProposals(props) {
     try {
       props.setLoading(true);
       const response = await API.getProposalsProfessor();
-      console.log(response);
       setActiveProposals(response);
       props.setLoading(false);
     } catch (err) {
@@ -52,7 +51,16 @@ function ProfessorActiveProposals(props) {
       <Row className="mb-3">
         <Col className="fs-2">Active thesis proposals</Col>
       </Row>
-
+      <Row>
+        <Col style={{marginBottom: "10px"}}>
+          <Link to="/newproposal">
+            <Button className="button-style">
+              <i className="bi bi-plus-square" style={{marginRight: "10px"}}></i>
+              New proposal
+            </Button>
+          </Link>
+        </Col>
+      </Row>
       {!activeProposals || activeProposals.length === 0 ? (
         <Alert variant="danger" style={{ maxWidth: "300px" }}>
           No active thesis proposals found

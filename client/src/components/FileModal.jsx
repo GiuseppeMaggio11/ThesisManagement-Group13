@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Modal, Form, Button } from "react-bootstrap";
 import {
   Trash,
@@ -7,18 +7,28 @@ import {
   TrashFill,
 } from "react-bootstrap-icons";
 import { HoverIconButton } from "./HoverIconButton";
+import MessageContext from "../messageCtx";
+import { ToastContainer } from "react-toastify";
+
 function FileDropModal({
   showModal,
   closeModal,
   handleSave,
   setSelectedFiles,
   selectedFiles,
+  exceed,
+  setExceed
 }) {
   const [wrongInput, setWrongInput] = useState(false);
+
+  const { handleToast } = useContext(MessageContext);
+
   const handleRemoveFile = (index) => {
     const newFiles = [...selectedFiles];
     newFiles.splice(index, 1);
     setSelectedFiles(newFiles);
+    setExceed(false)
+    console.log("Exceed state:", exceed);
   };
 
   const handleDragOver = (e) => {
@@ -27,17 +37,20 @@ function FileDropModal({
 
   const checkAndAdd = (files) => {
     let oldFiles = [...selectedFiles];
-    //console.log(files);
     files.forEach((newFile) => {
       const existingFile = oldFiles.find(
         (oldFile) => oldFile.name === newFile.name
       );
-      // If not, push the new file to the old array
-      if (!existingFile) {
+      if (!existingFile && oldFiles.length < 10) {
         oldFiles.push(newFile);
+      }
+      else if (oldFiles.length >= 10) {
+        console.log("Exceeded file limit!");
+        setExceed(true)
       }
     });
 
+    console.log("Exceed state:", exceed);
     setSelectedFiles(oldFiles);
   };
 
@@ -46,7 +59,6 @@ function FileDropModal({
     setWrongInput(false);
     const droppedFiles = Array.from(e.dataTransfer.files);
 
-    // Filter only pdf's files
     const pdfFiles = droppedFiles.filter(
       (file) => file.type === "application/pdf"
     );
@@ -56,8 +68,11 @@ function FileDropModal({
     );
 
     if (nonPdfFilesExist) setWrongInput(true);
-
     checkAndAdd(pdfFiles);
+    console.log("Exceed state after drop:", exceed);
+    if (exceed) {
+      handleToast('You exceed the maximum file number', 'error')
+    }
   };
 
   const handleLabelClick = (e) => {
@@ -75,7 +90,6 @@ function FileDropModal({
     );
 
     if (nonPdfFilesExist) setWrongInput(true);
-
     checkAndAdd(pdfFiles);
   };
 
@@ -85,18 +99,18 @@ function FileDropModal({
         <Modal.Title>Are you sure to apply to this thesis?</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <div>Upload all the files that the professor could need</div>
+        <div>Upload all the files that the professor could need (10 maximum)</div>
         <br></br>
         <div
-          className={wrongInput ? "drop-area-wrong" : "drop-area"}
+          className={(wrongInput || exceed) ? "drop-area-wrong" : "drop-area"}
           onDragOver={handleDragOver}
           onDrop={handleDrop}
           onClick={handleLabelClick}
         >
           <label htmlFor="fileInput">
             <FileEarmarkPlus size={60} style={{ marginBottom: "8px" }} />
-            {!wrongInput && <div>Drag & Drop or Click to Select PDF Files</div>}
-            {wrongInput && (
+            {!wrongInput && !exceed && <div>Drag & Drop or Click to Select PDF Files</div>}
+            {wrongInput && !exceed && (
               <div>
                 {" "}
                 <span className="text-wrong">Only </span>
@@ -104,16 +118,32 @@ function FileDropModal({
                 <span className="text-wrong"> files are allowed</span>{" "}
               </div>
             )}
+            {!wrongInput && exceed && (
+              <div>
+                {" "}
+                <span className="text-wrong">Only </span>
+                <span className="text-wrong-underlined">10 PDF</span>
+                <span className="text-wrong"> files are allowed</span>{" "}
+              </div>
+            )}
           </label>
         </div>
-        <input
+        {!exceed && <input
           type="file"
           id="fileInput"
           accept=".pdf"
           onChange={handleFileInputChange}
           multiple
           style={{ display: "none" }}
-        />
+        />}
+        {exceed &&
+          <input
+            id="fileInput"
+            onClick={()=>{handleToast('You exceed the maximum file number', 'error')}}
+           
+            style={{ display: "none" }}
+          />
+        }
         <div style={{ marginTop: 5 }}>
           {selectedFiles.map((file, index) => (
             <div key={index} className="file-item">
@@ -148,7 +178,9 @@ function FileDropModal({
           </Button>
         </Form>
       </Modal.Footer>
+
     </Modal>
+
   );
 }
 

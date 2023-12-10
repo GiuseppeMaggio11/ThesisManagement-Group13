@@ -3,7 +3,6 @@ import {
   Accordion,
   Alert,
   Button,
-  Card,
   Col,
   Container,
   Row,
@@ -15,6 +14,7 @@ import API from "../API";
 import MessageContext from "../messageCtx";
 import { CheckLg, XLg } from "react-bootstrap-icons";
 import ConfirmationModal from "./ConfirmationModal";
+import NoFileFound from "./NoFileFound";
 
 function Applications(props) {
   const [applications, setApplications] = useState(undefined);
@@ -67,17 +67,29 @@ function Applications(props) {
   };
 
   return (
-    <>
+    <div className="d-flex justify-content-center">
       {props.loading && <Loading />}
-      <Container>
-        <Row className="mb-3">
-          <Col className="fs-2">Students Pending Applications</Col>
+        <Container className="width-80 margin-custom">
+          <Row className="d-flex align-items-center">
+            <Col
+              xs={4}
+              className="d-flex justify-content-between align-items-center"
+            >
+            <h1
+              className={`margin-titles-custom ${
+                props.isMobile ? "smaller-heading" : ""
+              }`}
+            >
+              Applications
+            </h1>
+          </Col>
         </Row>
 
         {!applications || applications.length === 0 ? (
-          <Alert variant="danger" style={{ maxWidth: "300px" }}>
-            No Applications found
-          </Alert>
+          <>
+            <NoFileFound message={'No Applications found'}/>
+          </>
+       
         ) : (
           <Accordion>
             {thesisTitles.map((title, i) => {
@@ -120,7 +132,7 @@ function Applications(props) {
           </Accordion>
         )}
       </Container>
-    </>
+    </div>
   );
 }
 

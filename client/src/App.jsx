@@ -19,6 +19,7 @@ import SearchProposalRoute from "./components/SearchProposal";
 import ProfessorActiveProposals from "./components/ProfessorActiveProposals";
 //import Toasts from "./components/Toasts";
 import StudentApplications from "./components/StudentApplications";
+import ProposalsPage from "./components/ProposalsPage";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -118,24 +119,13 @@ function App() {
               }
             />
             <Route
-              path="/teacher"
+              path="/proposals"
               element={
-                <TeacherPage
+                <ProposalsPage
                   loading={loading}
                   setLoading={setLoading}
                   error={error}
                   setError={setError}
-                  loggedIn={loggedIn}
-                  user={user}
-                />
-              }
-            />
-            <Route
-              path="/proposal"
-              element={
-                <SearchProposalRoute
-                  loading={loading}
-                  setLoading={setLoading}
                   virtualClock={virtualClock}
                   loggedIn={loggedIn}
                   user={user}
@@ -169,18 +159,6 @@ function App() {
               path="/proposals/:id"
               element={
                 <ThesisPage
-                  loading={loading}
-                  virtualClock={virtualClock}
-                  setLoading={setLoading}
-                  loggedIn={loggedIn}
-                  user={user}
-                />
-              }
-            />
-            <Route
-              path="/activeproposals"
-              element={
-                <ProfessorActiveProposals
                   loading={loading}
                   virtualClock={virtualClock}
                   setLoading={setLoading}
