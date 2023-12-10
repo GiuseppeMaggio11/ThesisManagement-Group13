@@ -1,0 +1,90 @@
+/* Flip clock container */
+.flip-clock-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: fit-content;
+  }
+  
+  /* Flip clock styling */
+  .flip-clock {
+    display: flex;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    color: white;
+    height: max-content;
+  }
+  
+  
+  .digit {
+    display: flex;
+    height: 2em;
+    margin: 0 5px;
+    position: relative;
+  }
+  
+  .upper,
+  .lower {
+    display: flex;
+  }
+  
+  .card {
+    width: 40px;
+    height: 60px;
+    line-height: 60px;
+    font-size: 48px;
+    font-weight: bold;
+    text-align: center;
+    color: white;
+    background-color: black;
+    border-color: gray;
+    position: relative;
+    transform-style: preserve-3d;
+    overflow: hidden;
+    transition: transform 0.5s;
+  }
+  
+  .flipper {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-style: preserve-3d;
+    transition: transform 0.5s;
+  }
+  
+  .front,
+  .back {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    backface-visibility: hidden;
+    transition: transform 0.5s;
+  }
+  
+  .front {
+    transform: rotateY(0deg);
+  }
+  
+  .back {
+    transform: rotateY(180deg);
+  }
+
+  .chevron-up {
+  position: absolute;
+  font-size: xx-large;
+  bottom: 80%;
+  left: 5%;
+  cursor: pointer;
+}
+
+.chevron-down {
+  position: absolute;
+  font-size: xx-large;
+  top: 80%; 
+  left: 5%; 
+  cursor: pointer;
+}
