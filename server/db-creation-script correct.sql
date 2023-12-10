@@ -85,6 +85,7 @@ CREATE TABLE IF NOT EXISTS thesis(
     cod_degree VARCHAR(10) NOT NULL,
     keywords TEXT,
     is_archived BOOLEAN NOT NULL,
+    is_deleted BOOLEAN NOT NULL DEFAULT 0,
     FOREIGN KEY (cod_degree) REFERENCES degree_table(cod_degree),
     FOREIGN KEY (supervisor_id) REFERENCES teacher(id)
 );

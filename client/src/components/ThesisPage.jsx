@@ -95,6 +95,16 @@ function ThesisPage(props) {
     }
   }
 
+  const deleteProposal = async () => {
+    try {
+      await API.deleteProposal(parseInt(params.id));
+      navigate("/proposals");
+      handleToast("Proposal deleted correctly", "success");
+    } catch (err) {
+      handleToast("Error while deleting a proposal", "error");
+    }
+  }
+
   const handleApplication = () => {
     submitApplication(params.id, props.virtualClock);
     handleUpload(params.id);
@@ -330,7 +340,7 @@ function ThesisPage(props) {
             handleClose={() => setShowDelete(false)} 
             body={"Are you sure you want to delete this proposal ?"}
             action={"Delete"}
-            handleAction={{/* DELETE API */}}
+            handleAction={() => deleteProposal(params.id)}
           />
         </>
       )}

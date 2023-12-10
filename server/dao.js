@@ -20,7 +20,7 @@ const dbConfig = {
   host: "127.0.0.1",
   port: 3306,
   user: "root",
-  password: "rootroot",
+  password: "root",
   database: "db_se_thesismanagement",
 };
 
@@ -93,6 +93,28 @@ exports.getUserID = async (username) => {
     }
 
     const sql = "SELECT * FROM student WHERE email = ?";
+    const [results] = await pool.execute(sql, [username]);
+
+    if (results.length === 0) {
+      throw { error: "User not found." };
+    }
+
+    const userRow = results[0];
+    return userRow.id;
+  } catch (error) {
+    console.error("Error in getUserIDByID: ", error);
+    throw error;
+  }
+};
+
+//retrive the ProfID from the username
+exports.getProfID = async (username) => {
+  try {
+    if (!username) {
+      throw { error: "parameter is missing" };
+    }
+
+    const sql = "SELECT * FROM teacher WHERE email = ?";
     const [results] = await pool.execute(sql, [username]);
 
     if (results.length === 0) {
@@ -814,7 +836,7 @@ exports.getStudentApplication = async (studentId) => {
 exports.getProposalsProfessor = async (professor_id) => {
   try {
     const sql =
-      "SELECT t.* FROM thesis t inner join teacher p on p.id = t.supervisor_id WHERE p.email  = ? and is_archived = 0 order by t.title";
+      "SELECT t.* FROM thesis t inner join teacher p on p.id = t.supervisor_id WHERE p.email  = ? and is_archived = 0 and is_deleted = 0 order by t.title";
     const [rows] = await pool.execute(sql, [professor_id]);
     return rows;
   } catch (error) {
@@ -822,6 +844,65 @@ exports.getProposalsProfessor = async (professor_id) => {
     throw error;
   }
 };
+
+//check if a proposal 1 has an active application or 2 is_archived or 3 is_expired. in these case we prevent deletion of that thesis
+exports.checkBeforeDeleteProposal = async (thesis_id, professorID) => {
+  try {
+    //first check if the specified thesis is_archived or is_expired. if yes, we cant delete that thesis, and we return an error
+    const sql = "SELECT * FROM thesis WHERE id = ? AND is_archived = 0";
+    const [rows] = await pool.execute(sql, [thesis_id]);
+    if (rows.length === 0 ){
+      return {error: "The thesis you request to delete is either not available or not removale."}
+    }
+
+    //check if the requested proposal for delete is belongs to the professor whom we receive delete request from
+    const sql2 = "SELECT supervisor_id FROM thesis WHERE id = ?";
+    const [rows2] = await pool.execute(sql2, [thesis_id]);
+    if (rows2[0].supervisor_id !== professorID ){
+      return {error: "You can only delete your own proposals."}
+    }
+    
+
+    //second check if the specified thesis has an accepted application, then throw an error
+    const sql3 = `SELECT * FROM application WHERE thesis_id = ? AND status = "Accepted"`;
+    const [rows3] = await pool.execute(sql3, [thesis_id]);
+    if (rows3.length !== 0 ){
+      return {error: "The thesis you request to delete has an active application. you can't delete it."}
+    } else {
+      return "ok";
+    }
+  } catch (error) {
+    console.error("Error in check before delete proposal: ", error);
+    throw error;
+  }
+}
+
+exports.deleteProposal = async (thesis_id) =>{
+  try {
+    //we can't delete proposal from database since there might be some pending application for that proposal. instead we change the is_deleted column to 1
+    const sql = "UPDATE thesis SET is_deleted = 1 WHERE id = ?";
+    const [rows] = await pool.execute(sql, [thesis_id]);
+    return rows.info;
+
+  } catch (error) {
+    console.error("Error in delete proposal: ", error);
+    throw error;
+  }
+}
+
+//change all the recently deleted proposal's applications to state = cancelled
+exports.updateApplicationsAfterProposalDeletion = async (thesis_id) => {
+  try {
+    const sql = `UPDATE application SET status = "Cancelled" WHERE thesis_id = ?`;
+    const [rows] = await pool.execute(sql, [thesis_id]);
+    return rows.info;
+
+  } catch (error) {
+    console.error("Error in updating application table after deletion of a proposal: ", error);
+    throw error;
+  }
+}
+
 //begin transaction function
 exports.beginTransaction = async () => {
   let connection;

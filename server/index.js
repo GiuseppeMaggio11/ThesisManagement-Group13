@@ -30,6 +30,7 @@ const {
   newThesis,
   updateThesesArchivation,
   updateThesesArchivationManual,
+  deleteProposal,
 } = require("./controllers/manageThesis");
 const {
   listExternalCosupervisors,
@@ -269,3 +270,5 @@ app.get("/api/teachersList",
   isProfessor,
   getTeachersList
 );
+
+app.delete("/api/deleteProposal", isProfessor, deleteProposal);
