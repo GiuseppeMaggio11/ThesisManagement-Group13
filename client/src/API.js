@@ -277,6 +277,21 @@ async function updateThesisArchivation(thesis_id) {
   );
 }
 
+async function deleteProposal(thesis_id) {
+  return getJson(
+    fetch(URL + `/deleteProposal`, {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        thesis_id,
+      }),
+    })
+  );
+}
+
 const API = {
   logOut,
   getUserInfo,
@@ -298,5 +313,6 @@ const API = {
   getTeachers,
   getGroups,
   getDegrees,
+  deleteProposal,
 };
 export default API;

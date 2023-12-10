@@ -20,7 +20,7 @@ const dbConfig = {
   host: "127.0.0.1",
   port: 3306,
   user: "root",
-  password: "rootroot",
+  password: "root",
   database: "db_se_thesismanagement",
 };
 
@@ -836,7 +836,7 @@ exports.getStudentApplication = async (studentId) => {
 exports.getProposalsProfessor = async (professor_id) => {
   try {
     const sql =
-      "SELECT t.* FROM thesis t inner join teacher p on p.id = t.supervisor_id WHERE p.email  = ? and is_archived = 0 order by t.title";
+      "SELECT t.* FROM thesis t inner join teacher p on p.id = t.supervisor_id WHERE p.email  = ? and is_archived = 0 and is_deleted = 0 order by t.title";
     const [rows] = await pool.execute(sql, [professor_id]);
     return rows;
   } catch (error) {

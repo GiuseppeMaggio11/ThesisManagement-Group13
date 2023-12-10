@@ -44,6 +44,16 @@ function ProfessorActiveProposals(props) {
     }
   }
 
+  const deleteProposal = async (thesis_id) => {
+    try {
+      await API.deleteProposal(thesis_id);
+      handleToast("Proposal deleted correctly", "success");
+      getActiveProposals();
+    } catch (err) {
+      handleToast("Error while deleting a proposal", "error");
+    }
+  }
+
   return props.loading ? (
     <Loading />
   ) : (
@@ -69,11 +79,13 @@ function ProfessorActiveProposals(props) {
         <ActiveProposalsLargeScreen 
           activeProposals={activeProposals} 
           archiveProposal={archiveProposal}
+          deleteProposal={deleteProposal}
         />
       ) : (
         <ActiveProposalsMobile 
           activeProposals={activeProposals}
           archiveProposal={archiveProposal}
+          deleteProposal={deleteProposal}
         />
       )}
     </Container>
@@ -120,7 +132,14 @@ function ActiveProposalsLargeScreen(props) {
         >
           <Col>
             {props.activeProposals.map((proposal, i) => {
-              return <ElementProposalLargeScreen proposal={proposal} key={i} archiveProposal={props.archiveProposal}/>;
+              return (
+                <ElementProposalLargeScreen 
+                  proposal={proposal} 
+                  key={i} 
+                  archiveProposal={props.archiveProposal}
+                  deleteProposal={props.deleteProposal}
+                />
+              );
             })}
           </Col>
         </Row>
@@ -205,7 +224,7 @@ function ElementProposalLargeScreen(props) {
       handleClose={() => setShowDelete(false)} 
       body={"Are you sure you want to delete this proposal ?"}
       action={"Delete"}
-      handleAction={{/* DELETE API */}}
+      handleAction={() => props.deleteProposal(props.proposal.id)}
     />
     </>
   );
@@ -217,7 +236,13 @@ function ActiveProposalsMobile(props) {
       <Accordion>
         {props.activeProposals.map((proposal, i) => {
           return (
-            <ElementProposalMobile proposal={proposal} key={i} index={i} />
+            <ElementProposalMobile 
+              proposal={proposal} 
+              key={i} 
+              index={i}
+              archiveProposal={props.archiveProposal}
+              deleteProposal={props.deleteProposal}
+            />
           );
         })}
       </Accordion>
