@@ -131,7 +131,7 @@ function StudentApplication(props) {
     var year = date.getFullYear();
     var hours = date.getHours();
     var minutes = date.getMinutes();
-    return `${day}/${month}/${year} ${hours}:${
+    return `${month}/${day}/${year} ${hours}:${
       minutes < 10 ? "0" : ""
     }${minutes}`;
   }

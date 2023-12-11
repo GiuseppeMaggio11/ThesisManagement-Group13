@@ -84,7 +84,7 @@ function StudentApplications(props) {
                   </td>
                   <td>{element.name + " " + element.surname}</td>
                   <td>
-                    {dayjs(element.application_date).format("YYYY-MM-DD")}
+                    {dayjs(element.application_date).format("MM/DD/YYYY")}
                   </td>
                   <td>
                     <ApplicationStatus status={element.status} />
@@ -146,7 +146,7 @@ function MobileApplication(props) {
         <p>
           Application date:{" "}
           <b>
-            {dayjs(props.application.application_date).format("YYYY-MM-DD")}
+            {dayjs(props.application.application_date).format("MM/DD/YYYY")}
           </b>
         </p>
         <p>
@@ -155,7 +155,7 @@ function MobileApplication(props) {
         </p>
         <p>
           Expiration date:{" "}
-          <b>{dayjs(props.application.expiration).format("YYYY-MM-DD")}</b>
+          <b>{dayjs(props.application.expiration).format("MM/DD/YYYY")}</b>
         </p>
       </Accordion.Body>
     </Accordion.Item>
@@ -190,7 +190,7 @@ function ApplicationStatus(props) {
         </p>
         <p>
           Expiration date:{" "}
-          <b>{dayjs(element.expiration).format("YYYY-MM-DD")}</b>
+          <b>{dayjs(element.expiration).format("MM/DD/YYYY")}</b>
         </p>
       </Accordion.Body>
     </Accordion.Item>

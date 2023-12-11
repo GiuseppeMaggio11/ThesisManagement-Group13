@@ -20,7 +20,6 @@ function ViewProposal(props) {
   const fetchThesis = async (thesisId) => {
     try {
       const response = await API.getThesisForProfessorById(thesisId);
-      console.log(response);
       setProposal(response);
     } catch (err) {
       handleToast("Error while fetching Thesis", "error");
@@ -42,6 +41,7 @@ function ViewProposal(props) {
       <Table className="table-rounded">
         <thead>
           <tr>
+            <th className="empty-col-mediumScreen"></th>
             <th colSpan="6" className="title-mediumScreen">
               {proposal.title}
             </th>
@@ -157,7 +157,7 @@ function ViewProposal(props) {
                   <div className="table-footer">
                     <span>Valid until</span>
                     <span className="bold mx-1">
-                      {dayjs(proposal.expiration).format("DD/MM/YYYY")}
+                      {dayjs(proposal.expiration).format("MM/DD/YYYY")}
                     </span>
                   </div>
                 </Col>
@@ -172,9 +172,9 @@ function ViewProposal(props) {
                     <PencilFill />
                   </Button>
                   <Button
-                    className="button-style"
+                    className="button-style-cancel"
                     onClick={() => {
-                      handleToast("Thesis copied successfully", "success");
+                      handleToast("Thesis copied", "success");
                       navigate("/copyproposal/" + proposal.id);
                     }}
                   >

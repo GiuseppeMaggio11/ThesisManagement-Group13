@@ -165,7 +165,7 @@ function ElementProposalLargeScreen(props) {
         {props.proposal.thesis_type}
       </Col>
       <Col md={2} lg={2} xl={2} xxl={2} style={{ fontSize: 18 }}>
-        {dayjs(props.proposal.expiration).format("DD/MM/YYYY")}
+        {dayjs(props.proposal.expiration).format("MM/DD/YYYY")}
       </Col>
       <Col md={1} lg={1} xl={1} xxl={1}>
         {/* <Link to={"/copyproposal/" + props.proposal.id}>
@@ -265,7 +265,7 @@ function ElementProposalMobile(props) {
           <Col>
             <p>
               Expiration date:{" "}
-              <b>{dayjs(props.proposal.expiration).format("DD/MM/YYYY")}</b>
+              <b>{dayjs(props.proposal.expiration).format("MM/DD/YYYY")}</b>
             </p>
           </Col>
           <Col>{/*ADD BUTTON HERE*/}</Col>

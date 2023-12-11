@@ -552,7 +552,7 @@ function NewProposal(props) {
                       name="expiration"
                       value={
                         formData.expiration
-                          ? dayjs(formData.expiration).format("YYYY-MM-DD")
+                          ? dayjs(formData.expiration).format("MM/DD/YYYY")
                           : ""
                       }
                       onChange={handleChangeDate}
