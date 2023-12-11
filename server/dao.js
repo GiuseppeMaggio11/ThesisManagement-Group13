@@ -599,7 +599,7 @@ exports.setExpired = async (virtualDateTime) => {
     const [rows] = await pool.execute(sql, [virtualDateTime]);
     return rows.info;
   } catch (err) {
-    console.error("Error in updateThesesArchivation: ", err);
+    console.error("Error in setExpired: ", err);
     throw err;
   }
 };
