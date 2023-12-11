@@ -23,7 +23,7 @@ const VirtualClock = (props) => {
   const handleVirtualTime = async (newTime) => {
     props.setVirtualClock(newTime);
     localStorage.setItem("virtualclock", JSON.stringify(newTime));
-    await API.updateExpiration(newTime)
+    await API.setVirtualTime(newTime)
       .then((response) => {
         if (response && "errors" in response) {
           //setErrors(response.errors);
@@ -40,7 +40,7 @@ const VirtualClock = (props) => {
     setTempTime(new Date());
     props.setVirtualClock(new Date());
     localStorage.removeItem("virtualclock");
-    await API.updateExpiration(tempTime)
+    await API.setRealTime(  )
       .then((response) => {
         if (response && "errors" in response) {
           //setErrors(response.errors);

@@ -587,12 +587,12 @@ exports.getExternal_cosupervisors_emails = async () => {
 };
 
 // updates is archived value to 1 if date has passed
-exports.updateThesesArchivation = async (virtualDateTime) => {
+exports.setExpired = async (virtualDateTime) => {
   try {
     const sql = ` 
                 UPDATE thesis
-                SET is_archived = CASE
-                    WHEN expiration < STR_TO_DATE(?, '%Y-%m-%dT%H:%i:%s.%fZ') THEN 1
+                SET is_expired = CASE
+                    WHEN expiration < ? THEN 1
                     ELSE 0
                 END;
                 `;

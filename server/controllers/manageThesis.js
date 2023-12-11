@@ -55,10 +55,13 @@ try {
   // Get every cod_group from group_table table in db
   const codes_group = await dao.getCodes_group();
   // If given cod_group is not in list  raise error
-  if (!codes_group.includes(req.body.cod_group)) {
+  for (const group of req.body.cod_group){
+  if (!codes_group.includes(group)) {
     await dao.rollback();
-    return res.status(400).json({ error: `Cod_group: ${req.body.cod_group} is not a valid research group code` });
+    return res.status(400).json({ error: `Cod_group: ${group} is not a valid research group code` });
   }
+  }
+  
 
 
   //Create thesis object which contains data from front end
@@ -114,19 +117,6 @@ try {
 }
 }
 
-//updates is_archived value of every thesis based on new virtualclock time
-async function updateThesesArchivation(req, res) {
-  try {
-    await dao.beginTransaction();
-    const response_msg = await dao.updateThesesArchivation(req.body.datetime);
-    await dao.commit();
-    res.status(200).json(response_msg);
-    
-  }
-  catch (err) {
-    await dao.rollback();
-    res.status(500).json(err)
-  };
-}
 
-module.exports = {newThesis,updateThesesArchivation}
+
+module.exports = {newThesis}
