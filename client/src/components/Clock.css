@@ -19,7 +19,6 @@
   .digit {
     display: flex;
     height: 2em;
-    margin: 0 5px;
     position: relative;
   }
   
@@ -84,7 +83,11 @@
 .chevron-down {
   position: absolute;
   font-size: xx-large;
-  top: 80%; 
-  left: 5%; 
+  top: 150%; 
+  left: 6%; 
   cursor: pointer;
+}
+
+.date-separator {
+  margin: 0 0.5em; /* Adjust spacing between month/day/year */
 }
