@@ -7,6 +7,7 @@ import { useMediaQuery } from "react-responsive";
 import Loading from "./Loading";
 import dayjs from "dayjs";
 import { PencilFill } from "react-bootstrap-icons";
+import randomColor from "randomcolor";
 
 function ViewProposal(props) {
   const navigate = useNavigate();
@@ -66,7 +67,7 @@ function ViewProposal(props) {
               </td>
             </tr>
           )}
-          {proposal.keywords && (
+          {/*proposal.keywords && (
             <tr>
               <td colSpan="2" className="leftText customLeftColumn">
                 Keywords
@@ -80,7 +81,40 @@ function ViewProposal(props) {
                 ))}
               </td>
             </tr>
-          )}
+                )*/}
+          <tr>
+            <td colSpan="2" className="leftText customLeftColumn">
+              Keywords
+            </td>
+            <td className="rightText">
+              {proposal.keywords &&
+                proposal.keywords.map((key, index) => (
+                  <span
+                    key={index}
+                    className="mx-1 badge"
+                    style={{
+                      backgroundColor: randomColor({
+                        seed: key,
+                        luminosity: "bright",
+                        format: "rgba",
+                        alpha: 1,
+                      }).replace(/1(?=\))/, "0.1"),
+                      color: randomColor({
+                        seed: key,
+                        luminosity: "bright",
+                        format: "rgba",
+                        alpha: 1,
+                      }),
+                      padding: "0.5em 1.2em",
+                      borderRadius: "0.25rem",
+                    }}
+                  >
+                    {key}
+                  </span>
+                ))}
+            </td>
+          </tr>
+
           <tr>
             <td colSpan="2" className="leftText customLeftColumn">
               Type
@@ -163,7 +197,8 @@ function ViewProposal(props) {
                 </Col>
                 <Col className="text-end mx-2">
                   <Button
-                    className="button-style mx-2"
+                    variant="light"
+                    className="mx-2"
                     onClick={() => {
                       navigate("/updateproposal/" + proposal.id);
                     }}
@@ -172,7 +207,7 @@ function ViewProposal(props) {
                     <PencilFill />
                   </Button>
                   <Button
-                    className="button-style-cancel"
+                    variant="light"
                     onClick={() => {
                       handleToast("Thesis copied", "success");
                       navigate("/copyproposal/" + proposal.id);

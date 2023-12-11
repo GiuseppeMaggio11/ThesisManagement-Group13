@@ -54,7 +54,7 @@ function ThesisPage(props) {
           }),
           requiredKnowledge: thesisData.required_knowledge,
           ...(thesisData.notes !== "None" && { notes: thesisData.notes }),
-          expiration: dayjs(thesisData.expiration).format("MM/DD/YYYY"),
+          expiration: dayjs(thesisData.expiration).format("yyyy-MM-dd"),
           level: thesisData.thesis_level,
         });
         const isApplied = await API.isApplied();

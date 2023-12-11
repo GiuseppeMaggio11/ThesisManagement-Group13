@@ -211,8 +211,14 @@ function NewProposal(props) {
       keywords: formData.keywords.join(", "),
     };
     try {
-      const response = await API.newProposal(newProp);
-      handleToast("New proposal created successfully", "success");
+      if (!idUpd) {
+        const response = await API.newProposal(newProp);
+        handleToast("New proposal created", "success");
+      } else {
+        //API UPDATE
+        handleToast("Proposal updated", "success");
+      }
+
       navigate("/teacher");
     } catch (error) {
       console.log(error);
@@ -552,7 +558,7 @@ function NewProposal(props) {
                       name="expiration"
                       value={
                         formData.expiration
-                          ? dayjs(formData.expiration).format("MM/DD/YYYY")
+                          ? dayjs(formData.expiration).format("YYYY-MM-DD")
                           : ""
                       }
                       onChange={handleChangeDate}

@@ -481,10 +481,16 @@ input:checked+.slider::before {
   }
 }
 
-.active-proposal-row-custom {
-  border-bottom: 1px solid lightgray;
+.custom-card-active-proposals {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: box-shadow 0.3s;
+  border-radius: 20px;
 }
 
-.active-proposal-row-custom:hover {
-  background: rgb(245, 245, 245);
+.custom-card-active-proposals:hover {
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+}
+
+.title-custom-active-proposals:hover {
+  text-decoration: underline;
 }
