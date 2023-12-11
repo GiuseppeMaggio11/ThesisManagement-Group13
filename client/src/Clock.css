@@ -3,7 +3,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: fit-content;
+    height: 20vh;
   }
   
   /* Flip clock styling */
@@ -90,4 +90,14 @@
 
 .date-separator {
   margin: 0 0.5em; /* Adjust spacing between month/day/year */
+}
+
+.no-highlight {
+  -webkit-tap-highlight-color: transparent; /* Disable tap highlight */
+}
+
+/* fonts.css */
+@font-face {
+  font-family: 'LiquidCrystal'; 
+  src: local('LiquidCrystal'), url('./fonts/LiquidCrystal-Normal.otf') format('opentype');
 }
