@@ -359,121 +359,122 @@ const FlipClock = ({ isVirtual, setIsVirtual, isAmPm, setIsAmPm, handleChageAmPm
     };
 
     return (
+        <>
         <div className="flip-clock-container no-highlight">
             <div className="flip-clock no-highlight" style={{ paddingRight: '4em' }}>
                 {/* Month 1 */}
                 <div className="digit">
-                    <div className="chevron-up" onClick={() => handleChange('m1_up')}>
+                    {settingVirtual && <div className="chevron-up" onClick={() => handleChange('m1_up')}>
                         <ChevronUp color='black' id='m1_up' />
-                    </div>
+                    </div>}
                     <div className="card">
                         <div className="flipper">
                             <div className="front"> {settingVirtual ? virtualTimeArray[0] : month[0]}</div>
                         </div>
                     </div>
-                    <div className="chevron-down" onClick={() => handleChange('m1_down')}>
+                    {settingVirtual && <div className="chevron-down" onClick={() => handleChange('m1_down')}>
                         <ChevronDown color='black' id='m1_down' />
-                    </div>
+                    </div>}
                 </div>
                 {/* Month 2 */}
                 <div className="digit">
-                    <div className="chevron-up" onClick={() => handleChange('m2_up')}>
+                   {settingVirtual && <div className="chevron-up" onClick={() => handleChange('m2_up')}>
                         <ChevronUp color='black' id='m2_up' />
-                    </div>
+                    </div>}
                     <div className="card">
                         <div className="flipper">
                             <div className="front"> {settingVirtual ? virtualTimeArray[1] : month[1]}</div>
                         </div>
                     </div>
-                    <div className="chevron-down" onClick={() => handleChange('m2_down')}>
+                    {settingVirtual && <div className="chevron-down" onClick={() => handleChange('m2_down')}>
                         <ChevronDown color='black' id='m2_down' />
-                    </div>
+                    </div>}
                 </div>
                 <span className="date-separator"></span>
                 {/* Day 1 */}
                 <div className="digit">
-                    <div className="chevron-up" onClick={() => handleChange('d1_up')}>
+                    {settingVirtual && <div className="chevron-up" onClick={() => handleChange('d1_up')}>
                         <ChevronUp color='black' id='d1_up' />
-                    </div>
+                    </div>}
                     <div className="card">
                         <div className="flipper">
                             <div className="front"> {settingVirtual ? virtualTimeArray[2] : day[0]}</div>
                         </div>
                     </div>
-                    <div className="chevron-down" onClick={() => handleChange('d1_down')}>
+                    {settingVirtual && <div className="chevron-down" onClick={() => handleChange('d1_down')}>
                         <ChevronDown color='black' id='d1_down' />
-                    </div>
+                    </div>}
                 </div>
                 {/* Day 2 */}
                 <div className="digit">
-                    <div className="chevron-up" onClick={() => handleChange('d2_up')}>
+                    {settingVirtual &&<div className="chevron-up" onClick={() => handleChange('d2_up')}>
                         <ChevronUp color='black' id='d2_up' />
-                    </div>
+                    </div>}
                     <div className="card">
                         <div className="flipper">
                             <div className="front"> {settingVirtual ? virtualTimeArray[3] : day[1]}</div>
                         </div>
                     </div>
-                    <div className="chevron-down" onClick={() => handleChange('d2_down')}>
+                   {settingVirtual && <div className="chevron-down" onClick={() => handleChange('d2_down')}>
                         <ChevronDown color='black' id='d2_down' />
-                    </div>
+                    </div>}
                 </div>
                 <span className="date-separator"></span>
                 {/* year 1 */}
                 <div className="digit">
-                    <div className="chevron-up" onClick={() => handleChange('y1_up')}>
+                    {settingVirtual && <div className="chevron-up" onClick={() => handleChange('y1_up')}>
                         <ChevronUp color='black' id='y1_up' />
-                    </div>
+                    </div>}
                     <div className="card">
                         <div className="flipper">
                             <div className="front"> {settingVirtual ? virtualTimeArray[4] : year[0]}</div>
                         </div>
                     </div>
-                    <div className="chevron-down" onClick={() => handleChange('y1_down')}>
+                    {settingVirtual && <div className="chevron-down" onClick={() => handleChange('y1_down')}>
                         <ChevronDown color='black' id='y1_down' />
-                    </div>
+                    </div>}
                 </div>
                 {/* year 2 */}
                 <div className="digit">
-                    <div className="chevron-up" onClick={() => handleChange('y2_up')}>
+                    {settingVirtual && <div className="chevron-up" onClick={() => handleChange('y2_up')}>
                         <ChevronUp color='black' id='y2_up' />
-                    </div>
+                    </div>}
                     <div className="card">
                         <div className="flipper">
                             <div className="front"> {settingVirtual ? virtualTimeArray[5] : year[1]}</div>
                         </div>
                     </div>
-                    <div className="chevron-down" onClick={() => handleChange('y2_down')}>
+                    {settingVirtual && <div className="chevron-down" onClick={() => handleChange('y2_down')}>
                         <ChevronDown color='black' id='y2_down' />
-                    </div>
+                    </div>}
                 </div>
                 {/* year 3 */}
                 <div className="digit">
-                    <div className="chevron-up" onClick={() => handleChange('y3_up')}>
+                    {settingVirtual && <div className="chevron-up" onClick={() => handleChange('y3_up')}>
                         <ChevronUp color='black' id='y3_up' />
-                    </div>
+                    </div>}
                     <div className="card">
                         <div className="flipper">
                             <div className="front"> {settingVirtual ? virtualTimeArray[6] : year[2]}</div>
                         </div>
                     </div>
-                    <div className="chevron-down" onClick={() => handleChange('y3_down')}>
+                    {settingVirtual && <div className="chevron-down" onClick={() => handleChange('y3_down')}>
                         <ChevronDown color='black' id='y3_down' />
-                    </div>
+                    </div>}
                 </div>
                 {/* year 4 */}
                 <div className="digit">
-                    <div className="chevron-up" onClick={() => handleChange('y4_up')}>
+                    {settingVirtual && <div className="chevron-up" onClick={() => handleChange('y4_up')}>
                         <ChevronUp color='black' id='y4_up' />
-                    </div>
+                    </div>}
                     <div className="card">
                         <div className="flipper">
                             <div className="front"> {settingVirtual ? virtualTimeArray[7] : year[3]}</div>
                         </div>
                     </div>
-                    <div className="chevron-down" onClick={() => handleChange('y4_down')}>
+                    {settingVirtual && <div className="chevron-down" onClick={() => handleChange('y4_down')}>
                         <ChevronDown color='black' id='y4_down' />
-                    </div>
+                    </div>}
                 </div>
             </div>
             <span className="date-separator"></span>
@@ -481,97 +482,98 @@ const FlipClock = ({ isVirtual, setIsVirtual, isAmPm, setIsAmPm, handleChageAmPm
             <div className="flip-clock">
                 {/* Hour 1 */}
                 <div className="digit">
-                    <div className="chevron-up" onClick={() => handleChange('h1_up')}>
+                   {settingVirtual &&  <div className="chevron-up" onClick={() => handleChange('h1_up')}>
                         <ChevronUp color='black' id='h1_up' />
-                    </div>
+                    </div>}
                     <div className="card">
                         <div className="flipper">
                             <div className="front"> {settingVirtual ? virtualTimeArray[8] : hours[0]}</div>
                         </div>
                     </div>
-                    <div className="chevron-down" onClick={() => handleChange('h1_down')}>
+                    {settingVirtual && <div className="chevron-down" onClick={() => handleChange('h1_down')}>
                         <ChevronDown color='black' id='h1_down' />
-                    </div>
+                    </div>}
                 </div>
                 {/* Hour 2 */}
                 <div className="digit">
-                    <div className="chevron-up" onClick={() => handleChange('h2_up')}>
+                    {settingVirtual && <div className="chevron-up" onClick={() => handleChange('h2_up')}>
                         <ChevronUp color='black' id='h2_up' />
-                    </div>
+                    </div>}
                     <div className="card">
                         <div className="flipper">
                             <div className="front"> {settingVirtual ? virtualTimeArray[9] : hours[1]}</div>
                         </div>
                     </div>
-                    <div className="chevron-down" onClick={() => handleChange('h2_down')}>
+                    {settingVirtual && <div className="chevron-down" onClick={() => handleChange('h2_down')}>
                         <ChevronDown color='black' id='h2_down' />
-                    </div>
+                    </div>}
                 </div>
                 <span className="date-separator"></span>
 
                 {/* Minute 1 */}
                 <div className="digit">
-                    <div className="chevron-up" onClick={() => handleChange('min1_up')}>
+                    {settingVirtual && <div className="chevron-up" onClick={() => handleChange('min1_up')}>
                         <ChevronUp color='black' id='min1_up' />
-                    </div>
+                    </div>}
                     <div className="card">
                         <div className="flipper">
                             <div className="front"> {settingVirtual ? virtualTimeArray[10] : minutes[0]}</div>
                         </div>
                     </div>
-                    <div className="chevron-down" onClick={() => handleChange('min1_down')}>
+                    {settingVirtual && <div className="chevron-down" onClick={() => handleChange('min1_down')}>
                         <ChevronDown color='black' id='min1_down' />
-                    </div>
+                    </div>}
                 </div>
                 {/* Minute 2 */}
                 <div className="digit">
-                    <div className="chevron-up" onClick={() => handleChange('min2_up')}>
+                    {settingVirtual && <div className="chevron-up" onClick={() => handleChange('min2_up')}>
                         <ChevronUp color='black' id='min2_up' />
-                    </div>
+                    </div>}
                     <div className="card">
                         <div className="flipper">
                             <div className="front"> {settingVirtual ? virtualTimeArray[11] : minutes[1]}</div>
                         </div>
                     </div>
-                    <div className="chevron-down" onClick={() => handleChange('min2_down')}>
+                    {settingVirtual && <div className="chevron-down" onClick={() => handleChange('min2_down')}>
                         <ChevronDown color='black' id='min2_down' />
-                    </div>
+                    </div>}
                 </div>
                 <span className="date-separator"></span>
 
                 {/* seconds 1 */}
                 <div className="digit">
-                    <div className="chevron-up" onClick={() => handleChange('s1_up')}>
+                    {settingVirtual && <div className="chevron-up" onClick={() => handleChange('s1_up')}>
                         <ChevronUp color='black' id='s1_up' />
-                    </div>
+                    </div>}
                     <div className="card">
                         <div className="flipper">
                             <div className="front"> {settingVirtual ? virtualTimeArray[12] : seconds[0]}</div>
                         </div>
                     </div>
-                    <div className="chevron-down" onClick={() => handleChange('s1_down')}>
+                    {settingVirtual && <div className="chevron-down" onClick={() => handleChange('s1_down')}>
                         <ChevronDown color='black' id='s1_down' />
-                    </div>
+                    </div>}
                 </div>
                 {/* Hour 2 */}
                 <div className="digit">
-                    <div className="chevron-up" onClick={() => handleChange('s2_up')}>
+                    {settingVirtual && <div className="chevron-up" onClick={() => handleChange('s2_up')}>
                         <ChevronUp color='black' id='s2_up' />
-                    </div>
+                    </div>}
                     <div className="card">
                         <div className="flipper">
                             <div className="front"> {settingVirtual ? virtualTimeArray[13] : seconds[1]}</div>
                         </div>
                     </div>
-                    <div className="chevron-down" onClick={() => handleChange('s2_down')}>
+                    {settingVirtual && <div className="chevron-down" onClick={() => handleChange('s2_down')}>
                         <ChevronDown color='black' id='s2_down' />
-                    </div>
+                    </div>}
                 </div>
             </div>
             {isAmPm == 'am' && <span style={{ fontFamily: 'LiquidCrystal' }} className='ampm'> AM </span>}
             {isAmPm == 'pm' && <span style={{ fontFamily: 'LiquidCrystal' }} className='ampm'> PM </span>}
-            {isVirtual && settingVirtual && <ArrowRepeat className='search-button' onClick={handleChageAmPm} />}
+            {settingVirtual && <ArrowRepeat className='search-button' onClick={handleChageAmPm} />}
         </div >
+        </>
     );
 };
 

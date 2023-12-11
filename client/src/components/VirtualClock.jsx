@@ -79,9 +79,10 @@ const VirtualClock = (props) => {
         <FlipClock isVirtual={isVirtual} setIsVirtual={setIsVirtual} isAmPm={isAmPm} setIsAmPm={setIsAmPm} handleChageAmPm={handleChageAmPm} settingVirtual={settingVirtual} setSettingVirtual={setSettingVirtual}/>
       </div>
       <div style={{display:"flex", alignItems:"center", justifyContent:'center'}}>
-        {!settingVirtual && !isVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{setSettingVirtual(true)}}> set Virtual time</Button>}
+        {!settingVirtual && !isVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{setSettingVirtual(true)}}> Set Virtual time </Button>}
         {!settingVirtual && isVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{setIsVirtual(false)}}> RealTime Mode </Button>}
-        {settingVirtual && <Button  onClick={()=>{setIsVirtual(true); setSettingVirtual(false)}}> apply virtual time</Button>}
+        {!settingVirtual && isVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{setIsVirtual(false); setSettingVirtual(true)}}> Set Virtual time </Button>}
+        {settingVirtual && <Button  onClick={()=>{setIsVirtual(true); setSettingVirtual(false)}}> Apply virtual time </Button>}
       </div>
     </Container>
   );
