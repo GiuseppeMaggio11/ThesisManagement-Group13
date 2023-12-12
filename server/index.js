@@ -53,6 +53,7 @@ const bodyParser = require("body-parser");
 const cron = require('node-cron');
 var FakeTimers = require("@sinonjs/fake-timers");
 const CronJob = require('cron')
+const nodemailer = require("nodemailer");
 
 const app = express();
 const port = 3001;
@@ -275,6 +276,6 @@ app.put(
   ],
   setVirtualClock
 );*/
-const now = new Date().toLocaleString()
-console.log("Server time:",now );
+const now = new Date().toString()
+console.log("Date-time:",now );
 create_schedule()

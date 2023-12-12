@@ -395,6 +395,36 @@ exports.isAlreadyExisting = async (studentID, thesisID) => {
   }
 };
 
+//Return the email of the teacher and the title of the thesis
+exports.getDataTeacherApplicationEmail = async (thesisId) => {
+  try{
+
+    const sql  = "SELECT  email, title FROM thesis TS, teacher TE WHERE TS.id = ? AND TS.supervisor_id = TE.id"
+
+    const [result] = await pool.execute(sql, [thesisId]);
+
+    return result[0];
+
+  } catch(error){
+    console.error("Error in getDataApplicationEmail: ", error);
+    throw error
+  }
+}
+
+exports.getDataStudentApplicationEmail = async (thesisId, studentId) => {
+  try{
+    const sql  = "SELECT  email, title FROM thesis TS, student S WHERE TS.id = ? AND S.id = ? "
+    const [result] = await pool.execute(sql, [thesisId, studentId]);
+    return result[0];
+
+  } catch(error){
+    console.error("Error in getDataStudentApplicationEmail: ", error);
+    throw error
+  }
+}
+
+
+
 // Function to create a new application
 exports.newApply = async (studentID, ThesisID, date) => {
   try {
@@ -420,7 +450,7 @@ exports.newApply = async (studentID, ThesisID, date) => {
 exports.createThesis = async (thesis) => {
   try {
     const sql =
-      "INSERT INTO thesis (title, description, supervisor_id, thesis_level, thesis_type, required_knowledge, notes, expiration, cod_degree, is_archived, keywords) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
+      "INSERT INTO thesis (title, description, supervisor_id, thesis_level, thesis_type, required_knowledge, notes, expiration, cod_degree, is_archived, keywords, is_expired) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,0)";
     const [rows] = await pool.execute(sql, [
       thesis.title,
       thesis.description,
@@ -429,7 +459,7 @@ exports.createThesis = async (thesis) => {
       thesis.type_name,
       thesis.required_knowledge,
       thesis.notes,
-      thesis.expiration,
+      new Date(thesis.expiration.setHours(23,59,59)),
       thesis.cod_degree,
       thesis.is_archived,
       thesis.keywords,
@@ -736,6 +766,32 @@ exports.getStudentApplication = async (studentId) => {
     throw error;
   }
 };
+
+// get professor email of each thesis that is expiring a week from now
+exports.getProfessorEmailExpiring = async (specifiedDate) => {
+  try {
+    const sql = `
+    SELECT DISTINCT
+      u.email AS professor_email,
+      t.title AS thesis_title,
+      t.expiration AS thesis_expiration
+    FROM
+      users u
+    JOIN
+      teacher te ON u.email = te.email
+    JOIN
+      thesis t ON te.id = t.supervisor_id
+    WHERE
+      t.expiration BETWEEN DATE_ADD(?, INTERVAL 7 DAY) AND DATE_ADD(DATE_ADD(?, INTERVAL 7 DAY), INTERVAL 7 HOUR);
+  `;
+  const [rows] = await pool.execute(sql, [specifiedDate, specifiedDate]);
+    return rows;
+  } catch (error) {
+    console.error("Error in getExternal_cosupervisors_emails: ", error);
+    throw error;
+  }
+};
+
 
 //begin transaction function
 exports.beginTransaction = async () => {

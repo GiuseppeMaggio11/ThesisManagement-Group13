@@ -55,12 +55,11 @@ try {
   // Get every cod_group from group_table table in db
   const codes_group = await dao.getCodes_group();
   // If given cod_group is not in list  raise error
-  for (const group of req.body.cod_group){
-  if (!codes_group.includes(group)) {
+  if (!codes_group.includes(req.body.cod_group)) {
     await dao.rollback();
     return res.status(400).json({ error: `Cod_group: ${group} is not a valid research group code` });
   }
-  }
+  
   
 
 

@@ -5,6 +5,15 @@ const dao = require("../dao");
 const { validationResult } = require("express-validator");
 const CronJob = require('cron').CronJob;
 
+const nodemailer = require("nodemailer");
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'group13.thesismanagement@gmail.com',
+        pass: 'xuzg drbh ezyn zaqg'
+    }
+});
 
 var clock = null;
 
@@ -25,7 +34,7 @@ async function setVirtualClock(req, res) {
             });
         }
         const now = new Date();
-        console.log("Server time is: ", now.toString());
+        console.log("Datetime is now: ", now.toString());
         const response_msg = await dao.setExpired(newvirtual);
         text = {
             update: response_msg,
@@ -48,7 +57,7 @@ async function uninstallVirtualClock(req, res) {
         }
         const current = new Date();
         const response_msg = await dao.setExpired(current);
-        console.log("Current Time:", current.toLocaleString('italy'));
+        console.log("Datetime is now:", current.toString('italy'));
         text = {
             update: response_msg,
             now: current
@@ -62,8 +71,11 @@ async function uninstallVirtualClock(req, res) {
 
 
 function create_schedule() {
-    const scheduledTask = cron.schedule('0 0 0 * * *', async () => {
+    const scheduled_expired = cron.schedule('0 0 0 * * *', async () => {
         await update();
+    });
+    const scheduled_expiring_notification = cron.schedule('0 0 18 * * *', async () => {
+        await email();
     });
 }
 
@@ -72,6 +84,36 @@ const update = async () => {
         const now = new Date();
         const result = await dao.setExpired(now);
         console.log('Task executed at 00:00 am every day in Rome timezone.');
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+const email = async () => {
+    try {
+        const now = new Date("2023-12-12 12:09:59");
+        //const result = await dao.getProfessorEmailExpiring(now);
+        testing_mail = "group13.thesismanagement@gmail.com"
+
+        for (const proposal of result) {
+            console.log(proposal)
+            const data = new Date(proposal.thesis_expiration).toLocaleString();
+            const mailOptions = {
+                from: 'group13.thesismanagement@gmail.com',
+                to: testing_mail, //emailData.email deve essere
+                subject: `EXPIRING PROPOSAL "${proposal.thesis_title}"`,
+                text: `Proposal "${proposal.thesis_title}" is gonna expire a week from now at: ${data}`
+            };
+            transporter.sendMail(mailOptions, async (error, info) => {
+                if (!error) {
+                    console.log("Email mandata")
+                } else {
+                    console.log(error);
+                }
+            });
+        }
+        console.log('Task executed at 18:00 every day in Rome timezone.');
+
     } catch (err) {
         console.error(err);
     }

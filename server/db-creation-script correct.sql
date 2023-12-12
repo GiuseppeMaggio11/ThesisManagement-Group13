@@ -84,8 +84,8 @@ CREATE TABLE IF NOT EXISTS thesis(
     expiration DATETIME NOT NULL,
     cod_degree VARCHAR(10) NOT NULL,
     keywords TEXT,
-    is_archived BOOLEAN NOT NULL,
-    is_expired BOOLEAN NOT NULL,
+    is_archived BOOLEAN NOT NULL DEFAULT 0,
+    is_expired BOOLEAN NOT NULL DEFAULT 0,
     FOREIGN KEY (cod_degree) REFERENCES degree_table(cod_degree),
     FOREIGN KEY (supervisor_id) REFERENCES teacher(id)
 );
@@ -174,7 +174,7 @@ INSERT INTO external_supervisor (email, surname, name)
     ('maria.gentile@email.net', 'Gentile', 'Maria'),
     ('antonio.bruno@email.org', 'Bruno', 'Antonio'),
     ('elena.conti@email.net', 'Conti', 'Elena');
-INSERT INTO thesis (title, description, supervisor_id, thesis_level, thesis_type, required_knowledge, notes, expiration, cod_degree, keywords, is_archived)
+INSERT INTO thesis (title, description, supervisor_id, thesis_level, thesis_type, required_knowledge, notes, expiration, cod_degree, keywords, is_archived, is_expired)
 VALUES
     ('Development of a Secure Web Application', 'Creating a web application with a focus on security features.', 'P123456', 'Master', 'Sperimental', 'Strong knowledge of web security and programming.', 'None', '2023-12-15 23:59:59', 'DEGR01','AUTOMATATION, HUMAN COMPUTER INTERACTION',1,0),
     ('IoT-Based Smart Home Automation', 'Designing an IoT system for smart home automation.', 'P654321', 'Master', 'Company', 'Experience with IoT protocols and devices.', 'The thesis must be completed within 6 months.', '2024-08-30 23:59:59', 'DEGR02','USER EXPERIENCE, AUTOMATATION, MACHINE LEARNING', 0,0),
@@ -182,11 +182,11 @@ VALUES
     ('Data Visualization Tool', 'Developing a tool for visualizing complex data sets.', 'P654321', 'Master', 'Company', 'Strong knowledge of data visualization techniques.', 'The thesis must be completed within 5 months.', '2023-09-30 23:59:59' ,'DEGR02','SOFTWARE QUALITY',0,0),
     ('Machine Learning for Image Recognition', 'Implementing machine learning for image recognition tasks.', 'P123456', 'Master', 'Sperimental', 'Proficiency in machine learning and computer vision.', 'None', '2024-09-30 23:59:59', 'DEGR01',null ,1,0),
     ('Embedded Systems Programming', 'Developing software for embedded systems in IoT devices.', 'P654321', 'Master', 'Abroad', 'Experience with embedded systems and low-level programming.', 'The thesis must be completed within 7 months.', '2023-05-15 23:59:59' ,'DEGR02','DATA ANALYSIS, AUTOMATATION',0,0),
-    ('Blockchain Technology in Supply Chain Management', 'Exploring the use of blockchain for enhancing transparency in supply chains.', 'P123456', 'Master', 'Sperimental', 'Understanding of blockchain technology and supply chain processes.', 'None', '2024-10-31 23:59:59', 'DEGR03', 'BLOCKCHAIN, SUPPLY CHAIN, TECHNOLOGY', 0,0),
+    ('Blockchain Technology in Supply Chain Management', 'Exploring the use of blockchain for enhancing transparency in supply chains.', 'P123456', 'Master', 'Sperimental', 'Understanding of blockchain technology and supply chain processes.', 'None', '2024-10-31 23:59:59', 'DEGR03', 'BLOCKCHAIN, SUPPLY CHAIN, TECHNOLOGY', 0,1),
     ('Renewable Energy Integration in Smart Grids', 'Investigating the integration of renewable energy sources in smart grid systems.', 'P654321', 'Master', 'Company', 'Knowledge of renewable energy systems and smart grid technologies.', 'The thesis must address sustainability aspects.', '2023-11-30 23:59:59', 'DEGR05', 'RENEWABLE ENERGY, SMART GRIDS, SUSTAINABILITY', 0,0),
     ('Human-Computer Interaction in Virtual Reality', 'Designing immersive user experiences through virtual reality interfaces.', 'P123456', 'Master', 'Sperimental', 'Background in human-computer interaction and virtual reality development.', 'None', '2024-06-30 23:59:59', 'DEGR01', 'VIRTUAL REALITY, HCI, USER EXPERIENCE', 1,0),
     ('Advanced Robotics for Manufacturing', 'Developing advanced robotic systems for manufacturing processes.', 'P654321', 'Master', 'Company', 'Experience in robotics and automation.', 'The thesis must address real-world manufacturing challenges.', '2023-08-15 23:59:59', 'DEGR04', 'ROBOTICS, MANUFACTURING, AUTOMATION', 0,0),
-    ('Cybersecurity Measures in Internet of Things', 'Analyzing and implementing cybersecurity measures for IoT devices.', 'P123456', 'Master', 'Sperimental', 'Knowledge of IoT security protocols and cybersecurity best practices.', 'None', '2024-05-31 23:59:59', 'DEGR02', 'CYBERSECURITY, INTERNET OF THINGS, NETWORK SECURITY', 0,0),
+    ('Cybersecurity Measures in Internet of Things', 'Analyzing and implementing cybersecurity measures for IoT devices.', 'P123456', 'Master', 'Sperimental', 'Knowledge of IoT security protocols and cybersecurity best practices.', 'None', '2024-05-31 23:59:59', 'DEGR02', 'CYBERSECURITY, INTERNET OF THINGS, NETWORK SECURITY', 0,1),
     ('Healthcare Data Analytics', 'Applying data analytics techniques to healthcare data for insights and improvements.', 'P654321', 'Master', 'Company', 'Proficiency in data analytics and understanding of healthcare systems.', 'The thesis must comply with privacy regulations.', '2023-12-01 23:59:59', 'DEGR03', 'DATA ANALYTICS, HEALTHCARE, PRIVACY', 0,0),
 	('Quantum Computing Algorithms', 'Developing and analyzing algorithms for quantum computing.', 'P123456', 'Master', 'Sperimental', 'Understanding of quantum computing principles and algorithms.', 'None', '2024-09-15 23:59:59', 'DEGR01', 'QUANTUM COMPUTING, ALGORITHMS, THEORETICAL PHYSICS', 0,0),
     ('Urban Mobility Solutions', 'Designing innovative solutions for urban transportation and mobility.', 'P654321', 'Master', 'Company', 'Knowledge of urban planning and sustainable transportation.', 'The thesis must propose practical and sustainable mobility solutions.', '2023-07-31 23:59:59', 'DEGR05', 'URBAN MOBILITY, SUSTAINABILITY, TRANSPORTATION', 0,0),
