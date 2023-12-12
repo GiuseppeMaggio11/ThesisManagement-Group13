@@ -233,6 +233,19 @@ async function getThesisForProfessorById(id) {
   );
 }
 
+async function updateProposal(thesis) {
+  return getJson(
+    fetch(URL + "/updateThesis", {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(thesis),
+    })
+  );
+}
+
 const API = {
   logOut,
   getUserInfo,
@@ -251,5 +264,6 @@ const API = {
   isApplied,
   getProposalsProfessor,
   getThesisForProfessorById,
+  updateProposal,
 };
 export default API;

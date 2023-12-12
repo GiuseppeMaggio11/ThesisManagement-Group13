@@ -4,6 +4,7 @@ import {
   Accordion,
   Alert,
   Button,
+  Card,
   Col,
   Container,
   Form,
@@ -12,13 +13,22 @@ import {
 } from "react-bootstrap";
 import { useState, useEffect, useContext } from "react";
 import MessageContext from "../messageCtx";
-import { Dice1, Funnel, FunnelFill, Search } from "react-bootstrap-icons";
+import {
+  Calendar,
+  Dice1,
+  Funnel,
+  FunnelFill,
+  Person,
+  PersonFill,
+  Search,
+} from "react-bootstrap-icons";
 import dayjs from "dayjs";
 
 import API from "../API";
 
 import { FilterCard } from "./FilterCard";
 import Loading from "./Loading";
+import randomColor from "randomcolor";
 
 function SearchProposalRoute(props) {
   const [thesisProposals, setThesisProposals] = useState([]);
@@ -241,7 +251,7 @@ function SearchProposalComponent(props) {
             </Container>
           )}
 
-          {!props.isMobile ? (
+          {/*!props.isMobile ? (
             <Row>
               <Col>
                 {filteredThesisProposals.length == 0 ? (
@@ -296,36 +306,180 @@ function SearchProposalComponent(props) {
                   ))}
               </Accordion>
             </Row>
-          )}
+                  )*/}
+          <Row>
+            <Col>
+              {filteredThesisProposals.length == 0 ? (
+                <h2>No proposal found</h2>
+              ) : (
+                <Row>
+                  <Col>
+                    <Row>
+                      {filteredByTitle.length <= 0 &&
+                        filter === "" &&
+                        [...filteredThesisProposals].map((element) => (
+                          <Proposal key={element.id} proposal={element} />
+                        ))}
+                      {filteredByTitle.length <= 0 && filter !== "" && (
+                        <Col>
+                          <h2 className="mt-3"> no proposals found</h2>
+                        </Col>
+                      )}
+                      {filteredByTitle.length > 0 &&
+                        [...filteredByTitle].map((element) => (
+                          <Proposal
+                            key={element.id}
+                            proposal={element}
+                            isMobile={props.isMobile}
+                          />
+                        ))}
+                    </Row>
+                  </Col>
+                </Row>
+              )}
+            </Col>
+          </Row>
         </Container>
       </div>
     </>
   );
 }
 
-function ProposalAccordion(props) {
+function Proposal(props) {
+  const navigate = useNavigate();
+
   return (
-    <Accordion.Item eventKey={props.proposal.id.toString()}>
-      <Accordion.Header>
-        <span>
-          <Link
-            style={{ color: "#4682B4", fontSize: 18, textDecoration: "none" }}
-            to={`/proposals/${props.proposal.id}`}
-          >
-            {props.proposal.title}
-          </Link>
-        </span>
-      </Accordion.Header>
-      <Accordion.Body style={{ position: "relative" }}>
-        <p>
-          Supervisor: <b>{props.proposal.supervisor}</b>
-        </p>
-        <p>
-          Expiration date:{" "}
-          <b>{dayjs(props.proposal.expiration).format("MM/DD/YYYY")}</b>
-        </p>
-      </Accordion.Body>
-    </Accordion.Item>
+    <Col xs={12} md={12} lg={6} xl={6} xxl={6} className="mt-4">
+      <Card
+        style={{ padding: 20, minHeight: "350px" }}
+        className="custom-card-proposals"
+      >
+        <Row>
+          <Col style={{ minWidth: "300px" }}>
+            <div
+              className="title-custom-proposals"
+              onClick={() => navigate(`/proposals/${props.proposal.id}`)}
+              style={{
+                fontWeight: "medium",
+                fontSize: 20,
+                cursor: "pointer",
+              }}
+            >
+              {props.proposal.title}
+            </div>
+          </Col>
+          <Col className="text-end mx-2">
+            <PersonFill size={25} />
+            <span>
+              {props.proposal.supervisor.split(" ")[1] +
+                " " +
+                props.proposal.supervisor.split(" ")[0]}
+            </span>
+          </Col>
+        </Row>
+        <div
+          className="hide-scrollbar"
+          style={{
+            fontWeight: "semi-bold",
+            fontSize: 14,
+            height: !props.isMobile ? 25 : 40,
+            marginTop: 5,
+          }}
+        >
+          {props.proposal.keywords &&
+            props.proposal.keywords.map((key, index) => (
+              <span
+                key={index}
+                className="badge"
+                style={{
+                  backgroundColor: randomColor({
+                    seed: key,
+                    luminosity: "bright",
+                    format: "rgba",
+                    alpha: 1,
+                  }).replace(/1(?=\))/, "0.1"),
+                  color: randomColor({
+                    seed: key,
+                    luminosity: "bright",
+                    format: "rgba",
+                    alpha: 1,
+                  }),
+                  padding: "0.5em 1.2em",
+                  borderRadius: "0.25rem",
+                  marginRight: 10,
+                }}
+              >
+                {key}
+              </span>
+            ))}
+        </div>
+        <div
+          style={{
+            fontSize: 16,
+            marginTop: 16,
+            minHeight: 50,
+          }}
+        >
+          {props.proposal.description}
+        </div>
+        <Row
+          style={{
+            fontSize: 16,
+            marginTop: 16,
+          }}
+        >
+          <Col style={{ maxWidth: "110px" }}>
+            <span>Thesis Level</span>
+          </Col>
+          <Col>
+            <span
+              style={{
+                color: "black",
+              }}
+              className="badge"
+            >
+              {props.proposal.level && props.proposal.level.toUpperCase()}
+            </span>
+          </Col>
+        </Row>
+        <Row
+          style={{
+            fontSize: 16,
+            marginTop: 16,
+          }}
+        >
+          <Col style={{ maxWidth: "110px" }}>
+            <span>Thesis Type</span>
+          </Col>
+          <Col>
+            <span
+              style={{
+                color: "black",
+              }}
+              className="badge"
+            >
+              {props.proposal.type && props.proposal.type.toUpperCase()}
+            </span>
+          </Col>
+        </Row>
+        <Row
+          style={{
+            fontSize: 16,
+            marginTop: 16,
+          }}
+        >
+          <Col style={{ maxWidth: "110px" }}>
+            <span>Expire at</span>
+          </Col>
+          <Col>
+            <span className="badge" style={{ color: "black" }}>
+              {dayjs(props.proposal.expiration).format("MM/DD/YYYY")}
+            </span>
+            <Calendar />
+          </Col>
+        </Row>
+      </Card>
+    </Col>
   );
 }
 

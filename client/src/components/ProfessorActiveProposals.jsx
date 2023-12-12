@@ -112,11 +112,11 @@ function ElementProposalLargeScreen(props) {
   const navigate = useNavigate();
   return (
     <Col xs={12} md={12} lg={12} xl={12} xxl={12} className="mt-4">
-      <Card style={{ padding: 20 }} className="custom-card-active-proposals">
+      <Card style={{ padding: 20 }} className="custom-card-proposals">
         <Row>
           <Col style={{ minWidth: "300px" }}>
             <div
-              className="title-custom-active-proposals"
+              className="title-custom-proposals"
               onClick={() => navigate("/viewproposal/" + props.proposal.id)}
               style={{
                 fontWeight: "medium",

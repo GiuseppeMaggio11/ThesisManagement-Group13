@@ -481,16 +481,16 @@ input:checked+.slider::before {
   }
 }
 
-.custom-card-active-proposals {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition: box-shadow 0.3s;
+.custom-card-proposals {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  transition: box-shadow 0.5s;
   border-radius: 20px;
 }
 
-.custom-card-active-proposals:hover {
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+.custom-card-proposals:hover {
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.5);
 }
 
-.title-custom-active-proposals:hover {
+.title-custom-proposals:hover {
   text-decoration: underline;
 }

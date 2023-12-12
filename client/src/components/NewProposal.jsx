@@ -216,6 +216,8 @@ function NewProposal(props) {
         handleToast("New proposal created", "success");
       } else {
         //API UPDATE
+        console.log("newProp", newProp);
+        const response = await API.updateProposal(newProp);
         handleToast("Proposal updated", "success");
       }
 

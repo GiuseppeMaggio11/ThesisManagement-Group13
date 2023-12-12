@@ -18,6 +18,7 @@ import "../style.css";
 import { useMediaQuery } from "react-responsive";
 import Loading from "./Loading";
 import FileDropModal from "./FileModal";
+import randomColor from "randomcolor";
 
 function ThesisPage(props) {
   const params = useParams();
@@ -139,22 +140,38 @@ function ThesisPage(props) {
                     </td>
                   </tr>
                 )}
-
-                {pageData.keywords && (
-                  <tr>
-                    <td colSpan="2" className="leftText customLeftColumn">
-                      Keywords
-                    </td>
-                    <td className="rightText">
-                      {pageData.keywords.map((element, index) => (
-                        <React.Fragment key={index}>
-                          {index !== 0 && <span>, </span>}
-                          <u>{element}</u>
-                        </React.Fragment>
+                <tr>
+                  <td colSpan="2" className="leftText customLeftColumn">
+                    Keywords
+                  </td>
+                  <td className="rightText">
+                    {pageData.keywords &&
+                      pageData.keywords.map((key, index) => (
+                        <span
+                          key={index}
+                          className="mx-1 badge"
+                          style={{
+                            backgroundColor: randomColor({
+                              seed: key,
+                              luminosity: "bright",
+                              format: "rgba",
+                              alpha: 1,
+                            }).replace(/1(?=\))/, "0.1"),
+                            color: randomColor({
+                              seed: key,
+                              luminosity: "bright",
+                              format: "rgba",
+                              alpha: 1,
+                            }),
+                            padding: "0.5em 1.2em",
+                            borderRadius: "0.25rem",
+                          }}
+                        >
+                          {key}
+                        </span>
                       ))}
-                    </td>
-                  </tr>
-                )}
+                  </td>
+                </tr>
 
                 <tr>
                   <td colSpan="2" className="leftText customLeftColumn">

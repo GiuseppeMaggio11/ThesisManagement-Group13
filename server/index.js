@@ -290,7 +290,7 @@ app.put(
   isProfessor,
   [
     // Various checks of syntax of given data
-    check("thesis_id").isInt({ gt: 0 }),
+    check("id").isInt({ gt: 0 }),
     check("title").isString().isLength({ min: 1, max: 100 }),
     check("supervisor_id").isString().isLength({ min: 1, max: 7 }), //Maybe we can try to check if the string is in the format Pxxxxxx
     check("thesis_level").isIn(["Bachelor", "Master", "bachelor", "master"]),

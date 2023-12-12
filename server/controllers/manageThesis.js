@@ -157,11 +157,11 @@ async function updateThesis(req, res) {
     //inizio transazione
     await dao.beginTransaction();
 
-    const isValid = await dao.isThesisProposalValid(req.body.thesis_id);
+    const isValid = await dao.isThesisProposalValid(req.body.id);
     if (!isValid) {
       await dao.rollback();
       return res.status(400).json({
-        error: `Thesis_id: ${req.body.thesis_id} is not a valid thesis proposal`,
+        error: `Thesis_id: ${req.body.id} is not a valid thesis proposal`,
       });
     }
 
@@ -226,7 +226,7 @@ async function updateThesis(req, res) {
 
     //Create thesis object which contains data from front end
     const thesis = {
-      thesis_id: req.body.thesis_id,
+      thesis_id: req.body.id,
       title: req.body.title,
       description: req.body.description,
       supervisor_id: req.body.supervisor_id,
