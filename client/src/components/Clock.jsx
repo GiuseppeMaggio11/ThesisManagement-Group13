@@ -111,6 +111,9 @@ const FlipClock = ({ isVirtual, setIsVirtual, isAmPm, setIsAmPm, handleChageAmPm
                 if (v[2] === 3 && v[3] > 1) {
                     v[3] = 0
                 }
+                if(v[3]==0 && v[2]==0){
+                    v[3]=1;
+                }
                 setVirtualTimeArray(v)
                 setVirtual(v)
                 break;
@@ -124,6 +127,8 @@ const FlipClock = ({ isVirtual, setIsVirtual, isAmPm, setIsAmPm, handleChageAmPm
                     }
                 }
                 else {
+                    if(tmp==0 && v[2]===0)
+                        tmp=1
                     v[3] = tmp
                     setVirtualTimeArray(v)
                     setVirtual(v)
@@ -163,15 +168,29 @@ const FlipClock = ({ isVirtual, setIsVirtual, isAmPm, setIsAmPm, handleChageAmPm
             case 'h2_up':
                 tmp = parseInt((v[9] + 1) % 10)
                 if (v[8] === 1) {
-                    if (tmp < 3) {
-                        v[9] = tmp
-                        setVirtualTimeArray(v)
-                        setVirtual(v)
-                    }
-                    if (tmp > 2) {
-                        v[9] = 0
-                        setVirtualTimeArray(v)
-                        setVirtual(v)
+                    if(isAmPm==='pm'){
+                        if (tmp < 2) {
+                            v[9] = tmp
+                            setVirtualTimeArray(v)
+                            setVirtual(v)
+                        }
+                        if (tmp > 1) {
+                            v[9] = 0
+                            setVirtualTimeArray(v)
+                            setVirtual(v)
+                        }
+                    }else{
+                        if (tmp < 3) {
+                            v[9] = tmp
+                            setVirtualTimeArray(v)
+                            setVirtual(v)
+                        }
+                        if (tmp > 2) {
+                            v[9] = 0
+                            setVirtualTimeArray(v)
+                            setVirtual(v)
+                        }
+
                     }
                 }
                 else {
@@ -222,10 +241,12 @@ const FlipClock = ({ isVirtual, setIsVirtual, isAmPm, setIsAmPm, handleChageAmPm
                 setVirtual(v)
                 break;
             case 'd1_down':
-
                 tmp = parseInt((v[2] - 1) % 4)
                 if (tmp < 0)
                     tmp = 3
+                if(v[3]==0 && tmp==0){
+                    v[3]=1;
+                }
                 v[2] = tmp
                 if (v[2] === 3 && v[3] > 1) {
                     v[3] = 0
@@ -237,7 +258,8 @@ const FlipClock = ({ isVirtual, setIsVirtual, isAmPm, setIsAmPm, handleChageAmPm
                 tmp = parseInt((v[3] - 1) % 10)
                 if (tmp < 0)
                     tmp = 9
-
+                if(tmp==0 && v[2]===0)
+                    tmp=1
                 if (v[2] === 3) {
                     if (tmp < 2) {
                         v[3] = tmp
