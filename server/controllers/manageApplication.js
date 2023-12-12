@@ -11,6 +11,8 @@ const transporter = nodemailer.createTransport({
   pass: 'xuzg drbh ezyn zaqg'
 }
 });
+
+
 // accept one student application, cancels all other applications for that student,
 //rejects every other student application to that same thesis
 async function updateApplicationStatus(req, res) {
@@ -52,7 +54,7 @@ async function updateApplicationStatus(req, res) {
         const emailData = await dao.getDataStudentApplicationEmail(decision.thesis_id, decision.student_id)
         const mailOptions = {
           from: 'group13.thesismanagement@gmail.com',
-          to: `maggiomaggio7@gmail.com`, //emailData.email deve essere
+          to: `group13.thesismanagement@gmail.com`, //emailData.email deve essere
           subject: `Status for thesis ${emailData.title}`,
           text: `Your application for thesis ${emailData.title} was ${decision.status}`
         };
