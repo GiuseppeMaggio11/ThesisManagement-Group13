@@ -92,7 +92,7 @@ const update = async () => {
 const email = async () => {
     try {
         const now = new Date("2023-12-12 12:09:59");
-        //const result = await dao.getProfessorEmailExpiring(now);
+        const result = await dao.getProfessorEmailExpiring(now);
         testing_mail = "group13.thesismanagement@gmail.com"
 
         for (const proposal of result) {
