@@ -7,9 +7,7 @@ import {
   Calendar,
   Funnel,
   FunnelFill,
-  Person,
   PersonFill,
-  Search,
 } from "react-bootstrap-icons";
 import dayjs from "dayjs";
 
