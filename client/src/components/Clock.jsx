@@ -31,7 +31,7 @@ const FlipClock = ({ isVirtual, setIsVirtual, isAmPm, setIsAmPm, handleChageAmPm
     
       } */
 
-      const handleTraslationToArray = useCallback(() => {
+    const handleTraslationToArray = useCallback(() => {
         let v = [];
         v.push(parseInt(month[0]));
         v.push(parseInt(month[1]));
@@ -49,11 +49,11 @@ const FlipClock = ({ isVirtual, setIsVirtual, isAmPm, setIsAmPm, handleChageAmPm
         v.push(parseInt(seconds[1]));
         console.log(v);
         setVirtualTimeArray(v);
-      }, [month, day, year, hours, minutes, seconds]);
-      
-      useEffect(() => {
+    }, [month, day, year, hours, minutes, seconds]);
+
+    useEffect(() => {
         handleTraslationToArray();
-      }, [handleTraslationToArray]);
+    }, [handleTraslationToArray]);
 
     useEffect(() => {
         console.log(isLoading)
@@ -101,7 +101,7 @@ const FlipClock = ({ isVirtual, setIsVirtual, isAmPm, setIsAmPm, handleChageAmPm
             handleDateTimeUpdate(time);
             setIsLoading(false)
         }
-        else{
+        else {
             handleDateTimeUpdate(virtualTime.toDate());
             setIsLoading(false)
         }
@@ -135,8 +135,10 @@ const FlipClock = ({ isVirtual, setIsVirtual, isAmPm, setIsAmPm, handleChageAmPm
         console.log("Clicked ID:", id);
         let v = [...virtualTimeArray];
         let tmp;
+        let firstTwoElements = v.slice(0, 2);
+        let m = parseInt(firstTwoElements.join(''));
         switch (id) {
-            case 'm1_up':  
+            case 'm1_up':
                 v[0] = parseInt((v[0] + 1) % 2)
                 if (v[1] > 2)
                     v[1] = 0
@@ -148,43 +150,96 @@ const FlipClock = ({ isVirtual, setIsVirtual, isAmPm, setIsAmPm, handleChageAmPm
             case 'm2_up':
                 v[1] = parseInt((v[1] + 1) % 10)
                 console.log(v[1])
-                if(v[0]===0 && v[1]===0)
-                    v[1]=1 
-                if (v[1] > 2)
-                    v[0] = 0
+                if (v[0] === 0 && v[1] === 0)
+                    v[1] = 1
+                if (v[1] > 2 && v[0] === 1) {
+                    v[1] = 0
+                }
                 setVirtualTimeArray(v)
                 setVirtual(v)
                 break;
             case 'd1_up':
                 v[2] = parseInt((v[2] + 1) % 4)
-                if (v[2] === 3 && v[3] > 1) {
-                    v[3] = 0
+
+                //feb
+                if (m === 2) {
+                    if (v[2] > 2) {
+                        v[2] = 0
+                        if (v[3] === 0)
+                            v[3] = 1
+                    }
                 }
+                else if (m === 11 || m === 4 || m === 6 || m === 9) {
+                    if (v[2] > 3) {
+
+                        if (v[3] === 0)
+                            v[2] = 1
+                        else
+                            v[2] = 0
+                    }
+                    else if (v[2] === 3 && v[3] != 0)
+                        v[3] = 0
+                }
+
+                else {
+                    if (v[2] === 3 && v[3] > 1) {
+                        v[3] = 0
+                    }
+                }
+
                 if (v[3] == 0 && v[2] == 0) {
                     v[3] = 1;
                 }
+
                 setVirtualTimeArray(v)
                 setVirtual(v)
                 break;
+
             case 'd2_up':
-                tmp = parseInt((v[3] + 1) % 10)
-                if (v[2] === 3) {
-                    if (tmp < 2) {
-                        v[3] = tmp
-                        setVirtualTimeArray(v)
-                        setVirtual(v)
+                v[3] = parseInt((v[3] + 1) % 10)
+                //feb
+
+                if (m === 2) {
+                    if (v[7] % 4 === 0) {
+                        if (v[3] > 9) {
+                            if (v[2] === 0)
+                                v[3] = 1
+                            else
+                                v[3] = 0
+                        }
+                    }
+                    else {
+                        if (v[3] > 8) {
+                            if (v[2] === 2)
+                                v[3] = 0
+
+                        }
+                    }
+                }
+                else if (m === 11 || m === 4 || m === 6 || m === 9) {
+                    if (v[2] === 3) {
+                        v[3] = 0
                     }
                 }
                 else {
-                    if (tmp == 0 && v[2] === 0)
-                        tmp = 1
-                    v[3] = tmp
-                    setVirtualTimeArray(v)
-                    setVirtual(v)
+                    if (v[2] === 3) {
+                        if (v[3] > 1)
+                            v[3] = 0
+                    }
                 }
+
+                if (v[3] == 0 && v[2] == 0)
+                    v[3] = 1;
+
+                setVirtualTimeArray(v)
+                setVirtual(v)
                 break;
             case 'y1_up':
                 v[4] = parseInt((v[4] + 1) % 10)
+                console.log(v[4])
+                if (v[4] === 0) {
+                    v[4] = 1
+                }
                 setVirtualTimeArray(v)
                 setVirtual(v)
                 break;
@@ -269,67 +324,123 @@ const FlipClock = ({ isVirtual, setIsVirtual, isAmPm, setIsAmPm, handleChageAmPm
                 setVirtual(v)
                 break;
 
+
             case 'm1_down':
-                tmp = parseInt((v[0] - 1) % 2)
-                console.log(tmp)
-                if (tmp < 0)
-                    tmp = 1
-                if(tmp===0 && v[1]===0)
-                    v[1]=1
-                v[0] = tmp
-                if (v[1] > 2)
-                    v[1] = 0
+                v[0] = parseInt((v[0] - 1) % 2)
+
+                if (v[0] < 0) {
+                    if (v[1] > 2)
+                        v[1] = 0
+                    v[0] = 1
+                }
+                if (v[0] === 0 && v[1] === 0)
+                    v[1] = 1
+
                 setVirtualTimeArray(v)
                 setVirtual(v)
                 break;
             case 'm2_down':
-                tmp = parseInt((v[1] - 1) % 10)
-                if (tmp < 0)
-                    tmp = 9
-                v[1] = tmp
-                if (v[1] > 2)
-                    v[0] = 0
+                v[1] = parseInt((v[1] - 1) % 10)
+                if (v[1] < 0) {
+                    if (v[0] === 1)
+                        v[1] = 2
+                    else
+                        v[1] = 9
+                }
+
+                if (v[0] === 0 && v[1] === 0) {
+                    v[1] = 9
+                }
+
                 setVirtualTimeArray(v)
                 setVirtual(v)
                 break;
             case 'd1_down':
-                tmp = parseInt((v[2] - 1) % 4)
-                if (tmp < 0)
-                    tmp = 3
-                if (v[3] == 0 && tmp == 0) {
+                v[2] = parseInt((v[2] - 1) % 4)
+
+                //feb
+                if (m === 2) {
+                    if (v[7] % 4 == 0) {
+                        if (v[2] < 0) {
+                            v[2] = 2
+                        }
+                        v[2] = 2
+                    } else {
+                        if (v[2] < 0) {
+                            if (v[3] > 8)
+                                v[2] = 1
+                            else
+                                v[2] = 2
+                        }
+
+                    }
+                }
+                else if (m === 11 || m === 4 || m === 6 || m === 9) {
+                    if (v[2] < 0) {
+                        if (v[3] === 0)
+                            v[2] = 3
+                        else
+                            v[2] = 2
+                    }
+                }
+                else {
+                    if (v[2] < 0) {
+                        if (v[3] < 2)
+                            v[2] = 3
+                        else
+                            v[2] = 2
+                    }
+                }
+
+                if (v[3] == 0 && v[2] == 0) {
                     v[3] = 1;
                 }
-                v[2] = tmp
-                if (v[2] === 3 && v[3] > 1) {
-                    v[3] = 0
-                }
+
                 setVirtualTimeArray(v)
                 setVirtual(v)
                 break;
             case 'd2_down':
-                tmp = parseInt((v[3] - 1) % 10)
-                if (tmp < 0)
-                    tmp = 9
-                if (tmp == 0 && v[2] === 0)
-                    tmp = 1
-                if (v[2] === 3) {
-                    if (tmp < 2) {
-                        v[3] = tmp
-                    }
-                    else {
-                        v[3] = 0
+                v[3] = parseInt((v[3] - 1) % 10)
+                //feb
+                if (m === 2) {
+                    if (v[7] % 4 == 0) {
+                        if (v[3] < 0)
+                            v[3] = 9
 
+                    } else {
+                        if (v[3] < 0)
+                            if (v[2] === 2)
+                                v[3] = 8
+                            else
+                                v[3] = 9
+                    }
+                }
+                else if (m === 11 || m === 4 || m === 6 || m === 9) {
+                    if (v[3] < 0) {
+                        if (v[2] === 3)
+                            v[3] = 0
+                        else
+                            v[3] = 9
                     }
                 }
                 else {
-                    v[3] = tmp
+                    if (v[3] < 0)
+                        if (v[2] === 3)
+                            v[3] = 1
+                        else
+                            v[3] = 9
+
+                }
+
+                if (v[3] == 0 && v[2] == 0) {
+                    v[3] = 9;
                 }
                 setVirtualTimeArray(v)
                 setVirtual(v)
                 break;
             case 'y1_down':
                 tmp = parseInt((v[4] - 1) % 10)
-                if (tmp < 0)
+                if (tmp < 1)
                     tmp = 9
                 v[4] = tmp
                 setVirtualTimeArray(v)
