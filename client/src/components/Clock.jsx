@@ -357,14 +357,13 @@ const FlipClock = ({ isVirtual, setIsVirtual, isAmPm, setIsAmPm, handleChageAmPm
                 break;
             case 'd1_down':
                 v[2] = parseInt((v[2] - 1) % 4)
-
+                console.log(v[2])
                 //feb
                 if (m === 2) {
                     if (v[7] % 4 == 0) {
                         if (v[2] < 0) {
                             v[2] = 2
-                        }
-                        v[2] = 2
+                        }       
                     } else {
                         if (v[2] < 0) {
                             if (v[3] > 8)
