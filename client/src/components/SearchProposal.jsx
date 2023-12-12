@@ -1,21 +1,10 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useMediaQuery } from "react-responsive";
-import {
-  Accordion,
-  Alert,
-  Button,
-  Card,
-  Col,
-  Container,
-  Form,
-  Row,
-  Table,
-} from "react-bootstrap";
+import { Card, Col, Container, Form, Row } from "react-bootstrap";
 import { useState, useEffect, useContext } from "react";
 import MessageContext from "../messageCtx";
 import {
   Calendar,
-  Dice1,
   Funnel,
   FunnelFill,
   Person,
@@ -480,26 +469,6 @@ function Proposal(props) {
         </Row>
       </Card>
     </Col>
-  );
-}
-
-function ProposalTableRow(props) {
-  const navigation = useNavigate();
-  return (
-    <tr onClick={() => navigation(`/proposals/${props.proposal.id}`)}>
-      <td>
-        <Link
-          style={{ color: "#4682B4", fontSize: 18, textDecoration: "none" }}
-          to={`/proposals/${props.proposal.id}`}
-        >
-          {props.proposal.title}
-        </Link>
-      </td>
-      <td style={{ fontSize: 18 }}>{props.proposal.supervisor}</td>
-      <td style={{ fontSize: 18 }}>
-        {dayjs(props.proposal.expiration).format("MM/DD/YYYY")}
-      </td>
-    </tr>
   );
 }
 
