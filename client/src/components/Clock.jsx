@@ -20,10 +20,17 @@ const FlipClock = ({ isVirtual, setIsVirtual, isAmPm, setIsAmPm, handleChageAmPm
     const [isLoading, setIsLoading] = useState(true)
 
     const handlePickDate = (date) => {
-        console.log('date', date)
-        setVirtualTime(date)
-        setModalDate(false)
-        setIsVirtual(true)
+        const timePart = virtualTime.format('HH:mm:ss');
+        const selectedDate = date.startOf('day').format('YYYY-MM-DD');
+        
+        const combinedDateTime = `${selectedDate} ${timePart}`;
+        let d = dayjs(combinedDateTime)
+        console.log(d)
+        setVirtualTime(d);
+        setModalDate(false);
+        setIsVirtual(true);
+        
+
     }
 
     /*
