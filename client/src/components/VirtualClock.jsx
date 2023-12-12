@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Button, Card, Col, Container, Row } from "react-bootstrap";
 import API from "../API";
-import FlipClock from "./clock";
+import FlipClock from "./Clock";
+import { Calendar, Clock } from "react-bootstrap-icons";
 
 const VirtualClock = (props) => {
   const [tempTime, setTempTime] = useState(props.virtualClock);
@@ -25,7 +26,7 @@ const VirtualClock = (props) => {
       setTempTime(newDateTime);
     }; */
 
-  const handleVirtualTime = async (newTime) => {
+  /* const handleVirtualTime = async (newTime) => {
     props.setVirtualClock(newTime);
     localStorage.setItem("virtualclock", JSON.stringify(newTime));
     await API.updateExpiration(newTime)
@@ -60,7 +61,7 @@ const VirtualClock = (props) => {
       });
   };
   const formattedDateTime = tempTime.toLocaleString();
-
+ */
   function handleChageAmPm(){
     if(isAmPm==='pm'){
       console.log('è pm')
@@ -73,16 +74,20 @@ const VirtualClock = (props) => {
       console.log(isAmPm)
   }
 
+
   return (
-    <Container className="mt-3">
+    <Container className="mt-5">
       <div>
         <FlipClock isVirtual={isVirtual} setIsVirtual={setIsVirtual} isAmPm={isAmPm} setIsAmPm={setIsAmPm} handleChageAmPm={handleChageAmPm} settingVirtual={settingVirtual} setSettingVirtual={setSettingVirtual}/>
       </div>
       <div style={{display:"flex", alignItems:"center", justifyContent:'center'}}>
-        {!settingVirtual && !isVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{setSettingVirtual(true)}}> Set Virtual time </Button>}
+        {!settingVirtual && !isVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{setSettingVirtual(true)}}>Virtual time Mode </Button>}
         {!settingVirtual && isVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{setIsVirtual(false)}}> RealTime Mode </Button>}
         {!settingVirtual && isVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{setIsVirtual(false); setSettingVirtual(true)}}> Set Virtual time </Button>}
-        {settingVirtual && <Button  onClick={()=>{setIsVirtual(true); setSettingVirtual(false)}}> Apply virtual time </Button>}
+       
+        {settingVirtual && !isVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{setIsVirtual(false); setSettingVirtual(false)}}> Go back in Real Time </Button>}
+        {settingVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{setIsVirtual(true); setSettingVirtual(false)}}> Apply virtual time </Button>}
+      
       </div>
     </Container>
   );

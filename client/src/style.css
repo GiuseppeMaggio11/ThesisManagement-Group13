@@ -399,7 +399,6 @@ table.table-rounded thead tr {
 }
 
 .search-button {
-  margin-left: 1em;
   font-size: larger;
   color: black;
 }
@@ -629,6 +628,5 @@ input:checked+.slider::before {
 .ampm{
   font-size: xxx-large;
   padding-left: 0.5em;
-  padding-top: 0.5em;
 }
 
