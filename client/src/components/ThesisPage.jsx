@@ -26,7 +26,7 @@ function ThesisPage(props) {
   const [flag, setFlag] = useState(0);
   const [exceed, setExceed] = useState(false);
   const from = state?.from;
-/*   const [showArchive, setShowArchive] = useState(false);
+  /*   const [showArchive, setShowArchive] = useState(false);
   const [showDelete, setShowDelete] = useState(false); */
 
   if (!props.loggedIn) {
@@ -69,30 +69,10 @@ function ThesisPage(props) {
     init();
   }, []);
 
-  const archiveProposal = async () => {
-    try {
-      await API.updateThesisArchivation(params.id);
-      navigate("/proposals");
-      handleToast("Proposal archived correctly", "success");
-    } catch (err) {
-      handleToast("Error while archiving a proposal", "error");
-    }
-  };
-
-  const deleteProposal = async () => {
-    try {
-      await API.deleteProposal(parseInt(params.id));
-      navigate("/proposals");
-      handleToast("Proposal deleted correctly", "success");
-    } catch (err) {
-      handleToast("Error while deleting a proposal", "error");
-    }
-  };
-
   const handleApplication = () => {
+    if (selectedFiles.length) handleUpload(params.id);
     submitApplication(params.id, props.virtualClock);
-    if(selectedFiles.length)
-      handleUpload(params.id);
+    if (selectedFiles.length) handleUpload(params.id);
   };
 
   const handleUpload = (thesis_id) => {
@@ -119,7 +99,8 @@ function ThesisPage(props) {
   const submitApplication = (idThesis, date) => {
     API.applicationThesis(idThesis, date)
       .then(() => {
-        // console.log("tutto ok");
+        handleToast("Application submitted correctly", "success");
+        navigate("/studproposals");
       })
       .catch((err) => {
         handleToast(err, "error");
@@ -356,7 +337,7 @@ function ThesisPage(props) {
             </Table>
           </Container>
 
-           <FileDropModal
+          <FileDropModal
             showModal={openPanel}
             closeModal={closeModal}
             handleSave={() => {

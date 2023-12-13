@@ -4,12 +4,12 @@ const fs = require("fs");
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   auth: {
-  user: 'group13.thesismanagement@gmail.com',
-  pass: 'xuzg drbh ezyn zaqg'
-}
-}); 
+    user: "group13.thesismanagement@gmail.com",
+    pass: "xuzg drbh ezyn zaqg",
+  },
+});
 // accept one student application, cancels all other applications for that student,
 //rejects every other student application to that same thesis
 async function updateApplicationStatus(req, res) {
@@ -48,27 +48,30 @@ async function updateApplicationStatus(req, res) {
           //cancels every other application of that student
           //const result_cancel = await dao.cancelStudentApplications(decision);
         }
-        const emailData = await dao.getDataStudentApplicationEmail(decision.thesis_id, decision.student_id)
+        const emailData = await dao.getDataStudentApplicationEmail(
+          decision.thesis_id,
+          decision.student_id
+        );
         const mailOptions = {
-          from: 'group13.thesismanagement@gmail.com',
-          to: `maggiomaggio7@gmail.com`, //emailData.email deve essere
+          from: "group13.thesismanagement@gmail.com",
+          to: `group13.thesismanagement@gmail.com`,
           subject: `Status for thesis ${emailData.title}`,
-          text: `Your application for thesis ${emailData.title} was ${decision.status}`
+          text: `Your application for thesis ${emailData.title} was ${decision.status}`,
         };
         transporter.sendMail(mailOptions, async (error, info) => {
           if (!error) {
-          console.log("Email mandata")
+            console.log("Email mandata");
           } else {
-              console.log(error);
+            console.log(error);
           }
-      }); 
+        });
         await dao.commit();
         return res.status(200).json(updated_application);
       }
     }
 
     await dao.rollback();
-            return res
+    return res
       .status(400)
       .json(
         ` error: Application of student: ${req.body.student_id} for thesis with id: ${req.body.thesis_id} not found `
@@ -96,27 +99,30 @@ async function newApplication(req, res) {
       return res.status(422).json("You are already applied for this thesis");
     }
     const applications = await dao.getApplications();
-    for( const application of applications){
-      if( userID == application.student_id && application.status !== "Refused"){
+    for (const application of applications) {
+      if (
+        userID == application.student_id &&
+        application.status !== "Refused"
+      ) {
         return res.status(422).json("You are already applied for a thesis");
       }
     }
     const result = await dao.newApply(userID, thesis_id, date);
-    const emailData = await dao.getDataTeacherApplicationEmail(thesis_id)
+    const emailData = await dao.getDataTeacherApplicationEmail(thesis_id);
     const mailOptions = {
-      from: 'group13.thesismanagement@gmail.com',
-      to: `maggiomaggio7@gmail.com`, //emailData.email deve essere
+      from: "group13.thesismanagement@gmail.com",
+      to: `group13.thesismanagement@gmail.com`,
       subject: `Application for thesis ${emailData.title}`,
-      text: `You receive an Application for thesis ${emailData.title} from ${req.user.username}`
+      text: `You receive an Application for thesis ${emailData.title} from ${req.user.username}`,
     };
 
     transporter.sendMail(mailOptions, async (error, info) => {
-        if (!error) {
-        console.log("Email mandata")
-        } else {
-            console.log(error);
-        }
-    });  
+      if (!error) {
+        console.log("Email mandata");
+      } else {
+        console.log(error);
+      }
+    });
 
     res.status(200).json("Application created successfully");
   } catch (error) {
@@ -124,22 +130,27 @@ async function newApplication(req, res) {
   }
 }
 
-async function getApplicationStudent (req,res){
-    try{
-      let ThesisInfo;
-      const userID = await dao.getUserID(req.user.username);
-      const Application = await dao.getStudentApplication(userID);
-      let Result = await Promise.all(Application.map(async (thesis)=>{
-        ThesisInfo = await dao.getProposalById(thesis.thesis_id, req.user.user_type, req.user.username) 
-        return {...ThesisInfo, status: thesis.status}
-      }))
-      
-      return res.status(200).json(Result);
-    } catch (error){
-      
-      res.status(500).json(error);
-    }
-};
+async function getApplicationStudent(req, res) {
+  try {
+    let ThesisInfo;
+    const userID = await dao.getUserID(req.user.username);
+    const Application = await dao.getStudentApplication(userID);
+    let Result = await Promise.all(
+      Application.map(async (thesis) => {
+        ThesisInfo = await dao.getProposalById(
+          thesis.thesis_id,
+          req.user.user_type,
+          req.user.username
+        );
+        return { ...ThesisInfo, status: thesis.status };
+      })
+    );
+
+    return res.status(200).json(Result);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+}
 
 //this is for getting all the ACTIVE applications related to all the proposals of a specific professor (which makes this request)
 async function getApplications(req, res) {
@@ -155,9 +166,11 @@ async function isApplied(req, res) {
   try {
     const userID = await dao.getUserID(req.user.username);
     const applications = await dao.getApplications();
-    for( const application of applications){
-      if( userID== application.student_id && application.status !== "Refused"){
-
+    for (const application of applications) {
+      if (
+        userID == application.student_id &&
+        application.status !== "Refused"
+      ) {
         return res.status(200).json(1);
       }
     }
@@ -167,6 +180,10 @@ async function isApplied(req, res) {
   }
 }
 
-
-
-module.exports = { newApplication, updateApplicationStatus, getApplications,getApplicationStudent, isApplied };
+module.exports = {
+  newApplication,
+  updateApplicationStatus,
+  getApplications,
+  getApplicationStudent,
+  isApplied,
+};

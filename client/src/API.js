@@ -147,7 +147,7 @@ async function sendFiles(formData, thesis_id) {
       credentials: "include",
     });
 
-    return await getJson(response);
+    return getJson(response);
   } catch (error) {
     return { error: "Cannot communicate" };
   }

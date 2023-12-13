@@ -7,7 +7,7 @@ function ToggleComponent({ formData, handleChange, idView }) {
     <Toggle
       id="is_archived"
       name="is_archived"
-      checked={formData.is_archived === 0 ? false : true}
+      checked={formData.is_archived ? true : false}
       onChange={handleChange}
       disabled={idView ? true : false}
     />

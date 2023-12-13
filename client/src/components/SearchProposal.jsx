@@ -27,7 +27,7 @@ function SearchProposalRoute(props) {
   //  return API.redirectToLogin();
 
   useEffect(() => {
-    if(props.user && props.user.user_type !== "STUD") {
+    if (props.user && props.user.user_type !== "STUD") {
       return API.redirectToLogin();
     }
   }, [props.user]);
@@ -360,7 +360,7 @@ function Proposal(props) {
   const navigate = useNavigate();
 
   return (
-    <Col xs={12} md={12} lg={6} xl={6} xxl={6} className="mt-4">
+    <Col xs={12} md={12} lg={12} xl={12} xxl={12} className="mt-4">
       <Card
         style={{ padding: 20, minHeight: "350px" }}
         className="custom-card-proposals"

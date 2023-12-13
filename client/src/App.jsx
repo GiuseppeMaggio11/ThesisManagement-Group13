@@ -1,9 +1,7 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
-import ErrorAlert from "./components/ErrorAlert";
 import { ToastContainer } from "react-toastify";
-import TeacherPage from "./components/TeacherPage";
 import NewProposal from "./components/NewProposal";
 import ThesisPage from "./components/ThesisPage";
 import { toast } from "react-toastify";
@@ -19,6 +17,7 @@ import ProfessorActiveProposals from "./components/ProfessorActiveProposals";
 //import Toasts from "./components/Toasts";
 import StudentApplications from "./components/StudentApplications";
 import ViewProposal from "./components/ViewProposal";
+import Home from "./components/Home";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -98,6 +97,7 @@ function App() {
           <Header user={user} logout={logOut} />
           <ToastContainer />
           <Routes>
+            <Route exact path="/" element={<Home />} />
             <Route
               path="/virtualclock"
               element={

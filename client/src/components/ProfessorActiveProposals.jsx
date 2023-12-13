@@ -16,7 +16,14 @@ import MessageContext from "../messageCtx";
 import { useMediaQuery } from "react-responsive";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
-import { Calendar, Pencil, Trash3, Archive, Trash, PlusLg } from "react-bootstrap-icons";
+import {
+  Calendar,
+  Pencil,
+  Trash3,
+  Archive,
+  Trash,
+  PlusLg,
+} from "react-bootstrap-icons";
 import randomcolor from "randomcolor";
 
 function ProfessorActiveProposals(props) {
@@ -30,12 +37,11 @@ function ProfessorActiveProposals(props) {
   //}
 
   useEffect(() => {
-    if(props.user && props.user.user_type !== "PROF") {
+    if (props.user && props.user.user_type !== "PROF") {
       return API.redirectToLogin();
     }
   }, [props.user]);
 
- 
   const getActiveProposals = async () => {
     try {
       props.setLoading(true);
@@ -61,14 +67,19 @@ function ProfessorActiveProposals(props) {
   ) : (
     <Container className="p-4">
       <Row className="justify-content-between">
-        <Col xs={8} className="fs-2">Active thesis proposals</Col>
+        <Col xs={8} className="fs-2">
+          Active thesis proposals
+        </Col>
         <Col xs={4} className="d-flex justify-content-end align-items-center">
           <OverlayTrigger
-          placement="top"
-          delay={{ show: 250, hide: 400 }}
-          overlay={renderTooltipNew}
+            placement="top"
+            delay={{ show: 250, hide: 400 }}
+            overlay={renderTooltipNew}
           >
-            <PlusLg style={{ fontSize: 'xx-large' }} onClick={() => navigate("/newproposal/")} />
+            <PlusLg
+              style={{ fontSize: "xx-large", cursor: "pointer" }}
+              onClick={() => navigate("/newproposal/")}
+            />
           </OverlayTrigger>
         </Col>
       </Row>
@@ -185,73 +196,84 @@ function ElementProposalLargeScreen(props) {
             </div>
           </Col>
           <Col className="text-end mx-2">
-            <OverlayTrigger
-              placement="bottom"
-              delay={{ show: 250, hide: 400 }}
-              overlay={renderTooltipEdit}
-            >
-              <Button
-                variant="light"
-                className="mx-2"
-                onClick={() => {
-                  navigate("/updateproposal/" + props.proposal.id);
-                }}
-              >
-                {!props.isMobile && <span className="mx-2">Edit</span>}
-                <Pencil />
-              </Button>
-            </OverlayTrigger>
-            <OverlayTrigger
-              placement="bottom"
-              delay={{ show: 250, hide: 400 }}
-              overlay={renderTooltipCopy}
-            >
-              <Button
-                variant="light"
-                onClick={() => {
-                  navigate("/copyproposal/" + props.proposal.id);
-                }}
-              >
-                {!props.isMobile && <span className="mx-2">Copy</span>}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  fill="currentColor"
-                  className="bi bi-copy"
-                  viewBox="0 0 16 16"
+            <Row>
+              <Col xs={6} md={6} lg={3}>
+                <OverlayTrigger
+                  placement="bottom"
+                  delay={{ show: 250, hide: 400 }}
+                  overlay={renderTooltipEdit}
                 >
-                  <path
-                    fillRule="evenodd"
-                    d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"
-                  />
-                </svg>
-              </Button>
-            </OverlayTrigger>
-            <OverlayTrigger
-              placement="bottom"
-              delay={{ show: 250, hide: 400 }}
-              overlay={renderTooltipDelete}
-            >
-              <Button variant="light" className="mx-2" onClick={() => deleteProposal(props.proposal.id)}>
-                {!props.isMobile && <span className="mx-2">Delete</span>}
-                <Trash3 />
-              </Button>
-            </OverlayTrigger>
-            <OverlayTrigger
-              placement="bottom"
-              delay={{ show: 250, hide: 400 }}
-              overlay={renderTooltipArchive}
-            >
-              <Button
-                variant="light"
-                className="mx-2"
-                onClick={() => archiveProposal(props.proposal.id)}
-              >
-                {!props.isMobile && <span className="mx-2">Archive</span>}
-                <Archive />
-              </Button>
-            </OverlayTrigger>
+                  <Button
+                    variant="light"
+                    onClick={() => {
+                      navigate("/updateproposal/" + props.proposal.id);
+                    }}
+                  >
+                    {!props.isMobile && <span className="mx-2">Edit</span>}
+                    <Pencil />
+                  </Button>
+                </OverlayTrigger>
+              </Col>
+              <Col xs={6} md={6} lg={3}>
+                <OverlayTrigger
+                  placement="bottom"
+                  delay={{ show: 250, hide: 400 }}
+                  overlay={renderTooltipCopy}
+                >
+                  <Button
+                    variant="light"
+                    onClick={() => {
+                      navigate("/copyproposal/" + props.proposal.id);
+                    }}
+                  >
+                    {!props.isMobile && <span className="mx-2">Copy</span>}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      className="bi bi-copy"
+                      viewBox="0 0 16 16"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"
+                      />
+                    </svg>
+                  </Button>
+                </OverlayTrigger>
+              </Col>
+              <Col xs={6} md={6} lg={3}>
+                <OverlayTrigger
+                  placement="bottom"
+                  delay={{ show: 250, hide: 400 }}
+                  overlay={renderTooltipDelete}
+                >
+                  <Button
+                    variant="light"
+                    onClick={() => deleteProposal(props.proposal.id)}
+                  >
+                    {!props.isMobile && <span className="mx-2">Delete</span>}
+                    <Trash3 />
+                  </Button>
+                </OverlayTrigger>
+              </Col>
+              <Col xs={6} md={6} lg={3}>
+                <OverlayTrigger
+                  placement="bottom"
+                  delay={{ show: 250, hide: 400 }}
+                  overlay={renderTooltipArchive}
+                >
+                  <Button
+                    variant="light"
+                    onClick={() => archiveProposal(props.proposal.id)}
+                  >
+                    {!props.isMobile && <span className="mx-2">Archive</span>}
+                    <Archive />
+                  </Button>
+                </OverlayTrigger>
+              </Col>
+            </Row>
           </Col>
         </Row>
         <div
