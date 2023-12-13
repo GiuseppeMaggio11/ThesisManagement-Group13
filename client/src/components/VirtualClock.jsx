@@ -69,7 +69,7 @@ const VirtualClock = (props) => {
   return (
     <Container className="d-flex flex-column" style={{marginTop:'1em'}}>
       <div className="d-flex justify-content-center"> 
-        <h2>SISTEM CLOCK</h2>
+        <h2>SYSTEM CLOCK</h2>
     </div>
     <div>
       <FlipClock isVirtual={isVirtual} setIsVirtual={setIsVirtual} isAmPm={isAmPm} setIsAmPm={setIsAmPm} settingVirtual={settingVirtual} setSettingVirtual={setSettingVirtual} virtualTime={virtualTime} setVirtualTime={setVirtualTime}/>
@@ -81,7 +81,7 @@ const VirtualClock = (props) => {
       {!settingVirtual && isVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{setIsVirtual(false); setSettingVirtual(true)}}> Set Virtual time </Button>}
      
       {settingVirtual && !isVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{setIsVirtual(false); setSettingVirtual(false)}}> Go back in Real Time </Button>}
-      {settingVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{}}> Apply virtual time </Button>}
+      {settingVirtual && <Button style={{marginRight:'0.5em'}} onClick={handleVirtualTime}> Apply virtual time </Button>}
     </div>
   </Container>
   )  
