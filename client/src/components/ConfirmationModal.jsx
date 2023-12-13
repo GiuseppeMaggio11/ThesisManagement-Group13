@@ -8,10 +8,10 @@ function ConfirmationModal(props) {
       </Modal.Header>
       <Modal.Body>{props.body}</Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={props.handleClose}>
+        <Button className='button-style-cancel' onClick={props.handleClose}>
           Cancel
         </Button>
-        <Button variant="primary" onClick={() => {
+        <Button className="button-style" onClick={() => {
           props.handleAction();
           props.handleClose();
         }}>
