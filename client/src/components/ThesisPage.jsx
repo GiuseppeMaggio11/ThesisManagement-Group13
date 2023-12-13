@@ -38,7 +38,7 @@ function ThesisPage(props) {
       try {
         props.setLoading(true);
         const thesisData = await API.getThesisProposalsById(params.id);
-        //console.log(thesisData.cosupervisors);
+        console.log(thesisData);
         setPageData({
           title: thesisData.title,
           description: thesisData.description,
@@ -50,7 +50,7 @@ function ThesisPage(props) {
             return element.group;
           }),
           requiredKnowledge: thesisData.required_knowledge,
-          ...(thesisData.notes !== "None" && { notes: thesisData.notes }),
+           notes: thesisData.notes,
           expiration: dayjs(thesisData.expiration).format("MM-DD-YYYY"),
           level: thesisData.thesis_level,
         });
