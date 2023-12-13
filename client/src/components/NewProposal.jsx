@@ -122,7 +122,8 @@ function NewProposal(props) {
       let in_cosup = await API.getTeachers();
       let ex_cosup = await API.getListExternalCosupervisors();
       let groups = await API.getGroups();
-      let gr_notSelected=[]
+      let gr_notSelected = []
+
       let gr = groups.filter((g) => {
         return response.cod_group.some(
           group => group === g.cod
@@ -138,8 +139,8 @@ function NewProposal(props) {
         }
         )
       }
-      else{
-        gr_notSelected=groups
+      else {
+        gr_notSelected = groups
       }
       console.log(gr)
       console.log(gr_notSelected)

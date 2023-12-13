@@ -13,6 +13,7 @@ import {
   Tooltip,
 } from "react-bootstrap";
 import MessageContext from "../messageCtx";
+import ConfirmationModal from "./ConfirmationModal";
 import { useMediaQuery } from "react-responsive";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
@@ -123,6 +124,9 @@ function ActiveProposalsLargeScreen(props) {
 }
 
 function ElementProposalLargeScreen(props) {
+  const [showArchive, setShowArchive] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+
   const archiveProposal = async (thesis_id) => {
     try {
       await API.updateThesisArchivation(thesis_id);
@@ -251,7 +255,7 @@ function ElementProposalLargeScreen(props) {
                 >
                   <Button
                     variant="light"
-                    onClick={() => deleteProposal(props.proposal.id)}
+                    onClick={() => setShowDelete(true)}
                   >
                     {!props.isMobile && <span className="mx-2">Delete</span>}
                     <Trash3 />
@@ -266,7 +270,7 @@ function ElementProposalLargeScreen(props) {
                 >
                   <Button
                     variant="light"
-                    onClick={() => archiveProposal(props.proposal.id)}
+                    onClick={() => setShowArchive(true)}
                   >
                     {!props.isMobile && <span className="mx-2">Archive</span>}
                     <Archive />
@@ -378,6 +382,20 @@ function ElementProposalLargeScreen(props) {
           </Col>
         </Row>
       </Card>
+      <ConfirmationModal
+        show={showArchive}
+        handleClose={() => setShowArchive(false)}
+        body={"Are you sure you want to archive this proposal ?"}
+        action={"Archive"}
+        handleAction={() => archiveProposal(props.proposal.id)}
+      />
+      <ConfirmationModal
+        show={showDelete}
+        handleClose={() => setShowDelete(false)}
+        body={"Are you sure you want to delete this proposal ?"}
+        action={"Delete"}
+        handleAction={() => deleteProposal(props.proposal.id)}
+      />
     </Col>
   );
 }
