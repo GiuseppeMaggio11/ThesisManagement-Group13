@@ -42,6 +42,12 @@ const {
   listDegrees,
 } = require("./controllers/others");
 
+const {
+  setVirtualClock,
+  uninstallVirtualClock,
+  create_schedule,
+} = require("./controllers/virtualClock");
+
 const express = require("express");
 const morgan = require("morgan");
 const passport = require("passport");
@@ -55,6 +61,10 @@ const session = require("express-session");
 const fs = require("fs");
 const zipdir = require("zip-dir");
 const bodyParser = require("body-parser");
+const cron = require("node-cron");
+var FakeTimers = require("@sinonjs/fake-timers");
+const CronJob = require("cron");
+const nodemailer = require("nodemailer");
 
 const app = express();
 const port = 3001;
@@ -113,6 +123,8 @@ passport.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+//const txt = uninstallVirtualClock();
+
 /***USER - API***/
 //Session user info
 app.get(
@@ -132,8 +144,11 @@ app.post(
     failureFlash: true,
   }),
   function (req, res) {
-    if(req.user && req.user.user_type === "PROF") res.redirect("http://localhost:5173/profproposals");
-    else if(req.user && req.user.user_type === "STUD") res.redirect("http://localhost:5173/studproposals");  }
+    if (req.user && req.user.user_type === "PROF")
+      res.redirect("http://localhost:5173/profproposals");
+    else if (req.user && req.user.user_type === "STUD")
+      res.redirect("http://localhost:5173/studproposals");
+  }
 );
 
 app.get("/whoami", (req, res) => {
@@ -208,7 +223,7 @@ app.post(
     check("cosupervisors_external").isArray(),
     check("cosupervisors_external.*").isString(),
     check("cod_group").isArray(),
-    check("cod_group.*").isString()
+    check("cod_group.*").isString(),
   ],
   newThesis
 );
@@ -219,16 +234,6 @@ app.get(
   "/api/listExternalCosupervisors",
   isProfessor,
   listExternalCosupervisors
-);
-
-//UPDATE THESES WITH NEW VIRTUALCLOCK TIME
-app.put(
-  "/api/updateThesesArchivation",
-  [
-    // Check if valid date
-    check("expiration").isISO8601().toDate(),
-  ],
-  updateThesesArchivation
 );
 
 //ACCEPT/REJECT APPLICATION
@@ -259,8 +264,6 @@ app.post(
   ],
   createExternalCosupervisor
 );
-
-app.get("/api/isApplied", isLoggedIn, isApplied);
 
 app.get("/api/getProposalsProfessor", isProfessor, getProposalsProfessor);
 
@@ -311,7 +314,32 @@ app.put(
     check("cosupervisors_external").isArray(),
     check("cosupervisors_external.*").isString(),
     check("cod_group").isArray(),
-    check("cod_group.*").isString()
+    check("cod_group.*").isString(),
   ],
   updateThesis
 );
+
+app.get("/api/isApplied", isStudent, isApplied);
+
+//RETURN TO REAL DATETIME
+app.put("/api/setRealDateTime", uninstallVirtualClock);
+
+//SET VC DATETIME
+app.put(
+  "/api/setVirtualDateTime",
+  [check("datetime").isISO8601().toDate()],
+  setVirtualClock
+);
+
+//UPDATE THESES WITH NEW VIRTUALCLOCK TIME
+/*app.put(
+  "/api/updateThesesArchivation",
+  [
+    // Check if valid date
+    check("expiration").isISO8601().toDate(),
+  ],
+  setVirtualClock
+);*/
+const now = new Date().toString();
+console.log("Date-time:", now);
+create_schedule();

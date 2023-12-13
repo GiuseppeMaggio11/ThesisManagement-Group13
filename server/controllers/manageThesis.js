@@ -52,7 +52,7 @@ async function newThesis(req, res) {
     //Get every cod_degree from degree_table table in db
     const degrees = await dao.getDegrees();
     //If given cod_degre si not in list raise error
-    if (!degrees.some(degree => degree.cod === req.body.cod_degree)) {
+    if (!degrees.some((degree) => degree.cod === req.body.cod_degree)) {
       await dao.rollback();
       return res.status(400).json({
         error: `Cod_degree: ${req.body.cod_degree} is not a valid degree code`,
@@ -61,9 +61,9 @@ async function newThesis(req, res) {
 
     // --- GROUP COD should be an actual research group id, must be in group_table
     // Get every cod_group from group_table table in db
-    console.log("REQUEST", req.body.cod_group)
+    console.log("REQUEST", req.body.cod_group);
     const codes_group = await dao.getCodes_group();
-    console.log("CODES_GROUP", codes_group)
+    console.log("CODES_GROUP", codes_group);
 
     // If given cod_group is not in list  raise error
     for (group of req.body.cod_group) {
@@ -96,10 +96,7 @@ async function newThesis(req, res) {
 
     //Create a new thesis_group row which links thesis to its research group
     for (group of req.body.cod_group) {
-      await dao.createThesis_group(
-        result_thesis.id,
-        group
-      );
+      await dao.createThesis_group(result_thesis.id, group);
     }
 
     //Create new rows which link thesis to interal cosupervisor
@@ -213,7 +210,7 @@ async function updateThesis(req, res) {
     //Get every cod_degree from degree_table table in db
     const degrees = await dao.getDegrees();
     //If given cod_degre si not in list raise error
-    if (!degrees.some(degree => degree.cod === req.body.cod_degree)) {
+    if (!degrees.some((degree) => degree.cod === req.body.cod_degree)) {
       await dao.rollback();
       return res.status(400).json({
         error: `Cod_degree: ${req.body.cod_degree} is not a valid degree code`,
@@ -222,9 +219,9 @@ async function updateThesis(req, res) {
 
     // --- GROUP COD should be an actual research group id, must be in group_table
     // Get every cod_group from group_table table in db
-    console.log("REQUEST", req.body.cod_group)
+    console.log("REQUEST", req.body.cod_group);
     const codes_group = await dao.getCodes_group();
-    console.log("CODES_GROUP", codes_group)
+    console.log("CODES_GROUP", codes_group);
 
     // If given cod_group is not in list  raise error
     for (group of req.body.cod_group) {
@@ -258,10 +255,7 @@ async function updateThesis(req, res) {
     // Delete previous associations group-thesis, then insert the new associations
     await dao.deleteThesisGroups(thesis.thesis_id);
     for (group of req.body.cod_group) {
-      await dao.createThesis_group(
-        thesis.thesis_id,
-        group
-      );
+      await dao.createThesis_group(thesis.thesis_id, group);
     }
 
     //Delete all entries in thesis_cosupervisor_teacher related to this thesis, then insert the new values
@@ -360,7 +354,7 @@ async function getThesisForProfessorById(req, res) {
 
     thesis.list_cosupervisors = list_cosupervisors;
     thesis.cod_group = await dao.getThesisGroups(thesis_id);
-    
+
     res.status(200).json(thesis);
   } catch (err) {
     res.status(500).json(err);

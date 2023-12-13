@@ -190,9 +190,10 @@ async function getThesisProposalsById(thesisId) {
     throw proposal;
   }
 }
+//--------------------VIRTUAL CLOCK----------------------------------------------
 
-async function updateExpiration(virtualTime) {
-  const response = await fetch(URL + "/updateThesesArchivation", {
+async function setVirtualTime(virtualTime) {
+  const response = await fetch(URL + "/setVirtualDateTime", {
     method: "PUT",
     credentials: "include",
     headers: {
@@ -213,6 +214,28 @@ async function updateExpiration(virtualTime) {
     throw Error(error.error);
   }
 }
+
+async function setRealTime() {
+  const response = await fetch(URL + "/setRealDateTime", {
+    method: "PUT",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (response.ok) {
+    const msg = await response.json();
+    return msg;
+  } else if (response.status == "422") {
+    const errors = await response.json();
+    return errors.errors;
+  } else {
+    const error = await response.json();
+    throw Error(error.error);
+  }
+}
+//-----------END VIRTUAL CLOCK---------------------------------------------------
+
 async function getPendingApplications() {
   return getJson(
     fetch(`${URL}/getApplications`, {
@@ -321,12 +344,13 @@ const API = {
   newProposal,
   getListExternalCosupervisors,
   newExternalCosupervisor,
-  updateExpiration,
   getPendingApplications,
   updateApplictionStatus,
   redirectToLogin,
   getStudentApplications,
   isApplied,
+  setRealTime,
+  setVirtualTime,
   getProposalsProfessor,
   updateThesisArchivation,
   getTeachers,

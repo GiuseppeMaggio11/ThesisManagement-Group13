@@ -1,5 +1,6 @@
 const dao = require("../dao");
 const { validationResult } = require("express-validator");
+//const {transporter} = require("../index")
 const fs = require("fs");
 const nodemailer = require("nodemailer");
 
@@ -107,6 +108,7 @@ async function newApplication(req, res) {
         return res.status(422).json("You are already applied for a thesis");
       }
     }
+
     const result = await dao.newApply(userID, thesis_id, date);
     const emailData = await dao.getDataTeacherApplicationEmail(thesis_id);
     const mailOptions = {
