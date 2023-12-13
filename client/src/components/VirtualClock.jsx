@@ -9,6 +9,7 @@ const VirtualClock = (props) => {
   const [isVirtual, setIsVirtual] = useState(false)
   const [settingVirtual, setSettingVirtual] = useState(false)
   const [isAmPm, setIsAmPm] = useState('')
+  const [virtualTime, setVirtualTime] = useState();
 
   /*   const updateTime = (amount, unit) => {
       const newDateTime = new Date(tempTime);
@@ -26,10 +27,13 @@ const VirtualClock = (props) => {
       setTempTime(newDateTime);
     }; */
 
-  /* const handleVirtualTime = async (newTime) => {
-    props.setVirtualClock(newTime);
-    localStorage.setItem("virtualclock", JSON.stringify(newTime));
-    await API.updateExpiration(newTime)
+  const handleVirtualTime = async () => {
+    setIsVirtual(true); 
+    setSettingVirtual(false)
+    props.setVirtualClock(virtualTime.toDate());
+    localStorage.setItem("virtualclock", JSON.stringify(virtualTime.toDate()));
+    console.log(virtualTime)
+    await API.updateExpiration(virtualTime.toDate())
       .then((response) => {
         if (response && "errors" in response) {
           //setErrors(response.errors);
@@ -40,11 +44,12 @@ const VirtualClock = (props) => {
       })
       .catch((error) => {
         //setErrors([{ msg: error.message }]);
-      });
+      }); 
   };
 
   const handleRealTime = async () => {
     setTempTime(new Date());
+    setIsVirtual(false);
     props.setVirtualClock(new Date());
     localStorage.removeItem("virtualclock");
     await API.updateExpiration(tempTime)
@@ -60,37 +65,26 @@ const VirtualClock = (props) => {
         //setErrors([{ msg: error.message }]);
       });
   };
-  const formattedDateTime = tempTime.toLocaleString();
- */
-  function handleChageAmPm(){
-    if(isAmPm==='pm'){
-      console.log('è pm')
-      console.log('am')
-      setIsAmPm('am')
-    }
-    else
-      setIsAmPm('pm')
-
-      console.log(isAmPm)
-  }
-
 
   return (
-    <Container className="mt-5">
-      <div>
-        <FlipClock isVirtual={isVirtual} setIsVirtual={setIsVirtual} isAmPm={isAmPm} setIsAmPm={setIsAmPm} handleChageAmPm={handleChageAmPm} settingVirtual={settingVirtual} setSettingVirtual={setSettingVirtual}/>
-      </div>
-      <div style={{display:"flex", alignItems:"center", justifyContent:'center'}}>
-        {!settingVirtual && !isVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{setSettingVirtual(true)}}>Virtual time Mode </Button>}
-        {!settingVirtual && isVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{setIsVirtual(false)}}> RealTime Mode </Button>}
-        {!settingVirtual && isVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{setIsVirtual(false); setSettingVirtual(true)}}> Set Virtual time </Button>}
-       
-        {settingVirtual && !isVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{setIsVirtual(false); setSettingVirtual(false)}}> Go back in Real Time </Button>}
-        {settingVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{setIsVirtual(true); setSettingVirtual(false)}}> Apply virtual time </Button>}
-      
-      </div>
-    </Container>
-  );
+    <Container className="d-flex flex-column" style={{marginTop:'1em'}}>
+      <div className="d-flex justify-content-center"> 
+        <h2>SISTEM CLOCK</h2>
+    </div>
+    <div>
+      <FlipClock isVirtual={isVirtual} setIsVirtual={setIsVirtual} isAmPm={isAmPm} setIsAmPm={setIsAmPm} settingVirtual={settingVirtual} setSettingVirtual={setSettingVirtual} virtualTime={virtualTime} setVirtualTime={setVirtualTime}/>
+    </div>
+    <div className="mt-3 d-flex justify-content-center"> {/* Adjust the margin top as needed */}
+      {!settingVirtual && !isVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{setSettingVirtual(true)}}>Virtual time Mode </Button>}
+      {!settingVirtual && isVirtual && <Button style={{marginRight:'0.5em'}} onClick={handleRealTime}> Real time Mode </Button>}
+      {settingVirtual && isVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{handleRealTime();setSettingVirtual(false)}}> Real time Mode </Button>}
+      {!settingVirtual && isVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{setIsVirtual(false); setSettingVirtual(true)}}> Set Virtual time </Button>}
+     
+      {settingVirtual && !isVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{setIsVirtual(false); setSettingVirtual(false)}}> Go back in Real Time </Button>}
+      {settingVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{}}> Apply virtual time </Button>}
+    </div>
+  </Container>
+  )  
 };
 
 export default VirtualClock;
