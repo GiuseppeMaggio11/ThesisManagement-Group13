@@ -3,6 +3,7 @@ const URL = "http://localhost:3001/api";
 const URL_LOGIN = "http://localhost:3001";
 
 function getJson(httpResponsePromise) {
+  //debugger;
   // server API always return JSON, in case of error the format is the following { error: <message> }
   return new Promise((resolve, reject) => {
     httpResponsePromise
@@ -137,11 +138,11 @@ async function applicationThesis(thesis_id, date) {
   );
 }
 
-async function sendFiles(formData, thesis_id) {
+function sendFiles(formData, thesis_id) {
   try {
     const uploadURL = `${URL}/newFiles/${thesis_id}`;
-
-    const response = await fetch(uploadURL, {
+    console.log(formData)
+    const response = fetch(uploadURL, {
       method: "POST",
       body: formData, // FormData object containing the files
       credentials: "include",
@@ -175,7 +176,7 @@ async function getThesisProposals(date) {
       cosupervisors: element.cosupervisors,
     }));
   } else {
-    throw [];
+    return [];
   }
 }
 
@@ -276,6 +277,60 @@ async function isApplied() {
   );
 }
 
+async function downloadStudentApplicationAllFiles(student_id, thesis_id) {
+    const response = await fetch(URL + `/getAllFiles/${student_id}/${thesis_id}`, {
+      credentials: "include",
+      headers: {
+        "Accept": "application/zip"
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to download zip folder. Status: ${response.status}`);
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const downloadLink  = document.createElement('a');
+    downloadLink.href = url;
+    downloadLink.download = `${student_id}_${thesis_id}.zip`;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+    window.URL.revokeObjectURL(url);
+}
+
+async function downloadStudentApplicationFile (student_id, thesis_id, file_name) {
+  const response = await fetch(URL + `/getFile/${student_id}/${thesis_id}/${file_name}`, {
+    credentials: "include",
+    headers: {
+      "Accept": "application/pdf"
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to download PDF file. Status: ${response.status}`);
+  }
+
+  const blob = await response.blob();
+  const url = window.URL.createObjectURL(blob);
+  const downloadLink = document.createElement('a');
+  downloadLink.href = url;
+  downloadLink.download = `${file_name}.pdf`;
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+  window.URL.revokeObjectURL(url);
+}
+
+async function listApplicationFiles (student_id, thesis_id) {
+  return getJson(
+    fetch(`${URL}/getStudentFilesList/${student_id}/${thesis_id}`, {
+      credentials: "include",
+    })
+  );
+}
+
 async function getProposalsProfessor() {
   return getJson(
     fetch(`${URL}/getProposalsProfessor`, {
@@ -349,6 +404,9 @@ const API = {
   redirectToLogin,
   getStudentApplications,
   isApplied,
+  downloadStudentApplicationAllFiles,
+  downloadStudentApplicationFile,
+  listApplicationFiles,
   setRealTime,
   setVirtualTime,
   getProposalsProfessor,

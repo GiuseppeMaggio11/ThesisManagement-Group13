@@ -26,6 +26,7 @@ import {
   PlusLg,
 } from "react-bootstrap-icons";
 import randomcolor from "randomcolor";
+import NoFileFound from "./NoFileFound";
 
 function ProfessorActiveProposals(props) {
   const [activeProposals, setActiveProposals] = useState(undefined);
@@ -86,9 +87,9 @@ function ProfessorActiveProposals(props) {
       </Row>
 
       {!activeProposals || activeProposals.length === 0 ? (
-        <Alert variant="danger" style={{ maxWidth: "300px" }}>
-          No active thesis proposals found
-        </Alert>
+        <NoFileFound
+          message={"No proposals found"}
+        />
       ) : (
         <ActiveProposalsLargeScreen
           activeProposals={activeProposals}

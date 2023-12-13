@@ -561,7 +561,7 @@ input:checked+.slider::before {
 
 @media (min-width: 576px) {
   .modal-dialog {
-    max-width: 500px;
+    /*max-width: 500px;*/
     /* Adjust as needed */
     margin: auto;
   }

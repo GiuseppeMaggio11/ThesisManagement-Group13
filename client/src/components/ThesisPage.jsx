@@ -72,7 +72,6 @@ function ThesisPage(props) {
   const handleApplication = () => {
     if (selectedFiles.length) handleUpload(params.id);
     submitApplication(params.id, props.virtualClock);
-    if (selectedFiles.length) handleUpload(params.id);
   };
 
   const handleUpload = (thesis_id) => {
@@ -82,8 +81,7 @@ function ThesisPage(props) {
     }
     API.sendFiles(formData, thesis_id)
       .then(() => {
-        handleToast("Application submitted correctly", "success");
-        navigate("/studproposals");
+        
       })
       .catch((err) => {
         handleToast(err, "error");
@@ -260,7 +258,7 @@ function ThesisPage(props) {
                         </div>
                       </Col>
                       {
-                        /*!(from === "applications") &&*/ props.user
+                        !(from === "applications") && props.user
                           .user_type === "STUD" && (
                           <Col>
                             <div className="button-apply">

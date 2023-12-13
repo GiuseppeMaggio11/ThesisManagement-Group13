@@ -55,9 +55,9 @@ function ViewProposal(props) {
 
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
-  const archiveProposal = async () => {
+  const archiveProposal = async (id) => {
     try {
-      await API.updateThesisArchivation(idView);
+      await API.updateThesisArchivation(id);
       navigate("/profproposals");
       handleToast("Proposal archived correctly", "success");
     } catch (err) {
@@ -65,9 +65,9 @@ function ViewProposal(props) {
     }
   };
 
-  const deleteProposal = async () => {
+  const deleteProposal = async (id) => {
     try {
-      await API.deleteProposal(idView);
+      await API.deleteProposal(id);
       navigate("/profproposals");
       handleToast("Proposal deleted correctly", "success");
     } catch (err) {
@@ -299,14 +299,14 @@ function ViewProposal(props) {
     handleClose={() => setShowArchive(false)}
     body={"Are you sure you want to archive this proposal ?"}
     action={"Archive"}
-    handleAction={() => archiveProposal(idView)}
+    handleAction={() => archiveProposal(proposal.id)}
   />
   <ConfirmationModal
     show={showDelete}
     handleClose={() => setShowDelete(false)}
     body={"Are you sure you want to delete this proposal ?"}
     action={"Delete"}
-    handleAction={() => deleteProposal(idView)}
+    handleAction={() => deleteProposal(proposal.id)}
   /></>
   );
 }

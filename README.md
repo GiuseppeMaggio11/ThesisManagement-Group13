@@ -320,6 +320,96 @@ docker compose down
     } 
     ```
 
+#### **Update a thesis proposal**: `PUT /api/updateThesis`
+
+  - **Description**: Updates an existing thesis including its group, internal cosupervisors and external cosupervisors
+  - **Middleware**: `isProfessor`
+  - **Request Body**:
+    - `thesis_id` (unsigned non-zero integer): The id of the thesis,
+    - `title` (string): The new title of the thesis,
+    - `description` (string): The new description of the thesis,
+    - `supervisor_id` (string): The new supervisor ID of the thesis,
+    - `thesis_level` (string): The new level of the thesis,
+    - `type_name` (string): The new type of the thesis,
+    - `required_knowledge` (string): The new required knowledge of the thesis,
+    - `notes` (string): The new notes about the thesis,
+    - `expiration` (date): The new expiration date of the thesis,
+    - `cod_degree` (string): The new degree of the thesis,
+    - `is_archived` (boolean): If the updated thesis is archived,
+    - `keywords` (string): The new keywords of the thesis,
+    - `cosupervisors_internal` (array): The new internal co-supervisors of the thesis,
+    - `cosupervisors_external` (array): The new external co-supervisors of the thesis
+    - `cod_group` (string): The new code group of the thesis
+  - **Response**:
+    - In case of success, the api returns all the fields of the updated thesis as memorized inside the database
+    ```
+    {
+      "thesis_id": n (unsigned non-zero integer),
+      "title": "new title",
+      "description": "new description",
+      "supervisor_id": "new supervisor_id",
+      "thesis_level": "new thesis_level",
+      "type_name": "new type_name",
+      "required_knowledge": "new required_knowledge",
+      "notes": "new notes",
+      "expiration": "new expiration as string in the format YYYY-MM-DDThh:mm:ss.sssZ",
+      "cod_degree": "new cod_degree",
+      "is_archived": new_is_archived (boolean),
+      "keywords": "new keywords"
+    }
+    ```
+    - `422` if some inputs are wrong
+    - `400` if data is incorrect
+    - `500` if inside the group_table there was more than one entry with thesis_id equal to the one passed inside the request body
+    - `503` if a database error occurres 
+  - **Example**:
+    ```json
+    {   
+      "thesis_id": 1,
+      "title": "new title",
+      "description": "new description",
+      "supervisor_id" : "P654321",
+      "thesis_level": "Bachelor",
+      "type_name": "new type_name",
+      "required_knowledge": "new required_knowledge",
+      "notes": "new notes",
+      "expiration": "2050-01-01T00:00:00.000Z",
+      "cod_degree": "DEGR02",
+      "is_archived": false,
+      "keywords": "k1, k2",
+      "cosupervisors_internal": ["P123456"],
+      "cosupervisors_external": ["elena.conti@email.net"],
+      "cod_group": "GRP02"
+    } 
+    ```
+
+#### 8. **Download all student's application files**: `GET /api/getAllFiles/:student_id/:thesis_id`
+
+  - **Description**: Download all files associated with an application 
+  - **Middleware**: `isProfessor`
+  - **Request Body**: None,
+  - **Response**:
+    - `200` with a zip folder inside res.download containing all the files of the application
+    - `500` if an unexpected error occurs
+
+#### 9. **Download a single student's application file**: `GET /api/getFile/:student_id/:thesis_id/:file_name`
+
+  - **Description**: Download a single file associated with an application 
+  - **Middleware**: `isProfessor`
+  - **Request Body**: None,
+  - **Response**:
+    - `200` with a pdf file inside res.download 
+    - `500` if an unexpected error occurs
+
+#### 10. **Show the list of all files related to an application**: `GET /api/getStudentFilesList/:student_id/:thesis_id`
+
+  - **Description**: Get the list of the names of all the PDF files linked to an application 
+  - **Middleware**: `isProfessor`
+  - **Request Body**: None,
+  - **Response**:
+    - `200` with a list of strings representing files' name 
+    - `500` if an unexpected error occurs
+
 #### OTHER 1 Server
 
 #### OTHER 2 Server
@@ -451,6 +541,43 @@ docker compose down
 
 ```
 "Rows matched: 6  Changed: 3  Warnings: 0"
+```
+
+#### downloadStudentApplicationAllFiles
+
+- Description: Asks the server to download a zip folder containing all the files associated with an application
+- API server called:  GET `/api/getAllFiles/:student_id/:thesis_id`
+- Input: 
+  + `student_id`: The id of the student who submitted the application 
+  + `thesis_id`: The id of the thesis for which the student submitted the application.
+- Output: _None_
+
+#### downloadStudentApplicationFile
+
+- Description: Asks the server to download one of the PDF files associated with an application
+- API server called:  GET `/api/getFile/:student_id/:thesis_id/:file_name`
+- Input: 
+  + `student_id`: The id of the student who submitted the application 
+  + `thesis_id`: The id of the thesis for which the student submitted the application.
+  + `file_name`: The name of the file to be downloaded
+- Output: _None_
+
+#### listApplicationFiles
+
+- Description: Asks the server for the list of files' name associated with an application
+- API server called:  GET `/api/getStudentFilesList/:student_id/:thesis_id`
+- Input: 
+  + `student_id`: The id of the student who submitted the application 
+  + `thesis_id`: The id of the thesis for which the student submitted the application.
+- Output: A vector of strings, each representing the name of one of the files associated with the application
+- Example:
+```json
+[
+  "file_1.pdf",
+  "file_2.pdf",
+  "file_3.pdf",
+  ...
+]
 ```
 
 #### OTHER 2 Client

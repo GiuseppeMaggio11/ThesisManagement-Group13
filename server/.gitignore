@@ -1,6 +1,7 @@
 # dependencies
 /node_modules
 coverage/
+studentFiles/
 
 # misc
 .DS_Store

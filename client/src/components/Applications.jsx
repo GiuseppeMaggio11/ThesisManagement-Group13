@@ -5,14 +5,18 @@ import {
   Button,
   Col,
   Container,
+  Modal,
+  ModalBody,
+  OverlayTrigger,
   Row,
   Table,
+  Tooltip,
 } from "react-bootstrap";
 import Loading from "./Loading";
 import { useMediaQuery } from "react-responsive";
 import API from "../API";
 import MessageContext from "../messageCtx";
-import { CheckLg, XLg } from "react-bootstrap-icons";
+import { CheckLg, XLg, Download, Folder, FileEarmarkPdf, FileEarmarkPdfFill } from "react-bootstrap-icons";
 import ConfirmationModal from "./ConfirmationModal";
 import NoFileFound from "./NoFileFound";
 
@@ -30,10 +34,15 @@ function Applications(props) {
     //API CALL
     const getApplication = async () => {
       const result = await API.getPendingApplications();
+      const promises = result.map(async (element) => {
+        const files = await API.listApplicationFiles(element.student_id, element.thesis_id);
+        return Object.assign({}, element, {files: files});
+      });
+      const updatedResult = await Promise.all(promises);
       const uniqueThesisTitles = [
-        ...new Set(result.map((entry) => entry.thesis_title)),
+        ...new Set(updatedResult.map((entry) => entry.thesis_title)),
       ];
-      setApplications(result);
+      setApplications(updatedResult);
       setThesisTitles(uniqueThesisTitles);
       props.setLoading(false);
     };
@@ -55,15 +64,36 @@ function Applications(props) {
         "success"
       );
       const result = await API.getPendingApplications();
+      const promises = result.map(async (element) => {
+        const files = await API.listApplicationFiles(element.student_id, element.thesis_id);
+        return Object.assign({}, element, {files: files});
+      });
+      const updatedResult = await Promise.all(promises);
       const uniqueThesisTitles = [
-        ...new Set(result.map((entry) => entry.thesis_title)),
+        ...new Set(updatedResult.map((entry) => entry.thesis_title)),
       ];
-      setApplications(result);
+      setApplications(updatedResult);
       setThesisTitles(uniqueThesisTitles);
       props.setLoading(false);
     } catch (err) {
       handleToast(err, "error");
     }
+  };
+
+  const handleDownloadZip = async (student_id, thesis_id) => {
+    try {
+      await API.downloadStudentApplicationAllFiles(student_id, thesis_id);
+    } catch (err) {
+      handleToast(err, "error");
+    } 
+  };
+
+  const handleDownloadPDF = async (student_id, thesis_id, file_name) => {
+    try {
+      await API.downloadStudentApplicationFile(student_id, thesis_id, file_name);
+    } catch (err) {
+      handleToast(err, "error");
+    } 
   };
 
   return (
@@ -109,6 +139,7 @@ function Applications(props) {
                           <th>Application Date</th>
                           <th></th>
                           <th></th>
+                          <th></th>
                         </tr>
                       </thead>
                       <tbody>
@@ -118,6 +149,8 @@ function Applications(props) {
                               application={appl}
                               key={i}
                               handleApplication={handleApplication}
+                              handleDownloadZip={handleDownloadZip}
+                              handleDownloadPDF={handleDownloadPDF}
                               isMobile={isMobile}
                               title={title}
                             />
@@ -141,6 +174,16 @@ function StudentApplication(props) {
   const [action, setAction] = useState('');
   const [studentId, setStudentId] = useState('');
   const [thesisId, setThesisId] = useState('');
+
+  const [show, setShow] = useState(false);
+  const [hoveredRow, setHoveredRow] = useState(undefined);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
+  const handleRowHover = (index) => {
+    setHoveredRow(index);
+  };
 
   function formatDate(dateString) {
     var date = new Date(dateString);
@@ -169,38 +212,125 @@ function StudentApplication(props) {
 
 
   return props.title === props.application.thesis_title ? (
-    <tr>
-      {!props.isMobile && <td>{props.application.student_id}</td>}
-      <td>{props.application.student_name}</td>
-      <td>{formatDate(props.application.application_date)}</td>
-      <td>
-        <Button
-          variant="success"
-          onClick={() =>
-            handleConfirmation(
-              props.application.student_id,
-              props.application.thesis_id,
-              'Accepted'
-            )
-          }
-        >
-          <CheckLg size={20} />
-        </Button>
-      </td>
-      <td>
-        <Button
-          variant="danger"
-          onClick={() =>
-            handleConfirmation(
-              props.application.student_id,
-              props.application.thesis_id,
-              'Refused'
-            )
-          }
-        >
-          <XLg size={20} />
-        </Button>
-      </td>
+    <>
+      <tr>
+        {!props.isMobile && <td>{props.application.student_id}</td>}
+        <td>{props.application.student_name}</td>
+        <td>{formatDate(props.application.application_date)}</td>
+        <td>
+          <OverlayTrigger overlay={
+            <Tooltip id="tooltip-top">See application files</Tooltip>
+          }>
+            <Button
+              variant="secondary"
+              onClick={handleShow}
+            >
+              <Folder size={20} />
+            </Button>
+          </OverlayTrigger>
+        </td>
+        <td>
+          <OverlayTrigger overlay={
+            <Tooltip id="tooltip-top">Accept application</Tooltip>
+          }>
+            <Button
+              variant="success"
+              onClick={() =>
+                handleConfirmation(
+                  props.application.student_id,
+                  props.application.thesis_id,
+                  'Accepted'
+                )
+              }
+            >
+              <CheckLg size={20} />
+            </Button>
+          </OverlayTrigger>
+        </td>
+        <td>
+          <OverlayTrigger overlay={
+            <Tooltip id="tooltip-top">Reject application</Tooltip>
+          }>
+            <Button
+              variant="danger"
+              onClick={() =>
+                handleConfirmation(
+                  props.application.student_id,
+                  props.application.thesis_id,
+                  'Refused'
+                )
+              }
+            >
+              <XLg size={20} />
+            </Button>
+          </OverlayTrigger>
+        </td>
+      </tr>
+
+      <Modal size="lg" show={show} onHide={handleClose} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Application files</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+            <div style={{ marginRight: "1rem" }}>
+              <Table hover>
+                <tbody>
+                  {props.application.files.map((element, index) => {
+                    return (
+                      <tr 
+                        key={index}
+                        onMouseEnter={() => handleRowHover(index)}
+                        onMouseLeave={() => handleRowHover(undefined)}
+                      >
+                        <td>
+                          {hoveredRow === index ? <FileEarmarkPdfFill/> : <FileEarmarkPdf/>} {element}
+                        </td>
+                        <td>
+                          {/*<OverlayTrigger overlay={
+                            <Tooltip id="tooltip-top">Download file</Tooltip>
+                          }>*/}
+                            <Button 
+                              className="button-style" 
+                              onClick={() => 
+                                props.handleDownloadPDF(
+                                  props.application.student_id,
+                                  props.application.thesis_id,
+                                  element
+                                )
+                              }>
+                              <Download size={20} />
+                            </Button>
+                          {/*</td></OverlayTrigger>*/}
+                        </td>
+                      </tr>
+                    )}
+                  )}
+                </tbody>
+              </Table>
+            </div>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+          <OverlayTrigger overlay={
+            <Tooltip id="tooltip-top">Download zip folder</Tooltip>
+          }>
+            <Button 
+              className="button-style" 
+              onClick={() =>
+                props.handleDownloadZip(
+                  props.application.student_id,
+                  props.application.thesis_id
+                )}>
+              Download all 
+            </Button>
+          </OverlayTrigger>
+        </Modal.Footer>
+      </Modal>
+
       <ConfirmationModal
         show={showConfirmation}
         handleClose={() => setShowConfirmation(false)}
@@ -208,7 +338,7 @@ function StudentApplication(props) {
         action={action}
         body={`Are you sure you want to ${action.toLowerCase()} this application?`}
       />
-    </tr>
+    </>
   ) : null;
 }
 

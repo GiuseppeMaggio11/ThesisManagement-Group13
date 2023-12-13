@@ -49,7 +49,7 @@ const upload = multer({
 });
 
 async function addFiles (req,res){
-    const thesis_id = req.params.thesis_id;
+  const thesis_id = req.params.thesis_id;
   try {
     if (!Number.isInteger(Number(thesis_id))) {
       throw new Error('Thesis ID must be an integer');
@@ -81,15 +81,13 @@ async function getAllFiles (req,res) {
     
         zipdir(userFolderPath, { saveTo: zipFilePath }, function (err, buffer) {
           if (err) {
-            res.status(500).json('An error occurred while creating the zip archive.');
+            throw err;
           } else {
-            res.download(zipFilePath, () => {
+            res.status(200).download(zipFilePath, () => {
               // Delete the file after the download is complete
               fs.unlink(zipFilePath, (err) => {
                 if (err) {
                   console.error('Error deleting the zip file:', err);
-                } else {
-                  console.log('Zip file deleted successfully.');
                 }
               });
             });
