@@ -83,30 +83,32 @@ function NewProposal(props) {
 
       let ex_cosup = await API.getListExternalCosupervisors();
       let in_cosup = await API.getTeachers();
-      let groups = await API.getGroups();
-      let degrees = await API.getDegrees();
 
+      let degrees = await API.getDegrees();
+      let groups = await API.getGroups();
       let sup = in_cosup.filter(item => item.email === sup_email);
       console.log(sup)
-      const formatted_group = groups.map((e) => e.name);
+
 
       setCoSupervisorExternal_obj(ex_cosup);
       setCoSupervisorInternal_obj(in_cosup);
-      setGroups_obj(groups);
+
       setTeacher(sup[0]);
       setDegrees(degrees);
-
-      if((!idUpd && !idCopy)){
+      setGroups_obj(groups);
+      if ((!idUpd && !idCopy)) {
         const formatted_ex_cosup = ex_cosup.map(
           ({ name, surname }) => `${name} ${surname}`
         );
         const formatted_in_cosup = in_cosup.map(
           ({ name, surname }) => `${name} ${surname}`
         );
-      setCoSupervisorExternal(formatted_ex_cosup);
-      setCoSupervisorInternal(formatted_in_cosup);
-    }
-      setGroups(formatted_group);
+        const formatted_group = groups.map((e) => e.name);
+        setGroups(formatted_group);
+        setCoSupervisorExternal(formatted_ex_cosup);
+        setCoSupervisorInternal(formatted_in_cosup);
+      }
+
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -120,17 +122,34 @@ function NewProposal(props) {
       let in_cosup = await API.getTeachers();
       let ex_cosup = await API.getListExternalCosupervisors();
       let groups = await API.getGroups();
-
-     let gr = groups.filter((g)=>{
-          return response.cod_group.some(
-            group => group === g.cod
-          )}
+      let gr_notSelected=[]
+      let gr = groups.filter((g) => {
+        return response.cod_group.some(
+          group => group === g.cod
         )
+      }
+      )
 
-        gr =  gr.map(
-          ({ name }) => `${name}`
-        );
-       
+      if (gr.length) {
+        gr_notSelected = groups?.filter((g) => {
+          return response.cod_group.some(
+            group => group !== g.cod
+          )
+        }
+        )
+      }
+      else{
+        gr_notSelected=groups
+      }
+      console.log(gr)
+      console.log(gr_notSelected)
+
+      gr = gr.map(
+        ({ name }) => `${name}`
+      );
+      gr_notSelected = gr_notSelected?.map(
+        ({ name }) => `${name}`
+      );
 
       const formatted_ex_cosup = ex_cosup.map(
         ({ name, surname }) => `${name} ${surname}`
@@ -138,8 +157,6 @@ function NewProposal(props) {
       const formatted_in_cosup = in_cosup.map(
         ({ name, surname }) => `${name} ${surname}`
       );
-      setCoSupervisorExternal(formatted_ex_cosup);
-      setCoSupervisorInternal(formatted_in_cosup);
 
       in_cosup = in_cosup.filter((item => {
         return response.cosupervisors_internal.some(
@@ -161,25 +178,31 @@ function NewProposal(props) {
         ({ name, surname }) => `${name} ${surname}`
       );
 
-      if (cosupervisors_internal.length>0) {
-        console.log('internal')
-        let c_in = [...cosupervisors_internal]
-        console.log('before', c_in)
-        console.log('before', in_cosup)
+
+      if (formatted_in_cosup.length > 0) {
+        let c_in = [...formatted_in_cosup]
         c_in = c_in.filter(c => !in_cosup.includes(c))
-        console.log('after', c_in)
-        console.log('after', in_cosup)
-        cosupervisors_internal(c_in)
+        console.log('c_in', c_in)
+        setCoSupervisorInternal(c_in)
+      }
+      else {
+        setCoSupervisorInternal([])
       }
 
-      if (cosupervisors_external.length) {
-        console.log('external')
-        let c_out = [...cosupervisors_external]
-        console.log(c_out)
+      if (formatted_ex_cosup.length) {
+        let c_out = [...formatted_ex_cosup]
         c_out = c_out.filter(c => !ex_cosup.includes(c))
-        console.log('c_out', c_out)
         setCoSupervisorExternal(c_out)
       }
+      else {
+        setCoSupervisorExternal([])
+      }
+
+      if (gr_notSelected.length) {
+        setGroups(gr_notSelected)
+      }
+      else
+        setGroups([])
 
       response = {
         ...response,
