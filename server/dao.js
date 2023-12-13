@@ -129,6 +129,34 @@ exports.getProfID = async (username) => {
   }
 };
 
+exports.getDataTeacherApplicationEmail = async (thesisId) => {
+  try{
+
+    const sql  = "SELECT  email, title FROM thesis TS, teacher TE WHERE TS.id = ? AND TS.supervisor_id = TE.id"
+
+    const [result] = await pool.execute(sql, [thesisId]);
+
+    return result[0];
+
+  } catch(error){
+    console.error("Error in getDataApplicationEmail: ", error);
+    throw error
+  }
+}
+
+exports.getDataStudentApplicationEmail = async (thesisId, studentId) => {
+  try{
+    const sql  = "SELECT  email, title FROM thesis TS, student S WHERE TS.id = ? AND S.id = ? "
+    const [result] = await pool.execute(sql, [thesisId, studentId]);
+    return result[0];
+
+  } catch(error){
+    console.error("Error in getDataStudentApplicationEmail: ", error);
+    throw error
+  }
+}
+
+
 //Get proposals
 exports.getProposals = async (user_type, username, date) => {
   try {
@@ -151,7 +179,7 @@ exports.getProposals = async (user_type, username, date) => {
     }
     let formattedDate = dayjs(date).format("YYYY-MM-DD HH:mm:ss");
     sql =
-      "select t.id, title, description, tch.name ,tch.surname , thesis_level ,thesis_type , required_knowledge , notes, expiration, keywords , dg.title_degree , g.group_name, d.department_name  , is_archived from thesis t join teacher tch on t.supervisor_id = tch.id join degree_table dg on t.cod_degree = dg.cod_degree join group_table g on tch.cod_group = g.cod_group join department d on tch.cod_department = d.cod_department where t.expiration > ? AND is_deleted = 0 AND is_archived=0";
+      "SELECT t.id, title, description, tch.name ,tch.surname , thesis_level ,thesis_type , required_knowledge , notes, expiration, keywords , dg.title_degree , g.group_name, d.department_name  , is_archived FROM thesis t join teacher tch on t.supervisor_id = tch.id join degree_table dg on t.cod_degree = dg.cod_degree join group_table g on tch.cod_group = g.cod_group join department d on tch.cod_department = d.cod_department WHERE t.expiration > ? AND is_deleted = 0 AND is_archived=0";
     const [thesisResults] = await pool.execute(sql, [formattedDate]);
 
     if (thesisResults.length === 0) {
@@ -541,11 +569,12 @@ exports.getCodes_group = async () => {
   try {
     const sql = `SELECT cod_group FROM group_table`;
     const [rows] = await pool.execute(sql);
-
+  
     const codes_group = [];
     rows.map((e) => {
       codes_group.push(e.cod_group);
     });
+    console.log('INSIDE FUNCTION', codes_group)
     return codes_group;
   } catch (error) {
     console.error("Error in getCodes_group: ", error);
@@ -861,10 +890,10 @@ exports.updateThesis = async (thesis) => {
 };
 
 // Updates an existing row in thesis_group table, must receive id of thesis and id of related group, returns number of rows modified
-exports.updateThesisGroup = async (thesis_id, group_id) => {
+exports.deleteThesisGroups = async (thesis_id) => {
   try {
-    const sql = "UPDATE thesis_group SET group_id = ? WHERE thesis_id = ?";
-    const [rows] = await pool.execute(sql, [group_id, thesis_id]);
+    const sql = "DELETE FROM thesis_group WHERE thesis_id = ?";
+    const [rows] = await pool.execute(sql, [thesis_id]);
 
     /* const thesis_group = {
       thesis_id: thesis_id,
@@ -1192,12 +1221,12 @@ exports.getThesisIntCosupervisorForProfessor = async (id) => {
   }
 };
 
-exports.getThesisGroupForProfessor = async (id) => {
+exports.getThesisGroups= async (id) => {
   try {
     //get thesis group
     const sql = "select group_id from thesis_group where thesis_id = ?";
-    const [row] = await pool.execute(sql, [id]);
-    return row[0] ? row[0].group_id : [];
+    const [rows] = await pool.execute(sql, [id]);
+    return rows.map(x => x.group_id);
   } catch (err) {
     console.error("Error in getThesisGroupForProfessor: ", err);
     throw err;

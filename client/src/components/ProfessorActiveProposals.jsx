@@ -16,18 +16,26 @@ import MessageContext from "../messageCtx";
 import { useMediaQuery } from "react-responsive";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
-import { Calendar, PencilFill } from "react-bootstrap-icons";
+import { Calendar, Pencil, Trash3, Archive, Trash, PlusLg } from "react-bootstrap-icons";
 import randomcolor from "randomcolor";
 
 function ProfessorActiveProposals(props) {
   const [activeProposals, setActiveProposals] = useState(undefined);
   const { handleToast } = useContext(MessageContext);
   const isMobile = useMediaQuery({ maxWidth: 767 });
+  const navigate = useNavigate();
 
-  if (!props.loggedIn || props.user.user_type !== "PROF") {
-    return API.redirectToLogin();
-  }
+  //if (!props.loggedIn || props.user.user_type !== "PROF") {
+  //  return API.redirectToLogin();
+  //}
 
+  useEffect(() => {
+    if(props.user && props.user.user_type !== "PROF") {
+      return API.redirectToLogin();
+    }
+  }, [props.user]);
+
+ 
   const getActiveProposals = async () => {
     try {
       props.setLoading(true);
@@ -38,6 +46,11 @@ function ProfessorActiveProposals(props) {
       handleToast("Error while fetching active proposals", "error");
     }
   };
+  const renderTooltipNew = (props) => (
+    <Tooltip id="button-tooltip" {...props}>
+      New proposal
+    </Tooltip>
+  );
 
   useEffect(() => {
     getActiveProposals();
@@ -47,8 +60,17 @@ function ProfessorActiveProposals(props) {
     <Loading />
   ) : (
     <Container className="p-4">
-      <Row>
-        <Col className="fs-2">Active thesis proposals</Col>
+      <Row className="justify-content-between">
+        <Col xs={8} className="fs-2">Active thesis proposals</Col>
+        <Col xs={4} className="d-flex justify-content-end align-items-center">
+          <OverlayTrigger
+          placement="top"
+          delay={{ show: 250, hide: 400 }}
+          overlay={renderTooltipNew}
+          >
+            <PlusLg style={{ fontSize: 'xx-large' }} onClick={() => navigate("/newproposal/")} />
+          </OverlayTrigger>
+        </Col>
       </Row>
 
       {!activeProposals || activeProposals.length === 0 ? (
@@ -176,7 +198,7 @@ function ElementProposalLargeScreen(props) {
                 }}
               >
                 {!props.isMobile && <span className="mx-2">Edit</span>}
-                <PencilFill />
+                <Pencil />
               </Button>
             </OverlayTrigger>
             <OverlayTrigger
@@ -187,7 +209,6 @@ function ElementProposalLargeScreen(props) {
               <Button
                 variant="light"
                 onClick={() => {
-                  props.handleToast("Thesis copied", "success");
                   navigate("/copyproposal/" + props.proposal.id);
                 }}
               >
@@ -212,9 +233,9 @@ function ElementProposalLargeScreen(props) {
               delay={{ show: 250, hide: 400 }}
               overlay={renderTooltipDelete}
             >
-              <Button variant="light" className="mx-2" onClick={deleteProposal}>
+              <Button variant="light" className="mx-2" onClick={() => deleteProposal(props.proposal.id)}>
                 {!props.isMobile && <span className="mx-2">Delete</span>}
-                <PencilFill />
+                <Trash3 />
               </Button>
             </OverlayTrigger>
             <OverlayTrigger
@@ -225,10 +246,10 @@ function ElementProposalLargeScreen(props) {
               <Button
                 variant="light"
                 className="mx-2"
-                onClick={archiveProposal}
+                onClick={() => archiveProposal(props.proposal.id)}
               >
                 {!props.isMobile && <span className="mx-2">Archive</span>}
-                <PencilFill />
+                <Archive />
               </Button>
             </OverlayTrigger>
           </Col>

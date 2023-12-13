@@ -1,6 +1,15 @@
 const dao = require("../dao");
 const { validationResult } = require("express-validator");
 const fs = require("fs");
+const nodemailer = require("nodemailer");
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+  user: 'group13.thesismanagement@gmail.com',
+  pass: 'xuzg drbh ezyn zaqg'
+}
+}); 
 // accept one student application, cancels all other applications for that student,
 //rejects every other student application to that same thesis
 async function updateApplicationStatus(req, res) {
@@ -39,6 +48,20 @@ async function updateApplicationStatus(req, res) {
           //cancels every other application of that student
           //const result_cancel = await dao.cancelStudentApplications(decision);
         }
+        const emailData = await dao.getDataStudentApplicationEmail(decision.thesis_id, decision.student_id)
+        const mailOptions = {
+          from: 'group13.thesismanagement@gmail.com',
+          to: `maggiomaggio7@gmail.com`, //emailData.email deve essere
+          subject: `Status for thesis ${emailData.title}`,
+          text: `Your application for thesis ${emailData.title} was ${decision.status}`
+        };
+        transporter.sendMail(mailOptions, async (error, info) => {
+          if (!error) {
+          console.log("Email mandata")
+          } else {
+              console.log(error);
+          }
+      }); 
         await dao.commit();
         return res.status(200).json(updated_application);
       }
@@ -79,6 +102,21 @@ async function newApplication(req, res) {
       }
     }
     const result = await dao.newApply(userID, thesis_id, date);
+    const emailData = await dao.getDataTeacherApplicationEmail(thesis_id)
+    const mailOptions = {
+      from: 'group13.thesismanagement@gmail.com',
+      to: `maggiomaggio7@gmail.com`, //emailData.email deve essere
+      subject: `Application for thesis ${emailData.title}`,
+      text: `You receive an Application for thesis ${emailData.title} from ${req.user.username}`
+    };
+
+    transporter.sendMail(mailOptions, async (error, info) => {
+        if (!error) {
+        console.log("Email mandata")
+        } else {
+            console.log(error);
+        }
+    });  
 
     res.status(200).json("Application created successfully");
   } catch (error) {

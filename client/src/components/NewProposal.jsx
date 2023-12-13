@@ -61,7 +61,7 @@ function NewProposal(props) {
   const [groups_obj, setGroups_obj] = useState([]);
 
   const [keywords, setKeywords] = useState([]);
-  const [teachers, setTeachers] = useState([]);
+  const [teacher, setTeacher] = useState({});
   const [degrees, setDegrees] = useState([]);
 
   const { handleToast } = useContext(MessageContext);
@@ -79,27 +79,33 @@ function NewProposal(props) {
 
   const fetchData = async () => {
     try {
+      let sup_email = props.user.username
+
       let ex_cosup = await API.getListExternalCosupervisors();
       let in_cosup = await API.getTeachers();
       let groups = await API.getGroups();
       let degrees = await API.getDegrees();
 
-      const formatted_ex_cosup = ex_cosup.map(
-        ({ name, surname }) => `${name} ${surname}`
-      );
-      const formatted_in_cosup = in_cosup.map(
-        ({ name, surname }) => `${name} ${surname}`
-      );
+      let sup = in_cosup.filter(item => item.email === sup_email);
+      console.log(sup)
       const formatted_group = groups.map((e) => e.name);
 
       setCoSupervisorExternal_obj(ex_cosup);
       setCoSupervisorInternal_obj(in_cosup);
       setGroups_obj(groups);
-      setTeachers(in_cosup);
+      setTeacher(sup[0]);
       setDegrees(degrees);
 
+      if((!idUpd && !idCopy)){
+        const formatted_ex_cosup = ex_cosup.map(
+          ({ name, surname }) => `${name} ${surname}`
+        );
+        const formatted_in_cosup = in_cosup.map(
+          ({ name, surname }) => `${name} ${surname}`
+        );
       setCoSupervisorExternal(formatted_ex_cosup);
       setCoSupervisorInternal(formatted_in_cosup);
+    }
       setGroups(formatted_group);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -108,8 +114,80 @@ function NewProposal(props) {
 
   const fetchThesis = async (thesisId) => {
     try {
-      const response = await API.getThesisForProfessorById(thesisId);
-      debugger;
+      let response = await API.getThesisForProfessorById(thesisId);
+      console.log(response)
+
+      let in_cosup = await API.getTeachers();
+      let ex_cosup = await API.getListExternalCosupervisors();
+      let groups = await API.getGroups();
+
+     let gr = groups.filter((g)=>{
+          return response.cod_group.some(
+            group => group === g.cod
+          )}
+        )
+
+        gr =  gr.map(
+          ({ name }) => `${name}`
+        );
+       
+
+      const formatted_ex_cosup = ex_cosup.map(
+        ({ name, surname }) => `${name} ${surname}`
+      );
+      const formatted_in_cosup = in_cosup.map(
+        ({ name, surname }) => `${name} ${surname}`
+      );
+      setCoSupervisorExternal(formatted_ex_cosup);
+      setCoSupervisorInternal(formatted_in_cosup);
+
+      in_cosup = in_cosup.filter((item => {
+        return response.cosupervisors_internal.some(
+          ci => ci === item.id
+        )
+      }))
+
+      in_cosup = in_cosup.map(
+        ({ name, surname }) => `${name} ${surname}`
+      );
+
+      ex_cosup = ex_cosup.filter((item => {
+        return response.cosupervisors_external.some(
+          ci => ci === item.email
+        )
+      }))
+
+      ex_cosup = ex_cosup.map(
+        ({ name, surname }) => `${name} ${surname}`
+      );
+
+      if (cosupervisors_internal.length>0) {
+        console.log('internal')
+        let c_in = [...cosupervisors_internal]
+        console.log('before', c_in)
+        console.log('before', in_cosup)
+        c_in = c_in.filter(c => !in_cosup.includes(c))
+        console.log('after', c_in)
+        console.log('after', in_cosup)
+        cosupervisors_internal(c_in)
+      }
+
+      if (cosupervisors_external.length) {
+        console.log('external')
+        let c_out = [...cosupervisors_external]
+        console.log(c_out)
+        c_out = c_out.filter(c => !ex_cosup.includes(c))
+        console.log('c_out', c_out)
+        setCoSupervisorExternal(c_out)
+      }
+
+      response = {
+        ...response,
+        cod_group: gr,
+        cosupervisors_internal: in_cosup,
+        cosupervisors_external: ex_cosup
+      }
+
       setFormData(response);
     } catch (err) {
       handleToast("Error while fetching Thesis", "error");
@@ -117,11 +195,17 @@ function NewProposal(props) {
   };
 
   useEffect(() => {
-    props.setLoading(true);
-    fetchData();
-    if (idCopy || idUpd) fetchThesis(idCopy || idUpd);
-    props.setLoading(false);
-  }, []);
+    const fetchDataAndThesis = async () => {
+      props.setLoading(true);
+      await fetchData();
+      if (idCopy || idUpd) {
+        await fetchThesis(idCopy || idUpd);
+      }
+      props.setLoading(false);
+    };
+
+    fetchDataAndThesis();
+  }, [idCopy, idUpd]);
 
   const handleChange = (e) => {
     const { id, name, value, checked } = e.target;
@@ -286,6 +370,7 @@ function NewProposal(props) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const cosupervisorExternalEmails = findEmails(
       formData.cosupervisors_external,
       cosupervisors_external_obj
@@ -298,6 +383,7 @@ function NewProposal(props) {
 
     const newProp = {
       ...formData,
+      supervisor_id: teacher.id,
       cosupervisors_internal: cosupervisorInternalIDs,
       cosupervisors_external: cosupervisorExternalEmails,
       keywords: formData.keywords.join(", "),
@@ -311,11 +397,11 @@ function NewProposal(props) {
       } else {
         //API UPDATE
         console.log("newProp", newProp);
-        const response = await API.updateProposal(newProp);
+        const response = await API.updateProposal(newProp, idUpd);
         handleToast("Proposal updated", "success");
       }
 
-      navigate("/proposals");
+      navigate("/profproposals");
     } catch (error) {
       console.log(error);
       if (error.error) {
@@ -390,7 +476,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                        errors.some((error) => error?.path?.includes("title"))
+                          errors.some((error) => error?.path?.includes("title"))
                           ? { borderColor: "red" }
                           : {}
                       }
@@ -408,42 +494,24 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                        errors.some((error) =>
-                          error?.path?.includes("description")
-                        )
+                          errors.some((error) =>
+                            error?.path?.includes("description")
+                          )
                           ? { borderColor: "red" }
                           : {}
                       }
                       required
                     />
                   </Form.Group>
+                  <Form.Label htmlFor="description">Supervisor</Form.Label>
                   <Form.Group className="mb-3">
-                    <Form.Label htmlFor="supervisor_id" ref={supervisorRef}>
-                      Supervisor ID
-                    </Form.Label>
-                    <Form.Select
-                      id="supervisor_id"
-                      name="supervisor_id"
-                      value={formData.supervisor_id}
-                      onChange={handleChange}
-                      style={
-                        errors &&
-                        errors.some((error) =>
-                          error?.path?.includes("supervisor")
-                        )
-                          ? { borderColor: "red" }
-                          : {}
-                      }
-                      required
-                    >
-                      <option>Select a supervisor</option>
-                      {teachers.map((teacher, index) => (
-                        <option
-                          key={index}
-                          value={teacher.id}
-                        >{`${teacher.name} ${teacher.surname}`}</option>
-                      ))}
-                    </Form.Select>
+                    <Form.Control
+                      id="supervisor"
+                      type="text"
+                      style={{ marginTop: "0.5em" }}
+                      value={teacher && `${teacher.name} ${teacher.surname}`}
+                      disabled
+                    />
                   </Form.Group>
                   <Form.Group className="mb-3">
                     <Form.Label htmlFor="cosupervisors_internal">
@@ -523,7 +591,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                        errors.some((error) => error?.path?.includes("level"))
+                          errors.some((error) => error?.path?.includes("level"))
                           ? { borderColor: "red" }
                           : {}
                       }
@@ -571,7 +639,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                        errors.some((error) => error?.path?.includes("type"))
+                          errors.some((error) => error?.path?.includes("type"))
                           ? { borderColor: "red" }
                           : {}
                       }
@@ -611,9 +679,9 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                        errors.some((error) =>
-                          error?.path?.includes("required_knowledge")
-                        )
+                          errors.some((error) =>
+                            error?.path?.includes("required_knowledge")
+                          )
                           ? { borderColor: "red" }
                           : {}
                       }
@@ -631,7 +699,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                        errors.some((error) => error?.path?.includes("notes"))
+                          errors.some((error) => error?.path?.includes("notes"))
                           ? { borderColor: "red" }
                           : {}
                       }
@@ -652,9 +720,9 @@ function NewProposal(props) {
                       onChange={handleChangeDate}
                       style={
                         errors &&
-                        errors.some((error) =>
-                          error?.path?.includes("expiration")
-                        )
+                          errors.some((error) =>
+                            error?.path?.includes("expiration")
+                          )
                           ? { borderColor: "red" }
                           : {}
                       }
@@ -671,7 +739,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                        errors.some((error) => error?.path?.includes("degree"))
+                          errors.some((error) => error?.path?.includes("degree"))
                           ? { borderColor: "red" }
                           : {}
                       }

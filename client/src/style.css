@@ -603,15 +603,14 @@ input:checked+.slider::before {
   display: flex;
   align-items: center;
   margin: 1px;
-  background: rgb(255, 177, 75);
+  background: white;
   border-color: transparent;
   height: 40px;
 }
 
 .button-archive:hover {
-  background-color: white;
+  background-color: rgb(255, 177, 75);
   border-color: rgb(255, 177, 75);
-  color: rgb(255, 177, 75);
 }
 
 .button-archive:active {
@@ -623,7 +622,7 @@ input:checked+.slider::before {
 .button-delete {
   display: flex;
   align-items: center;
-  background: rgb(237, 89, 89);
+  background: white;
   border-color: transparent;
   margin: 1px;
   margin-right: 3px;
@@ -632,9 +631,8 @@ input:checked+.slider::before {
 }
 
 .button-delete:hover {
-  background-color: white;
+  background-color: rgb(237, 89, 89);
   border-color: rgb(237, 89, 89);
-  color: rgb(237, 89, 89);
 }
 
 .button-delete:active {

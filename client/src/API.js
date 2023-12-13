@@ -298,9 +298,9 @@ async function getThesisForProfessorById(id) {
   );
 }
 
-async function updateProposal(thesis) {
+async function updateProposal(thesis, id) {
   return getJson(
-    fetch(URL + "/updateThesis", {
+    fetch(URL + `/updateThesis/${id}`, {
       method: "PUT",
       credentials: "include",
       headers: {

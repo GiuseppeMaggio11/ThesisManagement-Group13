@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Accordion, Button, Col, Container, Row, Table } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../API";
@@ -6,14 +6,18 @@ import MessageContext from "../messageCtx";
 import { useMediaQuery } from "react-responsive";
 import Loading from "./Loading";
 import dayjs from "dayjs";
-import { PencilFill } from "react-bootstrap-icons";
+import { Pencil, Trash3, Archive } from "react-bootstrap-icons";
 import randomColor from "randomcolor";
+import ConfirmationModal from "./ConfirmationModal";
 
 function ViewProposal(props) {
   const navigate = useNavigate();
   const { idView } = useParams();
+
   const [proposal, setProposal] = useState(undefined);
   const { handleToast } = useContext(MessageContext);
+  const [showArchive, setShowArchive] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
 
   if (!props.loggedIn || props.user.user_type !== "PROF")
     return API.redirectToLogin();
@@ -35,15 +39,37 @@ function ViewProposal(props) {
 
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
+  const archiveProposal = async () => {
+    try {
+      await API.updateThesisArchivation(idView);
+      navigate("/profproposals");
+      handleToast("Proposal archived correctly", "success");
+    } catch (err) {
+      handleToast("Error while archiving a proposal", "error");
+    }
+  };
+
+  const deleteProposal = async () => {
+    try {
+      await API.deleteProposal(idView);
+      navigate("/profproposals");
+      handleToast("Proposal deleted correctly", "success");
+    } catch (err) {
+      handleToast("Error while deleting a proposal", "error");
+    }
+  };
+
+
+  
   return props.loading || !proposal ? (
     <Loading />
   ) : (
-    <Container className="navbarMargin">
+  <>  <Container className="navbarMargin">
       <Table className="table-rounded">
         <thead>
           <tr>
             <th className="empty-col-mediumScreen"></th>
-            <th colSpan="6" className="title-mediumScreen">
+            <th colSpan="6" className="empty-col-mediumScreen title-mediumScreen">
               {proposal.title}
             </th>
           </tr>
@@ -195,46 +221,77 @@ function ViewProposal(props) {
                     </span>
                   </div>
                 </Col>
-                <Col className="text-end mx-2">
-                  <Button
-                    variant="light"
-                    className="mx-2"
-                    onClick={() => {
-                      navigate("/updateproposal/" + proposal.id);
-                    }}
-                  >
-                    <span className="mx-2">Edit</span>
-                    <PencilFill />
-                  </Button>
-                  <Button
-                    variant="light"
-                    onClick={() => {
-                      handleToast("Thesis copied", "success");
-                      navigate("/copyproposal/" + proposal.id);
-                    }}
-                  >
-                    <span className="mx-2">Copy</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-copy"
-                      viewBox="0 0 16 16"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"
-                      />
-                    </svg>
-                  </Button>
-                </Col>
+                <Col
+                          style={{ display: "flex", justifyContent: "right" }}
+                        >
+                          <Button
+                            variant="light"
+                            className="mx-2"
+                            onClick={() => {
+                              navigate("/updateproposal/" + proposal.id);
+                            }}
+                          >
+                            <span className="mx-2">Edit</span>
+                            <Pencil />
+                          </Button>
+                          <Button
+                            variant="light"
+                            onClick={() => {
+                              navigate("/copyproposal/" + proposal.id);
+                            }}
+                          >
+                            <span className="mx-2">Copy</span>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              fill="currentColor"
+                              className="bi bi-copy"
+                              viewBox="0 0 16 16"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"
+                              />
+                            </svg>
+                          </Button>
+                          <Button
+                            variant="light"
+                            className="mx-2"
+                            onClick={() => setShowDelete(true)}
+                          >
+                            <span style={{ marginRight: "5px" }}>Delete</span>
+                            <Trash3 cursor="pointer"></Trash3>
+                          </Button>
+                          <Button
+                            variant="light"
+                            onClick={() => setShowArchive(true)}
+                            className="mx-2"
+                          >
+                            <span style={{ marginRight: "5px" }}>Archive</span>
+                            <Archive cursor="pointer"></Archive>
+                          </Button>
+                        </Col>
               </Row>
             </td>
           </tr>
         </tfoot>
       </Table>
     </Container>
+  <ConfirmationModal
+    show={showArchive}
+    handleClose={() => setShowArchive(false)}
+    body={"Are you sure you want to archive this proposal ?"}
+    action={"Archive"}
+    handleAction={() => archiveProposal(idView)}
+  />
+  <ConfirmationModal
+    show={showDelete}
+    handleClose={() => setShowDelete(false)}
+    body={"Are you sure you want to delete this proposal ?"}
+    action={"Delete"}
+    handleAction={() => deleteProposal(idView)}
+  /></>
   );
 }
 

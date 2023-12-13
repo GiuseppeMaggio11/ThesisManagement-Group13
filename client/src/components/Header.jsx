@@ -26,7 +26,7 @@ function Header(props) {
   const handleLogout = () => {
     if (isSmallScreen) setExpanded((old) => !old);
     props.logout();
-    navigate("/");
+    API.redirectToLogin();
   };
 
   return (
@@ -60,9 +60,11 @@ function Header(props) {
             <Nav.Link
               as={NavLink}
               to={
-                props.user && (props.user.user_type === "STUD" || props.user.user_type === "PROF")
-                  ? "proposals"
-                  : "/"
+                props.user && (props.user.user_type === "STUD")
+                  ? "studproposals"
+                  : props.user && props.user.user_type === "PROF" ?
+                  "/profproposals" : 
+                  ""
               }
               onClick={() => {
                 if (isSmallScreen) setExpanded((old) => !old);
@@ -80,7 +82,7 @@ function Header(props) {
                   ? "studentapplications"
                   : props.user && props.user.user_type === "PROF"
                   ? "applications"
-                  : "/"
+                  : ""
               }
               onClick={() => {
                 if (isSmallScreen) setExpanded((old) => !old);
@@ -122,16 +124,12 @@ function Header(props) {
                     onClick={() => {
                       if (isSmallScreen) setExpanded((old) => !old);
                       if (props.user && props.user.user_type === "STUD")
-                        navigate("/proposal");
+                        navigate("/studproposals");
                       else if (props.user && props.user.user_type === "PROF")
-                        navigate("/teacher");
+                        navigate("/profproposals");
                     }}
                   >
-                    {props.user && props.user.user_type === "STUD"
-                      ? "Student Dashboard"
-                      : props.user && props.user.user_type === "PROF"
-                      ? "Teacher Dashboard"
-                      : ""}
+                    Thesis proposals
                   </Dropdown.Item>
                   <Dropdown.Item className="link-style" onClick={handleLogout}>
                     Logout

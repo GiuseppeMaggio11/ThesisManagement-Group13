@@ -23,8 +23,14 @@ function SearchProposalRoute(props) {
   const { handleToast } = useContext(MessageContext);
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
-  if (!props.loggedIn || props.user.user_type !== "STUD")
-    return API.redirectToLogin();
+  //if (!props.loggedIn || props.user.user_type !== "STUD")
+  //  return API.redirectToLogin();
+
+  useEffect(() => {
+    if(props.user && props.user.user_type !== "STUD") {
+      return API.redirectToLogin();
+    }
+  }, [props.user]);
 
   useEffect(() => {
     props.setLoading(true);

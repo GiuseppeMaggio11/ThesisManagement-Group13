@@ -2,7 +2,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
 import ErrorAlert from "./components/ErrorAlert";
-import HomePage from "./components/HomePage";
 import { ToastContainer } from "react-toastify";
 import TeacherPage from "./components/TeacherPage";
 import NewProposal from "./components/NewProposal";
@@ -20,7 +19,6 @@ import ProfessorActiveProposals from "./components/ProfessorActiveProposals";
 //import Toasts from "./components/Toasts";
 import StudentApplications from "./components/StudentApplications";
 import ViewProposal from "./components/ViewProposal";
-import ProposalsPage from "./components/ProposalsPage";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -101,16 +99,6 @@ function App() {
           <ToastContainer />
           <Routes>
             <Route
-              path="/"
-              element={
-                <HomePage
-                  loading={loading}
-                  setLoading={setLoading}
-                  user={user}
-                />
-              }
-            />
-            <Route
               path="/virtualclock"
               element={
                 <VirtualClock
@@ -120,9 +108,23 @@ function App() {
               }
             />
             <Route
-              path="/proposals"
+              path="/profproposals"
               element={
-                <ProposalsPage
+                <ProfessorActiveProposals
+                  loading={loading}
+                  setLoading={setLoading}
+                  error={error}
+                  setError={setError}
+                  virtualClock={virtualClock}
+                  loggedIn={loggedIn}
+                  user={user}
+                />
+              }
+            />
+            <Route
+              path="/studproposals"
+              element={
+                <SearchProposalRoute
                   loading={loading}
                   setLoading={setLoading}
                   error={error}

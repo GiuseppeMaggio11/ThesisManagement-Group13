@@ -6,7 +6,7 @@ import API from "../API";
 import MessageContext from "../messageCtx";
 import ConfirmationModal from "./ConfirmationModal";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import { Trash3, Archive } from "react-bootstrap-icons";
+import { PencilFill, Trash3, Archive } from "react-bootstrap-icons";
 import "../style.css";
 import { useMediaQuery } from "react-responsive";
 import Loading from "./Loading";
@@ -26,8 +26,8 @@ function ThesisPage(props) {
   const [flag, setFlag] = useState(0);
   const [exceed, setExceed] = useState(false);
   const from = state?.from;
-  const [showArchive, setShowArchive] = useState(false);
-  const [showDelete, setShowDelete] = useState(false);
+/*   const [showArchive, setShowArchive] = useState(false);
+  const [showDelete, setShowDelete] = useState(false); */
 
   if (!props.loggedIn) {
     API.redirectToLogin();
@@ -51,7 +51,7 @@ function ThesisPage(props) {
           }),
           requiredKnowledge: thesisData.required_knowledge,
           ...(thesisData.notes !== "None" && { notes: thesisData.notes }),
-          expiration: dayjs(thesisData.expiration).format("yyyy-MM-dd"),
+          expiration: dayjs(thesisData.expiration).format("MM-DD-YYYY"),
           level: thesisData.thesis_level,
         });
         if (props.user.user_type === "STUD") {
@@ -296,7 +296,7 @@ function ThesisPage(props) {
                           </Col>
                         )
                       }
-                      {props.user.user_type === "PROF" && (
+                      {/* props.user.user_type === "PROF" && (
                         <Col
                           style={{ display: "flex", justifyContent: "right" }}
                         >
@@ -347,7 +347,7 @@ function ThesisPage(props) {
                             <Archive cursor="pointer"></Archive>
                           </Button>
                         </Col>
-                      )}
+                      ) */}
                     </Row>
                   </td>
                 </tr>
@@ -355,7 +355,7 @@ function ThesisPage(props) {
             </Table>
           </Container>
 
-          <FileDropModal
+           <FileDropModal
             showModal={openPanel}
             closeModal={closeModal}
             handleSave={() => {
@@ -366,7 +366,7 @@ function ThesisPage(props) {
             exceed={exceed}
             setExceed={setExceed}
           />
-          <ConfirmationModal
+          {/*<ConfirmationModal
             show={showArchive}
             handleClose={() => setShowArchive(false)}
             body={"Are you sure you want to archive this proposal ?"}
@@ -379,7 +379,7 @@ function ThesisPage(props) {
             body={"Are you sure you want to delete this proposal ?"}
             action={"Delete"}
             handleAction={() => deleteProposal(params.id)}
-          />
+          /> */}
         </>
       )}
     </>

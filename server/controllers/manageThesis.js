@@ -52,7 +52,7 @@ async function newThesis(req, res) {
     //Get every cod_degree from degree_table table in db
     const degrees = await dao.getDegrees();
     //If given cod_degre si not in list raise error
-    if (!degrees.includes(req.body.cod_degree)) {
+    if (!degrees.some(degree => degree.cod === req.body.cod_degree)) {
       await dao.rollback();
       return res.status(400).json({
         error: `Cod_degree: ${req.body.cod_degree} is not a valid degree code`,
@@ -61,13 +61,18 @@ async function newThesis(req, res) {
 
     // --- GROUP COD should be an actual research group id, must be in group_table
     // Get every cod_group from group_table table in db
+    console.log("REQUEST", req.body.cod_group)
     const codes_group = await dao.getCodes_group();
+    console.log("CODES_GROUP", codes_group)
+
     // If given cod_group is not in list  raise error
-    if (!codes_group.includes(req.body.cod_group)) {
-      await dao.rollback();
-      return res.status(400).json({
-        error: `Cod_group: ${req.body.cod_group} is not a valid research group code`,
-      });
+    for (group of req.body.cod_group) {
+      if (!codes_group.includes(group)) {
+        await dao.rollback();
+        return res.status(400).json({
+          error: `Cod_group: ${group} is not a valid research group code`,
+        });
+      }
     }
 
     //Create thesis object which contains data from front end
@@ -79,7 +84,7 @@ async function newThesis(req, res) {
       type_name: req.body.type_name,
       required_knowledge: req.body.required_knowledge,
       notes: req.body.notes,
-      expiration: req.body.expiration,
+      expiration: new Date(req.body.expiration.setHours(23, 59, 59)),
       cod_degree: req.body.cod_degree,
       is_archived: req.body.is_archived,
       keywords: req.body.keywords,
@@ -90,10 +95,12 @@ async function newThesis(req, res) {
     const result_thesis = await dao.createThesis(thesis);
 
     //Create a new thesis_group row which links thesis to its research group
-    const result_thesis_group = await dao.createThesis_group(
-      result_thesis.id,
-      req.body.cod_group
-    );
+    for (group of req.body.cod_group) {
+      await dao.createThesis_group(
+        result_thesis.id,
+        group
+      );
+    }
 
     //Create new rows which link thesis to interal cosupervisor
     if (req.body.cosupervisors_internal != null) {
@@ -121,7 +128,6 @@ async function newThesis(req, res) {
       }
     }
 
-    await dao.commit();
     await dao.commit();
 
     //Return inserted data
@@ -158,11 +164,11 @@ async function updateThesis(req, res) {
     //inizio transazione
     await dao.beginTransaction();
 
-    const isValid = await dao.isThesisProposalValid(req.body.id);
+    const isValid = await dao.isThesisProposalValid(req.params.id);
     if (!isValid) {
       await dao.rollback();
       return res.status(400).json({
-        error: `Thesis_id: ${req.body.id} is not a valid thesis proposal`,
+        error: `Thesis_id: ${req.params.id} is not a valid thesis proposal`,
       });
     }
 
@@ -207,7 +213,7 @@ async function updateThesis(req, res) {
     //Get every cod_degree from degree_table table in db
     const degrees = await dao.getDegrees();
     //If given cod_degre si not in list raise error
-    if (!degrees.includes(req.body.cod_degree)) {
+    if (!degrees.some(degree => degree.cod === req.body.cod_degree)) {
       await dao.rollback();
       return res.status(400).json({
         error: `Cod_degree: ${req.body.cod_degree} is not a valid degree code`,
@@ -216,18 +222,23 @@ async function updateThesis(req, res) {
 
     // --- GROUP COD should be an actual research group id, must be in group_table
     // Get every cod_group from group_table table in db
+    console.log("REQUEST", req.body.cod_group)
     const codes_group = await dao.getCodes_group();
+    console.log("CODES_GROUP", codes_group)
+
     // If given cod_group is not in list  raise error
-    if (!codes_group.includes(req.body.cod_group)) {
-      await dao.rollback();
-      return res.status(400).json({
-        error: `Cod_group: ${req.body.cod_group} is not a valid research group code`,
-      });
+    for (group of req.body.cod_group) {
+      if (!codes_group.includes(group)) {
+        await dao.rollback();
+        return res.status(400).json({
+          error: `Cod_group: ${group} is not a valid research group code`,
+        });
+      }
     }
 
     //Create thesis object which contains data from front end
     const thesis = {
-      thesis_id: req.body.id,
+      thesis_id: req.params.id,
       title: req.body.title,
       description: req.body.description,
       supervisor_id: req.body.supervisor_id,
@@ -235,7 +246,7 @@ async function updateThesis(req, res) {
       type_name: req.body.type_name,
       required_knowledge: req.body.required_knowledge,
       notes: req.body.notes,
-      expiration: req.body.expiration,
+      expiration: new Date(req.body.expiration.setHours(23, 59, 59)),
       cod_degree: req.body.cod_degree,
       is_archived: req.body.is_archived,
       keywords: req.body.keywords,
@@ -244,14 +255,13 @@ async function updateThesis(req, res) {
     //Update the given thesis in the db
     const result_thesis = await dao.updateThesis(thesis);
 
-    //Update the thesis_group table's row which links thesis to its research group
-    const result_thesis_group = await dao.updateThesisGroup(
-      thesis.thesis_id,
-      req.body.cod_group
-    );
-    if (result_thesis_group != 1) {
-      await dao.rollback();
-      return res.status(500).json({ error: "Internal server error" });
+    // Delete previous associations group-thesis, then insert the new associations
+    await dao.deleteThesisGroups(thesis.thesis_id);
+    for (group of req.body.cod_group) {
+      await dao.createThesis_group(
+        thesis.thesis_id,
+        group
+      );
     }
 
     //Delete all entries in thesis_cosupervisor_teacher related to this thesis, then insert the new values
@@ -349,8 +359,8 @@ async function getThesisForProfessorById(req, res) {
     } else thesis.cosupervisors_internal = [];
 
     thesis.list_cosupervisors = list_cosupervisors;
-    thesis.cod_group = await dao.getThesisGroupForProfessor(thesis_id);
-
+    thesis.cod_group = await dao.getThesisGroups(thesis_id);
+    
     res.status(200).json(thesis);
   } catch (err) {
     res.status(500).json(err);

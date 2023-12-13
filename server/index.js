@@ -132,8 +132,8 @@ app.post(
     failureFlash: true,
   }),
   function (req, res) {
-    res.redirect("http://localhost:5173");
-  }
+    if(req.user && req.user.user_type === "PROF") res.redirect("http://localhost:5173/profproposals");
+    else if(req.user && req.user.user_type === "STUD") res.redirect("http://localhost:5173/studproposals");  }
 );
 
 app.get("/whoami", (req, res) => {
@@ -188,10 +188,8 @@ app.post(
   [
     // Various checks of syntax of given data
     check("title").isString().isLength({ min: 1, max: 100 }),
-    check("supervisor_id").isString().isLength({ min: 1, max: 7 }),
-    check("thesis_level")
-      .isString()
-      .isIn(["Bachelor", "Master", "bachelor", "master"]),
+    check("supervisor_id").isString().isLength({ min: 1, max: 7 }), //Maybe we can try to check if the string is in the format Pxxxxxx
+    check("thesis_level").isIn(["Bachelor", "Master", "bachelor", "master"]),
     check("type_name").isString().isLength({ min: 1, max: 50 }),
     check("required_knowledge").isString(),
     check("notes").isString(),
@@ -209,7 +207,8 @@ app.post(
     check("cosupervisors_internal.*").isString(),
     check("cosupervisors_external").isArray(),
     check("cosupervisors_external.*").isString(),
-    check("cod_group").isString(),
+    check("cod_group").isArray(),
+    check("cod_group.*").isString()
   ],
   newThesis
 );
@@ -287,11 +286,10 @@ app.get(
 
 //UPDATES AN EXISTING THESIS
 app.put(
-  "/api/updateThesis",
+  "/api/updateThesis/:id",
   isProfessor,
   [
     // Various checks of syntax of given data
-    check("id").isInt({ gt: 0 }),
     check("title").isString().isLength({ min: 1, max: 100 }),
     check("supervisor_id").isString().isLength({ min: 1, max: 7 }), //Maybe we can try to check if the string is in the format Pxxxxxx
     check("thesis_level").isIn(["Bachelor", "Master", "bachelor", "master"]),
@@ -312,7 +310,8 @@ app.put(
     check("cosupervisors_internal.*").isString(),
     check("cosupervisors_external").isArray(),
     check("cosupervisors_external.*").isString(),
-    check("cod_group").isString(),
+    check("cod_group").isArray(),
+    check("cod_group.*").isString()
   ],
   updateThesis
 );
