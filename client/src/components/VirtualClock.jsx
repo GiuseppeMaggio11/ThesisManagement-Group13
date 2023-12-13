@@ -33,7 +33,7 @@ const VirtualClock = (props) => {
     props.setVirtualClock(virtualTime.toDate());
     localStorage.setItem("virtualclock", JSON.stringify(virtualTime.toDate()));
     console.log(virtualTime);
-    await API.updateExpiration(virtualTime.toDate())
+    await API.setVirtualTime(virtualTime.toDate())
       .then((response) => {
         if (response && "errors" in response) {
           //setErrors(response.errors);

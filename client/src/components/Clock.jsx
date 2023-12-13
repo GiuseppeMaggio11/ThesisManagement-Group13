@@ -423,8 +423,8 @@ const FlipClock = ({
         setVirtual(v);
         break;
       case "min2_down":
-        v[11] = parseInt((v[11] - 1) % 6);
-        if (v[11] < 0) v[11] = 5;
+        v[11] = parseInt((v[11] - 1) % 10);
+        if (v[11] < 0) v[11] = 9;
         setVirtualTimeArray(v);
         setVirtual(v);
         break;

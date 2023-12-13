@@ -17,7 +17,7 @@
   align-items: center;
   min-height: 5em;
   font-size: xx-large;
- 
+
 }
 
 .flip-clock-container {
@@ -60,7 +60,6 @@
   height: 100%;
   position: absolute;
   font-size: larger;
-  top: 0.1em;
   left: 0.1em;
   backface-visibility: hidden;
   transition: transform 0.5s;
