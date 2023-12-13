@@ -15,6 +15,7 @@ import API from "../API";
 
 import { FilterCard } from "./FilterCard";
 import Loading from "./Loading";
+import NoFileFound from "./NoFileFound";
 import randomColor from "randomcolor";
 
 function SearchProposalRoute(props) {
@@ -72,7 +73,12 @@ function SearchProposalComponent(props) {
   const [selectedCosupervisor, setSelectedCosupervisor] = useState([]);
   const [selectedKeywords, setSelectedKeywords] = useState([]);
   const [selectedSupervisor, setSelectedSupervisor] = useState([]);
+  const [selectedNotesWords, setSelectedNotesWords] = useState([]);
   const [selectedTitlesWords, setSelectedTitlesWords] = useState([]);
+  const [selectedDescriptionsWords, setSelectedDescriptionsWords] = useState(
+    []
+  );
+  const [selectedKnowledgeWords, setSelectedKnowledgeWords] = useState([]);
 
   useEffect(() => {
     setFilteredThesisProposals([...props.thesisProposals]);
@@ -110,7 +116,7 @@ function SearchProposalComponent(props) {
   return (
     <>
       <div className="d-flex justify-content-center">
-        <Container className="width-80 margin-custom">
+        <Container className="width-100 margin-custom">
           <Row className="d-flex align-items-center">
             <Col
               xs={4}
@@ -120,6 +126,7 @@ function SearchProposalComponent(props) {
                 className={`margin-titles-custom ${
                   props.isMobile ? "smaller-heading" : ""
                 }`}
+                style={{ paddingLeft: props.isMobile ? "0.5em" : "0" }}
               >
                 Thesis Proposals
               </h1>
@@ -214,7 +221,6 @@ function SearchProposalComponent(props) {
                     thesisList={props.thesisProposals}
                     loading={props.loading}
                     setLoading={props.setLoading}
-                    showFilters={showFilters}
                     setProposals={setFilteredThesisProposals}
                     selectedGroups={selectedGroups}
                     setSelectedGroups={setSelectedGroups}
@@ -230,8 +236,14 @@ function SearchProposalComponent(props) {
                     setSelectedSupervisor={setSelectedSupervisor}
                     selectedTitlesWords={selectedTitlesWords}
                     setSelectedTitlesWords={setSelectedTitlesWords}
+                    selectedDescriptionsWords={selectedDescriptionsWords}
+                    setSelectedDescriptionsWords={setSelectedDescriptionsWords}
                     setAdvancedFilters={setAdvancedFilters}
                     setShowFilters={setShowFilters}
+                    selectedNotesWords={selectedNotesWords}
+                    setSelectedNotesWords={setSelectedNotesWords}
+                    selectedKnowledgeWords={selectedKnowledgeWords}
+                    setSelectedKnowledgeWords={setSelectedKnowledgeWords}
                   />
                 </Col>
               </Row>
@@ -242,7 +254,7 @@ function SearchProposalComponent(props) {
             <Row>
               <Col>
                 {filteredThesisProposals.length == 0 ? (
-                  <h2>No proposal found</h2>
+                  advancedFilters? <NoFileFound message={'No proposal found with these parameters'} /> : <NoFileFound message={'No proposal found'} />
                 ) : (
                   <Table hover>
                     <thead>
@@ -261,9 +273,6 @@ function SearchProposalComponent(props) {
                             proposal={element}
                           />
                         ))}
-                      {filteredByTitle.length <= 0 && filter !== "" && (
-                        <h2 className="mt-3"> no proposals found</h2>
-                      )}
                       {filteredByTitle.length > 0 &&
                         [...filteredByTitle].map((element) => (
                           <ProposalTableRow
@@ -275,6 +284,9 @@ function SearchProposalComponent(props) {
                   </Table>
                 )}
               </Col>
+              {filteredByTitle.length <= 0 && filter !== "" && (
+                <NoFileFound message={'No proposal found with this name'} />
+              )}
             </Row>
           ) : (
             <Row style={{ marginBottom: "5rem" }}>
@@ -297,7 +309,13 @@ function SearchProposalComponent(props) {
           <Row>
             <Col>
               {filteredThesisProposals.length == 0 ? (
-                <h2>No proposal found</h2>
+                advancedFilters ? (
+                  <NoFileFound
+                    message={"No proposal found with these parameters"}
+                  />
+                ) : (
+                  <NoFileFound message={"No proposal found"} />
+                )
               ) : (
                 <Row>
                   <Col>

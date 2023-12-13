@@ -73,6 +73,42 @@ async function getListExternalCosupervisors() {
   );
 }
 
+async function getTeachers() {
+  return getJson(
+    fetch(URL + `/teachersList`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    })
+  );
+}
+
+async function getDegrees() {
+  return getJson(
+    fetch(URL + `/degrees`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    })
+  );
+}
+
+async function getGroups() {
+  return getJson(
+    fetch(URL + `/groups`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    })
+  );
+}
+
 async function newExternalCosupervisor(external_cosupervisor) {
   return getJson(
     fetch(URL + `/newExternalCosupervisor`, {
@@ -122,7 +158,7 @@ async function getThesisProposals(date) {
     credentials: "include",
   });
   const proposals = await response.json();
-  if (response.ok) {
+  if (response.ok && proposals.length > 0) {
     return proposals.map((element) => ({
       id: element.id,
       title: element.title,
@@ -139,7 +175,7 @@ async function getThesisProposals(date) {
       cosupervisors: element.cosupervisors,
     }));
   } else {
-    throw proposals;
+    throw [];
   }
 }
 
@@ -225,6 +261,35 @@ async function getProposalsProfessor() {
   );
 }
 
+async function updateThesisArchivation(thesis_id) {
+  return getJson(
+    fetch(URL + `/archiveProposalManual`, {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        thesis_id,
+      }),
+    })
+  );
+}
+
+async function deleteProposal(thesisID) {
+  const response = await fetch(URL + "/deleteproposal", {
+    method: "DELETE",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ thesis_id: thesisID }),
+  });
+
+  const result = await response.json();
+  return result;
+}
+
 async function getThesisForProfessorById(id) {
   return getJson(
     fetch(`${URL}/getThesisForProfessorById/${id}`, {
@@ -263,6 +328,11 @@ const API = {
   getStudentApplications,
   isApplied,
   getProposalsProfessor,
+  updateThesisArchivation,
+  getTeachers,
+  getGroups,
+  getDegrees,
+  deleteProposal,
   getThesisForProfessorById,
   updateProposal,
 };

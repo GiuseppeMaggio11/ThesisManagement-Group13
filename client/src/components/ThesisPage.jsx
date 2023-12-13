@@ -1,19 +1,12 @@
-import {
-  Container,
-  Table,
-  Accordion,
-  Button,
-  Modal,
-  Form,
-  Row,
-  Col,
-} from "react-bootstrap";
+import { Container, Table, Accordion, Button, Row, Col } from "react-bootstrap";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import dayjs from "dayjs";
 import React, { useEffect, useState, useContext } from "react";
 import API from "../API";
 import MessageContext from "../messageCtx";
+import ConfirmationModal from "./ConfirmationModal";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import { Trash3, Archive } from "react-bootstrap-icons";
 import "../style.css";
 import { useMediaQuery } from "react-responsive";
 import Loading from "./Loading";
@@ -31,10 +24,13 @@ function ThesisPage(props) {
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const { state } = useLocation();
   const [flag, setFlag] = useState(0);
+  const [exceed, setExceed] = useState(false);
   const from = state?.from;
+  const [showArchive, setShowArchive] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
 
-  if (!props.loggedIn || props.user.user_type !== "STUD") {
-    return API.redirectToLogin();
+  if (!props.loggedIn) {
+    API.redirectToLogin();
   }
 
   useEffect(() => {
@@ -58,8 +54,12 @@ function ThesisPage(props) {
           expiration: dayjs(thesisData.expiration).format("yyyy-MM-dd"),
           level: thesisData.thesis_level,
         });
-        const isApplied = await API.isApplied();
-        setFlag(isApplied);
+        if (props.user.user_type === "STUD") {
+          const isApplied = await API.isApplied();
+          setFlag(isApplied);
+        } else {
+          setFlag(1);
+        }
         // console.log(thesisData);
         setIsLoading(false);
       } catch (error) {
@@ -68,6 +68,26 @@ function ThesisPage(props) {
     };
     init();
   }, []);
+
+  const archiveProposal = async () => {
+    try {
+      await API.updateThesisArchivation(params.id);
+      navigate("/proposals");
+      handleToast("Proposal archived correctly", "success");
+    } catch (err) {
+      handleToast("Error while archiving a proposal", "error");
+    }
+  };
+
+  const deleteProposal = async () => {
+    try {
+      await API.deleteProposal(parseInt(params.id));
+      navigate("/proposals");
+      handleToast("Proposal deleted correctly", "success");
+    } catch (err) {
+      handleToast("Error while deleting a proposal", "error");
+    }
+  };
 
   const handleApplication = () => {
     submitApplication(params.id, props.virtualClock);
@@ -82,7 +102,7 @@ function ThesisPage(props) {
     API.sendFiles(formData, thesis_id)
       .then(() => {
         handleToast("Application submitted correctly", "success");
-        navigate("/proposal");
+        navigate("/proposals");
       })
       .catch((err) => {
         handleToast(err, "error");
@@ -92,6 +112,7 @@ function ThesisPage(props) {
   const closeModal = () => {
     setOpenPanel(false);
     setSelectedFiles([]);
+    setExceed(false);
   };
 
   const submitApplication = (idThesis, date) => {
@@ -245,7 +266,7 @@ function ThesisPage(props) {
               <tfoot>
                 <tr>
                   <td colSpan="3" className="text-center table-footer">
-                    <Row className="justify-content-between">
+                    <Row className="justify-space-between">
                       <Col>
                         <div className="table-footer">
                           <span className="bold">{pageData.level}</span>
@@ -256,20 +277,75 @@ function ThesisPage(props) {
                           <span className="bold"> {pageData.expiration}</span>
                         </div>
                       </Col>
-                      {!(from === "applications") && (
-                        <Col>
-                          <div className="button-apply">
-                            {flag === 0 ? (
-                              <Button
-                                className="button-style"
-                                onClick={() => setOpenPanel(true)}
-                              >
-                                APPLY
-                              </Button>
-                            ) : (
-                              <></>
-                            )}
-                          </div>
+                      {
+                        /*!(from === "applications") &&*/ props.user
+                          .user_type === "STUD" && (
+                          <Col>
+                            <div className="button-apply">
+                              {flag === 0 ? (
+                                <Button
+                                  className="button-style"
+                                  onClick={() => setOpenPanel(true)}
+                                >
+                                  APPLY
+                                </Button>
+                              ) : (
+                                <></>
+                              )}
+                            </div>
+                          </Col>
+                        )
+                      }
+                      {props.user.user_type === "PROF" && (
+                        <Col
+                          style={{ display: "flex", justifyContent: "right" }}
+                        >
+                          <Button
+                            variant="light"
+                            className="mx-2"
+                            onClick={() => {
+                              navigate("/updateproposal/" + proposal.id);
+                            }}
+                          >
+                            <span className="mx-2">Edit</span>
+                            <PencilFill />
+                          </Button>
+                          <Button
+                            variant="light"
+                            onClick={() => {
+                              handleToast("Thesis copied", "success");
+                              navigate("/copyproposal/" + proposal.id);
+                            }}
+                          >
+                            <span className="mx-2">Copy</span>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              fill="currentColor"
+                              className="bi bi-copy"
+                              viewBox="0 0 16 16"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"
+                              />
+                            </svg>
+                          </Button>
+                          <Button
+                            className="button-delete"
+                            onClick={() => setShowDelete(true)}
+                          >
+                            <span style={{ marginRight: "5px" }}>Delete</span>
+                            <Trash3 cursor="pointer"></Trash3>
+                          </Button>
+                          <Button
+                            className="button-archive"
+                            onClick={() => setShowArchive(true)}
+                          >
+                            <span style={{ marginRight: "5px" }}>Archive</span>
+                            <Archive cursor="pointer"></Archive>
+                          </Button>
                         </Col>
                       )}
                     </Row>
@@ -287,6 +363,22 @@ function ThesisPage(props) {
             }}
             setSelectedFiles={setSelectedFiles}
             selectedFiles={selectedFiles}
+            exceed={exceed}
+            setExceed={setExceed}
+          />
+          <ConfirmationModal
+            show={showArchive}
+            handleClose={() => setShowArchive(false)}
+            body={"Are you sure you want to archive this proposal ?"}
+            action={"Archive"}
+            handleAction={() => archiveProposal(params.id)}
+          />
+          <ConfirmationModal
+            show={showDelete}
+            handleClose={() => setShowDelete(false)}
+            body={"Are you sure you want to delete this proposal ?"}
+            action={"Delete"}
+            handleAction={() => deleteProposal(params.id)}
           />
         </>
       )}

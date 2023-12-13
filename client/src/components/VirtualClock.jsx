@@ -1,29 +1,39 @@
 import React, { useState, useEffect } from "react";
 import { Button, Card, Col, Container, Row } from "react-bootstrap";
 import API from "../API";
+import FlipClock from "./Clock";
+import { Calendar, Clock } from "react-bootstrap-icons";
 
 const VirtualClock = (props) => {
   const [tempTime, setTempTime] = useState(props.virtualClock);
+  const [isVirtual, setIsVirtual] = useState(false)
+  const [settingVirtual, setSettingVirtual] = useState(false)
+  const [isAmPm, setIsAmPm] = useState('')
+  const [virtualTime, setVirtualTime] = useState();
 
-  const updateTime = (amount, unit) => {
-    const newDateTime = new Date(tempTime);
+  /*   const updateTime = (amount, unit) => {
+      const newDateTime = new Date(tempTime);
+  
+      if (unit === "hour") {
+        newDateTime.setHours(newDateTime.getHours() + amount);
+      } else if (unit === "day") {
+        newDateTime.setDate(newDateTime.getDate() + amount);
+      } else if (unit === "month") {
+        newDateTime.setMonth(newDateTime.getMonth() + amount);
+      } else if (unit === "year") {
+        newDateTime.setFullYear(newDateTime.getFullYear() + amount);
+      }
+  
+      setTempTime(newDateTime);
+    }; */
 
-    if (unit === "hour") {
-      newDateTime.setHours(newDateTime.getHours() + amount);
-    } else if (unit === "day") {
-      newDateTime.setDate(newDateTime.getDate() + amount);
-    } else if (unit === "month") {
-      newDateTime.setMonth(newDateTime.getMonth() + amount);
-    } else if (unit === "year") {
-      newDateTime.setFullYear(newDateTime.getFullYear() + amount);
-    }
-
-    setTempTime(newDateTime);
-  };
-  const handleVirtualTime = async (newTime) => {
-    props.setVirtualClock(newTime);
-    localStorage.setItem("virtualclock", JSON.stringify(newTime));
-    await API.updateExpiration(newTime)
+  const handleVirtualTime = async () => {
+    setIsVirtual(true); 
+    setSettingVirtual(false)
+    props.setVirtualClock(virtualTime.toDate());
+    localStorage.setItem("virtualclock", JSON.stringify(virtualTime.toDate()));
+    console.log(virtualTime)
+    await API.updateExpiration(virtualTime.toDate())
       .then((response) => {
         if (response && "errors" in response) {
           //setErrors(response.errors);
@@ -34,10 +44,12 @@ const VirtualClock = (props) => {
       })
       .catch((error) => {
         //setErrors([{ msg: error.message }]);
-      });
+      }); 
   };
+
   const handleRealTime = async () => {
     setTempTime(new Date());
+    setIsVirtual(false);
     props.setVirtualClock(new Date());
     localStorage.removeItem("virtualclock");
     await API.updateExpiration(tempTime)
@@ -53,144 +65,26 @@ const VirtualClock = (props) => {
         //setErrors([{ msg: error.message }]);
       });
   };
-  const formattedDateTime = tempTime.toLocaleString();
+
   return (
-    <Container className="mt-4">
-      <Card className="text-center">
-        <Card.Header className="fs-3">Virtual Clock</Card.Header>
-        <Card.Body>
-          <Row>
-            <Col>
-              <Row>
-                <Col>
-                  <Button
-                    variant="info"
-                    onClick={() => updateTime(1, "hour")}
-                    className="w-50 mb-1"
-                  >
-                    +1 Hour
-                  </Button>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <Button
-                    onClick={() => updateTime(1, "day")}
-                    className="w-50 mb-1"
-                  >
-                    +1 Day
-                  </Button>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <Button
-                    variant="warning"
-                    onClick={() => updateTime(1, "month")}
-                    className="w-50 mb-1"
-                  >
-                    +1 Month
-                  </Button>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <Button
-                    variant="danger"
-                    onClick={() => updateTime(1, "year")}
-                    className="w-50 mb-1"
-                  >
-                    +1 Year
-                  </Button>
-                </Col>
-              </Row>
-            </Col>
-            <Col>
-              <Row>
-                <Col>
-                  <Card.Title>Current Time</Card.Title>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <Card.Text className="custom-virtual-clock">
-                    <span>{formattedDateTime}</span>
-                  </Card.Text>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <Button
-                    variant="danger"
-                    className="w-50 mb-1"
-                    onClick={() => handleVirtualTime(tempTime)}
-                  >
-                    Use VirtualTime
-                  </Button>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <Button
-                    variant="primary"
-                    className="w-50 mb-1"
-                    onClick={() => handleRealTime()}
-                  >
-                    Use real time
-                  </Button>
-                </Col>
-              </Row>
-            </Col>
-            <Col>
-              <Row>
-                <Col>
-                  <Button
-                    variant="info"
-                    onClick={() => updateTime(-1, "hour")}
-                    className="w-50 mb-1"
-                  >
-                    -1 Hour
-                  </Button>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <Button
-                    onClick={() => updateTime(-1, "day")}
-                    className="w-50 mb-1"
-                  >
-                    -1 Day
-                  </Button>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <Button
-                    variant="warning"
-                    onClick={() => updateTime(-1, "month")}
-                    className="w-50 mb-1"
-                  >
-                    -1 Month
-                  </Button>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <Button
-                    variant="danger"
-                    onClick={() => updateTime(-1, "year")}
-                    className="w-50 mb-1"
-                  >
-                    -1 Year
-                  </Button>
-                </Col>
-              </Row>
-            </Col>
-          </Row>
-        </Card.Body>
-      </Card>
-    </Container>
-  );
+    <Container className="d-flex flex-column" style={{marginTop:'1em'}}>
+      <div className="d-flex justify-content-center"> 
+        <h2>SYSTEM CLOCK</h2>
+    </div>
+    <div>
+      <FlipClock isVirtual={isVirtual} setIsVirtual={setIsVirtual} isAmPm={isAmPm} setIsAmPm={setIsAmPm} settingVirtual={settingVirtual} setSettingVirtual={setSettingVirtual} virtualTime={virtualTime} setVirtualTime={setVirtualTime}/>
+    </div>
+    <div className="mt-3 d-flex justify-content-center"> {/* Adjust the margin top as needed */}
+      {!settingVirtual && !isVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{setSettingVirtual(true)}}>Virtual time Mode </Button>}
+      {!settingVirtual && isVirtual && <Button style={{marginRight:'0.5em'}} onClick={handleRealTime}> Real time Mode </Button>}
+      {settingVirtual && isVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{handleRealTime();setSettingVirtual(false)}}> Real time Mode </Button>}
+      {!settingVirtual && isVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{setIsVirtual(false); setSettingVirtual(true)}}> Set Virtual time </Button>}
+     
+      {settingVirtual && !isVirtual && <Button style={{marginRight:'0.5em'}} onClick={()=>{setIsVirtual(false); setSettingVirtual(false)}}> Go back in Real Time </Button>}
+      {settingVirtual && <Button style={{marginRight:'0.5em'}} onClick={handleVirtualTime}> Apply virtual time </Button>}
+    </div>
+  </Container>
+  )  
 };
 
 export default VirtualClock;

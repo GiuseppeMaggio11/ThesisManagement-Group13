@@ -32,10 +32,14 @@ const {
   updateThesesArchivationManual,
   getThesisForProfessorById,
   updateThesis,
+  deleteProposal,
 } = require("./controllers/manageThesis");
 const {
   listExternalCosupervisors,
   createExternalCosupervisor,
+  getTeachersList,
+  listGroups,
+  listDegrees,
 } = require("./controllers/others");
 
 const express = require("express");
@@ -157,7 +161,6 @@ app.post("/logout", (req, res, next) => {
 app.get("/api/student/applications", isStudent, getApplicationStudent);
 //GET PROPOSALS
 app.get("/api/proposals", isLoggedIn, getProposals);
-
 //GET PROPOSAL BY ID
 app.get("/api/proposal/:id", isLoggedIn, getProposal);
 //DO AN APPLICATION FOR A PROPOSAL
@@ -166,6 +169,9 @@ app.post("/api/newApplication/:thesis_id", isStudent, newApplication);
 app.post("/api/newFiles/:thesis_id", isStudent, addFiles);
 
 app.get("/api/getAllFiles/:student_id/:thesis_id", isProfessor, getAllFiles);
+
+//GET TEACHERS
+app.get("/api/teachersList", isProfessor, getTeachersList);
 
 app.get(
   "/api/getStudentFilesList/:student_id/:thesis_id",
@@ -216,19 +222,6 @@ app.get(
   listExternalCosupervisors
 );
 
-//CREATES NEW EXTERNAL COSUPERVISOR
-app.post(
-  "/api/newExternalCosupervisor",
-  isProfessor,
-  [
-    // Various checks of syntax of given data
-    check("email").isEmail(),
-    check("surname").isLength({ min: 1, max: 50 }),
-    check("name").isLength({ min: 1, max: 50 }),
-  ],
-  createExternalCosupervisor
-);
-
 //UPDATE THESES WITH NEW VIRTUALCLOCK TIME
 app.put(
   "/api/updateThesesArchivation",
@@ -268,7 +261,7 @@ app.post(
   createExternalCosupervisor
 );
 
-app.get("/api/isApplied", isStudent, isApplied);
+app.get("/api/isApplied", isLoggedIn, isApplied);
 
 app.get("/api/getProposalsProfessor", isProfessor, getProposalsProfessor);
 
@@ -277,6 +270,14 @@ app.put(
   isProfessor,
   updateThesesArchivationManual
 );
+
+app.get("/api/groups", isProfessor, listGroups);
+
+app.get("/api/degrees", isProfessor, listDegrees);
+
+app.get("/api/teachersList", isProfessor, getTeachersList);
+
+app.delete("/api/deleteProposal", isProfessor, deleteProposal);
 
 app.get(
   "/api/getThesisForProfessorById/:id",

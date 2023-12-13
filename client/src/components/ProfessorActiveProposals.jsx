@@ -2,7 +2,6 @@ import { useContext, useEffect, useState } from "react";
 import API from "../API";
 import Loading from "./Loading";
 import {
-  Accordion,
   Alert,
   Button,
   Card,
@@ -15,7 +14,7 @@ import {
 } from "react-bootstrap";
 import MessageContext from "../messageCtx";
 import { useMediaQuery } from "react-responsive";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import { Calendar, PencilFill } from "react-bootstrap-icons";
 import randomcolor from "randomcolor";
@@ -29,26 +28,20 @@ function ProfessorActiveProposals(props) {
     return API.redirectToLogin();
   }
 
-  useEffect(() => {
-    const getActiveProposals = async () => {
-      try {
-        props.setLoading(true);
-        const response = await API.getProposalsProfessor();
-        setActiveProposals(response);
-        props.setLoading(false);
-      } catch (err) {
-        handleToast("Error while fetching active proposals", "error");
-      }
-    };
+  const getActiveProposals = async () => {
+    try {
+      props.setLoading(true);
+      const response = await API.getProposalsProfessor();
+      setActiveProposals(response);
+      props.setLoading(false);
+    } catch (err) {
+      handleToast("Error while fetching active proposals", "error");
+    }
+  };
 
+  useEffect(() => {
     getActiveProposals();
   }, []);
-
-  const renderTooltip = (props) => (
-    <Tooltip id="button-tooltip" {...props}>
-      Copy Thesis
-    </Tooltip>
-  );
 
   return props.loading ? (
     <Loading />
@@ -66,8 +59,8 @@ function ProfessorActiveProposals(props) {
         <ActiveProposalsLargeScreen
           activeProposals={activeProposals}
           handleToast={handleToast}
-          renderTooltip={renderTooltip}
           isMobile={isMobile}
+          getActiveProposals={getActiveProposals}
         />
       )}
     </Container>
@@ -85,8 +78,8 @@ function ActiveProposalsLargeScreen(props) {
                 proposal={proposal}
                 key={i}
                 handleToast={props.handleToast}
-                renderTooltip={props.renderTooltip}
                 isMobile={props.isMobile}
+                getActiveProposals={props.getActiveProposals}
               />
             );
           })}
@@ -97,6 +90,36 @@ function ActiveProposalsLargeScreen(props) {
 }
 
 function ElementProposalLargeScreen(props) {
+  const archiveProposal = async (thesis_id) => {
+    try {
+      await API.updateThesisArchivation(thesis_id);
+      props.handleToast("Proposal archived correctly", "success");
+      props.getActiveProposals();
+    } catch (err) {
+      props.handleToast("Error while archiving a proposal", "error");
+    }
+  };
+
+  const deleteProposal = async (thesis_id) => {
+    try {
+      API.deleteProposal(thesis_id).then((result) => {
+        //result or deletion is not always positive. we receive a JSON object either in form {result : ... [success case]} or {error: ... [error message]}
+        //so we have to check the content of packet we received from back-end and if it's really removed from database, we can update the page
+        if (
+          result[Object.keys(result)[0]] ===
+          "The proposal has been deleted successfully"
+        ) {
+          props.handleToast("Proposal deleted correctly", "success");
+          props.getActiveProposals();
+        } else {
+          props.handleToast(result[Object.keys(result)[0]], "error");
+        }
+      });
+    } catch (err) {
+      handleToast("Error while deleting a proposal", "error");
+    }
+  };
+
   const renderTooltipEdit = (props) => (
     <Tooltip id="button-tooltip" {...props}>
       Edit Thesis
@@ -106,6 +129,18 @@ function ElementProposalLargeScreen(props) {
   const renderTooltipCopy = (props) => (
     <Tooltip id="button-tooltip" {...props}>
       Copy Thesis
+    </Tooltip>
+  );
+
+  const renderTooltipDelete = (props) => (
+    <Tooltip id="button-tooltip" {...props}>
+      Delete Thesis
+    </Tooltip>
+  );
+
+  const renderTooltipArchive = (props) => (
+    <Tooltip id="button-tooltip" {...props}>
+      Archive Thesis
     </Tooltip>
   );
 
@@ -170,6 +205,30 @@ function ElementProposalLargeScreen(props) {
                     d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"
                   />
                 </svg>
+              </Button>
+            </OverlayTrigger>
+            <OverlayTrigger
+              placement="bottom"
+              delay={{ show: 250, hide: 400 }}
+              overlay={renderTooltipDelete}
+            >
+              <Button variant="light" className="mx-2" onClick={deleteProposal}>
+                {!props.isMobile && <span className="mx-2">Delete</span>}
+                <PencilFill />
+              </Button>
+            </OverlayTrigger>
+            <OverlayTrigger
+              placement="bottom"
+              delay={{ show: 250, hide: 400 }}
+              overlay={renderTooltipArchive}
+            >
+              <Button
+                variant="light"
+                className="mx-2"
+                onClick={archiveProposal}
+              >
+                {!props.isMobile && <span className="mx-2">Archive</span>}
+                <PencilFill />
               </Button>
             </OverlayTrigger>
           </Col>
@@ -278,33 +337,6 @@ function ElementProposalLargeScreen(props) {
       </Card>
     </Col>
   );
-  /* <Row
-      className="active-proposal-row-custom"
-    >
-      <Col>
-        <Row>
-          <Col>
-            <div
-              className="thesis-title-row-custom"
-            >
-              <span
-                onClick={() => {
-                  navigate("/viewproposal/" + props.proposal.id);
-                }}
-                style={{ cursor: "pointer" }}
-              >
-                {props.proposal.title}
-              </span>
-            </div>
-          </Col>
-        </Row>
-        <Row>
-          <Col>{props.proposal.thesis_level}</Col>
-          <Col>{props.proposal.thesis_type}</Col>
-          <Col>{dayjs(props.proposal.expiration).format("MM/DD/YYYY")}</Col>
-        </Row>
-      </Col>
-    </Row> */
 }
 
 export default ProfessorActiveProposals;

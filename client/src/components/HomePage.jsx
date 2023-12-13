@@ -1,8 +1,13 @@
-import { Button, Container, Image } from "react-bootstrap";
-import Loading from "./Loading";
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { Container, Image } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 function HomePage(props) {
+  const navigate = useNavigate();
+
+  /*useEffect(() => {
+    navigate("/proposals");
+  }, []);*/ 
   return (
     <>
       <Container>

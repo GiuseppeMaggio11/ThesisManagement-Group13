@@ -102,7 +102,29 @@ exports.getUserID = async (username) => {
     const userRow = results[0];
     return userRow.id;
   } catch (error) {
-    console.error("Error in getUserIDByEmail: ", error);
+    console.error("Error in getUserIDByID: ", error);
+    throw error;
+  }
+};
+
+//retrive the ProfID from the username
+exports.getProfID = async (username) => {
+  try {
+    if (!username) {
+      throw { error: "parameter is missing" };
+    }
+
+    const sql = "SELECT * FROM teacher WHERE email = ?";
+    const [results] = await pool.execute(sql, [username]);
+
+    if (results.length === 0) {
+      throw { error: "User not found." };
+    }
+
+    const userRow = results[0];
+    return userRow.id;
+  } catch (error) {
+    console.error("Error in getUserIDByID: ", error);
     throw error;
   }
 };
@@ -129,7 +151,7 @@ exports.getProposals = async (user_type, username, date) => {
     }
     let formattedDate = dayjs(date).format("YYYY-MM-DD HH:mm:ss");
     sql =
-      "select t.id, title, description, tch.name ,tch.surname , thesis_level ,thesis_type , required_knowledge , notes, expiration, keywords , dg.title_degree , g.group_name, d.department_name  , is_archived from thesis t join teacher tch on t.supervisor_id = tch.id join degree_table dg on t.cod_degree = dg.cod_degree join group_table g on tch.cod_group = g.cod_group join department d on tch.cod_department = d.cod_department where t.expiration > ?";
+      "select t.id, title, description, tch.name ,tch.surname , thesis_level ,thesis_type , required_knowledge , notes, expiration, keywords , dg.title_degree , g.group_name, d.department_name  , is_archived from thesis t join teacher tch on t.supervisor_id = tch.id join degree_table dg on t.cod_degree = dg.cod_degree join group_table g on tch.cod_group = g.cod_group join department d on tch.cod_department = d.cod_department where t.expiration > ? AND is_deleted = 0 AND is_archived=0";
     const [thesisResults] = await pool.execute(sql, [formattedDate]);
 
     if (thesisResults.length === 0) {
@@ -460,8 +482,24 @@ exports.getTeachers = async () => {
   }
 };
 
+exports.getTeachersList = async () => {
+  try {
+    const sql = `SELECT * FROM teacher`;
+    const [rows] = await pool.execute(sql);
+
+    const teachers = [];
+    rows.map((e) => {
+      teachers.push(e);
+    });
+    return teachers;
+  } catch (error) {
+    console.error("Error in getTeachersList: ", error);
+    throw error;
+  }
+};
+
 // Selects every code of degrees from degree_table, returns array of degrees codes
-exports.getDegrees = async () => {
+exports.getCodDegrees = async () => {
   try {
     const sql = `SELECT cod_degree FROM degree_table`;
     const [rows] = await pool.execute(sql);
@@ -469,6 +507,27 @@ exports.getDegrees = async () => {
     const degrees = [];
     rows.map((e) => {
       degrees.push(e.cod_degree);
+    });
+    return degrees;
+  } catch (error) {
+    console.error("Error in getCodDegrees: ", error);
+    throw error;
+  }
+};
+
+// Selects every degrees from degree_table, returns array of degrees
+exports.getDegrees = async () => {
+  try {
+    const sql = `SELECT * FROM degree_table`;
+    const [rows] = await pool.execute(sql);
+
+    const degrees = [];
+    rows.map((e) => {
+      const degree = {
+        name: e.title_degree,
+        cod: e.cod_degree,
+      };
+      degrees.push(degree);
     });
     return degrees;
   } catch (error) {
@@ -582,6 +641,27 @@ exports.getExternal_cosupervisors_emails = async () => {
     return external_cosupervisor_emails;
   } catch (error) {
     console.error("Error in getExternal_cosupervisors_emails: ", error);
+    throw error;
+  }
+};
+
+// Selects every group from group_table, returns array of groups
+exports.getGroups = async () => {
+  try {
+    const sql = `SELECT * FROM group_table`;
+    const [rows] = await pool.execute(sql);
+
+    const groups = [];
+    rows.map((e) => {
+      const group = {
+        name: e.group_name,
+        cod: e.cod_group,
+      };
+      groups.push(group);
+    });
+    return groups;
+  } catch (error) {
+    console.error("Error in getGroups: ", error);
     throw error;
   }
 };
@@ -942,18 +1022,76 @@ exports.isThesisProposalValid = async (thesis_id) => {
 
 // get student application
 exports.getProposalsProfessor = async (professor_id) => {
-  console.log(professor_id);
   try {
     const sql =
-      "SELECT t.* FROM thesis t inner join teacher p on p.id = t.supervisor_id WHERE p.email  = ? and is_archived = 0 order by t.title";
+      "SELECT t.* FROM thesis t inner join teacher p on p.id = t.supervisor_id WHERE p.email  = ? and is_archived = 0 and is_deleted = 0 order by t.title";
     const [rows] = await pool.execute(sql, [professor_id]);
-    console.log(rows);
     return rows;
   } catch (error) {
     console.error("Error in getExternal_cosupervisors_emails: ", error);
     throw error;
   }
 };
+
+//check if a proposal 1 has an active application or 2 is_archived or 3 is_expired. in these case we prevent deletion of that thesis
+exports.checkBeforeDeleteProposal = async (thesis_id, professorID) => {
+  try {
+    //first check the specified thesis is_archived and is_expired and is_deleted. if anyone of those is equall to 1, we cant delete that thesis, and we return an error
+    const sql =
+      "SELECT * FROM thesis WHERE id = ? AND is_archived = 0 AND is_deleted = 0"; //TODO: also add is_expired when merging with jacopo branch
+    const [rows] = await pool.execute(sql, [thesis_id]);
+    if (rows.length === 0) {
+      return "The thesis you request to delete is either not available or not removale.";
+    }
+
+    //check if the requested proposal for delete is belongs to the professor whom we receive delete request from
+    const sql2 = "SELECT supervisor_id FROM thesis WHERE id = ?";
+    const [rows2] = await pool.execute(sql2, [thesis_id]);
+    if (rows2[0].supervisor_id !== professorID) {
+      return "You can only delete your own proposals.";
+    }
+
+    //second check if the specified thesis has an accepted application, then throw an error
+    const sql3 = `SELECT * FROM application WHERE thesis_id = ? AND status = "Accepted"`;
+    const [rows3] = await pool.execute(sql3, [thesis_id]);
+    if (rows3.length !== 0) {
+      return "The thesis you request to delete has an active application. you can't delete it.";
+    } else {
+      return "ok";
+    }
+  } catch (error) {
+    console.error("Error in check before delete proposal: ", error);
+    throw error;
+  }
+};
+
+exports.deleteProposal = async (thesis_id) => {
+  try {
+    //we can't delete proposal from database since there might be some pending application for that proposal. instead we change the is_deleted column to 1
+    const sql = "UPDATE thesis SET is_deleted = 1 WHERE id = ?";
+    const [rows] = await pool.execute(sql, [thesis_id]);
+    return rows.info;
+  } catch (error) {
+    console.error("Error in delete proposal: ", error);
+    throw error;
+  }
+};
+
+//change all the recently deleted proposal's applications to state = cancelled
+exports.updateApplicationsAfterProposalDeletion = async (thesis_id) => {
+  try {
+    const sql = `UPDATE application SET status = "Cancelled" WHERE thesis_id = ?`;
+    const [rows] = await pool.execute(sql, [thesis_id]);
+    return rows.info;
+  } catch (error) {
+    console.error(
+      "Error in updating application table after deletion of a proposal: ",
+      error
+    );
+    throw error;
+  }
+};
+
 //begin transaction function
 exports.beginTransaction = async () => {
   let connection;
@@ -1059,7 +1197,7 @@ exports.getThesisGroupForProfessor = async (id) => {
     //get thesis group
     const sql = "select group_id from thesis_group where thesis_id = ?";
     const [row] = await pool.execute(sql, [id]);
-    return row[0]?.group_id;
+    return row[0] ? row[0].group_id : [];
   } catch (err) {
     console.error("Error in getThesisGroupForProfessor: ", err);
     throw err;

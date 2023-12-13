@@ -3,7 +3,6 @@ import {
   Accordion,
   Alert,
   Button,
-  Card,
   Col,
   Container,
   Row,
@@ -14,6 +13,8 @@ import { useMediaQuery } from "react-responsive";
 import API from "../API";
 import MessageContext from "../messageCtx";
 import { CheckLg, XLg } from "react-bootstrap-icons";
+import ConfirmationModal from "./ConfirmationModal";
+import NoFileFound from "./NoFileFound";
 
 function Applications(props) {
   const [applications, setApplications] = useState(undefined);
@@ -51,7 +52,7 @@ function Applications(props) {
         "Student application " +
           (status === "Accepted" ? " accepted " : " rejected ") +
           "correctly",
-        status === "Accepted" ? "success" : "error"
+        "success"
       );
       const result = await API.getPendingApplications();
       const uniqueThesisTitles = [
@@ -66,17 +67,29 @@ function Applications(props) {
   };
 
   return (
-    <>
+    <div className="d-flex justify-content-center">
       {props.loading && <Loading />}
-      <Container>
-        <Row className="mb-3">
-          <Col className="fs-2">Students Pending Applications</Col>
+        <Container className="width-80 margin-custom">
+          <Row className="d-flex align-items-center">
+            <Col
+              xs={4}
+              className="d-flex justify-content-between align-items-center"
+            >
+            <h1
+              className={`margin-titles-custom ${
+                props.isMobile ? "smaller-heading" : ""
+              }`}
+            >
+              Applications
+            </h1>
+          </Col>
         </Row>
 
         {!applications || applications.length === 0 ? (
-          <Alert variant="danger" style={{ maxWidth: "300px" }}>
-            No Applications found
-          </Alert>
+          <>
+            <NoFileFound message={'No Applications found'}/>
+          </>
+       
         ) : (
           <Accordion>
             {thesisTitles.map((title, i) => {
@@ -119,11 +132,16 @@ function Applications(props) {
           </Accordion>
         )}
       </Container>
-    </>
+    </div>
   );
 }
 
 function StudentApplication(props) {
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [action, setAction] = useState('');
+  const [studentId, setStudentId] = useState('');
+  const [thesisId, setThesisId] = useState('');
+
   function formatDate(dateString) {
     var date = new Date(dateString);
     var day = date.getDate();
@@ -136,6 +154,20 @@ function StudentApplication(props) {
     }${minutes}`;
   }
 
+  function handleConfirmation(studentId, thesisId, action) {
+    setStudentId(studentId);
+    setThesisId(thesisId);
+    setAction(action);
+    setShowConfirmation(true);
+  }
+
+  
+  function confirmAction() {
+    props.handleApplication(studentId, thesisId, action);
+    setShowConfirmation(false);
+  }
+
+
   return props.title === props.application.thesis_title ? (
     <tr>
       {!props.isMobile && <td>{props.application.student_id}</td>}
@@ -145,10 +177,10 @@ function StudentApplication(props) {
         <Button
           variant="success"
           onClick={() =>
-            props.handleApplication(
+            handleConfirmation(
               props.application.student_id,
               props.application.thesis_id,
-              "Accepted"
+              'Accepted'
             )
           }
         >
@@ -159,16 +191,23 @@ function StudentApplication(props) {
         <Button
           variant="danger"
           onClick={() =>
-            props.handleApplication(
+            handleConfirmation(
               props.application.student_id,
               props.application.thesis_id,
-              "Refused"
+              'Refused'
             )
           }
         >
           <XLg size={20} />
         </Button>
       </td>
+      <ConfirmationModal
+        show={showConfirmation}
+        handleClose={() => setShowConfirmation(false)}
+        handleAction={confirmAction}
+        action={action}
+        body={`Are you sure you want to ${action.toLowerCase()} this application?`}
+      />
     </tr>
   ) : null;
 }

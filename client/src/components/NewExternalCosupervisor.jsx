@@ -25,7 +25,8 @@ function NewExternalCoSupervisorForm(props) {
   const handleAddCoSupervisor = async () => {
     await API.newExternalCosupervisor(coSupervisor)
       .then((response) => {
-        setErrors(null)
+        setErrors(null);
+        handleToast("External co-supervisor created correctly", "success");
         props.fetchData();
       }
       )

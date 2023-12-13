@@ -1,0 +1,107 @@
+/* fonts.css */
+@font-face {
+  font-family: 'LiquidCrystal';
+  src: local('LiquidCrystal'), url('./fonts/LiquidCrystal-Normal.otf') format('opentype');
+}
+
+.flip-clock {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 5em;
+}
+
+.calendar-container,
+.clock-container {
+  display: flex;
+  align-items: center;
+  min-height: 5em;
+  font-size: xx-large;
+ 
+}
+
+.flip-clock-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.digit {
+  display: flex;
+  height: 4em;
+  position: relative;
+  align-items: center;
+}
+
+.upper,
+.lower {
+  display: flex;
+}
+
+.card-custom {
+  width: 1.5em;
+  height: 1.8em;
+  line-height: 1.8em;
+  font-family: 'LiquidCrystal';
+  font-size: 48px;
+  font-weight: bold;
+  text-align: center;
+  color: white;
+  background-color: black;
+  border-color: gray;
+  position: relative;
+  overflow: hidden;
+  margin-right: 0.1em;
+  border-radius: 15px;
+}
+
+.front {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  font-size: larger;
+  top: 0.1em;
+  left: 0.1em;
+  backface-visibility: hidden;
+  transition: transform 0.5s;
+}
+
+
+.chevron-up {
+  position: absolute;
+  font-size: xx-large;
+  bottom: 80%;
+  left: 30%;
+  cursor: pointer;
+}
+
+.chevron-down {
+  position: absolute;
+  font-size: xx-large;
+  top: 75%;
+  left: 30%;
+  cursor: pointer;
+}
+
+.date-separator {
+  margin: 0 0.1em;
+  /* Adjust spacing between month/day/year */
+}
+
+.no-highlight {
+  -webkit-tap-highlight-color: transparent;
+  /* Disable tap highlight */
+}
+
+.change-button {
+  font-size: larger;
+  color: black;
+  margin-left: 0em;
+  margin-top: 0.5em;
+}
+
+.dash {
+  font-size: xx-large;
+  color: black;
+  font-weight: 900;
+}
