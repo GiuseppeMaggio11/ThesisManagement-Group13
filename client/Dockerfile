@@ -11,8 +11,7 @@ COPY package.json .
 COPY package-lock.json .
 RUN npm install
 # copy source code and npm files
-COPY . .
-
+COPY ../client .
 # expose client port
 EXPOSE 5173
 

@@ -11,7 +11,7 @@ COPY package.json .
 COPY package-lock.json .
 RUN npm install
 # copy source code and npm files
-COPY . .
+COPY ../server .
 
 # Adjust permissions for the index.js file if needed
 RUN chmod +x /usr/src/app
