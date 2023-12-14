@@ -22,10 +22,12 @@ function StudentApplications(props) {
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const { handleToast } = useContext(MessageContext);
 
-  if (!props.loggedIn || props.user.user_type !== "STUD")
-    return API.redirectToLogin();
+  
 
   useEffect(() => {
+    if (!props.loggedIn || props.user.user_type !== "STUD"){
+      return API.redirectToLogin();
+    }
     props.setLoading(true);
     try {
       const getApplications = async () => {
@@ -33,7 +35,7 @@ function StudentApplications(props) {
         setApplications(result);
         props.setLoading(false);
       };
-      getApplications();
+    getApplications();
     } catch (err) {
       handleToast(err, "error");
     }

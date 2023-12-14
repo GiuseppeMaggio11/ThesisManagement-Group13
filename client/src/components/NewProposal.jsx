@@ -74,8 +74,7 @@ function NewProposal(props) {
   const expirationRef = useRef(null);
   const degreeRef = useRef(null);
 
-  if (!props.loggedIn || props.user.user_type !== "PROF")
-    return API.redirectToLogin();
+
 
   const fetchData = async () => {
     try {
@@ -220,6 +219,8 @@ function NewProposal(props) {
   };
 
   useEffect(() => {
+    if (!props.loggedIn || props.user.user_type !== "PROF"){
+      return API.redirectToLogin();}
     const fetchDataAndThesis = async () => {
       props.setLoading(true);
       await fetchData();

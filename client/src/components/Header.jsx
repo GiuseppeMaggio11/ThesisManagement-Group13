@@ -119,18 +119,6 @@ function Header(props) {
                   >
                     Virtual Clock
                   </Dropdown.Item>
-                  <Dropdown.Item
-                    className="link-style"
-                    onClick={() => {
-                      if (isSmallScreen) setExpanded((old) => !old);
-                      if (props.user && props.user.user_type === "STUD")
-                        navigate("/studproposals");
-                      else if (props.user && props.user.user_type === "PROF")
-                        navigate("/profproposals");
-                    }}
-                  >
-                    Thesis proposals
-                  </Dropdown.Item>
                   <Dropdown.Item className="link-style" onClick={handleLogout}>
                     Logout
                   </Dropdown.Item>
