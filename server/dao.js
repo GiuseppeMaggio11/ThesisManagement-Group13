@@ -1067,7 +1067,7 @@ exports.getProfessorEmailExpiring = async (specifiedDate) => {
     JOIN
       thesis t ON te.id = t.supervisor_id
     WHERE
-      t.expiration BETWEEN DATE_ADD(?, INTERVAL 7 DAY) AND DATE_ADD(DATE_ADD(?, INTERVAL 7 DAY), INTERVAL 7 HOUR);
+      t.expiration BETWEEN DATE_ADD(?, INTERVAL 7 DAY) AND DATE_ADD(DATE_ADD(?, INTERVAL 7 DAY), INTERVAL 7 HOUR) AND t.is_archived=0 AND t.is_expired=0 AND t.is_deleted=0;
   `;
     const [rows] = await pool.execute(sql, [specifiedDate, specifiedDate]);
     return rows;

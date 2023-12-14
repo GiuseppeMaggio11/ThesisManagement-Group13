@@ -244,7 +244,7 @@ function NewProposal(props) {
     const { name, value } = event.target;
     const today = props.virtualClock;
     const selectedDate = dayjs(value);
-    if (selectedDate < today) {
+    if (selectedDate.isBefore(dayjs(today))) {
       handleToast("Please select a date in the future", "error");
     } else {
       setFormData({ ...formData, [name]: value });
