@@ -78,10 +78,9 @@ function ProfessorActiveProposals(props) {
             delay={{ show: 250, hide: 400 }}
             overlay={renderTooltipNew}
           >
-            <PlusLg
-              style={{ fontSize: "xx-large", cursor: "pointer" }}
-              onClick={() => navigate("/newproposal/")}
-            />
+            <Button variant="light">
+              <PlusLg style={{ fontSize: "xx-large" }} />
+            </Button>
           </OverlayTrigger>
         </Col>
       </Row>

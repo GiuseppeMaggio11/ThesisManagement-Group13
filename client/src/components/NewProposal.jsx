@@ -120,6 +120,7 @@ function NewProposal(props) {
       console.log(response)
 
       let in_cosup = await API.getTeachers();
+      in_cosup = in_cosup.filter(teacher => teacher.id !== response.supervisor_id);
       let ex_cosup = await API.getListExternalCosupervisors();
       let groups = await API.getGroups();
       let gr_notSelected = []
