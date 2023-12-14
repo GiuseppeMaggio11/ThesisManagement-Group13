@@ -33,10 +33,8 @@ function Applications(props) {
   const { handleToast } = useContext(MessageContext);
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
-  
-
   useEffect(() => {
-    if (!props.loggedIn || props.user.user_type !== "PROF"){
+    if (!props.loggedIn || props.user.user_type !== "PROF") {
       return API.redirectToLogin();
     }
     props.setLoading(true);
@@ -233,8 +231,8 @@ function StudentApplication(props) {
         {!props.isMobile && <td>{props.application.student_id}</td>}
         <td>{props.application.student_name}</td>
         <td>{formatDate(props.application.application_date)}</td>
-        {props.application.files && props.application.files.length > 0 && (
-          <td>
+        <td>
+          {props.application.files && props.application.files.length > 0 && (
             <OverlayTrigger
               overlay={
                 <Tooltip id="tooltip-top">See application files</Tooltip>
@@ -244,8 +242,8 @@ function StudentApplication(props) {
                 <Folder size={20} />
               </Button>
             </OverlayTrigger>
-          </td>
-        )}
+          )}
+        </td>
         <td>
           <OverlayTrigger
             overlay={<Tooltip id="tooltip-top">Accept application</Tooltip>}

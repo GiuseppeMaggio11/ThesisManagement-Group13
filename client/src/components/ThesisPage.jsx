@@ -50,12 +50,13 @@ function ThesisPage(props) {
             return element.group;
           }),
           requiredKnowledge: thesisData.required_knowledge,
-           notes: thesisData.notes,
+          notes: thesisData.notes,
           expiration: dayjs(thesisData.expiration).format("MM-DD-YYYY"),
           level: thesisData.thesis_level,
         });
         if (props.user.user_type === "STUD") {
           const isApplied = await API.isApplied();
+          debugger;
           setFlag(isApplied);
         } else {
           setFlag(1);
@@ -80,9 +81,7 @@ function ThesisPage(props) {
       formData.append(`file`, selectedFiles[i]);
     }
     API.sendFiles(formData, thesis_id)
-      .then(() => {
-        
-      })
+      .then(() => {})
       .catch((err) => {
         handleToast(err, "error");
       });
@@ -257,9 +256,8 @@ function ThesisPage(props) {
                           <span className="bold"> {pageData.expiration}</span>
                         </div>
                       </Col>
-                      {
-                        !(from === "applications") && props.user
-                          .user_type === "STUD" && (
+                      {!(from === "applications") &&
+                        props.user.user_type === "STUD" && (
                           <Col>
                             <div className="button-apply">
                               {flag === 0 ? (
@@ -274,8 +272,7 @@ function ThesisPage(props) {
                               )}
                             </div>
                           </Col>
-                        )
-                      }
+                        )}
                       {/* props.user.user_type === "PROF" && (
                         <Col
                           style={{ display: "flex", justifyContent: "right" }}

@@ -22,10 +22,8 @@ function StudentApplications(props) {
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const { handleToast } = useContext(MessageContext);
 
-  
-
   useEffect(() => {
-    if (!props.loggedIn || props.user.user_type !== "STUD"){
+    if (!props.loggedIn || props.user.user_type !== "STUD") {
       return API.redirectToLogin();
     }
     props.setLoading(true);
@@ -35,7 +33,7 @@ function StudentApplications(props) {
         setApplications(result);
         props.setLoading(false);
       };
-    getApplications();
+      getApplications();
     } catch (err) {
       handleToast(err, "error");
     }
@@ -164,7 +162,7 @@ function MobileApplication(props) {
 }
 
 function ApplicationStatus(props) {
-  return props.status === "Refused" || props.status === "Cancelled" ? (
+  return props.status === "Rejected" || props.status === "Cancelled" ? (
     <Badge bg="danger" style={{ maxWidth: "100px" }}>
       {props.status}
     </Badge>
