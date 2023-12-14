@@ -204,12 +204,12 @@ function StudentApplication(props) {
   };
 
   function formatDate(dateString) {
-    var date = new Date(dateString);
-    var day = date.getDate();
-    var month = date.getMonth() + 1;
-    var year = date.getFullYear();
-    var hours = date.getHours();
-    var minutes = date.getMinutes();
+    let date = new Date(dateString);
+    let day = date.getDate();
+    let month = date.getMonth() + 1;
+    let year = date.getFullYear();
+    let hours = date.getHours();
+    let minutes = date.getMinutes();
     return `${month}/${day}/${year} ${hours}:${
       minutes < 10 ? "0" : ""
     }${minutes}`;
@@ -240,7 +240,7 @@ function StudentApplication(props) {
                 <Tooltip id="tooltip-top">See application files</Tooltip>
               }
             >
-              <Button variant="secondary" onClick={handleShow}>
+              <Button letiant="secondary" onClick={handleShow}>
                 <Folder size={20} />
               </Button>
             </OverlayTrigger>
@@ -251,7 +251,7 @@ function StudentApplication(props) {
             overlay={<Tooltip id="tooltip-top">Accept application</Tooltip>}
           >
             <Button
-              variant="success"
+              letiant="success"
               onClick={() =>
                 handleConfirmation(
                   props.application.student_id,
@@ -269,7 +269,7 @@ function StudentApplication(props) {
             overlay={<Tooltip id="tooltip-top">Reject application</Tooltip>}
           >
             <Button
-              variant="danger"
+              letiant="danger"
               onClick={() =>
                 handleConfirmation(
                   props.application.student_id,
@@ -335,7 +335,7 @@ function StudentApplication(props) {
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button letiant="secondary" onClick={handleClose}>
             Close
           </Button>
           <OverlayTrigger

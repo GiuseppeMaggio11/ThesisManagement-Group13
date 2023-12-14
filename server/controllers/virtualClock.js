@@ -1,5 +1,5 @@
-var cron = require("node-cron");
-var FakeTimers = require("@sinonjs/fake-timers");
+const cron = require("node-cron");
+const FakeTimers = require("@sinonjs/fake-timers");
 const schedule = require("node-schedule");
 const dao = require("../dao");
 const { validationResult } = require("express-validator");
@@ -36,7 +36,7 @@ async function setVirtualClock(req, res) {
     const now = new Date();
     console.log("Datetime is now: ", now.toString());
     const response_msg = await dao.setExpired(newvirtual);
-    text = {
+    let text = {
       update: response_msg,
       now: newvirtual,
     };
@@ -95,7 +95,7 @@ const email = async () => {
   try {
     const now = new Date();
     const result = await dao.getProfessorEmailExpiring(now);
-    testing_mail = "group13.thesismanagement@gmail.com";
+    let testing_mail = "group13.thesismanagement@gmail.com";
     for (const proposal of result) {
       console.log(proposal);
       const data = new Date(proposal.thesis_expiration).toLocaleString();

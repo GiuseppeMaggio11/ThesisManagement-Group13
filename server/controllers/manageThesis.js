@@ -66,7 +66,7 @@ async function newThesis(req, res) {
     console.log("CODES_GROUP", codes_group);
 
     // If given cod_group is not in list  raise error
-    for (group of req.body.cod_group) {
+    for (let group of req.body.cod_group) {
       if (!codes_group.includes(group)) {
         await dao.rollback();
         return res.status(400).json({
