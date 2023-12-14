@@ -19,8 +19,7 @@ function ViewProposal(props) {
   const [showArchive, setShowArchive] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
 
-  if (!props.loggedIn || props.user.user_type !== "PROF")
-    return API.redirectToLogin();
+  
 
   const fetchThesis = async (thesisId) => {
     try {
@@ -48,6 +47,9 @@ function ViewProposal(props) {
   };
 
   useEffect(() => {
+    if (!props.loggedIn || props.user.user_type !== "PROF"){
+      return API.redirectToLogin();
+    }
     props.setLoading(true);
     if (idView) fetchThesis(idView);
     props.setLoading(false);
