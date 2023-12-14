@@ -139,7 +139,7 @@ function ElementProposalLargeScreen(props) {
 
   const deleteProposal = async (thesis_id) => {
     try {
-      API.deleteProposal(thesis_id).then((result) => {
+      const result = await API.deleteProposal(thesis_id)
         //result or deletion is not always positive. we receive a JSON object either in form {result : ... [success case]} or {error: ... [error message]}
         //so we have to check the content of packet we received from back-end and if it's really removed from database, we can update the page
         if (
@@ -151,7 +151,6 @@ function ElementProposalLargeScreen(props) {
         } else {
           props.handleToast(result[Object.keys(result)[0]], "error");
         }
-      });
     } catch (err) {
       handleToast("Error while deleting a proposal", "error");
     }
