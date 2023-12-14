@@ -59,8 +59,10 @@ sections:
   - Hours estimated for remediation by SonarQube only for the selected and planned issues : 1d 6h
   - Hours spent on remediation : 2h 20m / 1d 5h effort Sonar - Cloud
   - debt ratio (as reported by SonarQube under "Measures-Maintainability") : 1.1%
-  - rating for each quality characteristic reported in SonarQube under "Measures" (namely reliability, security, maintainability )
-  : reliability = C security: A maintainability: A
+  - rating for each quality characteristic reported in SonarQube under "Measures" (namely reliability, security, maintainability ):
+    - reliability: C
+    - security: A
+    - maintainability: A
 
 ## ASSESSMENT
 
