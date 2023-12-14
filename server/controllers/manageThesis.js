@@ -95,7 +95,7 @@ async function newThesis(req, res) {
     const result_thesis = await dao.createThesis(thesis);
 
     //Create a new thesis_group row which links thesis to its research group
-    for (group of req.body.cod_group) {
+    for (let group of req.body.cod_group) {
       await dao.createThesis_group(result_thesis.id, group);
     }
 

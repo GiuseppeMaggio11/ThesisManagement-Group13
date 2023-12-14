@@ -58,7 +58,7 @@ async function uninstallVirtualClock(req, res) {
     const current = new Date();
     const response_msg = await dao.setExpired(current);
     console.log("Datetime is now:", current.toString("italy"));
-    text = {
+    let text = {
       update: response_msg,
       now: current,
     };
