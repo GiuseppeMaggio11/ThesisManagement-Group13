@@ -162,9 +162,9 @@ function MobileApplication(props) {
 }
 
 function ApplicationStatus(props) {
-  return props.status === "Refused" ? (
+  return props.status === "Refused" || props.status === "Cancelled" ? (
     <Badge bg="danger" style={{ maxWidth: "100px" }}>
-      Rejected
+      {props.status}
     </Badge>
   ) : props.status === "pending" ? (
     <Badge bg="secondary" style={{ maxWidth: "100px" }}>

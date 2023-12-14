@@ -96,7 +96,6 @@ const email = async () => {
     const now = new Date();
     const result = await dao.getProfessorEmailExpiring(now);
     testing_mail = "group13.thesismanagement@gmail.com";
-    console.log("result", result);
     for (const proposal of result) {
       console.log(proposal);
       const data = new Date(proposal.thesis_expiration).toLocaleString();

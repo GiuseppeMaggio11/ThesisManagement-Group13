@@ -3,13 +3,13 @@ import { Button, Card, Col, Container, Row } from "react-bootstrap";
 import API from "../API";
 import FlipClock from "./Clock";
 import { Calendar, Clock } from "react-bootstrap-icons";
-
+import dayjs from "dayjs";
 const VirtualClock = (props) => {
   const [tempTime, setTempTime] = useState(props.virtualClock);
   const [isVirtual, setIsVirtual] = useState(false);
   const [settingVirtual, setSettingVirtual] = useState(false);
   const [isAmPm, setIsAmPm] = useState("");
-  const [virtualTime, setVirtualTime] = useState();
+  const [virtualTime, setVirtualTime] = useState(dayjs(props.virtualClock));
 
   /*   const updateTime = (amount, unit) => {
       const newDateTime = new Date(tempTime);
@@ -132,6 +132,7 @@ const VirtualClock = (props) => {
             onClick={() => {
               setIsVirtual(false);
               setSettingVirtual(false);
+              handleRealTime();
             }}
           >
             {" "}
