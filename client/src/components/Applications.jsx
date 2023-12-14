@@ -240,7 +240,7 @@ function StudentApplication(props) {
                 <Tooltip id="tooltip-top">See application files</Tooltip>
               }
             >
-              <Button letiant="secondary" onClick={handleShow}>
+              <Button variant="secondary" onClick={handleShow}>
                 <Folder size={20} />
               </Button>
             </OverlayTrigger>
@@ -251,7 +251,7 @@ function StudentApplication(props) {
             overlay={<Tooltip id="tooltip-top">Accept application</Tooltip>}
           >
             <Button
-              letiant="success"
+              variant="success"
               onClick={() =>
                 handleConfirmation(
                   props.application.student_id,
@@ -269,7 +269,7 @@ function StudentApplication(props) {
             overlay={<Tooltip id="tooltip-top">Reject application</Tooltip>}
           >
             <Button
-              letiant="danger"
+              variant="danger"
               onClick={() =>
                 handleConfirmation(
                   props.application.student_id,
@@ -335,7 +335,7 @@ function StudentApplication(props) {
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button letiant="secondary" onClick={handleClose}>
+          <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
           <OverlayTrigger
