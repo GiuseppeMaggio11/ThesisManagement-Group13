@@ -80,6 +80,7 @@ sections:
 ## ASSESSMENT
 
 - What caused your errors in estimation (if any)?
+    + In this sprint, as in the previous one, we didn't make any significant assessment errors. We just worked one extra hour than planned.
 
 - What lessons did you learn (both positive and negative) in this sprint?
     + POSITIVE: Common coding sessions are an excellent tool for quickly identifying and resolving bugs, as well as for learning new programming techniques.
@@ -101,3 +102,4 @@ sections:
         > As mentioned earlier, in this sprint, we committed a large number of story points, and although we managed to complete all the work, the timelines were very tight, leading us to perform some tasks superficially. One of these tasks was the analysis of technical debt through Sonar Cloud, for which we couldn't allocate much resources. For the next sprint, we want to spend much more time on managing technical debt.
 
 - One thing you are proud of as a Team!!
+    + We have become able to handl challenging situations with pragmatism and dedication. Our determination made it possible to overcome significant challenges, showcasing the strength of our team and our ability to collaborate even in the most demanding circumstances.
