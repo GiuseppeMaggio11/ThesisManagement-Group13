@@ -84,22 +84,22 @@ sections:
 
 - What lessons did you learn (both positive and negative) in this sprint?
     + POSITIVE: Common coding sessions are an excellent tool for quickly identifying and resolving bugs, as well as for learning new programming techniques.
-    + NEGATIVE: Accumulating too many story points can be counterproductive, limiting (as some things may have been done hastily), and stressful for the mental health of team members.
+    + NEGATIVE: Accumulating too many story points can be counterproductive, limiting (as some things may have been done hastily) and stressful for the mental health of team members.
 
 - Which improvement goals set in the previous retrospective were you able to achieve? 
     + In this sprint, we committed to 10 user stories, totaling 26 story points, compared to just 6 in the previous sprint. We managed to successfully complete all the tasks we set out to accomplish.
     + In the two weeks that comprised this sprint, we held 2 technical meetings, which is twice the number compared to the two previous sprints. Additionally, during the last days before the delivery, we spent a significant amount of time collectively writing code in coding sessions where we supported each other.
   
 - Which ones you were not able to achieve? Why?
-    + As we had suspected, the workload for this sprint was quite substantial, and we couldn't dedicate as much time as we would have liked to the refactoring of all the e2e tests. The reformatting process of these tests began, but halfway through the sprint, we realized it would consume too much time. Therefore, we decided not to address this technical debt for this sprint.
+    + As we had suspected, the workload for this sprint was quite substantial and we couldn't dedicate as much time as we would have liked to the refactoring of all the e2e tests. The reformatting process of these tests began, but halfway through the sprint, we realized it would consume too much time. Therefore, we decided not to address this technical debt for this sprint.
 
 - Improvement goals for the next sprint and how to achieve them (technical tasks, team coordination, etc.)
     + Complete the refactoring of the e2e tests
         > Since this sprint will last approximately twice as long as the previous ones, this could be a good opportunity to finally complete the refactoring of the e2e tests once and for all.
     + Refactor the documentation
-        > Our project has comprehensive and thorough documentation. However, it has a small flaw: during various sprints, each team member wrote information about their code with a style different from everyone else's. One of the goals for this sprint is to give the entire documentation a well-defined format.
+        > Our project has comprehensive and complete documentation. However, it has a small flaw: during various sprints, each team member wrote information about their code with a style different from everyone else's. One of the goals for this sprint is to give the entire documentation a well-defined format.
     + Handle the Sonar Cloud technical debt analyses more effectively.
-        > As mentioned earlier, in this sprint, we committed a large number of story points, and although we managed to complete all the work, the timelines were very tight, leading us to perform some tasks superficially. One of these tasks was the analysis of technical debt through Sonar Cloud, for which we couldn't allocate much resources. For the next sprint, we want to spend much more time on managing technical debt.
+        > As mentioned earlier, in this sprint, we committed a large number of story points and although we managed to complete all the work, the timelines were very tight, leading us to perform some tasks superficially. One of these tasks was the analysis of technical debt through Sonar Cloud, for which we couldn't allocate much resources. For the next sprint, we want to spend much more time on managing technical debt.
 
 - One thing you are proud of as a Team!!
-    + We have become able to handl challenging situations with pragmatism and dedication. Our determination made it possible to overcome significant challenges, showcasing the strength of our team and our ability to collaborate even in the most demanding circumstances.
+    + We have become able to handle challenging situations with pragmatism and dedication. Our determination made it possible to overcome significant challenges, showcasing the strength of our team and our ability to collaborate even in the most demanding circumstances.
