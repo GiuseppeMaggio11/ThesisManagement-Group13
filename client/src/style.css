@@ -585,6 +585,7 @@ input:checked+.slider::before {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   transition: box-shadow 0.5s;
   border-radius: 20px;
+  height: 350px;
 }
 
 .custom-card-proposals:hover {
@@ -592,6 +593,16 @@ input:checked+.slider::before {
 }
 
 .title-custom-proposals:hover {
+  text-decoration: underline;
+}
+
+.description-read-more {
+  font-style: italic;
+  font-weight: 600;
+}
+
+.description-read-more:hover {
+  cursor: pointer;
   text-decoration: underline;
 }
 

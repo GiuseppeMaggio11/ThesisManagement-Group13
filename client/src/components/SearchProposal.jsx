@@ -23,9 +23,6 @@ function SearchProposalRoute(props) {
   const { handleToast } = useContext(MessageContext);
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
-  //if (!props.loggedIn || props.user.user_type !== "STUD")
-  //  return API.redirectToLogin();
-
   useEffect(() => {
     if (props.user && props.user.user_type !== "STUD") {
       return API.redirectToLogin();
@@ -255,63 +252,6 @@ function SearchProposalComponent(props) {
               </Row>
             </Container>
           )}
-
-          {/*!props.isMobile ? (
-            <Row>
-              <Col>
-                {filteredThesisProposals.length == 0 ? (
-                  advancedFilters? <NoFileFound message={'No proposal found with these parameters'} /> : <NoFileFound message={'No proposal found'} />
-                ) : (
-                  <Table hover>
-                    <thead>
-                      <tr>
-                        <th>Title</th>
-                        <th>Supervisor</th>
-                        <th>Expiration Date</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredByTitle.length <= 0 &&
-                        filter === "" &&
-                        [...filteredThesisProposals].map((element) => (
-                          <ProposalTableRow
-                            key={element.id}
-                            proposal={element}
-                          />
-                        ))}
-                      {filteredByTitle.length > 0 &&
-                        [...filteredByTitle].map((element) => (
-                          <ProposalTableRow
-                            key={element.id}
-                            proposal={element}
-                          />
-                        ))}
-                    </tbody>
-                  </Table>
-                )}
-              </Col>
-              {filteredByTitle.length <= 0 && filter !== "" && (
-                <NoFileFound message={'No proposal found with this name'} />
-              )}
-            </Row>
-          ) : (
-            <Row style={{ marginBottom: "5rem" }}>
-              <Accordion>
-                {filteredByTitle.length <= 0 &&
-                  filter === "" &&
-                  [...filteredThesisProposals].map((element) => (
-                    <ProposalAccordion key={element.id} proposal={element} />
-                  ))}
-                {filteredByTitle.length <= 0 && filter !== "" && (
-                  <h2 className="mt-3"> no proposals found</h2>
-                )}
-                {filteredByTitle.length > 0 &&
-                  [...filteredByTitle].map((element) => (
-                    <ProposalAccordion key={element.id} proposal={element} />
-                  ))}
-              </Accordion>
-            </Row>
-                  )*/}
           <Row>
             <Col>
               {filteredThesisProposals.length == 0 ? (
@@ -329,7 +269,11 @@ function SearchProposalComponent(props) {
                       {filteredByTitle.length <= 0 &&
                         filter === "" &&
                         [...filteredThesisProposals].map((element) => (
-                          <Proposal key={element.id} proposal={element} />
+                          <Proposal
+                            key={element.id}
+                            proposal={element}
+                            isMobile={props.isMobile}
+                          />
                         ))}
                       {filteredByTitle.length <= 0 && filter !== "" && (
                         <Col>
@@ -358,7 +302,6 @@ function SearchProposalComponent(props) {
 
 function Proposal(props) {
   const navigate = useNavigate();
-
   return (
     <Col xs={12} md={12} lg={12} xl={12} xxl={12} className="mt-4">
       <Card
@@ -431,7 +374,24 @@ function Proposal(props) {
             minHeight: 50,
           }}
         >
-          {props.proposal.description}
+          {props.proposal.description.length > (props.isMobile ? 100 : 600) ? (
+            <>
+              <span>
+                {props.proposal.description.substring(
+                  0,
+                  props.isMobile ? 100 : 600
+                ) + "..... "}
+              </span>
+              <span
+                className="description-read-more"
+                onClick={() => navigate(`/proposals/${props.proposal.id}`)}
+              >
+                Read more
+              </span>
+            </>
+          ) : (
+            props.proposal.description
+          )}
         </div>
         <Row
           style={{

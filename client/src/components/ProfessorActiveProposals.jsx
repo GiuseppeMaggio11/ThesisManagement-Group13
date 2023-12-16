@@ -86,9 +86,7 @@ function ProfessorActiveProposals(props) {
       </Row>
 
       {!activeProposals || activeProposals.length === 0 ? (
-        <NoFileFound
-          message={"No proposals found"}
-        />
+        <NoFileFound message={"No proposals found"} />
       ) : (
         <ActiveProposalsLargeScreen
           activeProposals={activeProposals}
@@ -139,18 +137,18 @@ function ElementProposalLargeScreen(props) {
 
   const deleteProposal = async (thesis_id) => {
     try {
-      const result = await API.deleteProposal(thesis_id)
-        //result or deletion is not always positive. we receive a JSON object either in form {result : ... [success case]} or {error: ... [error message]}
-        //so we have to check the content of packet we received from back-end and if it's really removed from database, we can update the page
-        if (
-          result[Object.keys(result)[0]] ===
-          "The proposal has been deleted successfully"
-        ) {
-          props.handleToast("Proposal deleted correctly", "success");
-          props.getActiveProposals();
-        } else {
-          props.handleToast(result[Object.keys(result)[0]], "error");
-        }
+      const result = await API.deleteProposal(thesis_id);
+      //result or deletion is not always positive. we receive a JSON object either in form {result : ... [success case]} or {error: ... [error message]}
+      //so we have to check the content of packet we received from back-end and if it's really removed from database, we can update the page
+      if (
+        result[Object.keys(result)[0]] ===
+        "The proposal has been deleted successfully"
+      ) {
+        props.handleToast("Proposal deleted correctly", "success");
+        props.getActiveProposals();
+      } else {
+        props.handleToast(result[Object.keys(result)[0]], "error");
+      }
     } catch (err) {
       handleToast("Error while deleting a proposal", "error");
     }
@@ -252,10 +250,7 @@ function ElementProposalLargeScreen(props) {
                   delay={{ show: 250, hide: 400 }}
                   overlay={renderTooltipDelete}
                 >
-                  <Button
-                    variant="light"
-                    onClick={() => setShowDelete(true)}
-                  >
+                  <Button variant="light" onClick={() => setShowDelete(true)}>
                     {!props.isMobile && <span className="mx-2">Delete</span>}
                     <Trash3 />
                   </Button>
@@ -267,10 +262,7 @@ function ElementProposalLargeScreen(props) {
                   delay={{ show: 250, hide: 400 }}
                   overlay={renderTooltipArchive}
                 >
-                  <Button
-                    variant="light"
-                    onClick={() => setShowArchive(true)}
-                  >
+                  <Button variant="light" onClick={() => setShowArchive(true)}>
                     {!props.isMobile && <span className="mx-2">Archive</span>}
                     <Archive />
                   </Button>
@@ -322,7 +314,24 @@ function ElementProposalLargeScreen(props) {
             minHeight: 50,
           }}
         >
-          {props.proposal.description}
+          {props.proposal.description.length > (props.isMobile ? 100 : 600) ? (
+            <>
+              <span>
+                {props.proposal.description.substring(
+                  0,
+                  props.isMobile ? 100 : 600
+                ) + "..... "}
+              </span>
+              <span
+                className="description-read-more"
+                onClick={() => navigate("/viewproposal/" + props.proposal.id)}
+              >
+                Read more
+              </span>
+            </>
+          ) : (
+            props.proposal.description
+          )}
         </div>
         <Row
           style={{
