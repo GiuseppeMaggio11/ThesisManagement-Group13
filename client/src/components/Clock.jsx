@@ -12,6 +12,8 @@ const FlipClock = ({
   settingVirtual,
   virtualTime,
   setVirtualTime,
+  systemTime,
+  setSystemTime
 }) => {
   const [time, setTime] = useState(new Date());
   const [virtualTimeArray, setVirtualTimeArray] = useState([
@@ -81,6 +83,7 @@ const FlipClock = ({
   }, [handleTraslationToArray]);
 
   useEffect(() => {
+    console.log(systemTime)
     if (!isVirtual && !settingVirtual) {
       const interval = setInterval(() => {
         setTime(new Date());
@@ -88,19 +91,28 @@ const FlipClock = ({
 
       return () => clearInterval(interval);
     }
-    if (settingVirtual && !isVirtual) {
-      handleTraslationToArray();
+     if (settingVirtual && !isVirtual) {
+        handleTraslationToArray();
     }
 
-    if (isVirtual && !settingVirtual) {
+     if (isVirtual && !settingVirtual) {
       const interval = setInterval(() => {
         setVirtualTime((prevVirtualTime) => {
-          const updatedVirtualTime = prevVirtualTime.add(1, "second");
+          let updatedVirtualTime;
+          if(prevVirtualTime!==undefined){
+            updatedVirtualTime = prevVirtualTime.add(1, "second");
+          }
+          else{
+            updatedVirtualTime = localStorage.getItem("virtualclock")? dayjs(new Date(JSON.parse(localStorage.getItem("virtualclock")))).add(1, "second"):dayjs().add(1, "second");
+          }
+          setSystemTime(updatedVirtualTime.toDate())
+          localStorage.setItem("virtualclock", JSON.stringify(updatedVirtualTime.toDate()));
           return updatedVirtualTime;
         });
       }, 1000);
       return () => clearInterval(interval);
     }
+  
   }, [isVirtual, settingVirtual]);
 
   useEffect(() => {
@@ -118,7 +130,7 @@ const FlipClock = ({
       handleDateTimeUpdate(time);
       setIsLoading(false);
     } else {
-      handleDateTimeUpdate(virtualTime.toDate());
+      handleDateTimeUpdate(virtualTime?virtualTime.toDate():new Date(JSON.parse(localStorage.getItem("virtualclock"))))
       setIsLoading(false);
     }
   }, [isLoading, time, virtualTime]);
