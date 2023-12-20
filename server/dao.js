@@ -427,8 +427,8 @@ exports.isThesisValid = async (thesisID, date) => {
 exports.isAlreadyExisting = async (studentID, thesisID) => {
   try {
     const sql =
-      "SELECT COUNT(*) as count FROM application WHERE student_id = ? AND thesis_id = ?";
-    const [countResult] = await pool.execute(sql, [studentID, thesisID]);
+      "SELECT COUNT(*) as count FROM application WHERE student_id = ? and (status ='Accepted' or status ='Pending')";
+    const [countResult] = await pool.execute(sql, [studentID]);
 
     if (countResult[0].count === 1) {
       return true;

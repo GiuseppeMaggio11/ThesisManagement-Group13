@@ -240,7 +240,7 @@ app.get(
 app.put(
   "/api/updateApplicationStatus",
   isProfessor,
-  [check("status").isIn(["Accepted", "Refused"])],
+  [check("status").isIn(["Accepted", "Rejected"])],
   updateApplicationStatus
 );
 
