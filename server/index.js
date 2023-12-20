@@ -148,6 +148,8 @@ app.post(
       res.redirect("http://localhost:5173/profproposals");
     else if (req.user && req.user.user_type === "STUD")
       res.redirect("http://localhost:5173/studproposals");
+    else if (req.user && req.user.user_type === "SECR")
+      res.redirect("http://localhost:5173/secrrequests");
   }
 );
 
