@@ -389,6 +389,15 @@ async function updateProposal(thesis, id) {
   );
 }
 
+async function getServerDateTime() {
+  return getJson(
+    fetch(`${URL}/getServerDateTime`, {
+      credentials: "include",
+    })
+  );  
+}
+
+
 const API = {
   logOut,
   getUserInfo,
@@ -417,5 +426,6 @@ const API = {
   deleteProposal,
   getThesisForProfessorById,
   updateProposal,
+  getServerDateTime
 };
 export default API;

@@ -118,4 +118,16 @@ const email = async () => {
     console.error(err);
   }
 };
-module.exports = { setVirtualClock, uninstallVirtualClock, create_schedule };
+
+
+async function getServerDateTime(req, res){
+  try{
+    const datetime = new Date()
+    res.status(200).json(datetime.toString())
+  }
+  catch(err){
+    res.status(500).json(err)
+  }
+}
+
+module.exports = { setVirtualClock, uninstallVirtualClock, create_schedule,getServerDateTime };

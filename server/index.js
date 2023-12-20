@@ -46,6 +46,7 @@ const {
   setVirtualClock,
   uninstallVirtualClock,
   create_schedule,
+  getServerDateTime
 } = require("./controllers/virtualClock");
 
 const express = require("express");
@@ -330,6 +331,9 @@ app.put(
   [check("datetime").isISO8601().toDate()],
   setVirtualClock
 );
+
+app.get("/api/getServerDateTime", getServerDateTime);
+
 
 //UPDATE THESES WITH NEW VIRTUALCLOCK TIME
 /*app.put(
