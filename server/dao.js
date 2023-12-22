@@ -1077,6 +1077,23 @@ exports.getProfessorEmailExpiring = async (specifiedDate) => {
   }
 };
 
+//status => 
+//0: secretary have to accept
+//1: accepted by the secretary
+//2: professor have to accept
+//3: accepted
+//4: rejected by secretary
+//5: rejected by professor
+exports.secretaryThesisRequest = async (request_id, change) => {
+  try {
+    const sql = `UPDATE thesis_request SET status_code = ? WHERE id = ?`;
+    const [rows] = await pool.execute(sql, [change, request_id]);
+    return rows.info;
+  } catch (error) {
+      throw error;
+  }
+}
+
 //begin transaction function
 exports.beginTransaction = async () => {
   let connection;

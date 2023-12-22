@@ -7,6 +7,7 @@ const {
   isStudent,
   isProfessor,
   isLoggedIn,
+  isSecretaryOrProfessor,
 } = require("./controllers/middleware");
 const {
   getProposals,
@@ -26,6 +27,9 @@ const {
   getStudentFilesList,
   getFile,
 } = require("./controllers/manageFiles");
+const {
+  secretaryThesisRequest
+} = require("./controllers/thesisRequest")
 const {
   newThesis,
   updateThesesArchivation,
@@ -320,6 +324,8 @@ app.put(
   ],
   updateThesis
 );
+
+app.put("/api/updateRequest/:id",isSecretaryOrProfessor, secretaryThesisRequest );
 
 app.get("/api/isApplied", isStudent, isApplied);
 
