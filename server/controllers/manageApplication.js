@@ -97,17 +97,17 @@ async function newApplication(req, res) {
     }
     const existing = await dao.isAlreadyExisting(userID, thesis_id);
     if (existing) {
-      return res.status(422).json("You are already applied for this thesis");
+      return res.status(422).json("You cannot apply");
     }
-    const applications = await dao.getApplications();
+    /* const applications = await dao.getApplications();
     for (const application of applications) {
       if (
         userID == application.student_id &&
-        application.status !== "Refused"
+        application.status !== "Rejected"
       ) {
         return res.status(422).json("You are already applied for a thesis");
       }
-    }
+    } */
 
     const result = await dao.newApply(userID, thesis_id, date);
     const emailData = await dao.getDataTeacherApplicationEmail(thesis_id);

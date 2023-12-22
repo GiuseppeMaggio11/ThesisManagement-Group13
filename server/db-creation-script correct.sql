@@ -35,6 +35,13 @@ CREATE TABLE IF NOT EXISTS teacher (
     cod_department VARCHAR(10) NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS secretary(
+    id VARCHAR(7) PRIMARY KEY,
+    surname VARCHAR(50) NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    email VARCHAR(255) NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS degree_table (
     cod_degree VARCHAR(10) PRIMARY KEY,
     title_degree VARCHAR(100) NOT NULL
@@ -165,6 +172,9 @@ INSERT INTO teacher (id, surname, name, email, cod_group, cod_department)
 VALUES
     ('P123456', 'Rossi', 'Mario', 'mario.rossi@polito.it', 'GRP01', 'DEP01'),
     ('P654321', 'Bianchi', 'Sofia', 'sofia.bianchi@polito.it', 'GRP02', 'DEP02');
+INSERT INTO secretary (id, surname, name, email) 
+VALUES
+    ('E123456', 'Giallo', 'Paolo', 'paola.giallo@polito.it');
 INSERT INTO degree_table (cod_degree, title_degree) 
 VALUES
     ('DEGR01', 'Computer engineering Master Degree'),
@@ -239,4 +249,3 @@ VALUES
     (4, 'maria.gentile@email.net'),
     (4, 'antonio.bruno@email.org'),
     (6, 'andrea.ferrari@email.com');
-
