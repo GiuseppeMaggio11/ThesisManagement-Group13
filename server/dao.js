@@ -1188,3 +1188,59 @@ exports.getThesisGroups = async (id) => {
     throw err;
   }
 };
+
+exports.getRequestsForProfessor = async (email) => {
+  try {
+    const sql =
+      "select " +
+      "tr.student_id, " +
+      "concat(s.name,' ', s.surname) as student_fullname, " +
+      "tr.title, " +
+      "tr.description, " +
+      "tr.supervisor_id, " +
+      "concat(t.name, ' ', t.surname) as professor_fullname, " +
+      "tr.thesis_level, " +
+      "tr.thesis_type, " +
+      "tr.cod_degree, " +
+      "d.title_degree " +
+      "from thesis_request tr " +
+      "inner join student s on s.id = tr.student_id " +
+      "inner join degree_table d on d.cod_degree = tr.cod_degree " +
+      "inner join teacher t on t.id = tr.supervisor_id " +
+      "where tr.status_code = 1 and t.email = ?";
+
+    const [rows] = await pool.execute(sql, [email]);
+    return rows;
+  } catch (err) {
+    console.error("Error in getRequestsForProfessor: ", err);
+    throw err;
+  }
+};
+
+exports.getRequestsForSecretary = async () => {
+  try {
+    const sql =
+      "select " +
+      "tr.student_id, " +
+      "concat(s.name,' ', s.surname) as student_fullname, " +
+      "tr.title, " +
+      "tr.description, " +
+      "tr.supervisor_id, " +
+      "concat(t.name, ' ', t.surname) as professor_fullname, " +
+      "tr.thesis_level, " +
+      "tr.thesis_type, " +
+      "tr.cod_degree, " +
+      "d.title_degree " +
+      "from thesis_request tr " +
+      "inner join student s on s.id = tr.student_id " +
+      "inner join degree_table d on d.cod_degree = tr.cod_degree " +
+      "inner join teacher t on t.id = tr.supervisor_id " +
+      "where tr.status_code = 0";
+
+    const [rows] = await pool.execute(sql);
+    return rows;
+  } catch (err) {
+    console.error("Error in getRequestsForSecretary: ", err);
+    throw err;
+  }
+};

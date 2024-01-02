@@ -100,6 +100,7 @@ CREATE TABLE IF NOT EXISTS thesis(
 
 CREATE TABLE IF NOT EXISTS thesis_request(
     id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id VARCHAR(7) NOT NULL,
     title VARCHAR(100) NOT NULL,
     description TEXT NOT NULL,
     supervisor_id VARCHAR(7) NOT NULL,
@@ -249,3 +250,10 @@ VALUES
     (4, 'maria.gentile@email.net'),
     (4, 'antonio.bruno@email.org'),
     (6, 'andrea.ferrari@email.com');
+INSERT INTO thesis_request (student_id, title, description, supervisor_id, thesis_level, thesis_type, cod_degree, status_code)
+VALUES
+('S123456', 'Research Topic 1', 'Description for Research Topic 1', 'P123456', 'Master', 'Experimental', 'DEGR01', 1),
+('S123456', 'Research Topic 2', 'Description for Research Topic 2', 'P654321', 'PhD', 'Theoretical', 'DEGR01', 0),
+('S654321', 'Research Topic 3', 'Description for Research Topic 3', 'P123456', 'Bachelor', 'Practical', 'DEGR02', 1),
+('S654321', 'Research Topic 4', 'Description for Research Topic 4', 'P123456', 'Master', 'Mixed', 'DEGR02', 0),
+('S123456', 'Research Topic 5', 'Description for Research Topic 5', 'P654321', 'PhD', 'Experimental', 'DEGR01', 1);

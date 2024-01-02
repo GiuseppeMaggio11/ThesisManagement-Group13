@@ -7,6 +7,7 @@ const {
   isStudent,
   isProfessor,
   isLoggedIn,
+  isSecretary,
 } = require("./controllers/middleware");
 const {
   getProposals,
@@ -41,12 +42,15 @@ const {
   listGroups,
   listDegrees,
 } = require("./controllers/others");
-
 const {
   setVirtualClock,
   uninstallVirtualClock,
   create_schedule,
 } = require("./controllers/virtualClock");
+const {
+  getRequestsForProfessor,
+  getRequestsForSecretary,
+} = require("./controllers/thesisRequest");
 
 const express = require("express");
 const morgan = require("morgan");
@@ -322,6 +326,11 @@ app.put(
 );
 
 app.get("/api/isApplied", isStudent, isApplied);
+
+//THESIS REQUESTS
+app.get("/api/getrequestsforsecr", isSecretary, getRequestsForSecretary);
+
+app.get("/api/getrequestsforprof", isProfessor, getRequestsForProfessor);
 
 //RETURN TO REAL DATETIME
 app.put("/api/setRealDateTime", uninstallVirtualClock);
