@@ -588,6 +588,12 @@ input:checked+.slider::before {
   height: 350px;
 }
 
+.custom-card-proposals-big {
+  height: 500px;
+  margin-inline:1em;
+  border-radius: 20px;
+}
+
 .custom-card-proposals:hover {
   box-shadow: 0 6px 10px rgba(0, 0, 0, 0.5);
 }
