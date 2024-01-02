@@ -474,7 +474,7 @@ exports.getDataStudentApplicationEmail = async (thesisId, studentId) => {
 exports.newApply = async (studentID, ThesisID, date) => {
   try {
     const status = "pending";
-    const formattedDate = dayjs(date).format("YYYY-MM-DD HH:mm:ss");
+    const formattedDate = dayjs(new Date()).format("YYYY-MM-DD HH:mm:ss");
 
     const sql =
       "INSERT INTO application (student_id, thesis_id, status, application_date) VALUES (?, ?, ?, ?)";
