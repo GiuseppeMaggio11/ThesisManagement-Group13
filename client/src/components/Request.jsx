@@ -5,24 +5,28 @@ import { Calendar,Pencil } from "react-bootstrap-icons";
 import dayjs from "dayjs";
 import Loading from "./Loading";
 import randomcolor from "randomcolor";
+import API from "../API";
 
 
 
-function RequestPage(props) {
+function RequestsPage(props) {
     const [requestList, setRequestList] = useState([])
+    
 
     useEffect(() => {
         async function getRquests() {
             props.setLoading(true);
             try {
-                if (props.user && props.user.user_type !== "PROF") {
-                    // get proposal for that prof
+                if (props.user && props.user.user_type === "PROF") {
+                    let result = await API.getRequestsForProfessor()
+                    setRequestList(result)
                 }
-                if (props.user && props.user.user_type !== "SECR") {
-                    // get proposal for that prof
+                if (props.user && props.user.user_type === "SECR") {
+                    let result = await API.getRequestsForSecretary()
+                    setRequestList(result)
                 }
             } catch (err) {
-                handleToast("Error while fetching requests", "error");
+                //handleToast("Error while fetching requests", "error");
             }
         }
         getRquests()
@@ -31,13 +35,13 @@ function RequestPage(props) {
 
 
 
-    return props.loading ? (
+    /* return props.loading ? (
         <Loading />
       ) : (
         <Container className="p-4">
           <Row className="justify-content-between">
             <Col xs={8} className="fs-2">
-              Active thesis proposals
+              Requests
             </Col>
         </Row>
         {
@@ -46,6 +50,9 @@ function RequestPage(props) {
             })
         }  
         </Container>
+      ) */
+      return(
+        <h1>Requests</h1>
       )
 }
 
@@ -79,16 +86,16 @@ function RequestCard(props){
                                     <OverlayTrigger
                                         placement="bottom"
                                         delay={{ show: 250, hide: 400 }}
-                                        overlay={renderTooltipEdit}
+                                        /* overlay={renderTooltipEdit} */
                                     >
                                         <Button
                                             variant="light"
-                                            onClick={() => {
+                                          /*   onClick={() => {
                                                 navigate("/updateproposal/" + props.proposal.id);
-                                            }}
+                                            }} */
                                         >
-                                            {!props.isMobile && <span className="mx-2">Edit</span>}
-                                            <Pencil />
+                                            {!props.isMobile && <span className="mx-2">Accept</span>}
+                                            {/* <Pencil /> */}
                                         </Button>
                                     </OverlayTrigger>
                                 </Col>
@@ -247,5 +254,5 @@ function RequestCard(props){
         </Col>
     )
 }
-export default RequestPage
+export default RequestsPage
 
