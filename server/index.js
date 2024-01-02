@@ -7,6 +7,7 @@ const {
   isStudent,
   isProfessor,
   isLoggedIn,
+  isSecretary,
 } = require("./controllers/middleware");
 const {
   getProposals,
@@ -41,13 +42,16 @@ const {
   listGroups,
   listDegrees,
 } = require("./controllers/others");
-
 const {
   setVirtualClock,
   uninstallVirtualClock,
   create_schedule,
   getServerDateTime
 } = require("./controllers/virtualClock");
+const {
+  getRequestsForProfessor,
+  getRequestsForSecretary,
+} = require("./controllers/thesisRequest");
 
 const express = require("express");
 const morgan = require("morgan");
@@ -149,6 +153,8 @@ app.post(
       res.redirect("http://localhost:5173/profproposals");
     else if (req.user && req.user.user_type === "STUD")
       res.redirect("http://localhost:5173/studproposals");
+    else if (req.user && req.user.user_type === "SECR")
+      res.redirect("http://localhost:5173/secrrequests");
   }
 );
 
@@ -241,7 +247,7 @@ app.get(
 app.put(
   "/api/updateApplicationStatus",
   isProfessor,
-  [check("status").isIn(["Accepted", "Refused"])],
+  [check("status").isIn(["Accepted", "Rejected"])],
   updateApplicationStatus
 );
 
@@ -321,6 +327,11 @@ app.put(
 );
 
 app.get("/api/isApplied", isStudent, isApplied);
+
+//THESIS REQUESTS
+app.get("/api/getrequestsforsecr", isSecretary, getRequestsForSecretary);
+
+app.get("/api/getrequestsforprof", isProfessor, getRequestsForProfessor);
 
 //RETURN TO REAL DATETIME
 app.put("/api/setRealDateTime", uninstallVirtualClock);

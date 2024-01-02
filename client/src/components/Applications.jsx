@@ -272,7 +272,7 @@ function StudentApplication(props) {
                 handleConfirmation(
                   props.application.student_id,
                   props.application.thesis_id,
-                  "Refused"
+                  "Rejected"
                 )
               }
             >
