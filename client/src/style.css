@@ -589,7 +589,7 @@ input:checked+.slider::before {
 }
 
 .custom-card-proposals-big {
-  height: 500px;
+
   margin-inline:1em;
   border-radius: 20px;
 }

@@ -202,9 +202,9 @@ function ElementProposalLargeScreen(props) {
         style={{ cursor: 'pointer' }}
       >
 
-        <Card style={{ padding: 20 }} className="custom-card-proposals">
+        <Card style={{ padding: 20, height: 'fit-content'}} className="custom-card-proposals">
           <Row>
-            <Col style={{ minWidth: "300px" }}>
+            <Col xs={6}>
               <div
                 className="title-custom-proposals"
                 onClick={() => navigate("/viewproposal/" + props.proposal.id)}
@@ -222,7 +222,6 @@ function ElementProposalLargeScreen(props) {
                 <Col xs={6} md={6} lg={3}>
                   <OverlayTrigger
                     placement="bottom"
-                    delay={{ show: 250, hide: 400 }}
                     overlay={renderTooltipEdit}
                   >
                     <Button
@@ -239,7 +238,6 @@ function ElementProposalLargeScreen(props) {
                 <Col xs={6} md={6} lg={3}>
                   <OverlayTrigger
                     placement="bottom"
-                    delay={{ show: 250, hide: 400 }}
                     overlay={renderTooltipCopy}
                   >
                     <Button
@@ -268,7 +266,6 @@ function ElementProposalLargeScreen(props) {
                 <Col xs={6} md={6} lg={3}>
                   <OverlayTrigger
                     placement="bottom"
-                    delay={{ show: 250, hide: 400 }}
                     overlay={renderTooltipDelete}
                   >
                     <Button variant="light" onClick={() => setShowDelete(true)}>
@@ -280,7 +277,6 @@ function ElementProposalLargeScreen(props) {
                 <Col xs={6} md={6} lg={3}>
                   <OverlayTrigger
                     placement="bottom"
-                    delay={{ show: 250, hide: 400 }}
                     overlay={renderTooltipArchive}
                   >
                     <Button variant="light" onClick={() => setShowArchive(true)}>
@@ -332,6 +328,7 @@ function ElementProposalLargeScreen(props) {
             style={{
               fontSize: 16,
               marginTop: 16,
+            
               minHeight: 50,
             }}
           >
@@ -340,7 +337,7 @@ function ElementProposalLargeScreen(props) {
                 <span>
                   {props.proposal.description.substring(
                     0,
-                    props.isMobile ? 100 : 600
+                    props.isMobile ? 100 : 400
                   ) + "..... "}
                 </span>
                 <span
@@ -357,10 +354,10 @@ function ElementProposalLargeScreen(props) {
           <Row
             style={{
               fontSize: 16,
-              marginTop: 16,
+              marginTop: '2em',
             }}
           >
-            <Col style={{ maxWidth: "110px" }}>
+            <Col style={{ maxWidth: "140px"}}>
               <span>Thesis Level</span>
             </Col>
             <Col>
@@ -380,7 +377,7 @@ function ElementProposalLargeScreen(props) {
               marginTop: 16,
             }}
           >
-            <Col style={{ maxWidth: "110px" }}>
+            <Col style={{ maxWidth: "140px" }}>
               <span>Thesis Type</span>
             </Col>
             <Col>
@@ -400,7 +397,7 @@ function ElementProposalLargeScreen(props) {
               marginTop: 16,
             }}
           >
-            <Col style={{ maxWidth: "110px" }}>
+            <Col style={{ maxWidth: "140px" }}>
               <span>Expire at</span>
             </Col>
             <Col>
@@ -447,9 +444,9 @@ function ElementProposalLargeScreen(props) {
              justifyContent: 'center'
            }}
          >
-            <Card style={{ padding: 20 }} className="custom-card-proposals-big">
+            <Card style={{ padding: 20,   height: 'fit-content'}} className="custom-card-proposals-big">
               <Row>
-                <Col style={{ minWidth: "300px", width: '300em' }}>
+                <Col xs={6}>
                   <div
                     className="title-custom-proposals"
                     onClick={() => navigate("/viewproposal/" + props.proposal.id)}
@@ -537,7 +534,7 @@ function ElementProposalLargeScreen(props) {
                   </Row>
                 </Col>
               </Row>
-              <div
+              {props.proposal.keywords && <div
                 className="hide-scrollbar"
                 style={{
                   fontWeight: "semi-bold",
@@ -546,8 +543,7 @@ function ElementProposalLargeScreen(props) {
                   marginTop: 5,
                 }}
               >
-                {props.proposal.keywords &&
-                  props.proposal.keywords.split(", ").map((key, index) => (
+                 { props.proposal.keywords.split(", ").map((key, index) => (
                     <span
                       key={index}
                       className="badge"
@@ -573,14 +569,16 @@ function ElementProposalLargeScreen(props) {
                     </span>
                   ))}
               </div>
+              }
               <div
                 style={{
                   fontSize: 16,
                   marginTop: 16,
-                  minHeight: 50,
+                  maxHeight: '500px',
+                  overflowY:'auto'
                 }}
               >
-                <span>
+                <span >
                   {props.proposal.description}
                 </span>
               </div>
@@ -588,9 +586,10 @@ function ElementProposalLargeScreen(props) {
                 style={{
                   fontSize: 16,
                   marginTop: 16,
+
                 }}
               >
-                <Col style={{ maxWidth: "110px" }}>
+                <Col xs={6} md={6} lg={6}>
                   <span>Thesis Level</span>
                 </Col>
                 <Col>
@@ -610,7 +609,7 @@ function ElementProposalLargeScreen(props) {
                   marginTop: 16,
                 }}
               >
-                <Col style={{ maxWidth: "110px" }}>
+               <Col xs={6} md={6} lg={6}>
                   <span>Thesis Type</span>
                 </Col>
                 <Col>
@@ -630,7 +629,7 @@ function ElementProposalLargeScreen(props) {
                   marginTop: 16,
                 }}
               >
-                <Col style={{ maxWidth: "110px" }}>
+                <Col xs={6} md={6} lg={6}>
                   <span>Expire at</span>
                 </Col>
                 <Col>
