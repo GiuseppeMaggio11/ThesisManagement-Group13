@@ -16,17 +16,6 @@ import MessageContext from "../messageCtx";
 import Cv from "./Cv";
 
 
-const CVModal = ({ show, handleClose, children }) => {
-    return (
-        <Modal className='modal-custom' show={show} onHide={handleClose} centered>
-            <Modal.Body className="p-4">
-                <div>
-                    {children}
-                </div>
-            </Modal.Body>
-        </Modal>
-    );
-};
 
 
 function RequestsPage(props) {
@@ -84,16 +73,20 @@ function RequestsPage(props) {
         }
     }
 
+    function handleClose(){
+        setShowCv(false)
+    }
+
 
     return props.loading ? (
         <Loading />
     ) : (
         <>
-            <Container className=" d-flex p-4">
+            <Container className="p-4">
                 <Row className="fs-2 mb-2">
                     Requests
                 </Row>
-                <Row style={{ marginTop: '3em', width:'80%' }}>
+                <Row >
                     {requestList.length > 0 ?
                         (requestList?.map((req, index) => {
                             return (
@@ -112,9 +105,9 @@ function RequestsPage(props) {
                     }
                 </Row>
             </Container>
-            <CVModal  show={showCv} handleClose={() => setShowCv(false)}>
-                <Cv loading={props.loading} setLoading={props.setLoading} studentID={studentID} />
-            </CVModal>
+
+            {showCv && <Cv show={showCv} onHide={handleClose} studentID={studentID}></Cv>}
+           
         </>
     )
 }
@@ -194,7 +187,7 @@ function RequestCard(props) {
                         </Col>
                     </Card.Header>
                     <Row>
-                        <Col xs={8} md={8} lg={8} xl={8} xxl={8}style={{ paddingLeft: 20, paddingRight:0}} >
+                        <Col xs={8} md={8} lg={8} xl={8} xxl={8} style={{ paddingLeft: 20, paddingRight: 0 }} >
                             <Row>
                                 <div
                                     style={{
@@ -207,7 +200,7 @@ function RequestCard(props) {
                                 </div>
                             </Row>
                             <Row>
-                                <Col style={{ padding: 0}} xs={12} md={12} lg={12}>
+                                <Col style={{ padding: 0 }} xs={12} md={12} lg={12}>
                                     <div
                                         className="title-custom-proposals"
                                         style={{
@@ -223,7 +216,7 @@ function RequestCard(props) {
                                 </Col>
                             </Row>
                             {isSecretary && <Row>
-                                <Col style={{ padding: 0}} xs={12} md={12} lg={12}>
+                                <Col style={{ padding: 0 }} xs={12} md={12} lg={12}>
                                     <div
                                         style={{
                                             fontWeight: "medium",
@@ -238,9 +231,9 @@ function RequestCard(props) {
                             </Row>}
                         </Col>
                         <Col xs={4} className="text-end px-0">
-                            <Row className={isMobile? "d-flex justify-content-end": ""} style={{ marginTop: '1em',  marginRight: '1em'}}>
+                            <Row className={isMobile ? "d-flex justify-content-end" : ""} style={{ marginTop: '1em', marginRight: '1em' }}>
                                 <Col className='mx-2 p-0' xs={2} md={4} lg={4} xl={4} xxl={4}>
-                                    {isMobile ? <Check2 style={{ fontSize: 20}} /> :
+                                    {isMobile ? <Check2 style={{ fontSize: 20 }} /> :
                                         <>
                                             <OverlayTrigger
                                                 placement="bottom"

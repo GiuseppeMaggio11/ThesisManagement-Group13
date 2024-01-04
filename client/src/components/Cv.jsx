@@ -2,16 +2,17 @@ import { useContext, useEffect, useState } from "react"
 import MessageContext from "../messageCtx";
 import API from "../API";
 import Loading from "./Loading";
-import { Col, Row } from "react-bootstrap";
+import { Col, Modal, Row } from "react-bootstrap";
 import { useMediaQuery } from "react-responsive";
 import dayjs from "dayjs";
 
 function Cv(props) {
-    const { studentID, loading, setLoading } = props
+    const { show, onHide, studentID} = props
     const { handleToast } = useContext(MessageContext);
     const [student, setStudent] = useState({})
     const [cv, setCv] = useState([])
     const isMobile = useMediaQuery({ maxWidth: 767 });
+    const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
 
@@ -21,7 +22,7 @@ function Cv(props) {
                 let student = await API.getStudent(studentID)
                 setCv(cv)
                 setStudent(student[0])
-                setLoading(false)
+                setIsLoading(false)
                 console.log('cv', JSON.stringify(cv))
                 console.log('student', JSON.stringify(student))
 
@@ -31,25 +32,26 @@ function Cv(props) {
             }
 
         }
-        setLoading(true)
         getCV(studentID)
     }, [studentID])
 
     return (
-        loading ? <Loading /> : (
+        isLoading ? <Loading /> : (
             <>
+             <Modal size='lg' show={show} onHide={onHide} contentClassName="modal-custom-student-apply">
+                <Modal.Body className="p-4" >
                 <Row>
-                    <Col xs={8}>
-                        <h2 style={{ marginRight: '0.3em', fontWeight: 600, paDDing: 0, width: 'fit-content' }}>{student.name + ' ' + student.surname}</h2>
+                    <Col xs={6}>
+                        <h4 style={{ marginRight: '0.3em', fontWeight: 600, padding: 0, width: 'fit-content' }}>{student.name + ' ' + student.surname}</h4>
                         <h4 style={{ fontWeight: 400, width: 'fit-content' }}>{studentID}</h4>
 
                     </Col>
-                    <Col xs={4} style={{ fontSize: 20 }}>
-                        <Row className='d-flex' style={{ justifyContent: 'flex-end', fontSize: 20 }}>
+                    <Col xs={6}  style={{ fontSize: isMobile?15:18 }}>
+                        <Row className='d-flex' style={{ justifyContent: 'flex-end' }}>
                             <span style={{ width: 'fit-content' }}>{'degree: '}</span>
                             <span style={{ fontWeight: 500, width: 'fit-content' }}>{student.cod_degree}</span>
                         </Row>
-                        <Row className='d-flex' style={{ justifyContent: 'flex-end' }}>
+                        <Row className='d-flex' style={{ justifyContent: 'flex-end'}}>
                             <span style={{ width: 'fit-content' }}>{'enrolled from : '}</span>
                             <span style={{ fontWeight: 500, width: 'fit-content' }}>{student.enrollment_year}</span>
                         </Row>
@@ -59,7 +61,7 @@ function Cv(props) {
                     <Col xs={2}>
                         Code
                     </Col>
-                    <Col xs={4}>
+                    <Col xs={6} md={4} lg={4} xl={4} xxl={4}>
                         Title
                     </Col>
                     <Col xs={2}>
@@ -68,9 +70,9 @@ function Cv(props) {
                     <Col xs={2}>
                        Grade
                     </Col>
-                    <Col xs={2}>
+                    {!isMobile && <Col xs={2}>
                         Date
-                    </Col>
+                    </Col>}
                 </Row>
 
                 {cv.map(((line, index) => {
@@ -80,7 +82,7 @@ function Cv(props) {
                                 <Col xs={2}>
                                     {line.cod_course}
                                 </Col>
-                                <Col xs={4}>
+                                <Col xs={6} md={4} lg={4} xl={4} xxl={4}>
                                     {line.title_course}
                                 </Col>
                                 <Col xs={2}>
@@ -89,15 +91,19 @@ function Cv(props) {
                                 <Col xs={2}>
                                     {line.grade}
                                 </Col>
-                                <Col xs={2}>
+                                {!isMobile && <Col xs={2}>
                                     {dayjs(new Date(line.date)).format('DD-MM-YYYY')}
-                                </Col>
+                                </Col>}
                             </Row>
 
                         </>
                     )
 
                 }))}
+                  
+                </Modal.Body>
+            </Modal>
+               
             </>
 
         )
