@@ -578,6 +578,13 @@ input:checked+.slider::before {
   }
 }
 
+.custom-card-applications {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  transition: box-shadow 0.5s;
+  border-radius: 20px;
+  height: 100px;
+}
+
 .custom-card-proposals {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   transition: box-shadow 0.5s;
@@ -587,7 +594,7 @@ input:checked+.slider::before {
 
 .custom-card-proposals-big {
 
-  margin-inline:1em;
+  margin-inline: 1em;
   border-radius: 20px;
 }
 
@@ -655,7 +662,19 @@ input:checked+.slider::before {
   color: rgb(237, 89, 89);
 }
 
-.cv-modal{
+.cv-modal {
   max-width: 100% !important;
   width: 90% !important;
+}
+
+.student-number-applyed {
+  display: inline-block;
+  width: 35px;
+  height: 35px;
+  line-height: 35px;
+  border-radius: 50%;
+  /* background-color: #FC5130;
+  color: white; */
+  text-align: center;
+  font-weight: 600;
 }
