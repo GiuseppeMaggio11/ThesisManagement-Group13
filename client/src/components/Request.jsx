@@ -238,9 +238,9 @@ function RequestCard(props) {
                             </Row>}
                         </Col>
                         <Col xs={4} className="text-end px-0">
-                            <Row style={{ marginTop: '1em' }}>
-                                <Col className='mx-2' xs={6} md={4} lg={4} xl={4} xxl={4}>
-                                    {isMobile ? <Check2 style={{ fontSize: 20 }} /> :
+                            <Row className={isMobile? "d-flex justify-content-end": ""} style={{ marginTop: '1em',  marginRight: '1em'}}>
+                                <Col className='mx-2 p-0' xs={2} md={4} lg={4} xl={4} xxl={4}>
+                                    {isMobile ? <Check2 style={{ fontSize: 20}} /> :
                                         <>
                                             <OverlayTrigger
                                                 placement="bottom"
@@ -257,7 +257,7 @@ function RequestCard(props) {
                                             </OverlayTrigger>
                                         </>}
                                 </Col>
-                                <Col xs={6} md={4} lg={4} xl={4}>
+                                <Col xs={2} md={4} lg={4} xl={4}>
 
                                     {isMobile ? <XLg style={{ fontSize: 15 }} /> :
                                         <>
