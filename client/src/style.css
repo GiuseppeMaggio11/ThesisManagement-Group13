@@ -478,6 +478,11 @@ input:checked+.slider::before {
   display: flex;
   align-items: center;
   min-height: calc(100% - 60px);
+  justify-content: center;
+}
+
+.modal-custom {
+  border-radius: 20px !important; 
 }
 
 .dropdown-container {
@@ -558,11 +563,17 @@ input:checked+.slider::before {
 }
 
 
-@media (min-width: 576px) {
+@media (max-width: 576px) {
   .modal-dialog {
     margin: auto;
   }
 }
+
+@media (min-width: 576px){
+.modal-dialog {
+    max-width: 100% !important;
+    width: 80% !important;
+}}
 
 @media (min-width: 765px) {
   .title-mediumScreen {
@@ -586,9 +597,9 @@ input:checked+.slider::before {
 }
 
 .custom-card-proposals-big {
-
+  width: 80%;
   margin-inline:1em;
-  border-radius: 20px;
+  border-radius: 20px; 
 }
 
 .custom-card-proposals:hover {
@@ -653,9 +664,4 @@ input:checked+.slider::before {
   background-color: white !important;
   border-color: rgb(237, 89, 89) !important;
   color: rgb(237, 89, 89);
-}
-
-.cv-modal{
-  max-width: 100% !important;
-  width: 90% !important;
 }

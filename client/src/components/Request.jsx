@@ -18,7 +18,7 @@ import Cv from "./Cv";
 
 const CVModal = ({ show, handleClose, children }) => {
     return (
-        <Modal style={{maxWidth:'100%'}} show={show} onHide={handleClose} centered>
+        <Modal className='modal-custom' show={show} onHide={handleClose} centered>
             <Modal.Body className="p-4">
                 <div>
                     {children}
@@ -93,7 +93,7 @@ function RequestsPage(props) {
                 <Row className="fs-2 mb-2">
                     Requests
                 </Row>
-                <Row style={{ marginTop: '3em' }}>
+                <Row style={{ marginTop: '3em', width:'80%' }}>
                     {requestList.length > 0 ?
                         (requestList?.map((req, index) => {
                             return (
@@ -138,7 +138,7 @@ function RequestCard(props) {
 
     console.log(request)
     return (
-        <Col xs={12} md={12} lg={6} xl={4} xxl={4} className="mt-4">
+        <Col xs={12} md={12} lg={6} xl={6} xxl={4} className="mt-4">
             <motion.div
                 whileHover={{ scale: 1.05 }}
                 style={{ cursor: 'pointer' }}
@@ -194,25 +194,27 @@ function RequestCard(props) {
                         </Col>
                     </Card.Header>
                     <Row>
-                        <Col xs={8}>
+                        <Col xs={8} md={8} lg={8} xl={8} xxl={8}style={{ paddingLeft: 20, paddingRight:0}} >
                             <Row>
                                 <div
                                     style={{
                                         fontWeight: "medium",
                                         fontSize: 20,
+                                        padding: 0
                                     }}
                                 >
                                     {request.title}
                                 </div>
                             </Row>
                             <Row>
-                                <Col xs={12} md={12} lg={12}>
+                                <Col style={{ padding: 0}} xs={12} md={12} lg={12}>
                                     <div
                                         className="title-custom-proposals"
                                         style={{
                                             fontWeight: "medium",
                                             fontSize: 15,
                                             cursor: "pointer",
+                                            padding: 0
                                         }}
                                     >
                                         <span>{'by '}</span>
@@ -221,11 +223,12 @@ function RequestCard(props) {
                                 </Col>
                             </Row>
                             {isSecretary && <Row>
-                                <Col xs={12} md={12} lg={12}>
+                                <Col style={{ padding: 0}} xs={12} md={12} lg={12}>
                                     <div
                                         style={{
                                             fontWeight: "medium",
                                             fontSize: 15,
+                                            padding: 0
                                         }}
                                     >
                                         <span>{'for '}</span>
@@ -234,9 +237,9 @@ function RequestCard(props) {
                                 </Col>
                             </Row>}
                         </Col>
-                        <Col className="text-end mx-2">
+                        <Col xs={4} className="text-end px-0">
                             <Row style={{ marginTop: '1em' }}>
-                                <Col xs={6} md={4} lg={4} xl={6}>
+                                <Col className='mx-2' xs={6} md={4} lg={4} xl={4} xxl={4}>
                                     {isMobile ? <Check2 style={{ fontSize: 20 }} /> :
                                         <>
                                             <OverlayTrigger
@@ -253,11 +256,8 @@ function RequestCard(props) {
                                                 </Button>
                                             </OverlayTrigger>
                                         </>}
-
-
-
                                 </Col>
-                                <Col xs={6} md={4} lg={4} xl={6}>
+                                <Col xs={6} md={4} lg={4} xl={4}>
 
                                     {isMobile ? <XLg style={{ fontSize: 15 }} /> :
                                         <>

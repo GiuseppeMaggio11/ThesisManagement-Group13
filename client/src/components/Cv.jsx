@@ -4,6 +4,7 @@ import API from "../API";
 import Loading from "./Loading";
 import { Col, Row } from "react-bootstrap";
 import { useMediaQuery } from "react-responsive";
+import dayjs from "dayjs";
 
 function Cv(props) {
     const { studentID, loading, setLoading } = props
@@ -11,7 +12,7 @@ function Cv(props) {
     const [student, setStudent] = useState({})
     const [cv, setCv] = useState([])
     const isMobile = useMediaQuery({ maxWidth: 767 });
-    
+
     useEffect(() => {
 
         const getCV = async (studentID) => {
@@ -39,24 +40,64 @@ function Cv(props) {
             <>
                 <Row>
                     <Col xs={8}>
-                        <Row>
-                            {student.name + ' ' + student.surname}
-                        </Row>
-                        <Row>
-                            {studentID}
-                        </Row>
+                        <h2 style={{ marginRight: '0.3em', fontWeight: 600, paDDing: 0, width: 'fit-content' }}>{student.name + ' ' + student.surname}</h2>
+                        <h4 style={{ fontWeight: 400, width: 'fit-content' }}>{studentID}</h4>
+
                     </Col>
-                    <Col xs={8} style={{justifyContent:'flex-end'}}>
-                        <Row>
-                            {'degree: '}
-                            {student.cod_degree}
+                    <Col xs={4} style={{ fontSize: 20 }}>
+                        <Row className='d-flex' style={{ justifyContent: 'flex-end', fontSize: 20 }}>
+                            <span style={{ width: 'fit-content' }}>{'degree: '}</span>
+                            <span style={{ fontWeight: 500, width: 'fit-content' }}>{student.cod_degree}</span>
                         </Row>
-                        <Row>
-                            {'enrolled from : '}
-                            {student.enrollment_year}
+                        <Row className='d-flex' style={{ justifyContent: 'flex-end' }}>
+                            <span style={{ width: 'fit-content' }}>{'enrolled from : '}</span>
+                            <span style={{ fontWeight: 500, width: 'fit-content' }}>{student.enrollment_year}</span>
                         </Row>
                     </Col>
                 </Row>
+                <Row style={{ fontWeight: 500, marginBottom:'0.5em', marginTop:'3em'}} >
+                    <Col xs={2}>
+                        Code
+                    </Col>
+                    <Col xs={4}>
+                        Title
+                    </Col>
+                    <Col xs={2}>
+                        CFU
+                    </Col>
+                    <Col xs={2}>
+                       Grade
+                    </Col>
+                    <Col xs={2}>
+                        Date
+                    </Col>
+                </Row>
+
+                {cv.map(((line, index) => {
+                    return (
+                        <>
+                            <Row className="my-2">
+                                <Col xs={2}>
+                                    {line.cod_course}
+                                </Col>
+                                <Col xs={4}>
+                                    {line.title_course}
+                                </Col>
+                                <Col xs={2}>
+                                    {line.cfu}
+                                </Col>
+                                <Col xs={2}>
+                                    {line.grade}
+                                </Col>
+                                <Col xs={2}>
+                                    {dayjs(new Date(line.date)).format('DD-MM-YYYY')}
+                                </Col>
+                            </Row>
+
+                        </>
+                    )
+
+                }))}
             </>
 
         )
