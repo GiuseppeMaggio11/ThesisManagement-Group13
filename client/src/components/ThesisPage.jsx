@@ -56,7 +56,6 @@ function ThesisPage(props) {
         });
         if (props.user.user_type === "STUD") {
           const isApplied = await API.isApplied();
-          debugger;
           setFlag(isApplied);
         } else {
           setFlag(1);
@@ -331,7 +330,7 @@ function ThesisPage(props) {
               </tfoot>
             </Table>
           </Container>
-          
+
           <FileDropModal
             showModal={openPanel}
             closeModal={closeModal}

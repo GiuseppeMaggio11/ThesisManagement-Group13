@@ -1,4 +1,4 @@
-import { Button, Modal } from 'react-bootstrap';
+import { Button, Modal } from "react-bootstrap";
 
 function ConfirmationModal(props) {
   return (
@@ -8,18 +8,21 @@ function ConfirmationModal(props) {
       </Modal.Header>
       <Modal.Body>{props.body}</Modal.Body>
       <Modal.Footer>
-        <Button className='button-style-cancel' onClick={props.handleClose}>
+        <Button className="button-style-cancel" onClick={props.handleClose}>
           Cancel
         </Button>
-        <Button className="button-style" onClick={() => {
-          props.handleAction();
-          props.handleClose();
-        }}>
+        <Button
+          className="button-style"
+          onClick={() => {
+            props.handleAction();
+            props.handleClose();
+          }}
+        >
           {props.action}
         </Button>
       </Modal.Footer>
     </Modal>
-);
+  );
 }
 
 export default ConfirmationModal;

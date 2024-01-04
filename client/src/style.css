@@ -582,7 +582,19 @@ input:checked+.slider::before {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   transition: box-shadow 0.5s;
   border-radius: 20px;
-  height: 100px;
+}
+
+.custom-card-applications:hover {
+  scale: 1.05;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+
+.custom-card-students-applyed {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  transition: box-shadow 0.5s;
+  border-radius: 20px;
 }
 
 .custom-card-proposals {
@@ -677,4 +689,10 @@ input:checked+.slider::before {
   color: white; */
   text-align: center;
   font-weight: 600;
+}
+
+.modal-custom-student-apply {
+  border-radius: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  transition: box-shadow 0.5s;
 }
