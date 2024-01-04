@@ -401,6 +401,20 @@ async function updateProposal(thesis, id) {
   );
 }
 
+async function updateRequest(id, newValue) {
+  return getJson(
+    fetch(URL + `/updateRequest/${id}`, {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({change: newValue}),
+    })
+  );
+}
+
+
 async function getServerDateTime() {
   return getJson(
     fetch(`${URL}/getServerDateTime`, {
@@ -420,6 +434,22 @@ async function getRequestsForProfessor() {
 async function getRequestsForSecretary() {
   return getJson(
     fetch(`${URL}/getrequestsforsecr`, {
+      credentials: "include",
+    })
+  );
+}
+
+async function getStudentCv(id) {
+  return getJson(
+    fetch(`${URL}/getStudentCv/${id}`, {
+      credentials: "include",
+    })
+  );
+}
+
+async function getStudent(id) {
+  return getJson(
+    fetch(`${URL}/getStudent/${id}`, {
       credentials: "include",
     })
   );
@@ -456,5 +486,8 @@ const API = {
   getServerDateTime,
   getRequestsForProfessor,
   getRequestsForSecretary,
+  updateRequest,
+  getStudentCv,
+  getStudent
 };
 export default API;

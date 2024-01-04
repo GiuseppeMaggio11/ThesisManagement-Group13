@@ -1,8 +1,9 @@
 const dao = require("../dao");
 
 async function secretaryThesisRequest(req, res) {
+  console.log(req.body.change)
   try {
-    await dao.secretaryThesisRequest(req.body.thesis_id, req.body.change);
+    await dao.secretaryThesisRequest(req.params.id, req.body.change);
 
     return res.status(200).json("updated");
   } catch (err) {

@@ -94,7 +94,7 @@ function FileDropModal({
   };
 
   return (
-    <Modal show={showModal} onHide={closeModal}>
+    <Modal show={showModal} onHide={closeModal} style={{flex:1}}>
       <Modal.Header>
         <Modal.Title>Are you sure to apply to this thesis?</Modal.Title>
       </Modal.Header>

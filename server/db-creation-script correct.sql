@@ -150,7 +150,6 @@ CREATE TABLE IF NOT EXISTS application(
     FOREIGN KEY (thesis_id) REFERENCES thesis(id)
 );
 
-
 INSERT INTO user_type (id, user_type)
 VALUES
     ('PROF', 'Professor'),

@@ -1189,10 +1189,27 @@ exports.getThesisGroups = async (id) => {
   }
 };
 
+//status => 
+//0: secretary have to accept
+//1: accepted by the secretary
+//2: professor have to accept
+//3: accepted
+//4: rejected by secretary
+//5: rejected by professor
+exports.secretaryThesisRequest = async (request_id, change) => {
+  try {
+    const sql = `UPDATE thesis_request SET status_code = ? WHERE id = ?`;
+    const [rows] = await pool.execute(sql, [change, request_id]);
+    return rows.info;
+  } catch (error) {
+    throw error;
+  }
+}
 exports.getRequestsForProfessor = async (email) => {
   try {
     const sql =
       "select " +
+      "tr.id, " +
       "tr.student_id, " +
       "concat(s.name,' ', s.surname) as student_fullname, " +
       "tr.title, " +
@@ -1216,11 +1233,11 @@ exports.getRequestsForProfessor = async (email) => {
     throw err;
   }
 };
-
 exports.getRequestsForSecretary = async () => {
   try {
     const sql =
       "select " +
+      "tr.id, " +
       "tr.student_id, " +
       "concat(s.name,' ', s.surname) as student_fullname, " +
       "tr.title, " +
@@ -1244,3 +1261,28 @@ exports.getRequestsForSecretary = async () => {
     throw err;
   }
 };
+
+
+exports.getStudentExams = async (studentID)=>{
+  try{
+    const sql = "select * FROM career WHERE id=?"
+    const [rows] = await pool.execute(sql, [studentID]);
+    return rows;
+  }
+  catch (err) {
+    console.error("Error in getStudentExams: ", err);
+    throw err;
+  }
+}
+
+exports.getStudent = async (studentID)=>{
+  try{
+    const sql = "select * FROM student WHERE id=?"
+    const [rows] = await pool.execute(sql, [studentID]);
+    return rows;
+  }
+  catch (err) {
+    console.error("Error in getStudentExams: ", err);
+    throw err;
+  }
+}

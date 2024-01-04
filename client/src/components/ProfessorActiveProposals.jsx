@@ -76,7 +76,6 @@ function ProfessorActiveProposals(props) {
         <Col xs={4} className="d-flex justify-content-end align-items-center">
           <OverlayTrigger
             placement="top"
-            delay={{ show: 250, hide: 400 }}
             overlay={renderTooltipNew}
           >
             <Button variant="light" onClick={() => navigate("/newproposal/")}>

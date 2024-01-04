@@ -1,6 +1,6 @@
-import { Button, Card, Col, Container, OverlayTrigger, Row } from "react-bootstrap";
+import { Button, Card, Col, Container, OverlayTrigger, Row, Tooltip, Modal } from "react-bootstrap";
 import { motion } from 'framer-motion';
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Calendar, Pencil, X } from "react-bootstrap-icons";
 import dayjs from "dayjs";
 import Loading from "./Loading";
@@ -12,13 +12,31 @@ import {
     XLg
 } from "react-bootstrap-icons";
 import { useMediaQuery } from "react-responsive";
+import MessageContext from "../messageCtx";
+import Cv from "./Cv";
+
+
+const CVModal = ({ show, handleClose, children }) => {
+    return (
+        <Modal style={{maxWidth:'100%'}} show={show} onHide={handleClose} centered>
+            <Modal.Body className="p-4">
+                <div>
+                    {children}
+                </div>
+            </Modal.Body>
+        </Modal>
+    );
+};
+
 
 function RequestsPage(props) {
     const [requestList, setRequestList] = useState([])
     const isMobile = useMediaQuery({ maxWidth: 767 });
-
+    const { handleToast } = useContext(MessageContext);
+    const [showCv, setShowCv] = useState(false)
+    const [studentID, setStudentID] = useState('')
     useEffect(() => {
-        async function getRquests() {
+        async function getRequests() {
             props.setLoading(true);
             try {
                 if (props.user && props.user.user_type === "PROF") {
@@ -30,36 +48,94 @@ function RequestsPage(props) {
                     setRequestList(result)
                 }
             } catch (err) {
-                //handleToast("Error while fetching requests", "error");
+                handleToast("Error while fetching requests", "error");
+                console.log(err)
             }
         }
-        getRquests()
+        getRequests()
         props.setLoading(false)
     }, [props.user]);
+
+    const handleDecision = async (request, decision) => {
+        console.log(request, decision)
+        let error = false
+        try {
+            if (decision) {
+                console.log(decision)
+                await API.updateRequest(request.id, props.user.user_type === "PROF" ? 3 : 1)
+            }
+            else
+                await API.updateRequest(request.id, props.user.user_type === "PROF" ? 5 : 4)
+        }
+        catch (err) {
+            error = true
+            handleToast("Error while updating the request", "error");
+        }
+        finally {
+            if (!error) {
+                setRequestList((prev) => {
+                    let req = [...prev]
+                    console.log(req)
+                    req = req.filter((r) => r.id != request.id)
+                    console.log(req)
+                    return req
+                })
+            }
+        }
+    }
+
 
     return props.loading ? (
         <Loading />
     ) : (
-        <Container className=" d-flex p-4">
-            <Row className="fs-2 mb-2">
-                Requests
-            </Row>
-            <Row style={{marginTop:'3em'}}>
-                {requestList.length > 0 ?
-                    (requestList?.map((req, index) => {
-                        return (
-                            <RequestCard key={index} request={req} isMobile={isMobile} isSecretary={props.user.user_type==='SECR'?true:false}/>
-                        )
+        <>
+            <Container className=" d-flex p-4">
+                <Row className="fs-2 mb-2">
+                    Requests
+                </Row>
+                <Row style={{ marginTop: '3em' }}>
+                    {requestList.length > 0 ?
+                        (requestList?.map((req, index) => {
+                            return (
+                                <RequestCard
+                                    key={index}
+                                    request={req}
+                                    isMobile={isMobile}
+                                    isSecretary={props.user.user_type === 'SECR' ? true : false}
+                                    handleDecision={handleDecision}
+                                    setShowCv={setShowCv}
+                                    setStudentID={setStudentID}
+                                />
+                            )
 
-                    })) : <NoFileFound message={"No request found"} />
-                }
-            </Row>
-        </Container>
+                        })) : <NoFileFound message={"No request found"} />
+                    }
+                </Row>
+            </Container>
+            <CVModal  show={showCv} handleClose={() => setShowCv(false)}>
+                <Cv loading={props.loading} setLoading={props.setLoading} studentID={studentID} />
+            </CVModal>
+        </>
     )
 }
 
+
+
 function RequestCard(props) {
-    const { request, isMobile,isSecretary } = props
+    const { request, isMobile, isSecretary, handleDecision, setShowCv, setStudentID } = props
+
+
+    const renderTooltipAccept = (props) => (
+        <Tooltip id="button-tooltip" {...props}>
+            Accept
+        </Tooltip>
+    );
+    const renderTooltipReject = (props) => (
+        <Tooltip id="button-tooltip" {...props}>
+            Reject
+        </Tooltip>
+    );
+
     console.log(request)
     return (
         <Col xs={12} md={12} lg={6} xl={4} xxl={4} className="mt-4">
@@ -92,7 +168,7 @@ function RequestCard(props) {
                             >
                                 {request.student_id}
                             </span>
-               
+
                             {isSecretary && <span
                                 className="badge"
                                 style={{
@@ -115,18 +191,15 @@ function RequestCard(props) {
                             >
                                 {request.supervisor_id}
                             </span>}
-                        </Col> 
+                        </Col>
                     </Card.Header>
                     <Row>
                         <Col xs={8}>
                             <Row>
                                 <div
-                                    className="title-custom-proposals"
-                                    /* onClick={() => navigate("/viewproposal/" + request.id)} */
                                     style={{
                                         fontWeight: "medium",
                                         fontSize: 20,
-                                        cursor: "pointer",
                                     }}
                                 >
                                     {request.title}
@@ -143,30 +216,42 @@ function RequestCard(props) {
                                         }}
                                     >
                                         <span>{'by '}</span>
-                                        <span style={{ fontWeight: 500 }}>{request.student_fullname}</span>
+                                        <span style={{ fontWeight: 500 }} onClick={() => { setShowCv(true); setStudentID(request.student_id) }}>{request.student_fullname}</span>
                                     </div>
                                 </Col>
                             </Row>
+                            {isSecretary && <Row>
+                                <Col xs={12} md={12} lg={12}>
+                                    <div
+                                        style={{
+                                            fontWeight: "medium",
+                                            fontSize: 15,
+                                        }}
+                                    >
+                                        <span>{'for '}</span>
+                                        <span style={{ fontWeight: 500 }}>{request.professor_fullname}</span>
+                                    </div>
+                                </Col>
+                            </Row>}
                         </Col>
                         <Col className="text-end mx-2">
                             <Row style={{ marginTop: '1em' }}>
                                 <Col xs={6} md={4} lg={4} xl={6}>
                                     {isMobile ? <Check2 style={{ fontSize: 20 }} /> :
                                         <>
-                                            {/* <OverlayTrigger
-                                        placement="bottom"
-                                        delay={{ show: 250, hide: 400 }}
-                                    /* overlay={renderTooltipEdit
-                                    > */}
-                                            <Button
-                                                variant="light"
-                                            /*  onClick={() => {
-                                                 navigate("/copyproposal/" + request.id);
-                                             }} */
+                                            <OverlayTrigger
+                                                placement="bottom"
+                                                overlay={renderTooltipAccept}
                                             >
-                                                <Check2 />
-                                            </Button>
-                                            {/* </OverlayTrigger> */}
+                                                <Button
+                                                    variant="light"
+                                                    onClick={() => {
+                                                        handleDecision(request, true)
+                                                    }}
+                                                >
+                                                    <Check2 />
+                                                </Button>
+                                            </OverlayTrigger>
                                         </>}
 
 
@@ -176,20 +261,20 @@ function RequestCard(props) {
 
                                     {isMobile ? <XLg style={{ fontSize: 15 }} /> :
                                         <>
-                                            {/*  <OverlayTrigger
-                                        placement="bottom"
-                                    overlay={renderTooltipCopy}
-                                    > */}
-                                            <Button
-                                                variant="light"
-                                            /*  onClick={() => {
-                                                 navigate("/copyproposal/" + request.id);
-                                             }} */
+                                            <OverlayTrigger
+                                                placement="bottom"
+                                                overlay={renderTooltipReject}
                                             >
-                                                <XLg />
-                                            </Button>
+                                                <Button
+                                                    variant="light"
+                                                    onClick={() => {
+                                                        handleDecision(request, false)
+                                                    }}
+                                                >
+                                                    <XLg />
+                                                </Button>
 
-                                            {/* </OverlayTrigger> */}
+                                            </OverlayTrigger>
                                         </>
                                     }
                                 </Col>

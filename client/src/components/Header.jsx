@@ -29,6 +29,7 @@ function Header(props) {
     API.redirectToLogin();
   };
 
+
   return (
     <Navbar
       expanded={expanded}
@@ -99,6 +100,26 @@ function Header(props) {
                 ? "My applications"
                 : props.user && props.user.user_type === "PROF"
                 ? "Applications"
+                : ""}
+            </Nav.Link>
+            <Nav.Link
+              as={NavLink}
+              to={
+                props.user && props.user.user_type === "STUD"
+                  ? /* "myRequests" */ ''
+                  : props.user && props.user.user_type === "PROF"
+                  ? "requests"
+                  : ""
+              }
+              onClick={() => {
+                if (isSmallScreen) setExpanded((old) => !old);
+              }}
+              className="fs-5"
+            >
+              {props.user && props.user.user_type === "STUD"
+                ? "My requests"
+                : props.user && props.user.user_type === "PROF"
+                ? "Requests"
                 : ""}
             </Nav.Link>
           </Nav>

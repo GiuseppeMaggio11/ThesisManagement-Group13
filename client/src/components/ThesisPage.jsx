@@ -331,7 +331,7 @@ function ThesisPage(props) {
               </tfoot>
             </Table>
           </Container>
-
+          
           <FileDropModal
             showModal={openPanel}
             closeModal={closeModal}
