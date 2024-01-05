@@ -9,7 +9,6 @@ import {
   Container,
   OverlayTrigger,
   Row,
-  Table,
   Tooltip,
 } from "react-bootstrap";
 import MessageContext from "../messageCtx";
@@ -25,11 +24,14 @@ import {
   Trash,
   PlusLg,
 } from "react-bootstrap-icons";
+import Toggle from "react-toggle";
+import "react-toggle/style.css"; 
 import randomcolor from "randomcolor";
 import NoFileFound from "./NoFileFound";
 
 function ProfessorActiveProposals(props) {
   const [activeProposals, setActiveProposals] = useState(undefined);
+  const [isArchived, setIsArchived] = useState(false);
   const { handleToast } = useContext(MessageContext);
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const navigate = useNavigate();
@@ -48,12 +50,32 @@ function ProfessorActiveProposals(props) {
     try {
       props.setLoading(true);
       const response = await API.getProposalsProfessor();
-      setActiveProposals(response);
+      const active_proposals = response.filter(proposal => proposal.is_archived === 0)
+      setActiveProposals(active_proposals);
       props.setLoading(false);
     } catch (err) {
       handleToast("Error while fetching active proposals", "error");
     }
   };
+
+  const getArchiveProposals = async () => {
+    try {
+      props.setLoading(true);
+      const response = await API.getProposalsProfessor();
+      const archive_proposals = response.filter(proposal => proposal.is_archived === 1)
+      setActiveProposals(archive_proposals);
+      props.setLoading(false);
+    } catch (err) {
+      handleToast("Error while fetching archive proposals", "error");
+    }
+  };
+
+  const handleChange = (e) => {
+    setIsArchived(e.target.checked);
+    e.target.checked ? 
+      getArchiveProposals() : getActiveProposals();
+  }
+
   const renderTooltipNew = (props) => (
     <Tooltip id="button-tooltip" {...props}>
       New proposal
@@ -72,7 +94,16 @@ function ProfessorActiveProposals(props) {
         <Col xs={8} className="fs-2">
           Active thesis proposals
         </Col>
-        <Col xs={4} className="d-flex justify-content-end align-items-center">
+        <Col xs={4} className="d-flex justify-content-between align-items-center">
+          <Col className="d-flex align-items-start">
+            <span style={{marginRight:"8px"}}> See archived proposals</span>
+            <Toggle
+              id="archived"
+              name="archived"
+              checked={isArchived}
+              onChange={handleChange}
+            />
+          </Col>
           <OverlayTrigger
             placement="top"
             delay={{ show: 250, hide: 400 }}
@@ -93,6 +124,7 @@ function ProfessorActiveProposals(props) {
           handleToast={handleToast}
           isMobile={isMobile}
           getActiveProposals={getActiveProposals}
+          isArchived={isArchived}
         />
       )}
     </Container>
@@ -112,6 +144,7 @@ function ActiveProposalsLargeScreen(props) {
                 handleToast={props.handleToast}
                 isMobile={props.isMobile}
                 getActiveProposals={props.getActiveProposals}
+                isArchived={props.isArchived}
               />
             );
           })}
@@ -186,7 +219,9 @@ function ElementProposalLargeScreen(props) {
           <Col style={{ minWidth: "300px" }}>
             <div
               className="title-custom-proposals"
-              onClick={() => navigate("/viewproposal/" + props.proposal.id)}
+              onClick={() => props.isArchived ? 
+                navigate("/proposals/" + props.proposal.id) : 
+                navigate("/viewproposal/" + props.proposal.id)}
               style={{
                 fontWeight: "medium",
                 fontSize: 20,
@@ -196,6 +231,7 @@ function ElementProposalLargeScreen(props) {
               {props.proposal.title}
             </div>
           </Col>
+          {!props.isArchived && (
           <Col className="text-end mx-2">
             <Row>
               <Col xs={6} md={6} lg={3}>
@@ -269,7 +305,7 @@ function ElementProposalLargeScreen(props) {
                 </OverlayTrigger>
               </Col>
             </Row>
-          </Col>
+          </Col> )}
         </Row>
         <div
           className="hide-scrollbar"

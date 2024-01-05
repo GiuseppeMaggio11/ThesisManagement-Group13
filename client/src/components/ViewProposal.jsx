@@ -240,56 +240,56 @@ function ViewProposal(props) {
                   </div>
                 </Col>
                 <Col
-                          style={{ display: "flex", justifyContent: "right" }}
-                        >
-                          <Button
-                            variant="light"
-                            className="mx-2"
-                            onClick={() => {
-                              navigate("/updateproposal/" + proposal.id);
-                            }}
-                          >
-                            <span className="mx-2">Edit</span>
-                            <Pencil />
-                          </Button>
-                          <Button
-                            variant="light"
-                            onClick={() => {
-                              navigate("/copyproposal/" + proposal.id);
-                            }}
-                          >
-                            <span className="mx-2">Copy</span>
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="16"
-                              height="16"
-                              fill="currentColor"
-                              className="bi bi-copy"
-                              viewBox="0 0 16 16"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"
-                              />
-                            </svg>
-                          </Button>
-                          <Button
-                            variant="light"
-                            className="mx-2"
-                            onClick={() => setShowDelete(true)}
-                          >
-                            <span style={{ marginRight: "5px" }}>Delete</span>
-                            <Trash3 cursor="pointer"></Trash3>
-                          </Button>
-                          <Button
-                            variant="light"
-                            onClick={() => setShowArchive(true)}
-                            className="mx-2"
-                          >
-                            <span style={{ marginRight: "5px" }}>Archive</span>
-                            <Archive cursor="pointer"></Archive>
-                          </Button>
-                        </Col>
+                  style={{ display: "flex", justifyContent: "right" }}
+                >
+                  <Button
+                    variant="light"
+                    className="mx-2"
+                    onClick={() => {
+                      navigate("/updateproposal/" + proposal.id);
+                    }}
+                  >
+                    <span className="mx-2">Edit</span>
+                    <Pencil />
+                  </Button>
+                  <Button
+                    variant="light"
+                    onClick={() => {
+                      navigate("/copyproposal/" + proposal.id);
+                    }}
+                  >
+                    <span className="mx-2">Copy</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      className="bi bi-copy"
+                      viewBox="0 0 16 16"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"
+                      />
+                    </svg>
+                  </Button>
+                  <Button
+                    variant="light"
+                    className="mx-2"
+                    onClick={() => setShowDelete(true)}
+                  >
+                    <span style={{ marginRight: "5px" }}>Delete</span>
+                    <Trash3 cursor="pointer"></Trash3>
+                  </Button>
+                  <Button
+                    variant="light"
+                    onClick={() => setShowArchive(true)}
+                    className="mx-2"
+                  >
+                    <span style={{ marginRight: "5px" }}>Archive</span>
+                    <Archive cursor="pointer"></Archive>
+                  </Button>
+                </Col>
               </Row>
             </td>
           </tr>
