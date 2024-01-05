@@ -186,7 +186,7 @@ app.post("/api/newFiles/:thesis_id", isStudent, addFiles);
 app.get("/api/getAllFiles/:student_id/:thesis_id", isProfessor, getAllFiles);
 
 //GET TEACHERS
-app.get("/api/teachersList", isProfessor, getTeachersList);
+app.get("/api/teachersList", isLoggedIn, getTeachersList);
 
 app.get(
   "/api/getStudentFilesList/:student_id/:thesis_id",
@@ -276,8 +276,6 @@ app.put(
 app.get("/api/groups", isProfessor, listGroups);
 
 app.get("/api/degrees", isProfessor, listDegrees);
-
-app.get("/api/teachersList", isProfessor, getTeachersList);
 
 app.delete("/api/deleteProposal", isProfessor, deleteProposal);
 
