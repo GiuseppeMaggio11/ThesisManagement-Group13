@@ -18,7 +18,7 @@ function ConfirmationModal(props) {
             props.handleClose();
           }}
         >
-          {props.action}
+          {/*props.action*/}Confirm
         </Button>
       </Modal.Footer>
     </Modal>

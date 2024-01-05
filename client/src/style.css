@@ -196,6 +196,8 @@ table.table-rounded thead tr {
   margin-right: 0.5em;
 }
 
+
+
 .button-style-trash {
   background-color: transparent;
   border-color: transparent;
@@ -256,9 +258,15 @@ table.table-rounded thead tr {
 }
 
 .button-style-cancel:hover {
-  background-color: #f27e25;
-  border-color: #f27e25;
+  background-color: #ed9049;
+  border-color: #ed9049;
   margin-right: 0.5em;
+}
+
+.button-style-cancel:active {
+  background-color: #f27e25 !important;
+  border-color: #f27e25 !important;
+  margin-right: 0.5em !important;
 }
 
 .link-style {
@@ -695,4 +703,37 @@ input:checked+.slider::before {
   border-radius: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   transition: box-shadow 0.5s;
+}
+
+.accept-button-appl:hover {
+  border: 1px solid green !important;
+  background: white !important;
+}
+
+.accept-button-appl:active {
+  border: 1px solid green !important;
+  background: white !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.reject-button-appl:hover {
+  border: 1px solid red !important;
+  background: white !important;
+}
+
+.reject-button-appl:active {
+  border: 1px solid red !important;
+  background: white !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.file-button-appl:hover {
+  border: 1px solid lightgray !important;
+  background: white !important;
+}
+
+.file-button-appl:active {
+  border: 1px solid lightgray !important;
+  background: white !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }

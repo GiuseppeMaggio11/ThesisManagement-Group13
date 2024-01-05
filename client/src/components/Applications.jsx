@@ -1,13 +1,10 @@
 import { useContext, useEffect, useState } from "react";
 import {
-  Accordion,
-  Alert,
   Button,
   Card,
   Col,
   Container,
   Modal,
-  ModalBody,
   OverlayTrigger,
   Row,
   Table,
@@ -18,16 +15,23 @@ import { useMediaQuery } from "react-responsive";
 import API from "../API";
 import MessageContext from "../messageCtx";
 import {
-  CheckLg,
-  XLg,
   Download,
-  Folder,
   FileEarmarkPdf,
   FileEarmarkPdfFill,
+  FolderFill,
+  CheckCircleFill,
+  XCircleFill,
+  CheckCircle,
+  XCircle,
+  CheckSquareFill,
+  CheckSquare,
+  XSquare,
+  XLg,
+  Check,
+  X,
 } from "react-bootstrap-icons";
 import ConfirmationModal from "./ConfirmationModal";
 import NoFileFound from "./NoFileFound";
-import { motion } from "framer-motion";
 import randomColor from "randomcolor";
 
 function Applications(props) {
@@ -243,6 +247,9 @@ function ApplicationCard(props) {
 }
 
 function ModalStudentsApplyedForThesis(props) {
+  const applicationsFiltered = props.applications.filter(
+    (appl) => props.title === appl.thesis_title
+  );
   return (
     <Modal
       show={props.show}
@@ -267,21 +274,20 @@ function ModalStudentsApplyedForThesis(props) {
       <Modal.Body style={{ maxHeight: "70vh", overflowY: "auto" }}>
         <Row>
           <Col xs={12} md={12} lg={12} xl={12}>
-            {props.applications
-              .filter((appl) => props.title === appl.thesis_title)
-              .map((application, i) => {
-                return (
-                  <StudentApplicationThesis
-                    key={i}
-                    application={application}
-                    isMobile={props.isMobile}
-                    handleApplication={props.handleApplication}
-                    handleDownloadZip={props.handleDownloadZip}
-                    handleDownloadPDF={props.handleDownloadPDF}
-                    setShowStudentApplyed={props.setShowStudentApplyed}
-                  />
-                );
-              })}
+            {applicationsFiltered.map((application, i) => {
+              return (
+                <StudentApplicationThesis
+                  key={i}
+                  application={application}
+                  isMobile={props.isMobile}
+                  handleApplication={props.handleApplication}
+                  handleDownloadZip={props.handleDownloadZip}
+                  handleDownloadPDF={props.handleDownloadPDF}
+                  setShowStudentApplyed={props.setShowStudentApplyed}
+                  applicationsFiltered={applicationsFiltered}
+                />
+              );
+            })}
           </Col>
         </Row>
       </Modal.Body>
@@ -328,7 +334,8 @@ function StudentApplicationThesis(props) {
   function confirmAction() {
     props.handleApplication(studentId, thesisId, action);
     setShowConfirmation(false);
-    props.setShowStudentApplyed(false);
+    if (props.applicationsFiltered.length === 0)
+      props.setShowStudentApplyed(false);
   }
 
   return (
@@ -344,27 +351,31 @@ function StudentApplicationThesis(props) {
         {!props.isMobile && (
           <Col>{formatDate(props.application.application_date)}</Col>
         )}
-        <Col>
-          {props.application.files && props.application.files.length > 0 ? (
+        <Col className="text-end">
+          {props.application.files && props.application.files.length > 0 && (
             <OverlayTrigger
               overlay={
                 <Tooltip id="tooltip-top">See application files</Tooltip>
               }
             >
-              <Button variant="secondary" onClick={handleShow}>
-                <Folder size={20} />
+              <Button
+                variant="light"
+                onClick={handleShow}
+                className="file-button-appl"
+                color="black"
+              >
+                <FolderFill size={30} />
               </Button>
             </OverlayTrigger>
-          ) : (
-            ""
           )}
         </Col>
-        <Col>
+        <Col className="text-end">
           <OverlayTrigger
             overlay={<Tooltip id="tooltip-top">Accept application</Tooltip>}
           >
             <Button
-              variant="success"
+              variant="light"
+              className="accept-button-appl"
               onClick={() =>
                 handleConfirmation(
                   props.application.student_id,
@@ -373,16 +384,17 @@ function StudentApplicationThesis(props) {
                 )
               }
             >
-              <CheckLg size={20} />
+              <Check size={25} />
             </Button>
           </OverlayTrigger>
         </Col>
-        <Col>
+        <Col className="text-end">
           <OverlayTrigger
             overlay={<Tooltip id="tooltip-top">Reject application</Tooltip>}
           >
             <Button
-              variant="danger"
+              variant="light"
+              className="reject-button-appl"
               onClick={() =>
                 handleConfirmation(
                   props.application.student_id,
@@ -391,7 +403,7 @@ function StudentApplicationThesis(props) {
                 )
               }
             >
-              <XLg size={20} />
+              <X size={25} />
             </Button>
           </OverlayTrigger>
         </Col>
@@ -421,9 +433,6 @@ function StudentApplicationThesis(props) {
                           {element}
                         </td>
                         <td>
-                          {/*<OverlayTrigger overlay={
-                        <Tooltip id="tooltip-top">Download file</Tooltip>
-                      }>*/}
                           <Button
                             className="button-style"
                             onClick={() =>
@@ -436,7 +445,6 @@ function StudentApplicationThesis(props) {
                           >
                             <Download size={20} />
                           </Button>
-                          {/*</td></OverlayTrigger>*/}
                         </td>
                       </tr>
                     );
@@ -447,7 +455,7 @@ function StudentApplicationThesis(props) {
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button className="button-style-cancel" onClick={handleClose}>
             Close
           </Button>
           <OverlayTrigger
@@ -472,7 +480,9 @@ function StudentApplicationThesis(props) {
         handleClose={() => setShowConfirmation(false)}
         handleAction={confirmAction}
         action={action}
-        body={`Are you sure you want to ${action.toLowerCase()} this application?`}
+        body={`Are you sure you want to ${
+          action === "Accepted" ? "accept" : "reject"
+        } this application?`}
       />
     </>
   );
