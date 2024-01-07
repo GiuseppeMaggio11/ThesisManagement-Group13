@@ -230,6 +230,18 @@ function App() {
                 />
               }
             />
+            <Route
+              path="/secrrequests"
+              element={
+                <RequestsPage
+                  loading={loading}
+                  setLoading={setLoading}
+                  virtualClock={virtualClock}
+                  loggedIn={loggedIn}
+                  user={user}
+                />
+              }
+            />
 
             {/*Leave DefaultRoute as last route */}
             <Route path="/*" element={<DefaultRoute />} />
