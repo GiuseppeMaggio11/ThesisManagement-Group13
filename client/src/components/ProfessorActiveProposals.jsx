@@ -201,7 +201,7 @@ function ElementProposalLargeScreen(props) {
         style={{ cursor: 'pointer' }}
       >
 
-        <Card style={{ padding: 20, height: 'fit-content'}} className="custom-card-proposals">
+        <Card style={{ padding: 20, height: 'fit-content' }} className="custom-card-proposals">
           <Row>
             <Col xs={6}>
               <div
@@ -327,7 +327,7 @@ function ElementProposalLargeScreen(props) {
             style={{
               fontSize: 16,
               marginTop: 16,
-            
+
               minHeight: 50,
             }}
           >
@@ -356,7 +356,7 @@ function ElementProposalLargeScreen(props) {
               marginTop: '2em',
             }}
           >
-            <Col style={{ maxWidth: "140px"}}>
+            <Col style={{ maxWidth: "140px" }}>
               <span>Thesis Level</span>
             </Col>
             <Col>
@@ -409,41 +409,41 @@ function ElementProposalLargeScreen(props) {
         </Card>
       </motion.div>
       {isClicked && (
-         <motion.div
-         initial={{ opacity: 0, x: cardPosition.x-100, y: cardPosition.y, width: '120%', height: '30%' }}
-         animate={{ opacity: 1, x: 0, y: 0, width: '100%', height: '100%' }}
-         exit={{ opacity: 0, x: cardPosition.x, y: cardPosition.y, width: '100%', height: '100%' }}
-         transition={{ opacity: { duration: 0 }, default: { duration: 0} }}
-         onClick={() => setIsClicked(false)}
-         style={{
-           position: 'fixed',
-           top: 0,
-           left: 0,
-           right: 0,
-           bottom: 0,
-           backgroundColor: 'rgba(0, 0, 0, 0.5)',
-           zIndex: 999,
-           display: 'flex',
-           justifyContent: 'center',
-           alignItems: 'center',
-         }}
-       >
-         <motion.div
-           initial={{ opacity: 0, scale: 0.8 }}
-           animate={{ opacity: 1, scale: 1 }}
-           exit={{ opacity: 0, scale: 0.8 }}
-           transition={{ duration: 0.3 }}
-           onClick={handleModalClick}
-           style={{
-             width: '90%',  // Adjust the width as per your requirement
-             height: '90%', // Adjust the height as per your requirement
-             overflow: 'auto',
-             display: 'flex',
-             alignItems: 'center',
-             justifyContent: 'center'
-           }}
-         >
-            <Card style={{ padding: 20,   height: 'fit-content'}} className="custom-card-proposals-big">
+        <motion.div
+          initial={{ opacity: 0, x: cardPosition.x - 100, y: cardPosition.y, width: '120%', height: '30%' }}
+          animate={{ opacity: 1, x: 0, y: 0, width: '100%', height: '100%' }}
+          exit={{ opacity: 0, x: cardPosition.x, y: cardPosition.y, width: '100%', height: '100%' }}
+          transition={{ opacity: { duration: 0 }, default: { duration: 0 } }}
+          onClick={() => setIsClicked(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 999,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.3 }}
+            onClick={handleModalClick}
+            style={{
+              width: '90%',  // Adjust the width as per your requirement
+              height: '90%', // Adjust the height as per your requirement
+              overflow: 'auto',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <Card style={{ padding: 20, height: 'fit-content' }} className="custom-card-proposals-big">
               <Row>
                 <Col xs={6}>
                   <div
@@ -463,7 +463,6 @@ function ElementProposalLargeScreen(props) {
                     <Col xs={6} md={6} lg={3}>
                       <OverlayTrigger
                         placement="bottom"
-                        delay={{ show: 250, hide: 400 }}
                         overlay={renderTooltipEdit}
                       >
                         <Button
@@ -480,7 +479,6 @@ function ElementProposalLargeScreen(props) {
                     <Col xs={6} md={6} lg={3}>
                       <OverlayTrigger
                         placement="bottom"
-                        delay={{ show: 250, hide: 400 }}
                         overlay={renderTooltipCopy}
                       >
                         <Button
@@ -509,7 +507,6 @@ function ElementProposalLargeScreen(props) {
                     <Col xs={6} md={6} lg={3}>
                       <OverlayTrigger
                         placement="bottom"
-                        delay={{ show: 250, hide: 400 }}
                         overlay={renderTooltipDelete}
                       >
                         <Button variant="light" onClick={() => setShowDelete(true)}>
@@ -521,7 +518,6 @@ function ElementProposalLargeScreen(props) {
                     <Col xs={6} md={6} lg={3}>
                       <OverlayTrigger
                         placement="bottom"
-                        delay={{ show: 250, hide: 400 }}
                         overlay={renderTooltipArchive}
                       >
                         <Button variant="light" onClick={() => setShowArchive(true)}>
@@ -542,31 +538,31 @@ function ElementProposalLargeScreen(props) {
                   marginTop: 5,
                 }}
               >
-                 { props.proposal.keywords.split(", ").map((key, index) => (
-                    <span
-                      key={index}
-                      className="badge"
-                      style={{
-                        backgroundColor: randomcolor({
-                          seed: key,
-                          luminosity: "bright",
-                          format: "rgba",
-                          alpha: 1,
-                        }).replace(/1(?=\))/, "0.1"),
-                        color: randomcolor({
-                          seed: key,
-                          luminosity: "bright",
-                          format: "rgba",
-                          alpha: 1,
-                        }),
-                        padding: "0.5em 1.2em",
-                        borderRadius: "0.25rem",
-                        marginRight: 10,
-                      }}
-                    >
-                      {key}
-                    </span>
-                  ))}
+                {props.proposal.keywords.split(", ").map((key, index) => (
+                  <span
+                    key={index}
+                    className="badge"
+                    style={{
+                      backgroundColor: randomcolor({
+                        seed: key,
+                        luminosity: "bright",
+                        format: "rgba",
+                        alpha: 1,
+                      }).replace(/1(?=\))/, "0.1"),
+                      color: randomcolor({
+                        seed: key,
+                        luminosity: "bright",
+                        format: "rgba",
+                        alpha: 1,
+                      }),
+                      padding: "0.5em 1.2em",
+                      borderRadius: "0.25rem",
+                      marginRight: 10,
+                    }}
+                  >
+                    {key}
+                  </span>
+                ))}
               </div>
               }
               <div
@@ -574,7 +570,7 @@ function ElementProposalLargeScreen(props) {
                   fontSize: 16,
                   marginTop: 16,
                   maxHeight: '500px',
-                  overflowY:'auto'
+                  overflowY: 'auto'
                 }}
               >
                 <span >
@@ -584,8 +580,7 @@ function ElementProposalLargeScreen(props) {
               <Row
                 style={{
                   fontSize: 16,
-                  marginTop: 16,
-
+                  marginTop: '2em',
                 }}
               >
                 <Col xs={6} md={6} lg={6}>
@@ -608,7 +603,7 @@ function ElementProposalLargeScreen(props) {
                   marginTop: 16,
                 }}
               >
-               <Col xs={6} md={6} lg={6}>
+                <Col xs={6} md={6} lg={6}>
                   <span>Thesis Type</span>
                 </Col>
                 <Col>
