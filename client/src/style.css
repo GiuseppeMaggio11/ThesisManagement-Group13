@@ -669,3 +669,36 @@ input:checked+.slider::before {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   transition: box-shadow 0.5s;
 }
+
+.accept-button-appl:hover {
+  border: 1px solid green !important;
+  background: white !important;
+}
+
+.accept-button-appl:active {
+  border: 1px solid green !important;
+  background: white !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.reject-button-appl:hover {
+  border: 1px solid red !important;
+  background: white !important;
+}
+
+.reject-button-appl:active {
+  border: 1px solid red !important;
+  background: white !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.file-button-appl:hover {
+  border: 1px solid lightgray !important;
+  background: white !important;
+}
+
+.file-button-appl:active {
+  border: 1px solid lightgray !important;
+  background: white !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}

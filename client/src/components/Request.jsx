@@ -287,6 +287,7 @@ function RequestCard(props) {
                       >
                         <Button
                           variant="light"
+                          className="accept-button-appl"
                           onClick={() => {
                             handleDecision(request, true);
                           }}
@@ -308,6 +309,7 @@ function RequestCard(props) {
                       >
                         <Button
                           variant="light"
+                          className="reject-button-appl"
                           onClick={() => {
                             handleDecision(request, false);
                           }}

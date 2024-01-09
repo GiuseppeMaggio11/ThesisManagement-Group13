@@ -2,14 +2,12 @@ import { useContext, useEffect, useState } from "react";
 import API from "../API";
 import Loading from "./Loading";
 import {
-  Alert,
   Button,
   Card,
   Col,
   Container,
   OverlayTrigger,
   Row,
-  Table,
   Tooltip,
 } from "react-bootstrap";
 import MessageContext from "../messageCtx";
@@ -22,17 +20,18 @@ import {
   Pencil,
   Trash3,
   Archive,
-  Trash,
   PlusLg,
 } from "react-bootstrap-icons";
 import randomcolor from "randomcolor";
 import NoFileFound from "./NoFileFound";
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
+import ViewProposalMotion from "./ViewProposalMotion";
 
 function ProfessorActiveProposals(props) {
   const [activeProposals, setActiveProposals] = useState(undefined);
   const { handleToast } = useContext(MessageContext);
   const isMobile = useMediaQuery({ maxWidth: 767 });
+  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 991 });
   const navigate = useNavigate();
 
   //if (!props.loggedIn || props.user.user_type !== "PROF") {
@@ -74,10 +73,7 @@ function ProfessorActiveProposals(props) {
           Active thesis proposals
         </Col>
         <Col xs={4} className="d-flex justify-content-end align-items-center">
-          <OverlayTrigger
-            placement="top"
-            overlay={renderTooltipNew}
-          >
+          <OverlayTrigger placement="top" overlay={renderTooltipNew}>
             <Button variant="light" onClick={() => navigate("/newproposal/")}>
               <PlusLg style={{ fontSize: "xx-large" }} />
             </Button>
@@ -92,6 +88,7 @@ function ProfessorActiveProposals(props) {
           activeProposals={activeProposals}
           handleToast={handleToast}
           isMobile={isMobile}
+          isTablet={isTablet}
           getActiveProposals={getActiveProposals}
         />
       )}
@@ -112,6 +109,7 @@ function ActiveProposalsLargeScreen(props) {
                 handleToast={props.handleToast}
                 isMobile={props.isMobile}
                 getActiveProposals={props.getActiveProposals}
+                isTablet={props.isTablet}
               />
             );
           })}
@@ -198,15 +196,16 @@ function ElementProposalLargeScreen(props) {
       <motion.div
         whileHover={{ scale: 1.05 }}
         onClick={handleClick}
-        style={{ cursor: 'pointer' }}
+        style={{ cursor: "pointer" }}
       >
-
-        <Card style={{ padding: 20, height: 'fit-content' }} className="custom-card-proposals">
+        <Card
+          style={{ padding: 20, height: "fit-content" }}
+          className="custom-card-proposals"
+        >
           <Row>
             <Col xs={6}>
               <div
                 className="title-custom-proposals"
-                onClick={() => navigate("/viewproposal/" + props.proposal.id)}
                 style={{
                   fontWeight: "medium",
                   fontSize: 20,
@@ -278,7 +277,10 @@ function ElementProposalLargeScreen(props) {
                     placement="bottom"
                     overlay={renderTooltipArchive}
                   >
-                    <Button variant="light" onClick={() => setShowArchive(true)}>
+                    <Button
+                      variant="light"
+                      onClick={() => setShowArchive(true)}
+                    >
                       {!props.isMobile && <span className="mx-2">Archive</span>}
                       <Archive />
                     </Button>
@@ -331,7 +333,8 @@ function ElementProposalLargeScreen(props) {
               minHeight: 50,
             }}
           >
-            {props.proposal.description.length > (props.isMobile ? 100 : 600) ? (
+            {props.proposal.description.length >
+            (props.isMobile ? 100 : 600) ? (
               <>
                 <span>
                   {props.proposal.description.substring(
@@ -341,7 +344,7 @@ function ElementProposalLargeScreen(props) {
                 </span>
                 <span
                   className="description-read-more"
-                  onClick={() => navigate("/viewproposal/" + props.proposal.id)}
+                  /* onClick={() => navigate("/viewproposal/" + props.proposal.id)} */
                 >
                   Read more
                 </span>
@@ -353,10 +356,14 @@ function ElementProposalLargeScreen(props) {
           <Row
             style={{
               fontSize: 16,
-              marginTop: '2em',
+              marginTop: "2em",
             }}
           >
-            <Col style={{ maxWidth: "140px" }}>
+            <Col
+              className={
+                props.isMobile ? "col-5" : props.isTablet ? "col-3" : "col-2"
+              }
+            >
               <span>Thesis Level</span>
             </Col>
             <Col>
@@ -376,7 +383,11 @@ function ElementProposalLargeScreen(props) {
               marginTop: 16,
             }}
           >
-            <Col style={{ maxWidth: "140px" }}>
+            <Col
+              className={
+                props.isMobile ? "col-5" : props.isTablet ? "col-3" : "col-2"
+              }
+            >
               <span>Thesis Type</span>
             </Col>
             <Col>
@@ -396,7 +407,11 @@ function ElementProposalLargeScreen(props) {
               marginTop: 16,
             }}
           >
-            <Col style={{ maxWidth: "140px" }}>
+            <Col
+              className={
+                props.isMobile ? "col-5" : props.isTablet ? "col-3" : "col-2"
+              }
+            >
               <span>Expire at</span>
             </Col>
             <Col>
@@ -408,24 +423,54 @@ function ElementProposalLargeScreen(props) {
           </Row>
         </Card>
       </motion.div>
-      {isClicked && (
-        <motion.div
-          initial={{ opacity: 0, x: cardPosition.x - 100, y: cardPosition.y, width: '120%', height: '30%' }}
-          animate={{ opacity: 1, x: 0, y: 0, width: '100%', height: '100%' }}
-          exit={{ opacity: 0, x: cardPosition.x, y: cardPosition.y, width: '100%', height: '100%' }}
+      {
+        isClicked && (
+          <ViewProposalMotion
+            proposal={props.proposal}
+            isMobile={props.isMobile}
+            setIsClicked={setIsClicked}
+            handleModalClick={handleModalClick}
+            renderTooltipEdit={renderTooltipEdit}
+            renderTooltipCopy={renderTooltipCopy}
+            renderTooltipDelete={renderTooltipDelete}
+            setShowDelete={setShowDelete}
+            renderTooltipArchive={renderTooltipArchive}
+            setShowArchive={setShowArchive}
+            cardPosition={cardPosition}
+            isTablet={props.isTablet}
+            user={props.user}
+          />
+        )
+
+        /* <motion.div
+          initial={{
+            opacity: 0,
+            x: cardPosition.x - 100,
+            y: cardPosition.y,
+            width: "120%",
+            height: "30%",
+          }}
+          animate={{ opacity: 1, x: 0, y: 0, width: "100%", height: "100%" }}
+          exit={{
+            opacity: 0,
+            x: cardPosition.x,
+            y: cardPosition.y,
+            width: "100%",
+            height: "100%",
+          }}
           transition={{ opacity: { duration: 0 }, default: { duration: 0 } }}
           onClick={() => setIsClicked(false)}
           style={{
-            position: 'fixed',
+            position: "fixed",
             top: 0,
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
             zIndex: 999,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
           <motion.div
@@ -435,24 +480,24 @@ function ElementProposalLargeScreen(props) {
             transition={{ duration: 0.3 }}
             onClick={handleModalClick}
             style={{
-              width: '90%',  // Adjust the width as per your requirement
-              height: '90%', // Adjust the height as per your requirement
-              overflow: 'auto',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
+              width: "90%", // Adjust the width as per your requirement
+              height: "90%", // Adjust the height as per your requirement
+              overflow: "auto",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            <Card style={{ padding: 20, height: 'fit-content' }} className="custom-card-proposals-big">
+            <Card
+              style={{ padding: 20, height: "fit-content" }}
+              className="custom-card-proposals-big"
+            >
               <Row>
                 <Col xs={6}>
                   <div
-                    className="title-custom-proposals"
-                    onClick={() => navigate("/viewproposal/" + props.proposal.id)}
                     style={{
                       fontWeight: "medium",
                       fontSize: 20,
-                      cursor: "pointer",
                     }}
                   >
                     {props.proposal.title}
@@ -471,7 +516,9 @@ function ElementProposalLargeScreen(props) {
                             navigate("/updateproposal/" + props.proposal.id);
                           }}
                         >
-                          {!props.isMobile && <span className="mx-2">Edit</span>}
+                          {!props.isMobile && (
+                            <span className="mx-2">Edit</span>
+                          )}
                           <Pencil />
                         </Button>
                       </OverlayTrigger>
@@ -487,7 +534,9 @@ function ElementProposalLargeScreen(props) {
                             navigate("/copyproposal/" + props.proposal.id);
                           }}
                         >
-                          {!props.isMobile && <span className="mx-2">Copy</span>}
+                          {!props.isMobile && (
+                            <span className="mx-2">Copy</span>
+                          )}
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="16"
@@ -509,8 +558,13 @@ function ElementProposalLargeScreen(props) {
                         placement="bottom"
                         overlay={renderTooltipDelete}
                       >
-                        <Button variant="light" onClick={() => setShowDelete(true)}>
-                          {!props.isMobile && <span className="mx-2">Delete</span>}
+                        <Button
+                          variant="light"
+                          onClick={() => setShowDelete(true)}
+                        >
+                          {!props.isMobile && (
+                            <span className="mx-2">Delete</span>
+                          )}
                           <Trash3 />
                         </Button>
                       </OverlayTrigger>
@@ -520,8 +574,13 @@ function ElementProposalLargeScreen(props) {
                         placement="bottom"
                         overlay={renderTooltipArchive}
                       >
-                        <Button variant="light" onClick={() => setShowArchive(true)}>
-                          {!props.isMobile && <span className="mx-2">Archive</span>}
+                        <Button
+                          variant="light"
+                          onClick={() => setShowArchive(true)}
+                        >
+                          {!props.isMobile && (
+                            <span className="mx-2">Archive</span>
+                          )}
                           <Archive />
                         </Button>
                       </OverlayTrigger>
@@ -529,58 +588,57 @@ function ElementProposalLargeScreen(props) {
                   </Row>
                 </Col>
               </Row>
-              {props.proposal.keywords && <div
-                className="hide-scrollbar"
-                style={{
-                  fontWeight: "semi-bold",
-                  fontSize: 14,
-                  height: !props.isMobile ? 25 : 40,
-                  marginTop: 5,
-                }}
-              >
-                {props.proposal.keywords.split(", ").map((key, index) => (
-                  <span
-                    key={index}
-                    className="badge"
-                    style={{
-                      backgroundColor: randomcolor({
-                        seed: key,
-                        luminosity: "bright",
-                        format: "rgba",
-                        alpha: 1,
-                      }).replace(/1(?=\))/, "0.1"),
-                      color: randomcolor({
-                        seed: key,
-                        luminosity: "bright",
-                        format: "rgba",
-                        alpha: 1,
-                      }),
-                      padding: "0.5em 1.2em",
-                      borderRadius: "0.25rem",
-                      marginRight: 10,
-                    }}
-                  >
-                    {key}
-                  </span>
-                ))}
-              </div>
-              }
+              {props.proposal.keywords && (
+                <div
+                  className="hide-scrollbar"
+                  style={{
+                    fontWeight: "semi-bold",
+                    fontSize: 14,
+                    height: !props.isMobile ? 25 : 40,
+                    marginTop: 5,
+                  }}
+                >
+                  {props.proposal.keywords.split(", ").map((key, index) => (
+                    <span
+                      key={index}
+                      className="badge"
+                      style={{
+                        backgroundColor: randomcolor({
+                          seed: key,
+                          luminosity: "bright",
+                          format: "rgba",
+                          alpha: 1,
+                        }).replace(/1(?=\))/, "0.1"),
+                        color: randomcolor({
+                          seed: key,
+                          luminosity: "bright",
+                          format: "rgba",
+                          alpha: 1,
+                        }),
+                        padding: "0.5em 1.2em",
+                        borderRadius: "0.25rem",
+                        marginRight: 10,
+                      }}
+                    >
+                      {key}
+                    </span>
+                  ))}
+                </div>
+              )}
               <div
                 style={{
                   fontSize: 16,
                   marginTop: 16,
-                  maxHeight: '500px',
-                  overflowY: 'auto'
+                  maxHeight: "500px",
+                  overflowY: "auto",
                 }}
               >
-                <span >
-                  {props.proposal.description}
-                </span>
+                <span>{props.proposal.description}</span>
               </div>
               <Row
                 style={{
                   fontSize: 16,
-                  marginTop: '2em',
+                  marginTop: "2em",
                 }}
               >
                 <Col xs={6} md={6} lg={6}>
@@ -635,8 +693,8 @@ function ElementProposalLargeScreen(props) {
               </Row>
             </Card>
           </motion.div>
-        </motion.div>
-      )}
+        </motion.div> */
+      }
       <ConfirmationModal
         show={showArchive}
         handleClose={() => setShowArchive(false)}

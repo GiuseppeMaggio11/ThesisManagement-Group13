@@ -12,11 +12,12 @@ import {
 import dayjs from "dayjs";
 
 import API from "../API";
-
+import { motion } from "framer-motion";
 import { FilterCard } from "./FilterCard";
 import Loading from "./Loading";
 import NoFileFound from "./NoFileFound";
 import randomColor from "randomcolor";
+import ViewProposalMotion from "./ViewProposalMotion";
 
 function SearchProposalRoute(props) {
   const [thesisProposals, setThesisProposals] = useState([]);
@@ -263,34 +264,36 @@ function SearchProposalComponent(props) {
                   <NoFileFound message={"No proposal found"} />
                 )
               ) : (
-                <Row>
-                  <Col>
-                    <Row>
-                      {filteredByTitle.length <= 0 &&
-                        filter === "" &&
-                        [...filteredThesisProposals].map((element) => (
-                          <Proposal
-                            key={element.id}
-                            proposal={element}
-                            isMobile={props.isMobile}
-                          />
-                        ))}
-                      {filteredByTitle.length <= 0 && filter !== "" && (
-                        <Col>
-                          <h2 className="mt-3"> no proposals found</h2>
-                        </Col>
-                      )}
-                      {filteredByTitle.length > 0 &&
-                        [...filteredByTitle].map((element) => (
-                          <Proposal
-                            key={element.id}
-                            proposal={element}
-                            isMobile={props.isMobile}
-                          />
-                        ))}
-                    </Row>
-                  </Col>
-                </Row>
+                <>
+                  <Row>
+                    <Col>
+                      <Row>
+                        {filteredByTitle.length <= 0 &&
+                          filter === "" &&
+                          [...filteredThesisProposals].map((element) => (
+                            <Proposal
+                              key={element.id}
+                              proposal={element}
+                              isMobile={props.isMobile}
+                            />
+                          ))}
+                        {filteredByTitle.length <= 0 && filter !== "" && (
+                          <Col>
+                            <h2 className="mt-3"> no proposals found</h2>
+                          </Col>
+                        )}
+                        {filteredByTitle.length > 0 &&
+                          [...filteredByTitle].map((element) => (
+                            <Proposal
+                              key={element.id}
+                              proposal={element}
+                              isMobile={props.isMobile}
+                            />
+                          ))}
+                      </Row>
+                    </Col>
+                  </Row>
+                </>
               )}
             </Col>
           </Row>
@@ -301,155 +304,186 @@ function SearchProposalComponent(props) {
 }
 
 function Proposal(props) {
+  const [isClicked, setIsClicked] = useState(false);
+  const [cardPosition, setCardPosition] = useState({ x: 0, y: 0 });
   const navigate = useNavigate();
+  const handleClick = (event) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    setIsClicked(true);
+    setCardPosition({ x: rect.left, y: rect.top });
+  };
+
+  const handleModalClick = (e) => {
+    // If the click occurs outside the expanded card, close it
+    if (e.target === e.currentTarget) {
+      setIsClicked(false);
+    }
+  };
   return (
     <Col xs={12} md={12} lg={12} xl={12} xxl={12} className="mt-4">
-      <Card
-        style={{ padding: 20, minHeight: "350px" }}
-        className="custom-card-proposals"
+      <motion.div
+        whileHover={{ scale: 1.05 }}
+        onClick={handleClick}
+        style={{ cursor: "pointer" }}
       >
-        <Row>
-          <Col style={{ minWidth: "300px" }}>
-            <div
-              className="title-custom-proposals"
-              onClick={() => navigate(`/proposals/${props.proposal.id}`)}
-              style={{
-                fontWeight: "medium",
-                fontSize: 20,
-                cursor: "pointer",
-              }}
-            >
-              {props.proposal.title}
-            </div>
-          </Col>
-          <Col className="text-end mx-2">
-            <PersonFill size={25} />
-            <span>
-              {props.proposal.supervisor.split(" ")[1] +
-                " " +
-                props.proposal.supervisor.split(" ")[0]}
-            </span>
-          </Col>
-        </Row>
-        <div
-          className="hide-scrollbar"
-          style={{
-            fontWeight: "semi-bold",
-            fontSize: 14,
-            height: !props.isMobile ? 25 : 40,
-            marginTop: 5,
-          }}
+        <Card
+          style={{ padding: 20, minHeight: "350px" }}
+          className="custom-card-proposals"
         >
-          {props.proposal.keywords &&
-            props.proposal.keywords.map((key, index) => (
-              <span
-                key={index}
-                className="badge"
+          <Row>
+            <Col style={{ minWidth: "300px" }}>
+              <div
+                className="title-custom-proposals"
                 style={{
-                  backgroundColor: randomColor({
-                    seed: key,
-                    luminosity: "bright",
-                    format: "rgba",
-                    alpha: 1,
-                  }).replace(/1(?=\))/, "0.1"),
-                  color: randomColor({
-                    seed: key,
-                    luminosity: "bright",
-                    format: "rgba",
-                    alpha: 1,
-                  }),
-                  padding: "0.5em 1.2em",
-                  borderRadius: "0.25rem",
-                  marginRight: 10,
+                  fontWeight: "medium",
+                  fontSize: 20,
+                  cursor: "pointer",
                 }}
               >
-                {key}
-              </span>
-            ))}
-        </div>
-        <div
-          style={{
-            fontSize: 16,
-            marginTop: 16,
-            minHeight: 50,
-          }}
-        >
-          {props.proposal.description.length > (props.isMobile ? 100 : 600) ? (
-            <>
+                {props.proposal.title}
+              </div>
+            </Col>
+            <Col className="text-end mx-2">
+              <PersonFill size={25} />
               <span>
-                {props.proposal.description.substring(
-                  0,
-                  props.isMobile ? 100 : 600
-                ) + "..... "}
+                {props.proposal.supervisor.split(" ")[1] +
+                  " " +
+                  props.proposal.supervisor.split(" ")[0]}
               </span>
+            </Col>
+          </Row>
+          <div
+            className="hide-scrollbar"
+            style={{
+              fontWeight: "semi-bold",
+              fontSize: 14,
+              height: !props.isMobile ? 25 : 40,
+              marginTop: 5,
+            }}
+          >
+            {props.proposal.keywords &&
+              props.proposal.keywords.map((key, index) => (
+                <span
+                  key={index}
+                  className="badge"
+                  style={{
+                    backgroundColor: randomColor({
+                      seed: key,
+                      luminosity: "bright",
+                      format: "rgba",
+                      alpha: 1,
+                    }).replace(/1(?=\))/, "0.1"),
+                    color: randomColor({
+                      seed: key,
+                      luminosity: "bright",
+                      format: "rgba",
+                      alpha: 1,
+                    }),
+                    padding: "0.5em 1.2em",
+                    borderRadius: "0.25rem",
+                    marginRight: 10,
+                  }}
+                >
+                  {key}
+                </span>
+              ))}
+          </div>
+          <div
+            style={{
+              fontSize: 16,
+              marginTop: 16,
+              minHeight: 50,
+            }}
+          >
+            {props.proposal.description.length >
+            (props.isMobile ? 100 : 600) ? (
+              <>
+                <span>
+                  {props.proposal.description.substring(
+                    0,
+                    props.isMobile ? 100 : 600
+                  ) + "..... "}
+                </span>
+                <span className="description-read-more">Read more</span>
+              </>
+            ) : (
+              props.proposal.description
+            )}
+          </div>
+          <Row
+            style={{
+              fontSize: 16,
+              marginTop: 16,
+            }}
+          >
+            <Col style={{ maxWidth: "110px" }}>
+              <span>Thesis Level</span>
+            </Col>
+            <Col>
               <span
-                className="description-read-more"
-                onClick={() => navigate(`/proposals/${props.proposal.id}`)}
+                style={{
+                  color: "black",
+                }}
+                className="badge"
               >
-                Read more
+                {props.proposal.level && props.proposal.level.toUpperCase()}
               </span>
-            </>
-          ) : (
-            props.proposal.description
-          )}
-        </div>
-        <Row
-          style={{
-            fontSize: 16,
-            marginTop: 16,
+            </Col>
+          </Row>
+          <Row
+            style={{
+              fontSize: 16,
+              marginTop: 16,
+            }}
+          >
+            <Col style={{ maxWidth: "110px" }}>
+              <span>Thesis Type</span>
+            </Col>
+            <Col>
+              <span
+                style={{
+                  color: "black",
+                }}
+                className="badge"
+              >
+                {props.proposal.type && props.proposal.type.toUpperCase()}
+              </span>
+            </Col>
+          </Row>
+          <Row
+            style={{
+              fontSize: 16,
+              marginTop: 16,
+            }}
+          >
+            <Col style={{ maxWidth: "110px" }}>
+              <span>Expire at</span>
+            </Col>
+            <Col>
+              <span className="badge" style={{ color: "black" }}>
+                {dayjs(props.proposal.expiration).format("MM/DD/YYYY")}
+              </span>
+              <Calendar />
+            </Col>
+          </Row>
+        </Card>
+      </motion.div>
+      {isClicked && (
+        <ViewProposalMotion
+          proposal={{
+            ...props.proposal,
+            keywords:
+              props.proposal.keywords && props.proposal.keywords.join(","),
+            thesis_level: props.proposal.level,
+            thesis_type: props.proposal.type,
           }}
-        >
-          <Col style={{ maxWidth: "110px" }}>
-            <span>Thesis Level</span>
-          </Col>
-          <Col>
-            <span
-              style={{
-                color: "black",
-              }}
-              className="badge"
-            >
-              {props.proposal.level && props.proposal.level.toUpperCase()}
-            </span>
-          </Col>
-        </Row>
-        <Row
-          style={{
-            fontSize: 16,
-            marginTop: 16,
-          }}
-        >
-          <Col style={{ maxWidth: "110px" }}>
-            <span>Thesis Type</span>
-          </Col>
-          <Col>
-            <span
-              style={{
-                color: "black",
-              }}
-              className="badge"
-            >
-              {props.proposal.type && props.proposal.type.toUpperCase()}
-            </span>
-          </Col>
-        </Row>
-        <Row
-          style={{
-            fontSize: 16,
-            marginTop: 16,
-          }}
-        >
-          <Col style={{ maxWidth: "110px" }}>
-            <span>Expire at</span>
-          </Col>
-          <Col>
-            <span className="badge" style={{ color: "black" }}>
-              {dayjs(props.proposal.expiration).format("MM/DD/YYYY")}
-            </span>
-            <Calendar />
-          </Col>
-        </Row>
-      </Card>
+          isMobile={props.isMobile}
+          setIsClicked={setIsClicked}
+          cardPosition={cardPosition}
+          isTablet={props.isTablet}
+          user={props.user}
+        />
+      )}
     </Col>
   );
 }
