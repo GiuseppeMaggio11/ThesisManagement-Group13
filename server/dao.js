@@ -1188,3 +1188,25 @@ exports.getThesisGroups = async (id) => {
     throw err;
   }
 };
+
+// Creates a new thesis row in thesis table, must receive every data of thesis, returns newly created row, including autoicremented id ( used to add new rows in successive tables)
+exports.createRequest = async (thesisRequest) => {
+  try {
+    const sql =
+      "INSERT INTO thesis_request (title, description, supervisor_id, thesis_level, thesis_type, cod_degree, status_code) VALUES (?, ?, ?, ?, ?, ?, 0)";
+    const [rows] = await pool.execute(sql, [
+      thesisRequest.title,
+      thesisRequest.description,
+      thesisRequest.supervisor_id,
+      thesisRequest.thesis_level,
+      thesisRequest.type_name,
+      thesisRequest.cod_degree,
+    ]);
+
+    const thesisRequestRow = { id: rows.insertId, ...thesisRequest };
+    return thesisRequestRow;
+  } catch (error) {
+    console.error("Error in createRequest: ", error);
+    throw error;
+  }
+};
