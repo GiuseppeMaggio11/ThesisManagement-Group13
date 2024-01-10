@@ -327,7 +327,7 @@ function Proposal(props) {
         style={{ cursor: "pointer" }}
       >
         <Card
-          style={{ padding: 20, minHeight: "350px" }}
+          style={{ padding: 20, minHeight: props.isMobile ? "400px" : "350px" }}
           className="custom-card-proposals"
         >
           <Row>
@@ -343,7 +343,7 @@ function Proposal(props) {
                 {props.proposal.title}
               </div>
             </Col>
-            <Col className="text-end mx-2">
+            <Col className={!props.isMobile ? "text-end mx-2" : "my-2"}>
               <PersonFill size={25} />
               <span>
                 {props.proposal.supervisor.split(" ")[1] +
@@ -395,13 +395,12 @@ function Proposal(props) {
               minHeight: 50,
             }}
           >
-            {props.proposal.description.length >
-            (props.isMobile ? 100 : 600) ? (
+            {props.proposal.description.length > (props.isMobile ? 80 : 400) ? (
               <>
                 <span>
                   {props.proposal.description.substring(
                     0,
-                    props.isMobile ? 100 : 600
+                    props.isMobile ? 80 : 400
                   ) + "..... "}
                 </span>
                 <span className="description-read-more">Read more</span>

@@ -35,6 +35,7 @@ async function getProposal(req, res) {
 async function getProposalsProfessor(req, res) {
   try {
     const proposals = await dao.getProposalsProfessor(req.user.username);
+
     return res.status(200).json(proposals);
   } catch (error) {
     res.status(500).json(error);
