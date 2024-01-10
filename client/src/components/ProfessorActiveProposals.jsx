@@ -92,7 +92,7 @@ function ProfessorActiveProposals(props) {
     <Container className="p-4">
       <Row className="justify-content-between">
         <Col xs={8} className="fs-2">
-          Active thesis proposals
+          { isArchived ? "Archived proposals" : "Active thesis proposals" }
         </Col>
         <Col xs={4} className="d-flex justify-content-between align-items-center">
           <Col className="d-flex align-items-start">
