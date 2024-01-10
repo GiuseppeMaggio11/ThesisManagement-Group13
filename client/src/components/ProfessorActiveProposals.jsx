@@ -31,7 +31,8 @@ function ProfessorActiveProposals(props) {
   const [activeProposals, setActiveProposals] = useState(undefined);
   const { handleToast } = useContext(MessageContext);
   const isMobile = useMediaQuery({ maxWidth: 767 });
-  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 991 });
+  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 1025 });
+  const isTabletHorizonthal = useMediaQuery({ minWidth: 1026, maxWidth: 1367 });
   const navigate = useNavigate();
 
   //if (!props.loggedIn || props.user.user_type !== "PROF") {
@@ -89,7 +90,9 @@ function ProfessorActiveProposals(props) {
           handleToast={handleToast}
           isMobile={isMobile}
           isTablet={isTablet}
+          isTabletHorizonthal={isTabletHorizonthal}
           getActiveProposals={getActiveProposals}
+          user={props.user}
         />
       )}
     </Container>
@@ -110,6 +113,8 @@ function ActiveProposalsLargeScreen(props) {
                 isMobile={props.isMobile}
                 getActiveProposals={props.getActiveProposals}
                 isTablet={props.isTablet}
+                isTabletHorizonthal={props.isTabletHorizonthal}
+                user={props.user}
               />
             );
           })}
@@ -438,6 +443,7 @@ function ElementProposalLargeScreen(props) {
             setShowArchive={setShowArchive}
             cardPosition={cardPosition}
             isTablet={props.isTablet}
+            isTabletHorizonthal={props.isTabletHorizonthal}
             user={props.user}
           />
         )
