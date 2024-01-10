@@ -42,7 +42,6 @@ function SearchProposalRoute(props) {
       })
       .catch((err) => handleToast(err, "error"));
   }, []);
-  
 
   return (
     <>
@@ -287,7 +286,7 @@ function SearchProposalComponent(props) {
                             />
                           ))}
                         {filteredByTitle.length <= 0 && filter !== "" && (
-                          <NoFileFound message={"No proposals found"}/>
+                          <NoFileFound message={"No proposals found"} />
                         )}
                         {filteredByTitle.length > 0 &&
                           [...filteredByTitle].map((element) => (
@@ -333,7 +332,6 @@ function Proposal(props) {
   const handleApplication = () => {
     if (selectedFiles.length) handleUpload(props.proposal.id);
     submitApplication(props.proposal.id, props.virtualClock); //virtualClocK??
-    
   };
 
   const handleUpload = (thesis_id) => {
@@ -344,14 +342,14 @@ function Proposal(props) {
     API.sendFiles(formData, thesis_id)
       .then(() => {})
       .catch((err) => {
-        handleToast(err, "error"); 
+        handleToast(err, "error");
       });
   };
-  
+
   const handleUploadInterface = () => {
-    setIsClicked(false)
-    setOpenPanel(true)
-  }
+    setIsClicked(false);
+    setOpenPanel(true);
+  };
 
   const closeModal = () => {
     setOpenPanel(false);
@@ -363,16 +361,16 @@ function Proposal(props) {
     setOpenPanel(false);
     setSelectedFiles([]);
     setExceed(false);
-    setIsClicked(true)
+    setIsClicked(true);
   };
 
   const submitApplication = (idThesis, date) => {
     API.applicationThesis(idThesis, date)
       .then(() => {
         handleToast("Application submitted correctly", "success");
-        props.setThesisProposals((prev)=>{
-          return prev.filter(p=>p.id!=props.proposal.id)
-        })
+        props.setThesisProposals((prev) => {
+          return prev.filter((p) => p.id != props.proposal.id);
+        });
       })
       .catch((err) => {
         handleToast(err, "error");
@@ -380,162 +378,165 @@ function Proposal(props) {
   };
 
   const handleModalClick = (e) => {
+    /*  console.log("e.target", e.target);
+    console.log("e.currentTarget", e.currentTarget); */
+
     // If the click occurs outside the expanded card, close it
-    if (e.target === e.currentTarget) {
+    if (!e || e.target === e.currentTarget) {
       setIsClicked(false);
     }
   };
   return (
     <>
-    <Col xs={12} md={12} lg={12} xl={12} xxl={12} className="mt-4">
-      <motion.div
-        whileHover={{ scale: 1.05 }}
-        onClick={handleClick}
-        style={{ cursor: "pointer" }}
-      >
-        <Card
-          style={{ padding: 20, minHeight: "350px" }}
-          className="custom-card-proposals"
+      <Col xs={12} md={12} lg={12} xl={12} xxl={12} className="mt-4">
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          onClick={handleClick}
+          style={{ cursor: "pointer" }}
         >
-          <Row>
-            <Col style={{ minWidth: "300px" }}>
-              <div
-                className="title-custom-proposals"
-                style={{
-                  fontWeight: "medium",
-                  fontSize: 20,
-                  cursor: "pointer",
-                }}
-              >
-                {props.proposal.title}
-              </div>
-            </Col>
-            <Col className="text-end mx-2">
-              <PersonFill size={25} />
-              <span>
-                {props.proposal.supervisor.split(" ")[1] +
-                  " " +
-                  props.proposal.supervisor.split(" ")[0]}
-              </span>
-            </Col>
-          </Row>
-          <div
-            className="hide-scrollbar"
-            style={{
-              fontWeight: "semi-bold",
-              fontSize: 14,
-              height: !props.isMobile ? 25 : 40,
-              marginTop: 5,
-            }}
+          <Card
+            style={{ padding: 20, minHeight: "350px" }}
+            className="custom-card-proposals"
           >
-            {props.proposal.keywords &&
-              props.proposal.keywords.map((key, index) => (
-                <span
-                  key={index}
-                  className="badge"
+            <Row>
+              <Col style={{ minWidth: "300px" }}>
+                <div
+                  className="title-custom-proposals"
                   style={{
-                    backgroundColor: randomColor({
-                      seed: key,
-                      luminosity: "bright",
-                      format: "rgba",
-                      alpha: 1,
-                    }).replace(/1(?=\))/, "0.1"),
-                    color: randomColor({
-                      seed: key,
-                      luminosity: "bright",
-                      format: "rgba",
-                      alpha: 1,
-                    }),
-                    padding: "0.5em 1.2em",
-                    borderRadius: "0.25rem",
-                    marginRight: 10,
+                    fontWeight: "medium",
+                    fontSize: 20,
+                    cursor: "pointer",
                   }}
                 >
-                  {key}
-                </span>
-              ))}
-          </div>
-          <div
-            style={{
-              fontSize: 16,
-              marginTop: 16,
-              minHeight: 50,
-            }}
-          >
-            {props.proposal.description.length >
-            (props.isMobile ? 100 : 600) ? (
-              <>
+                  {props.proposal.title}
+                </div>
+              </Col>
+              <Col className="text-end mx-2">
+                <PersonFill size={25} />
                 <span>
-                  {props.proposal.description.substring(
-                    0,
-                    props.isMobile ? 100 : 600
-                  ) + "..... "}
+                  {props.proposal.supervisor.split(" ")[1] +
+                    " " +
+                    props.proposal.supervisor.split(" ")[0]}
                 </span>
-                <span className="description-read-more">Read more</span>
-              </>
-            ) : (
-              props.proposal.description
-            )}
-          </div>
-          <Row
-            style={{
-              fontSize: 16,
-              marginTop: 16,
-            }}
-          >
-            <Col style={{ maxWidth: "110px" }}>
-              <span>Thesis Level</span>
-            </Col>
-            <Col>
-              <span
-                style={{
-                  color: "black",
-                }}
-                className="badge"
-              >
-                {props.proposal.level && props.proposal.level.toUpperCase()}
-              </span>
-            </Col>
-          </Row>
-          <Row
-            style={{
-              fontSize: 16,
-              marginTop: 16,
-            }}
-          >
-            <Col style={{ maxWidth: "110px" }}>
-              <span>Thesis Type</span>
-            </Col>
-            <Col>
-              <span
-                style={{
-                  color: "black",
-                }}
-                className="badge"
-              >
-                {props.proposal.type && props.proposal.type.toUpperCase()}
-              </span>
-            </Col>
-          </Row>
-          <Row
-            style={{
-              fontSize: 16,
-              marginTop: 16,
-            }}
-          >
-            <Col style={{ maxWidth: "110px" }}>
-              <span>Expire at</span>
-            </Col>
-            <Col>
-              <span className="badge" style={{ color: "black" }}>
-                {dayjs(props.proposal.expiration).format("MM/DD/YYYY")}
-              </span>
-              <Calendar />
-            </Col>
-          </Row>
-        </Card>
-      </motion.div>
-    </Col>
+              </Col>
+            </Row>
+            <div
+              className="hide-scrollbar"
+              style={{
+                fontWeight: "semi-bold",
+                fontSize: 14,
+                height: !props.isMobile ? 25 : 40,
+                marginTop: 5,
+              }}
+            >
+              {props.proposal.keywords &&
+                props.proposal.keywords.map((key, index) => (
+                  <span
+                    key={index}
+                    className="badge"
+                    style={{
+                      backgroundColor: randomColor({
+                        seed: key,
+                        luminosity: "bright",
+                        format: "rgba",
+                        alpha: 1,
+                      }).replace(/1(?=\))/, "0.1"),
+                      color: randomColor({
+                        seed: key,
+                        luminosity: "bright",
+                        format: "rgba",
+                        alpha: 1,
+                      }),
+                      padding: "0.5em 1.2em",
+                      borderRadius: "0.25rem",
+                      marginRight: 10,
+                    }}
+                  >
+                    {key}
+                  </span>
+                ))}
+            </div>
+            <div
+              style={{
+                fontSize: 16,
+                marginTop: 16,
+                minHeight: 50,
+              }}
+            >
+              {props.proposal.description.length >
+              (props.isMobile ? 100 : 600) ? (
+                <>
+                  <span>
+                    {props.proposal.description.substring(
+                      0,
+                      props.isMobile ? 100 : 600
+                    ) + "..... "}
+                  </span>
+                  <span className="description-read-more">Read more</span>
+                </>
+              ) : (
+                props.proposal.description
+              )}
+            </div>
+            <Row
+              style={{
+                fontSize: 16,
+                marginTop: 16,
+              }}
+            >
+              <Col style={{ maxWidth: "110px" }}>
+                <span>Thesis Level</span>
+              </Col>
+              <Col>
+                <span
+                  style={{
+                    color: "black",
+                  }}
+                  className="badge"
+                >
+                  {props.proposal.level && props.proposal.level.toUpperCase()}
+                </span>
+              </Col>
+            </Row>
+            <Row
+              style={{
+                fontSize: 16,
+                marginTop: 16,
+              }}
+            >
+              <Col style={{ maxWidth: "110px" }}>
+                <span>Thesis Type</span>
+              </Col>
+              <Col>
+                <span
+                  style={{
+                    color: "black",
+                  }}
+                  className="badge"
+                >
+                  {props.proposal.type && props.proposal.type.toUpperCase()}
+                </span>
+              </Col>
+            </Row>
+            <Row
+              style={{
+                fontSize: 16,
+                marginTop: 16,
+              }}
+            >
+              <Col style={{ maxWidth: "110px" }}>
+                <span>Expire at</span>
+              </Col>
+              <Col>
+                <span className="badge" style={{ color: "black" }}>
+                  {dayjs(props.proposal.expiration).format("MM/DD/YYYY")}
+                </span>
+                <Calendar />
+              </Col>
+            </Row>
+          </Card>
+        </motion.div>
+      </Col>
       {isClicked && (
         <ViewProposalMotion
           proposal={{
@@ -543,7 +544,7 @@ function Proposal(props) {
             keywords:
               props.proposal.keywords && props.proposal.keywords.join(","),
             thesis_level: props.proposal.level,
-            thesis_type: props.proposal.type, 
+            thesis_type: props.proposal.type,
           }}
           isMobile={props.isMobile}
           setIsClicked={setIsClicked}
@@ -552,21 +553,21 @@ function Proposal(props) {
           isTabletHorizonthal={props.isTabletHorizonthal}
           user={props.user}
           handleModalClick={handleModalClick}
-          handleUploadInterface = {handleUploadInterface}
+          handleUploadInterface={handleUploadInterface}
         />
       )}
-       <FileDropModal
-            showModal={openPanel}
-            closeModal={closeModal}
-            closeModalOnCancel={closeModalOnCancel}
-            handleSave={() => {
-              handleApplication();
-            }}
-            setSelectedFiles={setSelectedFiles}
-            selectedFiles={selectedFiles}
-            exceed={exceed}
-            setExceed={setExceed}
-          />
+      <FileDropModal
+        showModal={openPanel}
+        closeModal={closeModal}
+        closeModalOnCancel={closeModalOnCancel}
+        handleSave={() => {
+          handleApplication();
+        }}
+        setSelectedFiles={setSelectedFiles}
+        selectedFiles={selectedFiles}
+        exceed={exceed}
+        setExceed={setExceed}
+      />
     </>
   );
 }
