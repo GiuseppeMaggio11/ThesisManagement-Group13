@@ -62,6 +62,19 @@ async function newProposal(thesis) {
   );
 }
 
+async function newRequest(request) {
+  return getJson(
+    fetch(URL + "/newRequest", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(request),
+    })
+  );
+}
+
 async function getListExternalCosupervisors() {
   return getJson(
     fetch(URL + `/listExternalCosupervisors`, {
@@ -397,6 +410,7 @@ const API = {
   getThesisProposalsById,
   sendFiles,
   newProposal,
+  newRequest,
   getListExternalCosupervisors,
   newExternalCosupervisor,
   getPendingApplications,

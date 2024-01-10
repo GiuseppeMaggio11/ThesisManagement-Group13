@@ -66,7 +66,6 @@ function NewRequest(props) {
       ...formData,
       [name]: value,
     });
-    console.log(formData);
   };
 
   const updateChips = (field, value) => {
@@ -150,7 +149,7 @@ function NewRequest(props) {
     };
 
     try {
-      //const response = await API.newRequest(newProp);
+      const response = await API.newRequest(newProp);
       console.log(newProp)
       handleToast("New request created", "success");
 
