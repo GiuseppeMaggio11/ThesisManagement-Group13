@@ -24,6 +24,7 @@ function RequestsPage(props) {
   const { handleToast } = useContext(MessageContext);
   const [showCv, setShowCv] = useState(false);
   const [studentID, setStudentID] = useState("");
+  console.log(props.user)
   useEffect(() => {
     async function getRequests() {
       props.setLoading(true);
@@ -124,6 +125,25 @@ function RequestCard(props) {
     setStudentID,
   } = props;
 
+  const [student, setStudent] = useState()
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(()=>{
+    async function studentDetails(){
+      try{
+        setIsLoading(true)
+        let student = await API.getStudent(request.student_id)
+        console.log(student[0])
+        setStudent(student[0])
+        setIsLoading(false)
+      }
+      catch(err){
+          console.log(err)
+      }
+    }
+    studentDetails()
+  },[])
+
   const renderTooltipAccept = (props) => (
     <Tooltip id="button-tooltip" {...props}>
       Accept
@@ -137,11 +157,12 @@ function RequestCard(props) {
 
   console.log(request);
   return (
+    isLoading?<Loading/>:
     <Col xs={12} md={12} lg={6} xl={6} xxl={4} className="mt-4">
       <motion.div whileHover={{ scale: 1.05 }} style={{ cursor: "pointer" }}>
         <Card
           style={{ padding: 20, paddingTop: 15 }}
-          className="custom-card-proposals"
+          className="custom-card-request"
         >
           <Card.Header
             style={{
@@ -324,40 +345,32 @@ function RequestCard(props) {
             </Col>
           </Row>
 
-          <div
-            className="hide-scrollbar"
-            style={{
-              fontWeight: "semi-bold",
-              fontSize: 14,
-              height: !isMobile ? 25 : 40,
-              marginTop: 5,
-            }}
-          ></div>
+      
           <div
             style={{
               fontSize: 16,
               marginTop: 16,
-              minHeight: 50,
+              minHeight: isMobile?50:'',
+              maxHeight: isMobile?200:'',
+              height:isMobile?'fit-content':'80px',
               WebkitLineClamp: isMobile ? 2 : 3,
               WebkitBoxOrient: "vertical",
               overflow: "hidden",
-              display: "-webkit-box",
             }}
           >
-            {/* {request.description.length > (isMobile ? 100 : 600) ? (
+            {request.description.length > (isMobile ? 100 : 150) ? (
               <>
                 <span>
-                  {request.description.substring(0, isMobile ? 100 : 600) +
-                    "..... "}
+                  {request.description.substring(0, isMobile ? 100 : 150) +
+                    "... "}
                 </span>
-                <span className="description-read-more">Read more</span>
+                <span style={{width:'fit-content'}}className="description-read-more">Read more</span>
               </>
             ) : (
               request.description
-            )} */}
-            {request.description}
+            )}
           </div>
-          <Row
+        {/*   <Row
             style={{
               fontSize: 16,
               marginTop: 16,
@@ -376,7 +389,7 @@ function RequestCard(props) {
                 {request.thesis_level.toUpperCase()}
               </span>
             </Col>
-          </Row>
+          </Row> 
           <Row
             style={{
               fontSize: 16,
@@ -396,19 +409,19 @@ function RequestCard(props) {
                 {request.thesis_type.toUpperCase()}
               </span>
             </Col>
-          </Row>
+          </Row>*/}
           <Row
             style={{
               fontSize: 16,
               marginTop: 16,
             }}
           >
-            <Col xs={6} md={6} lg={6}>
+            <Col xs={5} md={3} lg={4} xl={4}>
               <span>Code Degree</span>
             </Col>
             <Col>
               <span className="badge" style={{ color: "black" }}>
-                {request.cod_degree}
+                {student.cod_degree}
               </span>
             </Col>
           </Row>

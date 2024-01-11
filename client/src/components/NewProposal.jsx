@@ -773,7 +773,7 @@ function NewProposal(props) {
                     >
                       <option>Select a degree</option>
                       {degrees.map((degree, index) => (
-                        <option key={index} value={degree.cod}>
+                        <option key={index} value={degree.cod} className="list-group-item">
                           {degree.name}
                         </option>
                       ))}

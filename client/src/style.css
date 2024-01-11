@@ -221,7 +221,7 @@ table.table-rounded thead tr {
   font-size: x-large;
 }
 
-.button-style-persone+:active {
+.button-style-person:active {
   background-color: transparent !important;
   border-color: transparent !important;
   color: black;
@@ -550,6 +550,9 @@ input:checked+.slider::before {
   padding: 0.2em;
   border: none;
 }
+.list-group-item:hover {
+ background-color: #cccccc61;
+}
 
 .ps__rail-x:hover>.ps__thumb-x,
 .ps__rail-x:focus>.ps__thumb-x,
@@ -601,6 +604,26 @@ input:checked+.slider::before {
   border-radius: 20px;
   height: 350px;
 }
+
+.custom-card-request{
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  transition: box-shadow 0.5s;
+  border-radius: 20px;
+  height: 245px;
+}
+
+@media (max-width: 768px) {
+  .custom-card-request{
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    transition: box-shadow 0.5s;
+    border-radius: 20px;
+    min-height: 200px;
+    max-height: 280px;
+    height: fit-content;
+  }
+}
+
+
 
 .custom-card-proposals-big {
   height: 500px;
@@ -677,6 +700,12 @@ input:checked+.slider::before {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   transition: box-shadow 0.5s;
 }
+.modal -custom-student-cv {
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  transition: box-shadow 0.5s;
+}
+
 
 .accept-button-appl:hover {
   border: 1px solid green !important;

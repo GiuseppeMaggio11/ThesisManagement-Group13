@@ -184,10 +184,19 @@ function ElementProposalLargeScreen(props) {
   );
 
   const handleClick = (event) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    setIsClicked(true);
-    setCardPosition({ x: rect.left, y: rect.top });
+    const isDeleteButtonClicked = (event.target.id === 'delete-button' || event.target.id === 'delete-svg' || event.target.id === 'delete-col'|| event.target.id === 'delete-span');
+    const isArchiveButtonClicked = (event.target.id === 'archive-button' || event.target.id === 'archive-svg' || event.target.id === 'archive-col'|| event.target.id === 'archive-span');
+    console.log(event.target.id)
+  
+    // If it's not the delete button, proceed with setting setIsClicked and setCardPosition
+    if (!isDeleteButtonClicked && !isArchiveButtonClicked) {
+      const rect = event.currentTarget.getBoundingClientRect();
+      setIsClicked(true);
+      setCardPosition({ x: rect.left, y: rect.top });
+    }
   };
+  
+  
 
   const handleModalClick = (e) => {
     // If the click occurs outside the expanded card, close it
@@ -266,28 +275,29 @@ function ElementProposalLargeScreen(props) {
                     </Button>
                   </OverlayTrigger>
                 </Col>
-                <Col xs={6} md={6} lg={3}>
+                <Col xs={6} md={6} lg={3} id="delete-col">
                   <OverlayTrigger
                     placement="bottom"
                     overlay={renderTooltipDelete}
                   >
-                    <Button variant="light" onClick={() => setShowDelete(true)}>
-                      {!props.isMobile && <span className="mx-2">Delete</span>}
-                      <Trash3 />
+                    <Button variant="light" id="delete-button" onClick={()=>{setShowDelete(true)}}>
+                      {!props.isMobile && <span  id="delete-span" className="mx-2">Delete</span>}
+                      <Trash3 id="delete-svg"/>
                     </Button>
                   </OverlayTrigger>
                 </Col>
-                <Col xs={6} md={6} lg={3}>
+                <Col xs={6} md={6} lg={3} id="archive-col">
                   <OverlayTrigger
                     placement="bottom"
                     overlay={renderTooltipArchive}
                   >
                     <Button
                       variant="light"
+                      id="archive-button"
                       onClick={() => setShowArchive(true)}
                     >
-                      {!props.isMobile && <span className="mx-2">Archive</span>}
-                      <Archive />
+                      {!props.isMobile && <span id="archive-span" className="mx-2">Archive</span>}
+                      <Archive id="archive-svg"/>
                     </Button>
                   </OverlayTrigger>
                 </Col>

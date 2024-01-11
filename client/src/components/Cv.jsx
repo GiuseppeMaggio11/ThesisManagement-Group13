@@ -38,8 +38,8 @@ function Cv(props) {
     return (
         isLoading ? <Loading /> : (
             <>
-             <Modal size='lg' show={show} onHide={onHide} contentClassName="modal-custom-student-apply">
-                <Modal.Body className="p-4" >
+             <Modal size='lg' show={show} onHide={onHide} contentClassName="modal-custom-student-cv">
+                <Modal.Body className="p-3" >
                 <Row>
                     <Col xs={6}>
                         <h4 style={{ marginRight: '0.3em', fontWeight: 600, padding: 0, width: 'fit-content' }}>{student.name + ' ' + student.surname}</h4>
@@ -57,7 +57,7 @@ function Cv(props) {
                         </Row>
                     </Col>
                 </Row>
-                <Row style={{ fontWeight: 500, marginBottom:'0.5em', marginTop:'3em'}} >
+                <Row style={{ fontWeight: 500, marginBottom:'0.5em', marginTop:'2em'}} >
                     <Col xs={2}>
                         Code
                     </Col>
@@ -74,11 +74,11 @@ function Cv(props) {
                         Date
                     </Col>}
                 </Row>
-
+                <div style={{maxHeight:isMobile?450:620, overflowY:'auto', overflowX:'hidden'}} >
                 {cv.map(((line, index) => {
                     return (
                         <>
-                            <Row className="my-2">
+                            <Row className="my-2" style={{backgroundColor:index%2==0?'#f5f3f4':'#ffffff', borderRadius:'20px'}}>
                                 <Col xs={2}>
                                     {line.cod_course}
                                 </Col>
@@ -100,7 +100,7 @@ function Cv(props) {
                     )
 
                 }))}
-                  
+                  </div>
                 </Modal.Body>
             </Modal>
                
