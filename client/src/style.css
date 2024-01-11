@@ -609,7 +609,7 @@ input:checked+.slider::before {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   transition: box-shadow 0.5s;
   border-radius: 20px;
-  height: 245px;
+  height: 270px;
 }
 
 @media (max-width: 768px) {
@@ -619,6 +619,16 @@ input:checked+.slider::before {
     border-radius: 20px;
     min-height: 200px;
     max-height: 280px;
+    height: fit-content;
+  }
+}
+@media (min-width: 769px) and (max-width: 1000px) {
+  .custom-card-request {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    transition: box-shadow 0.5s;
+    border-radius: 20px;
+    min-height: 180px;
+    max-height: 270px;
     height: fit-content;
   }
 }

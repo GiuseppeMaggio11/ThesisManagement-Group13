@@ -21,6 +21,7 @@ import Cv from "./Cv";
 function RequestsPage(props) {
   const [requestList, setRequestList] = useState([]);
   const isMobile = useMediaQuery({ maxWidth: 767 });
+  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 1000 });
   const { handleToast } = useContext(MessageContext);
   const [showCv, setShowCv] = useState(false);
   const [studentID, setStudentID] = useState("");
@@ -95,6 +96,7 @@ function RequestsPage(props) {
                   key={index}
                   request={req}
                   isMobile={isMobile}
+                  isTablet={isTablet}
                   isSecretary={props.user.user_type === "SECR" ? true : false}
                   handleDecision={handleDecision}
                   setShowCv={setShowCv}
@@ -119,6 +121,7 @@ function RequestCard(props) {
   const {
     request,
     isMobile,
+    isTablet,
     isSecretary,
     handleDecision,
     setShowCv,
@@ -350,9 +353,9 @@ function RequestCard(props) {
             style={{
               fontSize: 16,
               marginTop: 16,
-              minHeight: isMobile?50:'',
-              maxHeight: isMobile?200:'',
-              height:isMobile?'fit-content':'80px',
+              minHeight: isMobile||isTablet?50:'',
+              maxHeight: isMobile||isTablet?200:'',
+              height:isMobile||isTablet?'fit-content':'150px',
               WebkitLineClamp: isMobile ? 2 : 3,
               WebkitBoxOrient: "vertical",
               overflow: "hidden",
