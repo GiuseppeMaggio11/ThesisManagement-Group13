@@ -103,11 +103,8 @@ CREATE TABLE IF NOT EXISTS thesis_request(
     title VARCHAR(100) NOT NULL,
     description TEXT NOT NULL,
     supervisor_id VARCHAR(7) NOT NULL,
-    thesis_level VARCHAR(20) NOT NULL,
-    thesis_type VARCHAR(50) NOT NULL,
-    cod_degree VARCHAR(10) NOT NULL,
+    start_date DATETIME ,
     status_code INT NOT NULL DEFAULT 0,
-    FOREIGN KEY (cod_degree) REFERENCES degree_table(cod_degree),
     FOREIGN KEY (supervisor_id) REFERENCES teacher(id)
 );
 

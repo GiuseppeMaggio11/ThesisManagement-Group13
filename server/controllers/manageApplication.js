@@ -85,7 +85,7 @@ async function updateApplicationStatus(req, res) {
 
 async function newApplication(req, res) {
   const thesis_id = req.params.thesis_id; // Extract thesis_id from the URL
-  const date = req.body.date;
+  const date = new Date();
   try {
     if (!Number.isInteger(Number(thesis_id))) {
       return res.status(422).json("Thesis ID must be an integer");
@@ -99,15 +99,6 @@ async function newApplication(req, res) {
     if (existing) {
       return res.status(422).json("You cannot apply");
     }
-    /* const applications = await dao.getApplications();
-    for (const application of applications) {
-      if (
-        userID == application.student_id &&
-        application.status !== "Rejected"
-      ) {
-        return res.status(422).json("You are already applied for a thesis");
-      }
-    } */
 
     const result = await dao.newApply(userID, thesis_id, date);
     const emailData = await dao.getDataTeacherApplicationEmail(thesis_id);

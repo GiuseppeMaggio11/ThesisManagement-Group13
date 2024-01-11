@@ -340,11 +340,8 @@ app.post(
     // Various checks of syntax of given data
     check("title").isString().isLength({ min: 1, max: 100 }),
     check("supervisor_id").isString().isLength({ min: 1, max: 7 }), //Maybe we can try to check if the string is in the format Pxxxxxx
-    check("thesis_level").isIn(["Bachelor", "Master", "bachelor", "master"]),
-    check("type_name").isString().isLength({ min: 1, max: 50 }),
-    check("cod_degree").isString().isLength({ min: 1, max: 10 }),
-    check("cod_group").isArray(),
-    check("cod_group.*").isString(),
+    check("cosupervisors_internal").isArray(),
+    check("cosupervisors_internal.*").isString(),
   ],
   newRequest
 );
