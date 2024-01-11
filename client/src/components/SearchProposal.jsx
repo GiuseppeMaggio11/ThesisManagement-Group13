@@ -565,7 +565,7 @@ function Proposal(props) {
         exceed={exceed}
         setExceed={setExceed}
       />
-    </>
+    </Col>
   );
 }
 

@@ -1,4 +1,6 @@
 import { Button, Card, Col, OverlayTrigger, Row } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+
 import dayjs from "dayjs";
 import {
   Calendar,
@@ -19,13 +21,12 @@ function ViewProposalMotion(props) {
   const [cosup, setCosup] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isAlreadyApplied, setIsAlreadyApplied] = useState(false);
-
+  const navigate = useNavigate();
   useEffect(() => {
     setIsLoading(true);
     async function isApplied() {
       let alreadyApply = await API.isApplied();
       setIsAlreadyApplied(alreadyApply);
-      setIsLoading(false);
     }
     console.log(props.proposal);
     if (type === "STUD" && props.proposal) {
@@ -47,6 +48,7 @@ function ViewProposalMotion(props) {
       console.log(concatenatedCosup);
       setCosup(concatenatedCosup.join(", "));
     }
+    setIsLoading(false);
   }, [props.proposal, type]);
 
   /*  const handleModalClick = (e) => {
