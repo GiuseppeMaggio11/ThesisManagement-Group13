@@ -18,11 +18,14 @@ import Loading from "./Loading";
 import NoFileFound from "./NoFileFound";
 import randomColor from "randomcolor";
 import ViewProposalMotion from "./ViewProposalMotion";
+import FileDropModal from "./FileModal";
 
 function SearchProposalRoute(props) {
   const [thesisProposals, setThesisProposals] = useState([]);
   const { handleToast } = useContext(MessageContext);
   const isMobile = useMediaQuery({ maxWidth: 767 });
+  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 1025 });
+  const isTabletHorizonthal = useMediaQuery({ minWidth: 1026, maxWidth: 1367 });
 
   useEffect(() => {
     if (props.user && props.user.user_type !== "STUD") {
@@ -32,16 +35,12 @@ function SearchProposalRoute(props) {
 
   useEffect(() => {
     props.setLoading(true);
-    //if (dirtyThesisProposals)
     API.getThesisProposals(props.virtualClock)
       .then((list) => {
-        // console.log(list);
         setThesisProposals(list);
-        //setDirtyThesisProposals(false);
         props.setLoading(false);
       })
       .catch((err) => handleToast(err, "error"));
-    //}
   }, []);
 
   return (
@@ -52,9 +51,13 @@ function SearchProposalRoute(props) {
         <SearchProposalComponent
           thesisProposals={thesisProposals}
           isMobile={isMobile}
+          isTablet={isTablet}
+          isTabletHorizonthal={isTabletHorizonthal}
           setLoading={props.setLoading}
           loadind={props.loading}
           virtualClock={props.virtualClock}
+          user={props.user}
+          setThesisProposals={setThesisProposals}
         />
       )}
     </>
@@ -275,12 +278,15 @@ function SearchProposalComponent(props) {
                               key={element.id}
                               proposal={element}
                               isMobile={props.isMobile}
+                              isTablet={props.isTablet}
+                              isTabletHorizonthal={props.isTabletHorizonthal}
+                              user={props.user}
+                              thesisProposals={props.thesisProposals}
+                              setThesisProposals={props.setThesisProposals}
                             />
                           ))}
                         {filteredByTitle.length <= 0 && filter !== "" && (
-                          <Col>
-                            <h2 className="mt-3"> no proposals found</h2>
-                          </Col>
+                          <NoFileFound message={"No proposals found"} />
                         )}
                         {filteredByTitle.length > 0 &&
                           [...filteredByTitle].map((element) => (
@@ -288,6 +294,11 @@ function SearchProposalComponent(props) {
                               key={element.id}
                               proposal={element}
                               isMobile={props.isMobile}
+                              isTablet={props.isTablet}
+                              isTabletHorizonthal={props.isTabletHorizonthal}
+                              user={props.user}
+                              thesisProposals={props.thesisProposals}
+                              setThesisProposals={props.setThesisProposals}
                             />
                           ))}
                       </Row>
@@ -306,16 +317,72 @@ function SearchProposalComponent(props) {
 function Proposal(props) {
   const [isClicked, setIsClicked] = useState(false);
   const [cardPosition, setCardPosition] = useState({ x: 0, y: 0 });
-  const navigate = useNavigate();
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [exceed, setExceed] = useState(false);
+  const [openPanel, setOpenPanel] = useState(false);
+
+  const { handleToast } = useContext(MessageContext);
+
   const handleClick = (event) => {
     const rect = event.currentTarget.getBoundingClientRect();
     setIsClicked(true);
     setCardPosition({ x: rect.left, y: rect.top });
   };
 
+  const handleApplication = () => {
+    if (selectedFiles.length) handleUpload(props.proposal.id);
+    submitApplication(props.proposal.id, props.virtualClock); //virtualClocK??
+  };
+
+  const handleUpload = (thesis_id) => {
+    const formData = new FormData();
+    for (let i = 0; i < selectedFiles.length; i++) {
+      formData.append(`file`, selectedFiles[i]);
+    }
+    API.sendFiles(formData, thesis_id)
+      .then(() => {})
+      .catch((err) => {
+        handleToast(err, "error");
+      });
+  };
+
+  const handleUploadInterface = () => {
+    setIsClicked(false);
+    setOpenPanel(true);
+  };
+
+  const closeModal = () => {
+    setOpenPanel(false);
+    setSelectedFiles([]);
+    setExceed(false);
+  };
+
+  const closeModalOnCancel = () => {
+    setOpenPanel(false);
+    setSelectedFiles([]);
+    setExceed(false);
+    setIsClicked(true);
+  };
+
+  const submitApplication = (idThesis, date) => {
+    API.applicationThesis(idThesis, date)
+      .then(() => {
+        handleToast("Application submitted correctly", "success");
+        props.setThesisProposals((prev) => {
+          return prev.filter((p) => p.id != props.proposal.id);
+        });
+      })
+      .catch((err) => {
+        handleToast(err, "error");
+      });
+  };
+
   const handleModalClick = (e) => {
+    /*  console.log("e.target", e.target);
+    console.log("e.currentTarget", e.currentTarget); */
+
     // If the click occurs outside the expanded card, close it
-    if (e.target === e.currentTarget) {
+    if (!e || e.target === e.currentTarget) {
       setIsClicked(false);
     }
   };
@@ -480,10 +547,25 @@ function Proposal(props) {
           setIsClicked={setIsClicked}
           cardPosition={cardPosition}
           isTablet={props.isTablet}
+          isTabletHorizonthal={props.isTabletHorizonthal}
           user={props.user}
+          handleModalClick={handleModalClick}
+          handleUploadInterface={handleUploadInterface}
         />
       )}
-    </Col>
+      <FileDropModal
+        showModal={openPanel}
+        closeModal={closeModal}
+        closeModalOnCancel={closeModalOnCancel}
+        handleSave={() => {
+          handleApplication();
+        }}
+        setSelectedFiles={setSelectedFiles}
+        selectedFiles={selectedFiles}
+        exceed={exceed}
+        setExceed={setExceed}
+      />
+    </>
   );
 }
 

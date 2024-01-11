@@ -1,11 +1,64 @@
 import { Button, Card, Col, OverlayTrigger, Row } from "react-bootstrap";
 import dayjs from "dayjs";
-import { Calendar, Pencil, Trash3, Archive } from "react-bootstrap-icons";
+import {
+  Calendar,
+  Pencil,
+  Trash3,
+  Archive,
+  People,
+  Person,
+} from "react-bootstrap-icons";
 import randomcolor from "randomcolor";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import API from "../API";
+import Loading from "./Loading";
 
 function ViewProposalMotion(props) {
-  return (
+  const type = props.user?.user_type;
+  const [cosup, setCosup] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAlreadyApplied, setIsAlreadyApplied] = useState(false);
+
+  useEffect(() => {
+    setIsLoading(true);
+    async function isApplied() {
+      let alreadyApply = await API.isApplied();
+      setIsAlreadyApplied(alreadyApply);
+      setIsLoading(false);
+    }
+    console.log(props.proposal);
+    if (type === "STUD" && props.proposal) {
+      setCosup(props.proposal?.cosupervisors.join(", "));
+      try {
+        isApplied();
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    if (type === "PROF" && props.proposal) {
+      let ext = props.proposal?.external_cosupervisors?.map((ex) => {
+        return ex.ext_supervisor_name;
+      });
+      let int = props.proposal?.internal_cosupervisors?.map((ex) => {
+        return ex.ext_supervisor_name;
+      });
+      let concatenatedCosup = [...int, ...ext];
+      console.log(concatenatedCosup);
+      setCosup(concatenatedCosup.join(", "));
+    }
+  }, [props.proposal, type]);
+
+  /*  const handleModalClick = (e) => {
+    // If the click occurs outside the expanded card, close it
+    if (e.target === e.currentTarget) {
+      props.setIsClicked(false);
+    }
+  }; */
+
+  return isLoading ? (
+    <Loading />
+  ) : (
     <motion.div
       initial={{
         opacity: 0,
@@ -23,7 +76,7 @@ function ViewProposalMotion(props) {
         height: "100%",
       }}
       transition={{ opacity: { duration: 0 }, default: { duration: 0 } }}
-      onClick={() => props.setIsClicked(false)}
+      onClick={props.handleModalClick}
       style={{
         position: "fixed",
         top: 0,
@@ -53,98 +106,193 @@ function ViewProposalMotion(props) {
         }}
       >
         <Card
-          style={{ padding: 20, height: "fit-content" }}
+          style={{
+            padding: 20,
+            height: "fit-content",
+            maxHeight: props.isMobile ? "800px" : "",
+            overflowY: props.isMobile ? "auto" : "none",
+          }}
           className="custom-card-proposals-big"
         >
           <Row>
-            <Col xs={6}>
+            <Col xs={type === "STUD" ? 12 : 8} lg={6}>
               <div
                 style={{
-                  fontWeight: "medium",
-                  fontSize: 20,
+                  fontWeight: 600,
+                  fontSize: props.isMobile ? 20 : 28,
+                  marginBottom: props.isMobile && type === "PROF" ? "1rem" : "",
                 }}
               >
                 {props.proposal.title}
               </div>
+              {type === "STUD" && (
+                <div
+                  style={{
+                    fontSize: props.isMobile ? 15 : 18,
+                    paddingLeft: "1rem",
+                    marginTop: "0.5rem",
+                  }}
+                >
+                  <Person
+                    style={{ marginBottom: "0.3rem", marginRight: "1rem" }}
+                  />
+                  <span style={{ fontWeight: 500, fontSize: 18 }}>
+                    {props.proposal.supervisor}
+                  </span>
+                </div>
+              )}
+              {type === "STUD" && cosup != "" && (
+                <div
+                  style={{
+                    fontSize: 18,
+                    paddingLeft: "1rem",
+                  }}
+                >
+                  <People
+                    style={{ marginBottom: "0.3rem", marginRight: "1rem" }}
+                  />
+                  <span style={{ fontWeight: 500, fontSize: 18 }}>{cosup}</span>
+                </div>
+              )}
             </Col>
-            <Col className="text-end mx-2">
-              <Row>
-                <Col xs={6} md={6} lg={3}>
-                  <OverlayTrigger
-                    placement="bottom"
-                    overlay={props.renderTooltipEdit}
-                  >
-                    <Button
-                      variant="light"
-                      onClick={() => {
-                        navigate("/updateproposal/" + props.proposal.id);
-                      }}
+
+            {type === "PROF" && (
+              <Col className="text-end mx-2">
+                <Row>
+                  <Col xs={6} md={6} lg={3}>
+                    <OverlayTrigger
+                      placement="bottom"
+                      overlay={props.renderTooltipEdit}
                     >
-                      {!props.isMobile && <span className="mx-2">Edit</span>}
-                      <Pencil />
-                    </Button>
-                  </OverlayTrigger>
-                </Col>
-                <Col xs={6} md={6} lg={3}>
-                  <OverlayTrigger
-                    placement="bottom"
-                    overlay={props.renderTooltipCopy}
-                  >
-                    <Button
-                      variant="light"
-                      onClick={() => {
-                        navigate("/copyproposal/" + props.proposal.id);
-                      }}
-                    >
-                      {!props.isMobile && <span className="mx-2">Copy</span>}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        className="bi bi-copy"
-                        viewBox="0 0 16 16"
+                      <Button
+                        variant="light"
+                        onClick={() => {
+                          navigate("/updateproposal/" + props.proposal.id);
+                        }}
                       >
-                        <path
-                          fillRule="evenodd"
-                          d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"
-                        />
-                      </svg>
-                    </Button>
-                  </OverlayTrigger>
-                </Col>
-                <Col xs={6} md={6} lg={3}>
-                  <OverlayTrigger
-                    placement="bottom"
-                    overlay={props.renderTooltipDelete}
-                  >
-                    <Button
-                      variant="light"
-                      onClick={() => props.setShowDelete(true)}
+                        {!props.isMobile && <span className="mx-2">Edit</span>}
+                        <Pencil />
+                      </Button>
+                    </OverlayTrigger>
+                  </Col>
+                  <Col xs={6} md={6} lg={3}>
+                    <OverlayTrigger
+                      placement="bottom"
+                      overlay={props.renderTooltipCopy}
                     >
-                      {!props.isMobile && <span className="mx-2">Delete</span>}
-                      <Trash3 />
-                    </Button>
-                  </OverlayTrigger>
-                </Col>
-                <Col xs={6} md={6} lg={3}>
-                  <OverlayTrigger
-                    placement="bottom"
-                    overlay={props.renderTooltipArchive}
-                  >
-                    <Button
-                      variant="light"
-                      onClick={() => setShowArchive(true)}
+                      <Button
+                        variant="light"
+                        onClick={() => {
+                          navigate("/copyproposal/" + props.proposal.id);
+                        }}
+                      >
+                        {!props.isMobile && <span className="mx-2">Copy</span>}
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          fill="currentColor"
+                          className="bi bi-copy"
+                          viewBox="0 0 16 16"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"
+                          />
+                        </svg>
+                      </Button>
+                    </OverlayTrigger>
+                  </Col>
+                  <Col xs={6} md={6} lg={3}>
+                    <OverlayTrigger
+                      placement="bottom"
+                      overlay={props.renderTooltipDelete}
                     >
-                      {!props.isMobile && <span className="mx-2">Archive</span>}
-                      <Archive />
-                    </Button>
-                  </OverlayTrigger>
-                </Col>
-              </Row>
-            </Col>
+                      <Button
+                        variant="light"
+                        onClick={() => props.setShowDelete(true)}
+                      >
+                        {!props.isMobile && (
+                          <span className="mx-2">Delete</span>
+                        )}
+                        <Trash3 />
+                      </Button>
+                    </OverlayTrigger>
+                  </Col>
+                  <Col xs={6} md={6} lg={3}>
+                    <OverlayTrigger
+                      placement="bottom"
+                      overlay={props.renderTooltipArchive}
+                    >
+                      <Button
+                        variant="light"
+                        onClick={() => setShowArchive(true)}
+                      >
+                        {!props.isMobile && (
+                          <span className="mx-2">Archive</span>
+                        )}
+                        <Archive />
+                      </Button>
+                    </OverlayTrigger>
+                  </Col>
+                </Row>
+              </Col>
+            )}
+
+            {props.proposal.keywords && type === "STUD" && (
+              <Col
+                xs={6}
+                lg={6}
+                className="hide-scrollbar"
+                style={{
+                  fontWeight: "semi-bold",
+                  fontSize: props.isMobile || props.isTablet ? 14 : 20,
+                  height: !props.isMobile ? 25 : 40,
+                  marginTop: 5,
+                }}
+              >
+                {props.proposal.keywords.split(", ").map((key, index) => (
+                  <span
+                    key={index}
+                    className="badge"
+                    style={{
+                      backgroundColor: randomcolor({
+                        seed: key,
+                        luminosity: "bright",
+                        format: "rgba",
+                        alpha: 1,
+                      }).replace(/1(?=\))/, "0.1"),
+                      color: randomcolor({
+                        seed: key,
+                        luminosity: "bright",
+                        format: "rgba",
+                        alpha: 1,
+                      }),
+                      padding: "0.5em 1.2em",
+                      borderRadius: "0.25rem",
+                      marginRight: 10,
+                    }}
+                  >
+                    {key}
+                  </span>
+                ))}
+              </Col>
+            )}
           </Row>
-          {props.proposal.keywords && (
+
+          {type === "PROF" && cosup != "" && (
+            <Col
+              style={{
+                fontSize: 18,
+                paddingLeft: "1rem",
+              }}
+            >
+              <People style={{ marginBottom: "0.3rem", marginRight: "1rem" }} />
+              <span style={{ fontWeight: 500, fontSize: 18 }}>{cosup}</span>
+            </Col>
+          )}
+
+          {props.proposal.keywords && type === "PROF" && (
             <div
               className="hide-scrollbar"
               style={{
@@ -152,6 +300,7 @@ function ViewProposalMotion(props) {
                 fontSize: 14,
                 height: !props.isMobile ? 25 : 40,
                 marginTop: 5,
+                paddingLeft: "0.5rem",
               }}
             >
               {props.proposal.keywords.split(", ").map((key, index) => (
@@ -181,83 +330,187 @@ function ViewProposalMotion(props) {
               ))}
             </div>
           )}
+
+          <div
+            style={{
+              fontSize: 16,
+              marginTop: "0.5rem",
+              paddingLeft: "0.5rem",
+            }}
+          >
+            <p
+              style={{
+                fontWeight: 500,
+                margin: 0,
+                marginTop: props.isMobile ? "0.5rem" : 0,
+              }}
+            >
+              {" "}
+              DESCRIPTION{" "}
+            </p>
+            <span
+              style={{
+                display: "block",
+                paddingLeft: "1rem",
+                maxHeight: props.isMobile ? "200px" : "500px",
+                overflowY: "auto",
+                minWidth: props.isMobile
+                  ? 0
+                  : props.isTablet
+                  ? 500
+                  : props.isTabletHorizonthal
+                  ? 800
+                  : 1300,
+              }}
+            >
+              {props.proposal.description}
+            </span>
+          </div>
+
           <div
             style={{
               fontSize: 16,
               marginTop: 16,
-              maxHeight: "500px",
-              overflowY: "auto",
+              paddingLeft: "0.5rem",
             }}
           >
-            <span>{props.proposal.description}</span>
+            <p style={{ fontWeight: 500, margin: 0 }}> REQUIRED KNOWLEDGE </p>
+            <span
+              style={{
+                display: "block",
+                paddingLeft: "1rem",
+                maxHeight: "500px",
+                overflowY: "auto",
+              }}
+            >
+              {props.proposal.required_knowledge}
+            </span>
           </div>
-          <Row
-            style={{
-              fontSize: 16,
-              marginTop: "2em",
-            }}
-          >
-            <Col
-              className={
-                props.isMobile ? "col-5" : props.isTablet ? "col-3" : "col-2"
-              }
-            >
-              <span>Thesis Level</span>
-            </Col>
-            <Col>
-              <span
-                style={{
-                  color: "black",
-                }}
-                className="badge"
-              >
-                {props.proposal.thesis_level.toUpperCase()}
-              </span>
-            </Col>
-          </Row>
-          <Row
+
+          <div
             style={{
               fontSize: 16,
               marginTop: 16,
+              paddingLeft: "0.5rem",
             }}
           >
-            <Col
-              className={
-                props.isMobile ? "col-5" : props.isTablet ? "col-3" : "col-2"
-              }
+            <p style={{ fontWeight: 500, margin: 0 }}> NOTES </p>
+            <span
+              style={{
+                display: "block",
+                paddingLeft: "1rem",
+                maxHeight: "500px",
+                overflowY: "auto",
+              }}
             >
-              <span>Thesis Type</span>
-            </Col>
-            <Col>
-              <span
+              {props.proposal.notes}
+            </span>
+          </div>
+
+          <Row className="d-flex">
+            <Col xl={10}>
+              <Row
                 style={{
-                  color: "black",
+                  fontSize: 16,
+                  marginTop: "2em",
                 }}
-                className="badge"
               >
-                {props.proposal.thesis_type.toUpperCase()}
-              </span>
+                <Col
+                  className={
+                    props.isMobile
+                      ? "col-5"
+                      : props.isTablet
+                      ? "col-3"
+                      : "col-2"
+                  }
+                >
+                  <span style={{ color: "black", fontWeight: 500 }}>
+                    Thesis Level
+                  </span>
+                </Col>
+                <Col>
+                  <span
+                    style={{
+                      color: "black",
+                    }}
+                  >
+                    {props.proposal.thesis_level.toUpperCase()}
+                  </span>
+                </Col>
+              </Row>
+              <Row
+                style={{
+                  fontSize: 16,
+                  marginTop: 16,
+                }}
+              >
+                <Col
+                  className={
+                    props.isMobile
+                      ? "col-5"
+                      : props.isTablet
+                      ? "col-3"
+                      : "col-2"
+                  }
+                >
+                  <span style={{ color: "black", fontWeight: 500 }}>
+                    Thesis Type
+                  </span>
+                </Col>
+                <Col>
+                  <span
+                    style={{
+                      color: "black",
+                    }}
+                  >
+                    {props.proposal.thesis_type.toUpperCase()}
+                  </span>
+                </Col>
+              </Row>
+              <Row
+                style={{
+                  fontSize: 16,
+                  marginTop: 16,
+                }}
+              >
+                <Col
+                  className={
+                    props.isMobile
+                      ? "col-5"
+                      : props.isTablet
+                      ? "col-3"
+                      : "col-2"
+                  }
+                >
+                  <span style={{ color: "black", fontWeight: 500 }}>
+                    Expire at
+                  </span>
+                </Col>
+                <Col>
+                  <span style={{ color: "black" }}>
+                    {dayjs(props.proposal.expiration).format("MM/DD/YYYY")}
+                  </span>
+                  <Calendar
+                    style={{ marginLeft: "0.4rem", marginBottom: "0.2rem" }}
+                  />
+                </Col>
+              </Row>
             </Col>
-          </Row>
-          <Row
-            style={{
-              fontSize: 16,
-              marginTop: 16,
-            }}
-          >
-            <Col
-              className={
-                props.isMobile ? "col-5" : props.isTablet ? "col-3" : "col-2"
-              }
-            >
-              <span>Expire at</span>
-            </Col>
-            <Col>
-              <span className="badge" style={{ color: "black" }}>
-                {dayjs(props.proposal.expiration).format("MM/DD/YYYY")}
-              </span>
-              <Calendar />
-            </Col>
+            {type === "STUD" && !isAlreadyApplied && (
+              <Col
+                className="d-flex flex-column justify-content-end align-items-end"
+                xl={2}
+              >
+                <div className="m-2">
+                  <Button
+                    className="button-style"
+                    onClick={props.handleUploadInterface}
+                  >
+                    <span className="mx-2">Apply</span>
+                  </Button>
+                </div>
+              </Col>
+            )}
           </Row>
         </Card>
       </motion.div>
