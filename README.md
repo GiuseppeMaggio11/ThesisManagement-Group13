@@ -40,13 +40,21 @@ Maggio Giuseppe 313346
 
 ## React Client Application Routes
 
-- Route `/`: Initial route. Unauthenticated users will not see anything in it.
-Authenticated users will see buttons to access the various routes
-- Route `/login`: Route containing the login form
-- Route `/proposals`: Route containing the list of all thesis proposals relating to the degree of the logged-in student. It is accessible only to authenticated users and shows only basic information (title, supervisor and expiration date).
-It is possible to filter thesis proposals based on the content of a text field form
-- Route `/teacher`: Route only accessible to authenticated professors containing a button to create a new thesis proposal.
+- Route `/`: Initial route that automatically redirects to login page
+- Route `/virtualclock`: Route containing the virtual clock
+- Route `/profproposals`: Route only accessible to authenticated professors. It contains the active proposals of the professor currently logged-in.
+- Route `/studproposals`: Route only accessible to authenticated students. It contains a list of all thesis proposals related to the degree of the logged-in student.
 - Route `/newproposal`: Route only accessible to authenticated professors. It allows them to create a new thesis proposal by filling all its informations (title, description, supervisor, co-supervisors, level, keywords, type, group, required knowledge, notes, expiration date, degree and if it's archived).
+- Route `/copyproposal/:idCopy`: Route only accessible to authenticated professors. It allows them to create a new thesis proposal by copying an already existing one.
+- Route `/updateproposal/:idUpd`: Route only accessible to authenticated professors. It allows them to update an existing thesis proposal by changing its fields.
+- Route `/viewproposal/:idView`: Route only accessible to authenticated professors. It allows them to see the details of a thesis proposal.
+- Route `/applications`: Route only accessible to authenticated professors. It contains a list of all pending applications from students for thesis created by the logged-in professor, grouped by thesis.
+- Route `/studentapplications`: Route only accessible to authenticated students. It contains a list of all applications made by the logged-in student, along with their status (pending, approved or rejected).
+- Route `/proposals/:id`: Route only accessible to authenticated students. It allows them to see the details of a thesis proposal and to apply to it.
+- Route `/requests`: Route only accessible to authenticated professors. It contains a list of all student requests for thesis supervised by the logged-in professor.
+- Route `/studentrequests`: Route only accessible to authenticated students. It contains a list of all requests made by the logged-in student.
+- Route `/newrequest`: Route only accessible to authenticated students. It allows them to create a new thesis request by filling the following informations : title, description, supervisor, internal co-supervisors.
+
 
 ## Docker Compose
 
@@ -588,7 +596,159 @@ docker compose down
 
 ## Database Tables
 
+### Table: user_type
 
+This table contains the different user types.
+
+- **id (VARCHAR(4), PRIMARY KEY):** Unique identifier for each user type.
+- **user_type (VARCHAR(30), NOT NULL):** Descriptive name for the user type.
+
+### Table: users
+
+This table contains all the registered users with their credentials and type.
+
+- **email (VARCHAR(255), PRIMARY KEY):** User email as unique identifier for each user.
+- **salt (VARCHAR(16), NOT NULL):** Salt used for password hashing.
+- **password (VARCHAR(128), NOT NULL):** Hashed password for user authentication.
+- **user_type_id (VARCHAR(4), NOT NULL, FOREIGN KEY):** Foreign key referencing user_type(id).
+
+### Table: student
+
+This table contains all the students with their personal and studies informations. 
+
+- **id (VARCHAR(7), PRIMARY KEY):** Unique identifier for each student.
+- **surname (VARCHAR(50), NOT NULL):** Student's surname.
+- **name (VARCHAR(50), NOT NULL):** Student's first name.
+- **gender (VARCHAR(10), NOT NULL):** Student's gender.
+- **nationality (VARCHAR(50), NOT NULL):** Student's nationality.
+- **email (VARCHAR(255), NOT NULL):** Student's email.
+- **cod_degree (VARCHAR(10), NOT NULL, FOREIGN KEY):** Foreign key referencing degree_table(cod_degree).
+- **enrollment_year (INT, NOT NULL):** Year when the student enrolled.
+
+### Table: teacher
+
+This table contains all the teachers with their informations. 
+
+- **id (VARCHAR(7), PRIMARY KEY):** Unique identifier for each teacher.
+- **surname (VARCHAR(50), NOT NULL):** Teacher's surname.
+- **name (VARCHAR(50), NOT NULL):** Teacher's first name.
+- **email (VARCHAR(255), NOT NULL):** Teacher's email.
+- **cod_group (VARCHAR(10), NOT NULL):** Group code where the teacher belongs.
+- **cod_department (VARCHAR(10), NOT NULL):** Department code where the teacher belongs.
+
+### Table: secretary
+
+This table contains all the secretaries with their informations. 
+
+- **id (VARCHAR(7), PRIMARY KEY):** Unique identifier for each secretary.
+- **surname (VARCHAR(50), NOT NULL):** Secretary's surname.
+- **name (VARCHAR(50), NOT NULL):** Secretary's first name.
+- **email (VARCHAR(255), NOT NULL):** Secretary's email.
+
+### Table: degree_table
+
+This table contains the degrees available.
+
+- **cod_degree (VARCHAR(10), PRIMARY KEY):** Code degree as unique identifier for each degree.
+- **title_degree (VARCHAR(100), NOT NULL):** Title of the degree.
+
+### Table: career
+
+This table contains all the different careers of each student and their courses.
+
+- **id (VARCHAR(7), NOT NULL, FOREIGN KEY):** Foreign key referencing student(id).
+- **cod_course (VARCHAR(10), NOT NULL):** Code for the course.
+- **title_course (VARCHAR(50), NOT NULL):** Title of the course.
+- **cfu (INT, NOT NULL):** Credit units for the course.
+- **grade (DECIMAL(3, 0), NOT NULL):** Grade obtained by the student.
+- **date (DATE, NOT NULL):** Date when the course was completed.
+
+### Table: group_table
+
+This table contains all the groups.
+
+- **cod_group (VARCHAR(10), PRIMARY KEY):** Code group as unique identifier for each group.
+- **group_name (VARCHAR(50), NOT NULL):** Name of the group.
+
+### Table: department
+
+This table contains all the departments and their related groups.
+
+- **cod_department (VARCHAR(10), NOT NULL):** Code for the department.
+- **department_name (VARCHAR(50), NOT NULL):** Name of the department.
+- **cod_group (VARCHAR(10), NOT NULL, FOREIGN KEY):** Foreign key referencing group_table(cod_group).
+
+### Table: external_supervisor
+
+This table contains all the possible external thesis co-supervisors and their informations.
+
+- **email (VARCHAR(255), PRIMARY KEY):** External co-supervisor email as unique identifier for each external co-supervisor.
+- **surname (VARCHAR(50), NOT NULL):** External co-supervisor's surname.
+- **name (VARCHAR(50), NOT NULL):** External co-supervisor's first name.
+
+### Table: thesis
+
+This table contains all the thesis proposals with their characteristics.
+
+- **id (INT, AUTO_INCREMENT, PRIMARY KEY):** Unique identifier for each thesis.
+- **title (VARCHAR(100), NOT NULL):** Title of the thesis.
+- **description (TEXT, NOT NULL):** Description of the thesis.
+- **supervisor_id (VARCHAR(7), NOT NULL, FOREIGN KEY):** Id of the supervisor of the thesis as foreign key referencing teacher(id).
+- **thesis_level (VARCHAR(20), NOT NULL):** Level of the thesis.
+- **thesis_type (VARCHAR(50), NOT NULL):** Type of the thesis.
+- **required_knowledge (TEXT, NOT NULL):** Required knowledge for the thesis.
+- **notes (TEXT, NOT NULL):** Additional notes for the thesis.
+- **expiration (DATETIME, NOT NULL):** Expiration date for the thesis.
+- **cod_degree (VARCHAR(10), NOT NULL, FOREIGN KEY):** Degree of the thesis as foreign key referencing degree_table(cod_degree).
+- **keywords (TEXT):** Keywords associated with the thesis.
+- **is_archived (BOOLEAN, NOT NULL, DEFAULT 0):** Indicates whether the thesis is archived.
+- **is_expired (BOOLEAN, NOT NULL, DEFAULT 0):** Indicates whether the thesis is expired.
+- **is_deleted (BOOLEAN, NOT NULL, DEFAULT 0):** Indicates whether the thesis is deleted.
+
+### Table: thesis_request
+
+This table contains all the thesis requests, their characteristics and their status.
+
+- **id (INT, AUTO_INCREMENT, PRIMARY KEY):** Unique identifier for each thesis request.
+- **title (VARCHAR(100), NOT NULL):** Title of the thesis request.
+- **description (TEXT, NOT NULL):** Description of the thesis request.
+- **supervisor_id (VARCHAR(7), NOT NULL, FOREIGN KEY):** Thesis supervisor as foreign key referencing teacher(id).
+- **start_date (DATETIME):** Start date of the thesis request.
+- **status_code (INT, NOT NULL, DEFAULT 0):** Status code for the thesis request.
+
+## Table: thesis_group
+
+This table links thesis proposals with all their related groups.
+
+- **thesis_id (INT, NOT NULL, FOREIGN KEY):** Foreign key referencing thesis(id).
+- **group_id (VARCHAR(10), NOT NULL, FOREIGN KEY):** Foreign key referencing group_table(cod_group).
+
+## Table: thesis_cosupervisor_teacher
+
+This table links thesis proposals with all their internal co-supervisors (teachers).
+
+- **id (INT, AUTO_INCREMENT, PRIMARY KEY):** Unique identifier for each internal cosupervisor-thesis relationship.
+- **thesis_id (INT, FOREIGN KEY):** Foreign key referencing thesis(id).
+- **thesisrequest_id (INT, FOREIGN KEY):** Foreign key referencing thesis_request(id).
+- **cosupevisor_id (VARCHAR(7), NOT NULL, FOREIGN KEY):** Foreign key referencing teacher(id).
+
+## Table: thesis_cosupervisor_external
+
+This table links thesis proposals with all their external co-supervisors.
+
+- **id (INT, AUTO_INCREMENT, PRIMARY KEY):** Unique identifier for each external cosupervisor-thesis relationship.
+- **thesis_id (INT, FOREIGN KEY):** Foreign key referencing thesis(id).
+- **thesisrequest_id (INT, FOREIGN KEY):** Foreign key referencing thesis_request(id).
+- **cosupevisor_id (VARCHAR(255), NOT NULL, FOREIGN KEY):** Foreign key referencing external_supervisor(email).
+
+## Table: application
+
+This table contains all the student applications and their status.
+
+- **student_id (VARCHAR(7), NOT NULL, FOREIGN KEY):** Foreign key referencing student(id).
+- **thesis_id (INT, NOT NULL, FOREIGN KEY):** Foreign key referencing thesis(id).
+- **status (VARCHAR(10), NOT NULL):** Status of the application.
+- **application_date (DATETIME, NOT NULL):** Date when the application was submitted.
 
 ## Main React Components
 
