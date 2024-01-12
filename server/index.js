@@ -7,6 +7,8 @@ const {
   isStudent,
   isProfessor,
   isLoggedIn,
+  isSecretary,
+  isSecretaryOrProfessor,
 } = require("./controllers/middleware");
 const {
   getProposals,
@@ -41,12 +43,21 @@ const {
   listGroups,
   listDegrees,
 } = require("./controllers/others");
-
 const {
   setVirtualClock,
   uninstallVirtualClock,
   create_schedule,
+  getServerDateTime
 } = require("./controllers/virtualClock");
+const {
+  getRequestsForProfessor,
+  getRequestsForSecretary,
+  secretaryThesisRequest
+} = require("./controllers/thesisRequest");
+const {
+  getStudentCV,
+  getStudent
+} = require("./controllers/student")
 
 const express = require("express");
 const morgan = require("morgan");
@@ -148,6 +159,8 @@ app.post(
       res.redirect("http://localhost:5173/profproposals");
     else if (req.user && req.user.user_type === "STUD")
       res.redirect("http://localhost:5173/studproposals");
+    else if (req.user && req.user.user_type === "SECR")
+      res.redirect("http://localhost:5173/secrrequests");
   }
 );
 
@@ -187,6 +200,12 @@ app.get("/api/getAllFiles/:student_id/:thesis_id", isProfessor, getAllFiles);
 
 //GET TEACHERS
 app.get("/api/teachersList", isProfessor, getTeachersList);
+
+//GET STUDENT CV
+app.get("/api/getStudent/:student_id", isSecretaryOrProfessor, getStudent);
+
+//GET STUDENT CV
+app.get("/api/getStudentCv/:student_id", isSecretaryOrProfessor, getStudentCV);
 
 app.get(
   "/api/getStudentFilesList/:student_id/:thesis_id",
@@ -321,6 +340,14 @@ app.put(
 
 app.get("/api/isApplied", isStudent, isApplied);
 
+//THESIS REQUESTS
+app.get("/api/getrequestsforsecr", isSecretary, getRequestsForSecretary);
+
+app.get("/api/getrequestsforprof", isProfessor, getRequestsForProfessor);
+
+app.put("/api/updateRequest/:id",isSecretaryOrProfessor, secretaryThesisRequest );
+
+
 //RETURN TO REAL DATETIME
 app.put("/api/setRealDateTime", uninstallVirtualClock);
 
@@ -330,6 +357,9 @@ app.put(
   [check("datetime").isISO8601().toDate()],
   setVirtualClock
 );
+
+app.get("/api/getServerDateTime", getServerDateTime);
+
 
 //UPDATE THESES WITH NEW VIRTUALCLOCK TIME
 /*app.put(

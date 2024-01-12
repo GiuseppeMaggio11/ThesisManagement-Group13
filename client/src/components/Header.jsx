@@ -29,6 +29,7 @@ function Header(props) {
     API.redirectToLogin();
   };
 
+
   return (
     <Navbar
       expanded={expanded}
@@ -41,10 +42,10 @@ function Header(props) {
           <Image
             src="https://upload.wikimedia.org/wikipedia/it/archive/4/47/20210407201938%21Logo_PoliTo_dal_2021_blu.png"
             alt="logo polito"
-            width={200} 
+            width={200}
             height={200}
             style={{
-              filter: 'grayscale(100%) brightness(0) invert(100%)',
+              filter: "grayscale(100%) brightness(0) invert(100%)",
             }}
             fluid
           />
@@ -60,20 +61,26 @@ function Header(props) {
             <Nav.Link
               as={NavLink}
               to={
-                props.user && (props.user.user_type === "STUD")
+                props.user && props.user.user_type === "STUD"
                   ? "studproposals"
-                  : props.user && props.user.user_type === "PROF" ?
-                  "/profproposals" : 
-                  ""
+                  : props.user && props.user.user_type === "PROF"
+                  ? "/profproposals"
+                  : props.user && props.user.user_type === "SECR"
+                  ? "/secrrequests"
+                  : ""
               }
               onClick={() => {
                 if (isSmallScreen) setExpanded((old) => !old);
               }}
               className="fs-5"
             >
-              {props.user && (props.user.user_type === 'STUD' || props.user.user_type === 'PROF') ? (
-                "Thesis proposals"
-              ) : ""}
+              {props.user &&
+              (props.user.user_type === "STUD" ||
+                props.user.user_type === "PROF")
+                ? "Thesis proposals"
+                : props.user && props.user.user_type === "SECR"
+                ? "Pending requests"
+                : ""}
             </Nav.Link>
             <Nav.Link
               as={NavLink}
@@ -93,6 +100,26 @@ function Header(props) {
                 ? "My applications"
                 : props.user && props.user.user_type === "PROF"
                 ? "Applications"
+                : ""}
+            </Nav.Link>
+            <Nav.Link
+              as={NavLink}
+              to={
+                props.user && props.user.user_type === "STUD"
+                  ? /* "myRequests" */ ''
+                  : props.user && props.user.user_type === "PROF"
+                  ? "requests"
+                  : ""
+              }
+              onClick={() => {
+                if (isSmallScreen) setExpanded((old) => !old);
+              }}
+              className="fs-5"
+            >
+              {props.user && props.user.user_type === "STUD"
+                ? "My requests"
+                : props.user && props.user.user_type === "PROF"
+                ? "Requests"
                 : ""}
             </Nav.Link>
           </Nav>

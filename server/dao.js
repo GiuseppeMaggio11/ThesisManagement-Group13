@@ -474,7 +474,7 @@ exports.getDataStudentApplicationEmail = async (thesisId, studentId) => {
 exports.newApply = async (studentID, ThesisID, date) => {
   try {
     const status = "pending";
-    const formattedDate = dayjs(date).format("YYYY-MM-DD HH:mm:ss");
+    const formattedDate = dayjs(new Date()).format("YYYY-MM-DD HH:mm:ss");
 
     const sql =
       "INSERT INTO application (student_id, thesis_id, status, application_date) VALUES (?, ?, ?, ?)";
@@ -1188,3 +1188,101 @@ exports.getThesisGroups = async (id) => {
     throw err;
   }
 };
+
+//status => 
+//0: secretary have to accept
+//1: accepted by the secretary
+//2: professor have to accept
+//3: accepted
+//4: rejected by secretary
+//5: rejected by professor
+exports.secretaryThesisRequest = async (request_id, change) => {
+  try {
+    const sql = `UPDATE thesis_request SET status_code = ? WHERE id = ?`;
+    const [rows] = await pool.execute(sql, [change, request_id]);
+    return rows.info;
+  } catch (error) {
+    throw error;
+  }
+}
+exports.getRequestsForProfessor = async (email) => {
+  try {
+    const sql =
+      "select " +
+      "tr.id, " +
+      "tr.student_id, " +
+      "concat(s.name,' ', s.surname) as student_fullname, " +
+      "tr.title, " +
+      "tr.description, " +
+      "tr.supervisor_id, " +
+      "concat(t.name, ' ', t.surname) as professor_fullname, " +
+      "tr.thesis_level, " +
+      "tr.thesis_type, " +
+      "tr.cod_degree, " +
+      "d.title_degree " +
+      "from thesis_request tr " +
+      "inner join student s on s.id = tr.student_id " +
+      "inner join degree_table d on d.cod_degree = tr.cod_degree " +
+      "inner join teacher t on t.id = tr.supervisor_id " +
+      "where tr.status_code = 1 and t.email = ?";
+
+    const [rows] = await pool.execute(sql, [email]);
+    return rows;
+  } catch (err) {
+    console.error("Error in getRequestsForProfessor: ", err);
+    throw err;
+  }
+};
+exports.getRequestsForSecretary = async () => {
+  try {
+    const sql =
+      "select " +
+      "tr.id, " +
+      "tr.student_id, " +
+      "concat(s.name,' ', s.surname) as student_fullname, " +
+      "tr.title, " +
+      "tr.description, " +
+      "tr.supervisor_id, " +
+      "concat(t.name, ' ', t.surname) as professor_fullname, " +
+      "tr.thesis_level, " +
+      "tr.thesis_type, " +
+      "tr.cod_degree, " +
+      "d.title_degree " +
+      "from thesis_request tr " +
+      "inner join student s on s.id = tr.student_id " +
+      "inner join degree_table d on d.cod_degree = tr.cod_degree " +
+      "inner join teacher t on t.id = tr.supervisor_id " +
+      "where tr.status_code = 0";
+
+    const [rows] = await pool.execute(sql);
+    return rows;
+  } catch (err) {
+    console.error("Error in getRequestsForSecretary: ", err);
+    throw err;
+  }
+};
+
+
+exports.getStudentExams = async (studentID)=>{
+  try{
+    const sql = "select * FROM career WHERE id=?"
+    const [rows] = await pool.execute(sql, [studentID]);
+    return rows;
+  }
+  catch (err) {
+    console.error("Error in getStudentExams: ", err);
+    throw err;
+  }
+}
+
+exports.getStudent = async (studentID)=>{
+  try{
+    const sql = "select * FROM student WHERE id=?"
+    const [rows] = await pool.execute(sql, [studentID]);
+    return rows;
+  }
+  catch (err) {
+    console.error("Error in getStudentExams: ", err);
+    throw err;
+  }
+}

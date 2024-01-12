@@ -6,10 +6,11 @@ import { Calendar, Clock } from "react-bootstrap-icons";
 import dayjs from "dayjs";
 const VirtualClock = (props) => {
   const [tempTime, setTempTime] = useState(props.virtualClock);
-  const [isVirtual, setIsVirtual] = useState(false);
+  const [isVirtual, setIsVirtual] = useState(
+    JSON.parse(localStorage.getItem("virtualclock"))? true: false);
   const [settingVirtual, setSettingVirtual] = useState(false);
   const [isAmPm, setIsAmPm] = useState("");
-  const [virtualTime, setVirtualTime] = useState(dayjs(props.virtualClock));
+  const [virtualTime, setVirtualTime] = useState();
 
   /*   const updateTime = (amount, unit) => {
       const newDateTime = new Date(tempTime);
@@ -81,6 +82,8 @@ const VirtualClock = (props) => {
           setSettingVirtual={setSettingVirtual}
           virtualTime={virtualTime}
           setVirtualTime={setVirtualTime}
+          systemTime={props.virtualClock? props.virtualClock : new Date()}
+          setSystemTime={props.setVirtualClock}
         />
       </div>
       <div className="mt-3 d-flex justify-content-center">

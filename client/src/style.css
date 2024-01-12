@@ -20,7 +20,6 @@
   .custom-navdropdown {
     max-width: 30%;
   }
-
 }
 
 /*Virtual clock*/
@@ -36,7 +35,6 @@
 }
 
 /*Chips input */
-
 .chip-list {
   list-style: none;
   margin: 0px;
@@ -93,7 +91,6 @@
   justify-content: center;
   cursor: pointer;
 } */
-
 .chips-input {
   display: inline-flex;
   border: 0px;
@@ -104,7 +101,6 @@
   margin: 3px;
   padding: 5px;
 }
-
 
 /*Loading*/
 .loader-container {
@@ -159,7 +155,6 @@ table.table-rounded thead tr {
   font-weight: 680;
 }
 
-
 .table-footer {
   text-align: left;
   font-size: 13px;
@@ -173,7 +168,6 @@ table.table-rounded thead tr {
 .button-apply {
   margin-right: 1em;
 }
-
 
 .rightText {
   text-align: center;
@@ -196,6 +190,8 @@ table.table-rounded thead tr {
   margin-right: 0.5em;
 }
 
+
+
 .button-style-trash {
   background-color: transparent;
   border-color: transparent;
@@ -208,7 +204,6 @@ table.table-rounded thead tr {
   border-color: transparent;
   color: #e19861;
   margin-left: 0.2em;
-
 }
 
 .button-style-person {
@@ -226,7 +221,7 @@ table.table-rounded thead tr {
   font-size: x-large;
 }
 
-.button-style-persone+:active {
+.button-style-person:active {
   background-color: transparent !important;
   border-color: transparent !important;
   color: black;
@@ -256,9 +251,15 @@ table.table-rounded thead tr {
 }
 
 .button-style-cancel:hover {
-  background-color: #f27e25;
-  border-color: #f27e25;
+  background-color: #ed9049;
+  border-color: #ed9049;
   margin-right: 0.5em;
+}
+
+.button-style-cancel:active {
+  background-color: #f27e25 !important;
+  border-color: #f27e25 !important;
+  margin-right: 0.5em !important;
 }
 
 .link-style {
@@ -270,7 +271,6 @@ table.table-rounded thead tr {
   background-color: #4682B4;
   border-color: #4682B4;
 }
-
 
 .custom-accordion-item {
   border: none;
@@ -346,7 +346,6 @@ table.table-rounded thead tr {
   text-decoration: underline;
   text-decoration-color: #f27e25;
   text-decoration-thickness: 15%;
-
 }
 
 .smaller-heading {
@@ -418,7 +417,6 @@ table.table-rounded thead tr {
   padding: 5px;
 }
 
-
 .form-check-input {
   border-color: black
 }
@@ -445,7 +443,6 @@ table.table-rounded thead tr {
   transition: 0.4s;
 }
 
-
 /* Slider knob appearance */
 .slider::before {
   content: '';
@@ -459,7 +456,6 @@ table.table-rounded thead tr {
 
 input:checked+.slider {
   background-color: #2196F3;
-
 }
 
 input:checked+.slider::before {
@@ -537,6 +533,14 @@ input:checked+.slider::before {
   padding: 20px;
 }
 
+.custom-rounded-upload {
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
+ /*  padding-left: 1rem;
+  padding-right: 1rem; */
+}
+
 .custom-input-text {
   border-radius: 10px;
   padding: 5px;
@@ -545,6 +549,9 @@ input:checked+.slider::before {
 .list-group-item {
   padding: 0.2em;
   border: none;
+}
+.list-group-item:hover {
+ background-color: #cccccc61;
 }
 
 .ps__rail-x:hover>.ps__thumb-x,
@@ -556,15 +563,6 @@ input:checked+.slider::before {
 
 .ps__rail-x {
   height: 10px !important;
-}
-
-
-@media (min-width: 576px) {
-  .modal-dialog {
-    /*max-width: 500px;*/
-    /* Adjust as needed */
-    margin: auto;
-  }
 }
 
 @media (min-width: 765px) {
@@ -581,11 +579,66 @@ input:checked+.slider::before {
   }
 }
 
+.custom-card-applications {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  transition: box-shadow 0.5s;
+  border-radius: 20px;
+}
+
+.custom-card-applications:hover {
+  scale: 1.05;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+
+.custom-card-students-applyed {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  transition: box-shadow 0.5s;
+  border-radius: 20px;
+}
+
 .custom-card-proposals {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   transition: box-shadow 0.5s;
   border-radius: 20px;
   height: 350px;
+}
+
+.custom-card-request{
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  transition: box-shadow 0.5s;
+  border-radius: 20px;
+  height: 270px;
+}
+
+@media (max-width: 768px) {
+  .custom-card-request{
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    transition: box-shadow 0.5s;
+    border-radius: 20px;
+    min-height: 200px;
+    max-height: 280px;
+    height: fit-content;
+  }
+}
+@media (min-width: 769px) and (max-width: 1000px) {
+  .custom-card-request {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    transition: box-shadow 0.5s;
+    border-radius: 20px;
+    min-height: 180px;
+    max-height: 270px;
+    height: fit-content;
+  }
+}
+
+
+
+.custom-card-proposals-big {
+  height: 500px;
+  margin-inline: 1em;
+  border-radius: 20px;
 }
 
 .custom-card-proposals:hover {
@@ -650,4 +703,59 @@ input:checked+.slider::before {
   background-color: white !important;
   border-color: rgb(237, 89, 89) !important;
   color: rgb(237, 89, 89);
+}
+
+.modal -custom-student-apply {
+  border-radius: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  transition: box-shadow 0.5s;
+}
+.modal -custom-student-cv {
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  transition: box-shadow 0.5s;
+}
+
+
+.accept-button-appl:hover {
+  border: 1px solid green !important;
+  background: white !important;
+}
+
+.accept-button-appl:active {
+  border: 1px solid green !important;
+  background: white !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.reject-button-appl:hover {
+  border: 1px solid red !important;
+  background: white !important;
+}
+
+.reject-button-appl:active {
+  border: 1px solid red !important;
+  background: white !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.file-button-appl:hover {
+  border: 1px solid lightgray !important;
+  background: white !important;
+}
+
+.file-button-appl:active {
+  border: 1px solid lightgray !important;
+  background: white !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.student-number-applyed {
+  display: inline-block;
+  width: 35px;
+  height: 35px;
+  line-height: 35px;
+  border-radius: 50%;
+  text-align: center;
+  font-weight: 600;
 }

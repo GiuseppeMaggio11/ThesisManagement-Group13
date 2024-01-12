@@ -13,6 +13,7 @@ import { ToastContainer } from "react-toastify";
 function FileDropModal({
   showModal,
   closeModal,
+  closeModalOnCancel,
   handleSave,
   setSelectedFiles,
   selectedFiles,
@@ -94,7 +95,7 @@ function FileDropModal({
   };
 
   return (
-    <Modal show={showModal} onHide={closeModal}>
+    <Modal contentClassName='custom-rounded-upload' show={showModal} onHide={closeModal} style={{flex:1}}>
       <Modal.Header>
         <Modal.Title>Are you sure to apply to this thesis?</Modal.Title>
       </Modal.Header>
@@ -163,7 +164,7 @@ function FileDropModal({
           <Button
             className="button-style-cancel"
             variant="light"
-            onClick={closeModal}
+            onClick={closeModalOnCancel}
           >
             Cancel
           </Button>
