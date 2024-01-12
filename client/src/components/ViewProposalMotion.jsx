@@ -228,7 +228,7 @@ function ViewProposalMotion(props) {
                     >
                       <Button
                         variant="light"
-                        onClick={() => setShowArchive(true)}
+                        onClick={() => props.setShowArchive(true)}
                       >
                         {!props.isMobile && (
                           <span className="mx-2">Archive</span>

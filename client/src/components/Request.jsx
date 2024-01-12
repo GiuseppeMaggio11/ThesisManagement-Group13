@@ -25,7 +25,6 @@ function RequestsPage(props) {
   const { handleToast } = useContext(MessageContext);
   const [showCv, setShowCv] = useState(false);
   const [studentID, setStudentID] = useState("");
-  console.log(props.user)
   useEffect(() => {
     async function getRequests() {
       props.setLoading(true);
@@ -48,20 +47,23 @@ function RequestsPage(props) {
   }, [props.user]);
 
   const handleDecision = async (request, decision) => {
-    console.log(request, decision);
+    //console.log(request, decision);
     let error = false;
     try {
       if (decision) {
-        console.log(decision);
+        //console.log(decision);
         await API.updateRequest(
           request.id,
           props.user.user_type === "PROF" ? 3 : 1
         );
-      } else
+        handleToast("Request accepted", "success");
+      } else {
         await API.updateRequest(
           request.id,
           props.user.user_type === "PROF" ? 5 : 4
         );
+        handleToast("Request rejected", "error");
+      }
     } catch (err) {
       error = true;
       handleToast("Error while updating the request", "error");
@@ -69,9 +71,9 @@ function RequestsPage(props) {
       if (!error) {
         setRequestList((prev) => {
           let req = [...prev];
-          console.log(req);
+          //console.log(req);
           req = req.filter((r) => r.id != request.id);
-          console.log(req);
+          //console.log(req);
           return req;
         });
       }
@@ -128,24 +130,23 @@ function RequestCard(props) {
     setStudentID,
   } = props;
 
-  const [student, setStudent] = useState()
-  const [isLoading, setIsLoading] = useState(true)
+  const [student, setStudent] = useState();
+  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(()=>{
-    async function studentDetails(){
-      try{
-        setIsLoading(true)
-        let student = await API.getStudent(request.student_id)
-        console.log(student[0])
-        setStudent(student[0])
-        setIsLoading(false)
-      }
-      catch(err){
-          console.log(err)
+  useEffect(() => {
+    async function studentDetails() {
+      try {
+        setIsLoading(true);
+        let student = await API.getStudent(request.student_id);
+        //console.log(student[0]);
+        setStudent(student[0]);
+        setIsLoading(false);
+      } catch (err) {
+        console.log(err);
       }
     }
-    studentDetails()
-  },[])
+    studentDetails();
+  }, []);
 
   const renderTooltipAccept = (props) => (
     <Tooltip id="button-tooltip" {...props}>
@@ -158,9 +159,10 @@ function RequestCard(props) {
     </Tooltip>
   );
 
-  console.log(request);
-  return (
-    isLoading?<Loading/>:
+  //console.log(request);
+  return isLoading ? (
+    <Loading />
+  ) : (
     <Col xs={12} md={12} lg={6} xl={6} xxl={4} className="mt-4">
       <motion.div whileHover={{ scale: 1.05 }} style={{ cursor: "pointer" }}>
         <Card
@@ -348,14 +350,13 @@ function RequestCard(props) {
             </Col>
           </Row>
 
-      
           <div
             style={{
               fontSize: 16,
               marginTop: 16,
-              minHeight: isMobile||isTablet?50:'',
-              maxHeight: isMobile||isTablet?200:'',
-              height:isMobile||isTablet?'fit-content':'150px',
+              minHeight: isMobile || isTablet ? 50 : "",
+              maxHeight: isMobile || isTablet ? 200 : "",
+              height: isMobile || isTablet ? "fit-content" : "150px",
               WebkitLineClamp: isMobile ? 2 : 3,
               WebkitBoxOrient: "vertical",
               overflow: "hidden",
@@ -367,13 +368,18 @@ function RequestCard(props) {
                   {request.description.substring(0, isMobile ? 100 : 150) +
                     "... "}
                 </span>
-                <span style={{width:'fit-content'}}className="description-read-more">Read more</span>
+                <span
+                  style={{ width: "fit-content" }}
+                  className="description-read-more"
+                >
+                  Read more
+                </span>
               </>
             ) : (
               request.description
             )}
           </div>
-        {/*   <Row
+          {/*   <Row
             style={{
               fontSize: 16,
               marginTop: 16,
