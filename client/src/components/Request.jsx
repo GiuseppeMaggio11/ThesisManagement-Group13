@@ -13,7 +13,7 @@ import Loading from "./Loading";
 import randomcolor from "randomcolor";
 import API from "../API";
 import NoFileFound from "./NoFileFound";
-import { Check2, XLg } from "react-bootstrap-icons";
+import { Check2, XLg, People } from "react-bootstrap-icons";
 import { useMediaQuery } from "react-responsive";
 import MessageContext from "../messageCtx";
 import Cv from "./Cv";
@@ -132,7 +132,6 @@ function RequestCard(props) {
 
   const [student, setStudent] = useState();
   const [isLoading, setIsLoading] = useState(true);
-
   useEffect(() => {
     async function studentDetails() {
       try {
@@ -296,6 +295,25 @@ function RequestCard(props) {
                   </Col>
                 </Row>
               )}
+             
+                {request.cosup_fullname.length>0 && <Row>
+                  <Col style={{ padding: 0 }} xs={12} md={12} lg={12}>
+                    <div
+                      style={{
+                        fontWeight: "medium",
+                        fontSize: 15,
+                        padding: 0,
+                      }}s
+                    >
+                      <People style={{marginRight:'0.5rem'}}/>
+                      <span style={{ fontWeight: 500 }}>
+                        {request.cosup_fullname.join(", ")}
+                      </span>
+                    </div>
+                  </Col>
+                </Row>}
+        
+
             </Col>
             <Col xs={4} className="text-end px-0">
               <Row

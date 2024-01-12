@@ -642,6 +642,23 @@ exports.createThesis_cosupervisor_teacher = async (thesis_id, professor_id) => {
     throw error;
   }
 };
+// Insert new row in thesis_cosupervisor table, must receive thesis id and cosupervisor id
+exports.createRequest_cosupervisor_teacher = async (request_id, professor_id) => {
+  try {
+    const sql =
+      "INSERT INTO thesis_cosupervisor_teacher (thesisrequest_id, cosupevisor_id) VALUES (?,?)";
+    await pool.execute(sql, [request_id, professor_id]);
+
+    const thesis_cosupervisor = {
+      request_id: request_id,
+      thesis_cosupervisor: professor_id,
+    };
+    return thesis_cosupervisor;
+  } catch (error) {
+    console.error("Error in createRequest_cosupervisor_teacher: ", error);
+    throw error;
+  }
+};
 
 // Insert new row in thesis_cosupervisor table, must receive thesis id and cosupervisor id
 exports.createRequest_cosupervisor_teacher = async (request_id, professor_id) => {
@@ -1212,9 +1229,10 @@ exports.getThesisGroups = async (id) => {
 exports.createRequest = async (thesisRequest) => {
   try {
     const sql =
-      "INSERT INTO thesis_request (title, description, supervisor_id, status_code) VALUES (?, ?, ?, 0)";
+      "INSERT INTO thesis_request (title, student_id, description, supervisor_id, status_code) VALUES (?, ?, ?,?, 0)";
     const [rows] = await pool.execute(sql, [
       thesisRequest.title,
+      thesisRequest.student_id,
       thesisRequest.description,
       thesisRequest.supervisor_id,
     ]);
@@ -1230,7 +1248,7 @@ exports.createRequest = async (thesisRequest) => {
 //status => 
 //0: secretary have to accept
 //1: accepted by the secretary
-//2: professor have to accept
+//2: professor have to accepts
 //3: accepted
 //4: rejected by secretary
 //5: rejected by professor
@@ -1243,34 +1261,49 @@ exports.secretaryThesisRequest = async (request_id, change) => {
     throw error;
   }
 }
+exports.teachersThesisRequest = async (request_id, change) => {
+  try {
+    let start_date = new Date()
+    const sql = `UPDATE thesis_request SET status_code = ?, start_date = ? WHERE id = ?`;
+    const [rows] = await pool.execute(sql, [change, start_date, request_id]);
+    return rows.info;
+  } catch (error) {
+    throw error;
+  }
+}
 exports.getRequestsForProfessor = async (email) => {
   try {
     const sql =
-      "select " +
+      "SELECT " +
       "tr.id, " +
       "tr.student_id, " +
-      "concat(s.name,' ', s.surname) as student_fullname, " +
+      "CONCAT(s.name, ' ', s.surname) AS student_fullname, " +
       "tr.title, " +
       "tr.description, " +
       "tr.supervisor_id, " +
-      "concat(t.name, ' ', t.surname) as professor_fullname, " +
-      "tr.thesis_level, " +
-      "tr.thesis_type, " +
-      "tr.cod_degree, " +
-      "d.title_degree " +
-      "from thesis_request tr " +
-      "inner join student s on s.id = tr.student_id " +
-      "inner join degree_table d on d.cod_degree = tr.cod_degree " +
-      "inner join teacher t on t.id = tr.supervisor_id " +
-      "where tr.status_code = 1 and t.email = ?";
+      "CONCAT(t.name, ' ', t.surname) AS professor_fullname " +
+      "FROM thesis_request tr " +
+      "INNER JOIN student s ON s.id = tr.student_id " +
+      "INNER JOIN teacher t ON t.id = tr.supervisor_id " +
+      "WHERE tr.status_code = 1 AND t.email = ?";
 
     const [rows] = await pool.execute(sql, [email]);
+
+    for (const r of rows) {
+      const sql2 = "SELECT t.id, CONCAT(t.name, ' ', t.surname) AS cosup_fullname FROM teacher t INNER JOIN thesis_cosupervisor_teacher tc ON tc.cosupevisor_id = t.id WHERE tc.thesisrequest_id = ?";
+      const [rows2] = await pool.execute(sql2, [r.id]);
+
+      let cosup = rows2.map((row) => row.cosup_fullname);
+      r.cosup_fullname = cosup;
+    }
+
     return rows;
   } catch (err) {
     console.error("Error in getRequestsForProfessor: ", err);
     throw err;
   }
 };
+
 exports.getRequestsForSecretary = async () => {
   try {
     const sql =
@@ -1281,18 +1314,23 @@ exports.getRequestsForSecretary = async () => {
       "tr.title, " +
       "tr.description, " +
       "tr.supervisor_id, " +
-      "concat(t.name, ' ', t.surname) as professor_fullname, " +
-      "tr.thesis_level, " +
-      "tr.thesis_type, " +
-      "tr.cod_degree, " +
-      "d.title_degree " +
+      "concat(t.name, ' ', t.surname) as professor_fullname " +
       "from thesis_request tr " +
       "inner join student s on s.id = tr.student_id " +
-      "inner join degree_table d on d.cod_degree = tr.cod_degree " +
       "inner join teacher t on t.id = tr.supervisor_id " +
       "where tr.status_code = 0";
 
     const [rows] = await pool.execute(sql);
+
+    
+    for (const r of rows) {
+      const sql2 = "SELECT t.id, CONCAT(t.name, ' ', t.surname) AS cosup_fullname FROM teacher t INNER JOIN thesis_cosupervisor_teacher tc ON tc.cosupevisor_id = t.id WHERE tc.thesisrequest_id = ?";
+      const [rows2] = await pool.execute(sql2, [r.id]);
+
+      let cosup = rows2.map((row) => row.cosup_fullname);
+      r.cosup_fullname = cosup;
+    }
+    
     return rows;
   } catch (err) {
     console.error("Error in getRequestsForSecretary: ", err);

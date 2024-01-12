@@ -53,7 +53,7 @@ const {
 const {
   getRequestsForProfessor,
   getRequestsForSecretary,
-  secretaryThesisRequest
+  updateThesisRequest
 } = require("./controllers/thesisRequest");
 const {
   getStudentCV,
@@ -200,7 +200,7 @@ app.post("/api/newFiles/:thesis_id", isStudent, addFiles);
 app.get("/api/getAllFiles/:student_id/:thesis_id", isProfessor, getAllFiles);
 
 //GET TEACHERS
-app.get("/api/teachersList", isProfessor, getTeachersList);
+app.get("/api/teachersList", isLoggedIn, getTeachersList);
 
 //GET STUDENT CV
 app.get("/api/getStudent/:student_id", isSecretaryOrProfessor, getStudent);
@@ -344,7 +344,7 @@ app.get("/api/getrequestsforsecr", isSecretary, getRequestsForSecretary);
 
 app.get("/api/getrequestsforprof", isProfessor, getRequestsForProfessor);
 
-app.put("/api/updateRequest/:id",isSecretaryOrProfessor, secretaryThesisRequest );
+app.put("/api/updateRequest/:id",isSecretaryOrProfessor, updateThesisRequest );
 
 
 //RETURN TO REAL DATETIME

@@ -1,9 +1,16 @@
 const dao = require("../dao");
 
-async function secretaryThesisRequest(req, res) {
-  console.log(req.body.change)
+async function updateThesisRequest(req, res) {
+  console.log(req.user.user_type)
   try {
-    await dao.secretaryThesisRequest(req.params.id, req.body.change);
+    if(req.user.user_type === 'SECR'){
+      await dao.secretaryThesisRequest(req.params.id, req.body.change);
+      console.log('secr')
+    }
+    else{
+      console.log('teacher')
+      await dao.teachersThesisRequest(req.params.id, req.body.change);
+    }
 
     return res.status(200).json("updated");
   } catch (err) {
@@ -31,7 +38,7 @@ async function getRequestsForSecretary(req, res) {
 }
 
 module.exports = {
-  secretaryThesisRequest,
+  updateThesisRequest,
   getRequestsForProfessor,
   getRequestsForSecretary,
 };

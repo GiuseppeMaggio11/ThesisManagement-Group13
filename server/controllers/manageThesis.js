@@ -412,6 +412,7 @@ async function deleteProposal(req, res) {
 }
 // CREATE THESIS REQUEST 
 async function newRequest(req, res) {
+  const userID = await dao.getUserID(req.user.username);
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).json({ errors: errors });
@@ -432,82 +433,34 @@ async function newRequest(req, res) {
       });
     }
 
-    // ---DEGREE CODE should be an actual degree, must be in degree table
-    //Get every cod_degree from degree_table table in db
-    const degrees = await dao.getDegrees();
-    //If given cod_degre si not in list raise error
-    if (!degrees.some((degree) => degree.cod === req.body.cod_degree)) {
-      await dao.rollback();
-      return res.status(400).json({
-        error: `Cod_degree: ${req.body.cod_degree} is not a valid degree code`,
-      });
-    }
-
-    // --- GROUP COD should be an actual research group id, must be in group_table
-    // Get every cod_group from group_table table in db
-    const codes_group = await dao.getCodes_group();
-
-    // If given cod_group is not in list  raise error
-    for (let group of req.body.cod_group) {
-      if (!codes_group.includes(group)) {
-        await dao.rollback();
-        return res.status(400).json({
-          error: `Cod_group: ${group} is not a valid research group code`,
-        });
-      }
-    }
-
     //Create thesis object which contains data from front end
     const thesisRequest = {
       title: req.body.title,
       description: req.body.description,
       supervisor_id: req.body.supervisor_id,
-      thesis_level: req.body.thesis_level,
-      type_name: req.body.type_name,
-      cod_degree: req.body.cod_degree,
-
+      student_id: userID
     };
     //Insert new thesis in db
-    const result_thesis = await dao.createRequest(thesisRequest);
-
-/// CREATE THESE OTHER ROWS WHEN THESIS IS ACCEPTED (?)
-/*  
-    //Create a new thesis_group row which links thesis to its research group
-    for (let group of req.body.cod_group) {
-      await dao.createThesis_group(result_thesis.id, group);
-    }
+    const result_request = await dao.createRequest(thesisRequest);
 
     //Create new rows which link thesis to interal cosupervisor
     if (req.body.cosupervisors_internal != null) {
       for (const internal_cosupervisor of req.body.cosupervisors_internal) {
         const result_cosupervisors_internal = [];
         result_cosupervisors_internal.push(
-          await dao.createThesis_cosupervisor_teacher(
-            result_thesis.id,
+          await dao.createRequest_cosupervisor_teacher(
+            result_request.id,
             internal_cosupervisor
           )
         );
       }
     }
 
-    //Create new rows which link thesis to external cosupervisor
-    if (req.body.cosupervisors_external != null) {
-      for (const external_cosupervisor of req.body.cosupervisors_external) {
-        const result_cosupervisors_external = [];
-        result_cosupervisors_external.push(
-          await dao.createThesis_cosupervisor_external(
-            result_thesis.id,
-            external_cosupervisor
-          )
-        );
-      }
-    }
-*/
     await dao.commit();
 
     const mailOptions = {
-      from:  "group13.thesismanagement@gmail.com",
-      to:  "group13.thesismanagement@gmail.com",
+      from: "group13.thesismanagement@gmail.com",
+      to: "group13.thesismanagement@gmail.com",
       subject: `NEW THESIS REQUEST`,
       text: `New thesis request title:"${thesisRequest.title}", has been sent to you`,
     };
@@ -520,7 +473,7 @@ async function newRequest(req, res) {
     });
 
     //Return inserted data
-    return res.status(200).json(result_thesis);
+    return res.status(200).json(result_request);
   } catch (err) {
     //rollback if errors occur
     await dao.rollback();

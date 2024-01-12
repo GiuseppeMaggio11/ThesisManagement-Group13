@@ -42,13 +42,6 @@ CREATE TABLE IF NOT EXISTS secretary(
     email VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS secretary(
-    id VARCHAR(7) PRIMARY KEY,
-    surname VARCHAR(50) NOT NULL,
-    name VARCHAR(50) NOT NULL,
-    email VARCHAR(255) NOT NULL
-);
-
 CREATE TABLE IF NOT EXISTS degree_table (
     cod_degree VARCHAR(10) PRIMARY KEY,
     title_degree VARCHAR(100) NOT NULL
@@ -107,16 +100,14 @@ CREATE TABLE IF NOT EXISTS thesis(
 
 CREATE TABLE IF NOT EXISTS thesis_request(
     id INT AUTO_INCREMENT PRIMARY KEY,
-    student_id VARCHAR(7) NOT NULL,
+    student_id VARCHAR(7),
     title VARCHAR(100) NOT NULL,
     description TEXT NOT NULL,
     supervisor_id VARCHAR(7) NOT NULL,
-    thesis_level VARCHAR(20) NOT NULL,
-    thesis_type VARCHAR(50) NOT NULL,
-    cod_degree VARCHAR(10) NOT NULL,
+    start_date DATETIME ,
     status_code INT NOT NULL DEFAULT 0,
-    FOREIGN KEY (cod_degree) REFERENCES degree_table(cod_degree),
-    FOREIGN KEY (supervisor_id) REFERENCES teacher(id)
+    FOREIGN KEY (supervisor_id) REFERENCES teacher(id),
+    FOREIGN KEY (student_id) REFERENCES student(id)
 );
 
 CREATE TABLE IF NOT EXISTS thesis_group(
@@ -131,13 +122,8 @@ CREATE TABLE IF NOT EXISTS thesis_cosupervisor_teacher(
     id INT AUTO_INCREMENT PRIMARY KEY,
     thesis_id INT,
     thesisrequest_id INT,
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    thesis_id INT,
-    thesisrequest_id INT,
     cosupevisor_id VARCHAR(7) NOT NULL,
     FOREIGN KEY (thesis_id) REFERENCES thesis(id),
-    FOREIGN KEY (cosupevisor_id) REFERENCES teacher(id),
-    FOREIGN KEY (thesisrequest_id) REFERENCES thesis_request(id)
     FOREIGN KEY (cosupevisor_id) REFERENCES teacher(id),
     FOREIGN KEY (thesisrequest_id) REFERENCES thesis_request(id)
 );
@@ -146,13 +132,8 @@ CREATE TABLE IF NOT EXISTS thesis_cosupervisor_external(
     id INT AUTO_INCREMENT PRIMARY KEY,
     thesis_id INT,
     thesisrequest_id INT,
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    thesis_id INT,
-    thesisrequest_id INT,
     cosupevisor_id VARCHAR(255) NOT NULL,
     FOREIGN KEY (thesis_id) REFERENCES thesis(id),
-    FOREIGN KEY (cosupevisor_id) REFERENCES external_supervisor(email),
-    FOREIGN KEY (thesisrequest_id) REFERENCES thesis_request(id)
     FOREIGN KEY (cosupevisor_id) REFERENCES external_supervisor(email),
     FOREIGN KEY (thesisrequest_id) REFERENCES thesis_request(id)
 );
@@ -189,9 +170,6 @@ INSERT INTO teacher (id, surname, name, email, cod_group, cod_department)
 VALUES
     ('P123456', 'Rossi', 'Mario', 'mario.rossi@polito.it', 'GRP01', 'DEP01'),
     ('P654321', 'Bianchi', 'Sofia', 'sofia.bianchi@polito.it', 'GRP02', 'DEP02');
-INSERT INTO secretary (id, surname, name, email) 
-VALUES
-    ('E123456', 'Giallo', 'Paolo', 'paola.giallo@polito.it');
 INSERT INTO secretary (id, surname, name, email) 
 VALUES
     ('E123456', 'Giallo', 'Paolo', 'paola.giallo@polito.it');
@@ -254,20 +232,30 @@ VALUES
     ('S123456', 5, 'Pending', '2023-07-10 11:30:00'),
     ('S654321', 6, 'Approved', '2023-02-28 13:15:00')
 ;*/
-INSERT INTO thesis_cosupervisor_teacher (thesis_id, cosupevisor_id)
-VALUES 
-    (1, 'P654321'),
-    (6, 'P123456');
+
 INSERT INTO thesis_cosupervisor_external (thesis_id, cosupevisor_id)
 VALUES 
     (3, 'elena.conti@email.net'),
     (4, 'maria.gentile@email.net'),
     (4, 'antonio.bruno@email.org'),
     (6, 'andrea.ferrari@email.com');
-INSERT INTO thesis_request (student_id, title, description, supervisor_id, thesis_level, thesis_type, cod_degree, status_code)
+
+    /* id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
+    supervisor_id VARCHAR(7) NOT NULL,
+    start_date DATETIME ,
+    status_code INT NOT NULL DEFAULT 0, */
+
+
+INSERT INTO thesis_request (student_id, title, description, supervisor_id, start_date, status_code)
 VALUES
-('S123456', 'Research Topic 1', 'Description for Research Topic 1', 'P123456', 'Master', 'Experimental', 'DEGR01', 1),
-('S123456', 'Research Topic 2', 'Description for Research Topic 2', 'P654321', 'PhD', 'Theoretical', 'DEGR01', 0),
-('S654321', 'Research Topic 3', 'Description for Research Topic 3', 'P123456', 'Bachelor', 'Practical', 'DEGR02', 1),
-('S654321', 'Research Topic 4', 'Description for Research Topic 4', 'P123456', 'Master', 'Mixed', 'DEGR02', 0),
-('S123456', 'Research Topic 5', 'Description for Research Topic 5', 'P654321', 'PhD', 'Experimental', 'DEGR01', 1);
+('S123456', 'Research Topic 1', 'Description for Research Topic 1', 'P123456', '2023-12-15 10:30:00', 1),
+('S654321', 'Research Topic 4', 'Description for Research Topic 4', 'P123456', '2023-11-15 10:30:00', 0);
+
+INSERT INTO thesis_cosupervisor_teacher (thesis_id, thesisrequest_id ,cosupevisor_id)
+VALUES 
+    (1, NULL, 'P654321'),
+    (6, NULL, 'P123456'),
+    (NULL, 1, 'P654321'),
+    (NULL, 1, 'P123456');
