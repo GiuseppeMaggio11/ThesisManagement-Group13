@@ -106,7 +106,7 @@ function Header(props) {
               as={NavLink}
               to={
                 props.user && props.user.user_type === "STUD"
-                  ? /* "myRequests" */ ''
+                  ? "studentrequests"
                   : props.user && props.user.user_type === "PROF"
                   ? "requests"
                   : ""
@@ -119,7 +119,7 @@ function Header(props) {
               {props.user && props.user.user_type === "STUD"
                 ? "My requests"
                 : props.user && props.user.user_type === "PROF"
-                ? "Requests"
+                ? "Requests" /* "Student requests" */
                 : ""}
             </Nav.Link>
           </Nav>

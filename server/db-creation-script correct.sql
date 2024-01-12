@@ -42,6 +42,13 @@ CREATE TABLE IF NOT EXISTS secretary(
     email VARCHAR(255) NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS secretary(
+    id VARCHAR(7) PRIMARY KEY,
+    surname VARCHAR(50) NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    email VARCHAR(255) NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS degree_table (
     cod_degree VARCHAR(10) PRIMARY KEY,
     title_degree VARCHAR(100) NOT NULL
@@ -124,8 +131,13 @@ CREATE TABLE IF NOT EXISTS thesis_cosupervisor_teacher(
     id INT AUTO_INCREMENT PRIMARY KEY,
     thesis_id INT,
     thesisrequest_id INT,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    thesis_id INT,
+    thesisrequest_id INT,
     cosupevisor_id VARCHAR(7) NOT NULL,
     FOREIGN KEY (thesis_id) REFERENCES thesis(id),
+    FOREIGN KEY (cosupevisor_id) REFERENCES teacher(id),
+    FOREIGN KEY (thesisrequest_id) REFERENCES thesis_request(id)
     FOREIGN KEY (cosupevisor_id) REFERENCES teacher(id),
     FOREIGN KEY (thesisrequest_id) REFERENCES thesis_request(id)
 );
@@ -134,8 +146,13 @@ CREATE TABLE IF NOT EXISTS thesis_cosupervisor_external(
     id INT AUTO_INCREMENT PRIMARY KEY,
     thesis_id INT,
     thesisrequest_id INT,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    thesis_id INT,
+    thesisrequest_id INT,
     cosupevisor_id VARCHAR(255) NOT NULL,
     FOREIGN KEY (thesis_id) REFERENCES thesis(id),
+    FOREIGN KEY (cosupevisor_id) REFERENCES external_supervisor(email),
+    FOREIGN KEY (thesisrequest_id) REFERENCES thesis_request(id)
     FOREIGN KEY (cosupevisor_id) REFERENCES external_supervisor(email),
     FOREIGN KEY (thesisrequest_id) REFERENCES thesis_request(id)
 );
@@ -172,6 +189,9 @@ INSERT INTO teacher (id, surname, name, email, cod_group, cod_department)
 VALUES
     ('P123456', 'Rossi', 'Mario', 'mario.rossi@polito.it', 'GRP01', 'DEP01'),
     ('P654321', 'Bianchi', 'Sofia', 'sofia.bianchi@polito.it', 'GRP02', 'DEP02');
+INSERT INTO secretary (id, surname, name, email) 
+VALUES
+    ('E123456', 'Giallo', 'Paolo', 'paola.giallo@polito.it');
 INSERT INTO secretary (id, surname, name, email) 
 VALUES
     ('E123456', 'Giallo', 'Paolo', 'paola.giallo@polito.it');

@@ -11,6 +11,7 @@ const utc = require("dayjs/plugin/utc");
 const timezone = require("dayjs/plugin/timezone");
 const { resolve } = require("path");
 const { rejects } = require("assert");
+const { request } = require("http");
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -642,6 +643,24 @@ exports.createThesis_cosupervisor_teacher = async (thesis_id, professor_id) => {
   }
 };
 
+// Insert new row in thesis_cosupervisor table, must receive thesis id and cosupervisor id
+exports.createRequest_cosupervisor_teacher = async (request_id, professor_id) => {
+  try {
+    const sql =
+      "INSERT INTO thesis_cosupervisor_teacher (thesisrequest_id, cosupevisor_id) VALUES (?,?)";
+    await pool.execute(sql, [request_id, professor_id]);
+
+    const thesis_cosupervisor = {
+      request_id: request_id,
+      thesis_cosupervisor: professor_id,
+    };
+    return thesis_cosupervisor;
+  } catch (error) {
+    console.error("Error in createRequest_cosupervisor_teacher: ", error);
+    throw error;
+  }
+};
+
 // Insert new row in thesis_cosupervisor_external table, must receive thesis id and email
 exports.createThesis_cosupervisor_external = async (thesis_id, email) => {
   try {
@@ -1186,6 +1205,25 @@ exports.getThesisGroups = async (id) => {
   } catch (err) {
     console.error("Error in getThesisGroupForProfessor: ", err);
     throw err;
+  }
+};
+
+// Creates a new thesis row in thesis table, must receive every data of thesis, returns newly created row, including autoicremented id ( used to add new rows in successive tables)
+exports.createRequest = async (thesisRequest) => {
+  try {
+    const sql =
+      "INSERT INTO thesis_request (title, description, supervisor_id, status_code) VALUES (?, ?, ?, 0)";
+    const [rows] = await pool.execute(sql, [
+      thesisRequest.title,
+      thesisRequest.description,
+      thesisRequest.supervisor_id,
+    ]);
+
+    const thesisRequestRow = { id: rows.insertId, ...thesisRequest };
+    return thesisRequestRow;
+  } catch (error) {
+    console.error("Error in createRequest: ", error);
+    throw error;
   }
 };
 

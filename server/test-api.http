@@ -60,3 +60,20 @@ GET http://localhost:3001/api/listExternalCosupervisors HTTP/1.1
 ###
 
 GET http://localhost:3001/api/student/applications HTTP/1.1
+###
+
+# New reservation
+POST http://localhost:3001/api/newRequest
+Content-Type: application/json
+
+{   
+    
+    "title": "Test ERROR2",
+    "description": "Test description",
+    "supervisor_id":"P123456",
+    "thesis_level": "Bachelor",
+    "type_name": "Test type_name2",
+    "cod_degree": "DEGR01",
+    "cod_group" : ["GRP01"]
+}
+###

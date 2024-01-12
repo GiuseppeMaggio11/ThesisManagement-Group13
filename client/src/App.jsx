@@ -19,6 +19,8 @@ import StudentApplications from "./components/StudentApplications";
 import ViewProposal from "./components/ViewProposal";
 import Home from "./components/Home";
 import RequestsPage from "./components/Request";
+import StudentRequests from "./components/StudentRequests";
+import NewRequest from "./components/NewRequest";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -242,7 +244,30 @@ function App() {
                 />
               }
             />
-
+            <Route
+              path="/studentrequests"
+              element={
+                <StudentRequests
+                  loading={loading}
+                  setLoading={setLoading}
+                  virtualClock={virtualClock}
+                  loggedIn={loggedIn}
+                  user={user}
+                />
+              }
+            ></Route>
+            <Route
+              path="/newrequest"
+              element={
+                <NewRequest
+                  loading={loading}
+                  virtualClock={virtualClock}
+                  setLoading={setLoading}
+                  loggedIn={loggedIn}
+                  user={user}
+                />
+              }
+            />
             {/*Leave DefaultRoute as last route */}
             <Route path="/*" element={<DefaultRoute />} />
           </Routes>

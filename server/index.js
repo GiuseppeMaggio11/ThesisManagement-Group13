@@ -35,6 +35,7 @@ const {
   getThesisForProfessorById,
   updateThesis,
   deleteProposal,
+  newRequest
 } = require("./controllers/manageThesis");
 const {
   listExternalCosupervisors,
@@ -296,8 +297,6 @@ app.get("/api/groups", isProfessor, listGroups);
 
 app.get("/api/degrees", isProfessor, listDegrees);
 
-app.get("/api/teachersList", isProfessor, getTeachersList);
-
 app.delete("/api/deleteProposal", isProfessor, deleteProposal);
 
 app.get(
@@ -361,15 +360,24 @@ app.put(
 app.get("/api/getServerDateTime", getServerDateTime);
 
 
-//UPDATE THESES WITH NEW VIRTUALCLOCK TIME
-/*app.put(
-  "/api/updateThesesArchivation",
+app.get("/api/getServerDateTime", getServerDateTime);
+
+
+//CREATES NEW THESIS REQUEST
+app.post(
+  "/api/newRequest",
+  isStudent,
   [
-    // Check if valid date
-    check("expiration").isISO8601().toDate(),
+    // Various checks of syntax of given data
+    check("title").isString().isLength({ min: 1, max: 100 }),
+    check("supervisor_id").isString().isLength({ min: 1, max: 7 }), //Maybe we can try to check if the string is in the format Pxxxxxx
+    check("cosupervisors_internal").isArray(),
+    check("cosupervisors_internal.*").isString(),
   ],
-  setVirtualClock
-);*/
+  newRequest
+);
+
+
 const now = new Date().toString();
 console.log("Date-time:", now);
 create_schedule();
