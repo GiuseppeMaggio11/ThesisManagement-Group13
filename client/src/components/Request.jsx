@@ -416,7 +416,11 @@ function RequestCard(props) {
           </div>
           <Row className="text-end text-muted">
             <Col className="text-end text-muted">
-              {expanded && <span onClick={toggleExpanded}>Reduce</span>}
+              {expanded && (
+                <span onClick={toggleExpanded} style={{ cursor: "pointer" }}>
+                  Reduce
+                </span>
+              )}
             </Col>
           </Row>
           {/*   <Row
