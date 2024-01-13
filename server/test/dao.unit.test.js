@@ -1,8 +1,16 @@
 const dao = require("../dao");
 const mysql = require("mysql2/promise");
 const dayjs = require("dayjs");
+const crypto = require("crypto");
 
 
+
+jest.mock("crypto", () => {
+    return {
+        scrypt: jest.fn(),
+        timingSafeEqual: jest.fn()
+    }
+});
 
 jest.mock("mysql2/promise", () => {
     const mockConnection = {
@@ -125,8 +133,7 @@ describe("isAlreadyExisting", () => {
 
     test("Should return true if a student is already applied for a thesis", async () => {
         const mockInput = {
-            studentID: 1,
-            thesisID: 1,
+            studentID: "S111111"
         };
         const mockExecuteOutput = [
             [{ count: 1 }]
@@ -137,10 +144,9 @@ describe("isAlreadyExisting", () => {
 
         expect(mockPool.execute).toHaveBeenCalledTimes(1);
         expect(mockPool.execute).toHaveBeenCalledWith(
-            "SELECT COUNT(*) as count FROM application WHERE student_id = ? AND thesis_id = ?",
+            "SELECT COUNT(*) as count FROM application WHERE student_id = ? and (status ='Accepted' or status ='Pending')",
             [
-                mockInput.studentID,
-                mockInput.thesisID
+                mockInput.studentID
             ]
         );
         expect(result).toBe(true);
@@ -148,8 +154,7 @@ describe("isAlreadyExisting", () => {
 
     test("Should return false if a student is not already applied for a thesis", async () => {
         const mockInput = {
-            studentID: 1,
-            thesisID: 1,
+            studentID: "S111111"
         };
         const mockExecuteOutput = [
             [{ count: 0 }]
@@ -160,10 +165,9 @@ describe("isAlreadyExisting", () => {
 
         expect(mockPool.execute).toHaveBeenCalledTimes(1);
         expect(mockPool.execute).toHaveBeenCalledWith(
-            "SELECT COUNT(*) as count FROM application WHERE student_id = ? AND thesis_id = ?",
+            "SELECT COUNT(*) as count FROM application WHERE student_id = ? and (status ='Accepted' or status ='Pending')",
             [
-                mockInput.studentID,
-                mockInput.thesisID
+                mockInput.studentID
             ]
         );
         expect(result).toBe(false);
@@ -171,8 +175,7 @@ describe("isAlreadyExisting", () => {
 
     test("Should throw an error if there is more than one couple student_id-thesis_id", async () => {
         const mockInput = {
-            studentID: 1,
-            thesisID: 1,
+            studentID: "S111111"
         };
         const mockExecuteOutput = [
             [{ count: 2 }]
@@ -183,18 +186,16 @@ describe("isAlreadyExisting", () => {
 
         expect(mockPool.execute).toHaveBeenCalledTimes(1);
         expect(mockPool.execute).toHaveBeenCalledWith(
-            "SELECT COUNT(*) as count FROM application WHERE student_id = ? AND thesis_id = ?",
+            "SELECT COUNT(*) as count FROM application WHERE student_id = ? and (status ='Accepted' or status ='Pending')",
             [
-                mockInput.studentID,
-                mockInput.thesisID
+                mockInput.studentID
             ]
         );
     });
 
     test("Should handle errors during query execution", async () => {
         const mockInput = {
-            studentID: 1,
-            thesisID: 1
+            studentID: "S111111"
         };
         mockPool.execute.mockRejectedValue("Database error");
 
@@ -202,10 +203,9 @@ describe("isAlreadyExisting", () => {
 
         expect(mockPool.execute).toHaveBeenCalledTimes(1);
         expect(mockPool.execute).toHaveBeenCalledWith(
-            "SELECT COUNT(*) as count FROM application WHERE student_id = ? AND thesis_id = ?",
+            "SELECT COUNT(*) as count FROM application WHERE student_id = ? and (status ='Accepted' or status ='Pending')",
             [
-                mockInput.studentID,
-                mockInput.thesisID
+                mockInput.studentID
             ]
         );
     });
@@ -301,7 +301,7 @@ describe("createThesis", () => {
             type_name: "type",
             required_knowledge: "knowledge",
             notes: "notes",
-            expiration: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+            expiration: new Date(),
             cod_degree: "cod",
             is_archived: false,
             keywords: "keywordss"
@@ -313,7 +313,7 @@ describe("createThesis", () => {
 
         expect(mockPool.execute).toHaveBeenCalledTimes(1);
         expect(mockPool.execute).toHaveBeenCalledWith(
-            "INSERT INTO thesis (title, description, supervisor_id, thesis_level, thesis_type, required_knowledge, notes, expiration, cod_degree, is_archived, keywords) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)",
+            "INSERT INTO thesis (title, description, supervisor_id, thesis_level, thesis_type, required_knowledge, notes, expiration, cod_degree, is_archived, keywords, is_expired) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)",
             [mockInput.title, mockInput.description, mockInput.supervisor_id,
             mockInput.thesis_level, mockInput.type_name, mockInput.required_knowledge, mockInput.notes,
             mockInput.expiration, mockInput.cod_degree, mockInput.is_archived, mockInput.keywords]
@@ -330,7 +330,7 @@ describe("createThesis", () => {
             type_name: "type",
             required_knowledge: "knowledge",
             notes: "notes",
-            expiration: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+            expiration: new Date(),
             cod_degree: "cod",
             is_archived: false,
             keywords: "keywordss"
@@ -341,7 +341,7 @@ describe("createThesis", () => {
 
         expect(mockPool.execute).toHaveBeenCalledTimes(1);
         expect(mockPool.execute).toHaveBeenCalledWith(
-            "INSERT INTO thesis (title, description, supervisor_id, thesis_level, thesis_type, required_knowledge, notes, expiration, cod_degree, is_archived, keywords) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)",
+            "INSERT INTO thesis (title, description, supervisor_id, thesis_level, thesis_type, required_knowledge, notes, expiration, cod_degree, is_archived, keywords, is_expired) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)",
             [mockInput.title, mockInput.description, mockInput.supervisor_id,
             mockInput.thesis_level, mockInput.type_name, mockInput.required_knowledge, mockInput.notes,
             mockInput.expiration, mockInput.cod_degree, mockInput.is_archived, mockInput.keywords]
@@ -801,7 +801,7 @@ describe("getProposals", () => {
         const result = await dao.getProposals(mockInput.user_type, mockInput.username, mockInput.date)
 
         expect(mockPool.execute).toHaveBeenCalledTimes(3);
-        expect(result).toStrictEqual({ error: "no entry" });
+        expect(result).toStrictEqual([]);
 
     });
 
@@ -1011,13 +1011,11 @@ describe("rollback", () => {
 
 });
 
-// SPRINT 2
+describe("updateThesesArchivationManual", () => {
 
-describe("updateThesesArchivation", () => {
-
-    test("Should update \"isArchived\" for every thesis when the virtual clock date is after their expiration date", async () => {
+    test("Should update \"isArchived\" for a specified existing thesis proposal", async () => {
         const mockInput = {
-            virtualDateTime: dayjs()
+            thesis_id: 1
         };
         const mockRows = {
             info: "ok"
@@ -1025,32 +1023,38 @@ describe("updateThesesArchivation", () => {
 
         mockPool.execute.mockResolvedValue([mockRows]);
 
-        const result = await dao.updateThesesArchivation(mockInput.virtualDateTime);
+        const result = await dao.updateThesesArchivationManual(mockInput.thesis_id);
 
         expect(mockPool.execute).toHaveBeenCalledTimes(1);
         expect(mockPool.execute).toHaveBeenCalledWith(
             ` 
                 UPDATE thesis
-                SET is_archived = CASE
-                    WHEN expiration < STR_TO_DATE(?, '%Y-%m-%dT%H:%i:%s.%fZ') THEN 1
-                    ELSE 0
-                END;
+                SET is_archived = 1
+                WHERE id = ?
                 `,
-            [mockInput.virtualDateTime]
+            [mockInput.thesis_id]
         );
         expect(result).toStrictEqual(mockRows.info);
     });
 
     test("Should handle database errors", async () => {
         const mockInput = {
-            virtualDateTime: dayjs()
+            thesis_id: 1
         };
 
         mockPool.execute.mockRejectedValue("Database error");
 
-        await expect(dao.updateThesesArchivation(mockInput.virtualDateTime)).rejects.toStrictEqual("Database error");
+        await expect(dao.updateThesesArchivationManual(mockInput.thesis_id)).rejects.toStrictEqual("Database error");
 
         expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            ` 
+                UPDATE thesis
+                SET is_archived = 1
+                WHERE id = ?
+                `,
+            [mockInput.thesis_id]
+        );
     });
 
 });
@@ -1063,7 +1067,7 @@ describe("updateApplicationStatus", () => {
             student_id: "S123456",
             thesis_id: 1
         };
-        
+
         mockPool.execute.mockResolvedValue([true]);
 
         const result = await dao.updateApplicationStatus(mockInput);
@@ -1341,3 +1345,2384 @@ describe("getStudentApplication", () => {
     });
 
 });
+
+
+describe("getUser", () => {
+
+    test("Should return the info of an existing user", async () => {
+        const mockInput = {
+            email: "email",
+            password: "password"
+        };
+        const mockRows = [
+            {
+                email: "email",
+                salt: "salt",
+                password: "password",
+                user_type_id: "user_type_id"
+            }
+        ];
+        const mockUser = {
+            username: "email",
+            user_type: "user_type_id"
+        };
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+        crypto.scrypt.mockImplementation((password, salt, keylen, callback) => {
+            callback(null, Buffer.from("hashedpassword"));
+        });
+        crypto.timingSafeEqual.mockReturnValue(true);
+
+        const result = await dao.getUser(mockInput.email, mockInput.password);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM users WHERE email = ?",
+            [mockInput.email]
+        );
+        expect(crypto.scrypt).toHaveBeenCalledTimes(1);
+        expect(crypto.timingSafeEqual).toHaveBeenCalledTimes(1);
+        expect(result).toStrictEqual(mockUser);
+    });
+
+    test("Should return false - MySql query doesn't return anything", async () => {
+        const mockInput = {
+            email: "email",
+            password: "password"
+        };
+        const mockRows = [];
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.getUser(mockInput.email, mockInput.password);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM users WHERE email = ?",
+            [mockInput.email]
+        );
+        expect(crypto.scrypt).not.toHaveBeenCalled();
+        expect(crypto.timingSafeEqual).not.toHaveBeenCalled();
+        expect(result).toBe(false);
+    });
+
+    test("Should return false - Wrong password", async () => {
+        const mockInput = {
+            email: "email",
+            password: "password"
+        };
+        const mockRows = [
+            {
+                email: "email",
+                salt: "salt",
+                password: "differentpassword",
+                user_type_id: "user_type_id"
+            }
+        ];
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+        crypto.scrypt.mockImplementation((password, salt, keylen, callback) => {
+            callback(null, Buffer.from("hashedpassword"));
+        });
+        crypto.timingSafeEqual.mockReturnValue(false);
+
+        const result = await dao.getUser(mockInput.email, mockInput.password);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM users WHERE email = ?",
+            [mockInput.email]
+        );
+        expect(crypto.scrypt).toHaveBeenCalledTimes(1);
+        expect(crypto.timingSafeEqual).toHaveBeenCalledTimes(1);
+        expect(result).toBe(false);
+    });
+
+    test("Should throw an error - crypto.scrypt doesn't work properly", async () => {
+        const mockInput = {
+            email: "email",
+            password: "password"
+        };
+        const mockRows = [
+            {
+                email: "email",
+                salt: "salt",
+                password: "password",
+                user_type_id: "user_type_id"
+            }
+        ];
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+        crypto.scrypt.mockImplementation((password, salt, keylen, callback) => {
+            callback("Error");
+        });
+
+        await expect(dao.getUser(mockInput.email, mockInput.password)).rejects.toStrictEqual("Error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM users WHERE email = ?",
+            [mockInput.email]
+        );
+        expect(crypto.scrypt).toHaveBeenCalledTimes(1);
+        expect(crypto.timingSafeEqual).not.toHaveBeenCalled();
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            email: "email",
+            password: "password"
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getUser(mockInput.email, mockInput.password)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM users WHERE email = ?",
+            [mockInput.email]
+        );
+        expect(crypto.scrypt).not.toHaveBeenCalled();
+        expect(crypto.timingSafeEqual).not.toHaveBeenCalled();
+    });
+
+});
+
+describe("getUserByEmail", () => {
+
+    test("Should return an existing user given their email", async () => {
+        const mockInput = {
+            email: "email"
+        };
+        const mockRows = [
+            {
+                email: "email",
+                salt: "salt",
+                password: "password",
+                user_type_id: "user_type_id"
+            }
+        ];
+        const mockUser = {
+            username: "email",
+            user_type: "user_type_id"
+        };
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.getUserByEmail(mockInput.email);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM users WHERE email = ?",
+            [mockInput.email]
+        );
+        expect(result).toStrictEqual(mockUser);
+    });
+
+    test("Should throw an error - MySql query is empty", async () => {
+        const mockInput = {
+            email: "email"
+        };
+        const mockRows = [];
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        await expect(dao.getUserByEmail(mockInput.email)).rejects.toStrictEqual({ error: "User not found." });
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM users WHERE email = ?",
+            [mockInput.email]
+        );
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            email: "email"
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getUserByEmail(mockInput.email)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM users WHERE email = ?",
+            [mockInput.email]
+        );
+    });
+
+});
+
+describe("getUserID", () => {
+
+    test("Should retrieve te id of an existing user", async () => {
+        const mockInput = {
+            username: "username"
+        };
+        const mockRows = [
+            {
+                id: "S111111",
+                surname: "surname",
+                name: "name",
+                gender: "gender",
+                nationality: "nationality",
+                email: "email",
+                cod_degree: "cod_degree",
+                enrollment_year: 2019
+            }
+        ];
+        const mockResult = "S111111";
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.getUserID(mockInput.username);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM student WHERE email = ?",
+            [mockInput.username]
+        );
+        expect(result).toStrictEqual(mockResult);
+    });
+
+    test("Should throw an error - Parameter \"username\" isn't valid", async () => {
+        const mockInput = {
+            username: undefined
+        };
+
+        await expect(dao.getUserID(mockInput.username)).rejects.toStrictEqual({ error: "parameter is missing" });
+
+        expect(mockPool.execute).not.toHaveBeenCalled();
+    });
+
+    test("Should throw an error - MySql query is empty", async () => {
+        const mockInput = {
+            username: "username"
+        };
+        const mockRows = [];
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        await expect(dao.getUserID(mockInput.username)).rejects.toStrictEqual({ error: "User not found." });
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM student WHERE email = ?",
+            [mockInput.username]
+        );
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            username: "username"
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getUserID(mockInput.username)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM student WHERE email = ?",
+            [mockInput.username]
+        );
+    });
+
+});
+
+describe("getProfID", () => {
+
+    test("Should retrieve te id of an existing professor", async () => {
+        const mockInput = {
+            username: "username"
+        };
+        const mockRows = [
+            {
+                id: "P111111",
+                surname: "surname",
+                name: "name",
+                email: "email",
+                cod_group: "cod_group",
+                cod_department: "cod_department"
+            }
+        ];
+        const mockResult = "P111111";
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.getProfID(mockInput.username);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM teacher WHERE email = ?",
+            [mockInput.username]
+        );
+        expect(result).toStrictEqual(mockResult);
+    });
+
+    test("Should throw an error - Parameter \"username\" isn't valid", async () => {
+        const mockInput = {
+            username: undefined
+        };
+
+        await expect(dao.getProfID(mockInput.username)).rejects.toStrictEqual({ error: "parameter is missing" });
+
+        expect(mockPool.execute).not.toHaveBeenCalled();
+    });
+
+    test("Should throw an error - MySql query is empty", async () => {
+        const mockInput = {
+            username: "username"
+        };
+        const mockRows = [];
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        await expect(dao.getProfID(mockInput.username)).rejects.toStrictEqual({ error: "User not found." });
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM teacher WHERE email = ?",
+            [mockInput.username]
+        );
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            username: "username"
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getProfID(mockInput.username)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM teacher WHERE email = ?",
+            [mockInput.username]
+        );
+    });
+
+});
+
+describe("getDataTeacherApplicationEmail", () => {
+
+    test("Should retrieve the thesis title and the supervisor email of an application for an existing thesis proposal", async () => {
+        const mockInput = {
+            thesisId: 1
+        };
+        const mockRows = [
+            {
+                email: "email",
+                title: "title"
+            }
+        ];
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.getDataTeacherApplicationEmail(mockInput.thesisId);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT  email, title FROM thesis TS, teacher TE WHERE TS.id = ? AND TS.supervisor_id = TE.id",
+            [mockInput.thesisId]
+        );
+        expect(result).toStrictEqual(mockRows[0]);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            thesisId: 1
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getDataTeacherApplicationEmail(mockInput.thesisId)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT  email, title FROM thesis TS, teacher TE WHERE TS.id = ? AND TS.supervisor_id = TE.id",
+            [mockInput.thesisId]
+        );
+    });
+
+});
+
+describe("getDataStudentApplicationEmail", () => {
+
+    test("Should retrieve the thesis title and the student email of an application for an existing thesis proposal", async () => {
+        const mockInput = {
+            thesisId: 1,
+            studentId: "S111111"
+        };
+        const mockRows = [
+            {
+                email: "email",
+                title: "title"
+            }
+        ];
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.getDataStudentApplicationEmail(mockInput.thesisId, mockInput.studentId);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT  email, title FROM thesis TS, student S WHERE TS.id = ? AND S.id = ? ",
+            [mockInput.thesisId, mockInput.studentId]
+        );
+        expect(result).toStrictEqual(mockRows[0]);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            thesisId: 1,
+            studentId: "S111111"
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getDataStudentApplicationEmail(mockInput.thesisId, mockInput.studentId)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT  email, title FROM thesis TS, student S WHERE TS.id = ? AND S.id = ? ",
+            [mockInput.thesisId, mockInput.studentId]
+        );
+    });
+
+});
+
+describe("getTeachersList", () => {
+
+    test("Should retrieve the list of all the teachers", async () => {
+        const mockRows = [
+            {
+                id: "P111111",
+                surname: "surname1",
+                name: "name1",
+                email: "email1",
+                cod_group: "cod_group1",
+                cod_department: "cod_department1"
+            },
+            {
+                id: "P222222",
+                surname: "surname2",
+                name: "name2",
+                email: "email2",
+                cod_group: "cod_group2",
+                cod_department: "cod_department2"
+            }
+        ];
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.getTeachersList();
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM teacher"
+        );
+        expect(result).toStrictEqual(mockRows);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getTeachersList()).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM teacher"
+        );
+    });
+
+});
+
+describe("getDegrees", () => {
+
+    test("Should retrieve the list of all degrees", async () => {
+        const mockRows = [
+            {
+                title_degree: "degree 1",
+                cod_degree: "DEGR01",
+            },
+            {
+                title_degree: "degree 2",
+                cod_degree: "DEGR02",
+            }
+        ];
+        const mockResult = [
+            {
+                name: "degree 1",
+                cod: "DEGR01",
+            },
+            {
+                name: "degree 2",
+                cod: "DEGR02",
+            }
+        ]
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.getDegrees();
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM degree_table"
+        );
+        expect(result).toStrictEqual(mockResult);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getDegrees()).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM degree_table"
+        );
+    });
+
+});
+
+describe("createRequest_cosupervisor_teacher", () => {
+
+    test("Should associate a cosupervisor to a thesis request", async () => {
+        const mockInput = {
+            request_id: 1,
+            professor_id: "P111111"
+        };
+        const mockOutput = {
+            request_id: 1,
+            thesis_cosupervisor: "P111111"
+        };
+
+        mockPool.execute.mockResolvedValue(true);
+
+        const result = await dao.createRequest_cosupervisor_teacher(mockInput.request_id, mockInput.professor_id);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "INSERT INTO thesis_cosupervisor_teacher (thesisrequest_id, cosupevisor_id) VALUES (?,?)",
+            [
+                mockInput.request_id,
+                mockInput.professor_id
+            ]
+        );
+        expect(result).toStrictEqual(mockOutput);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            request_id: 1,
+            professor_id: "P111111"
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.createRequest_cosupervisor_teacher(mockInput.request_id, mockInput.professor_id)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "INSERT INTO thesis_cosupervisor_teacher (thesisrequest_id, cosupevisor_id) VALUES (?,?)",
+            [
+                mockInput.request_id,
+                mockInput.professor_id
+            ]
+        );
+    });
+
+});
+
+describe("getGroups", () => {
+
+    test("Should retrieve the list of all groups", async () => {
+        const mockRows = [
+            {
+                group_name: "Group 1",
+                cod_group: "GRP01",
+            },
+            {
+                group_name: "Group 2",
+                cod_group: "GRP02",
+            }
+        ];
+        const mockResult = [
+            {
+                name: "Group 1",
+                cod: "GRP01",
+            },
+            {
+                name: "Group 2",
+                cod: "GRP02",
+            }
+        ];
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.getGroups();
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM group_table"
+        );
+        expect(result).toStrictEqual(mockResult);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getGroups()).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM group_table"
+        );
+    });
+
+});
+
+describe("setExpired", () => {
+
+    test("Should update \"isArchieved\" for every thesis proposal that has expiration date greater then \"virtualDateTime\"", async () => {
+        const mockInput = {
+            virtualDateTime: new Date()
+        };
+        const mockRows = {
+            info: "ok"
+        };
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.setExpired(mockInput.virtualDateTime);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            ` 
+                UPDATE thesis
+                SET is_expired = CASE
+                    WHEN expiration < ? THEN 1
+                    ELSE 0
+                END;
+                `,
+            [mockInput.virtualDateTime]
+        );
+        expect(result).toStrictEqual(mockRows.info);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            virtualDateTime: new Date()
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.setExpired(mockInput.virtualDateTime)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            ` 
+                UPDATE thesis
+                SET is_expired = CASE
+                    WHEN expiration < ? THEN 1
+                    ELSE 0
+                END;
+                `,
+            [mockInput.virtualDateTime]
+        );
+    });
+
+});
+
+describe("updateThesis", () => {
+
+    test("Should update an existing thesis proposal", async () => {
+        const mockInput = {
+            thesis: {
+                title: "title",
+                description: "description",
+                supervisor_id: "P111111",
+                thesis_level: "thesis_level",
+                type_name: "type_name",
+                required_knowledge: "required_knowledge",
+                notes: "notes",
+                expiration: new Date(),
+                cod_degree: "DEGR01",
+                is_archived: 0,
+                keywords: "keywords",
+                thesis_id: 1,
+            }
+        }
+        const mockRows = {
+            affectedRows: 1
+        };
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.updateThesis(mockInput.thesis);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            `UPDATE thesis
+      SET title = ?, description = ?, supervisor_id = ?, thesis_level = ?, thesis_type = ?, required_knowledge = ?, notes = ?, expiration = ?, cod_degree = ?, is_archived = ?, keywords = ?
+      WHERE id = ?`,
+            [
+                mockInput.thesis.title,
+                mockInput.thesis.description,
+                mockInput.thesis.supervisor_id,
+                mockInput.thesis.thesis_level,
+                mockInput.thesis.type_name,
+                mockInput.thesis.required_knowledge,
+                mockInput.thesis.notes,
+                mockInput.thesis.expiration,
+                mockInput.thesis.cod_degree,
+                mockInput.thesis.is_archived,
+                mockInput.thesis.keywords,
+                mockInput.thesis.thesis_id,
+            ]
+        );
+        expect(result).toStrictEqual(mockRows.affectedRows);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            thesis: {
+                title: "title",
+                description: "description",
+                supervisor_id: "P111111",
+                thesis_level: "thesis_level",
+                type_name: "type_name",
+                required_knowledge: "required_knowledge",
+                notes: "notes",
+                expiration: new Date(),
+                cod_degree: "DEGR01",
+                is_archived: 0,
+                keywords: "keywords",
+                thesis_id: 1,
+            }
+        }
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.updateThesis(mockInput.thesis)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            `UPDATE thesis
+      SET title = ?, description = ?, supervisor_id = ?, thesis_level = ?, thesis_type = ?, required_knowledge = ?, notes = ?, expiration = ?, cod_degree = ?, is_archived = ?, keywords = ?
+      WHERE id = ?`,
+            [
+                mockInput.thesis.title,
+                mockInput.thesis.description,
+                mockInput.thesis.supervisor_id,
+                mockInput.thesis.thesis_level,
+                mockInput.thesis.type_name,
+                mockInput.thesis.required_knowledge,
+                mockInput.thesis.notes,
+                mockInput.thesis.expiration,
+                mockInput.thesis.cod_degree,
+                mockInput.thesis.is_archived,
+                mockInput.thesis.keywords,
+                mockInput.thesis.thesis_id,
+            ]
+        );
+    });
+
+});
+
+describe("deleteThesisGroups", () => {
+
+    test("Should delete all groups associated to a specific thesis proposal", async () => {
+        const mockInput = {
+            thesis_id: 1
+        };
+        const mockRows = {
+            affectedRows: 1
+        };
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.deleteThesisGroups(mockInput.thesis_id);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "DELETE FROM thesis_group WHERE thesis_id = ?",
+            [mockInput.thesis_id]
+        );
+        expect(result).toStrictEqual(mockRows.affectedRows);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            thesis_id: 1
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.deleteThesisGroups(mockInput.thesis_id)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "DELETE FROM thesis_group WHERE thesis_id = ?",
+            [mockInput.thesis_id]
+        );
+    });
+
+});
+
+describe("deleteThesisCosupervisorTeacherAll", () => {
+
+    test("Should delete all internal cosupervisors associated with a specified thesis proposal", async () => {
+        const mockInput = {
+            thesis_id: 1
+        };
+        const mockRows = {
+            affectedRows: 1
+        };
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.deleteThesisCosupervisorTeacherAll(mockInput.thesis_id);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "DELETE FROM thesis_cosupervisor_teacher WHERE thesis_id = ?",
+            [mockInput.thesis_id]
+        );
+        expect(result).toStrictEqual(mockRows.affectedRows);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            thesis_id: 1
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.deleteThesisCosupervisorTeacherAll(mockInput.thesis_id)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "DELETE FROM thesis_cosupervisor_teacher WHERE thesis_id = ?",
+            [mockInput.thesis_id]
+        );
+    });
+
+});
+
+describe("deleteThesisCosupervisorExternalAll", () => {
+
+    test("Should delete all external cosupervisors associated with a specified thesis proposal", async () => {
+        const mockInput = {
+            thesis_id: 1
+        };
+        const mockRows = {
+            affectedRows: 1
+        };
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.deleteThesisCosupervisorExternalAll(mockInput.thesis_id);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "DELETE FROM thesis_cosupervisor_external WHERE thesis_id = ?",
+            [mockInput.thesis_id]
+        );
+        expect(result).toStrictEqual(mockRows.affectedRows);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            thesis_id: 1
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.deleteThesisCosupervisorExternalAll(mockInput.thesis_id)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "DELETE FROM thesis_cosupervisor_external WHERE thesis_id = ?",
+            [mockInput.thesis_id]
+        );
+    });
+
+});
+
+describe("isThesisProposalValid", () => {
+
+    test("Should check if a given thesis proposal exists - return true", async () => {
+        const mockInput = {
+            thesis_id: 1
+        };
+        const mockRows = [
+            { count: 1 }
+        ];
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.isThesisProposalValid(mockInput.thesis_id);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT COUNT(*) AS count FROM thesis WHERE id=?",
+            [mockInput.thesis_id]
+        );
+        expect(result).toBe(true);
+    });
+
+    test("Should check if a given thesis proposal exists - return false", async () => {
+        const mockInput = {
+            thesis_id: 1
+        };
+        const mockRows = [
+            { count: 0 }
+        ];
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.isThesisProposalValid(mockInput.thesis_id);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT COUNT(*) AS count FROM thesis WHERE id=?",
+            [mockInput.thesis_id]
+        );
+        expect(result).toBe(false);
+    });
+
+    test("Should throw an error - more than one thesis proposal found", async () => {
+        const mockInput = {
+            thesis_id: 1
+        };
+        const mockRows = [
+            { count: 2 }
+        ];
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        await expect(dao.isThesisProposalValid(mockInput.thesis_id)).rejects.toStrictEqual(new Error("Internal server error"));
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT COUNT(*) AS count FROM thesis WHERE id=?",
+            [mockInput.thesis_id]
+        );
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            thesis_id: 1
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.isThesisProposalValid(mockInput.thesis_id)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT COUNT(*) AS count FROM thesis WHERE id=?",
+            [mockInput.thesis_id]
+        );
+    });
+
+});
+
+describe("getProposalsProfessor", () => {
+
+    test("Should retrieve all the thesis proposals of a given supervisor", async () => {
+        const mockInput = {
+            professor_id: "P111111"
+        };
+        const mockRows = [
+            {
+                id: 1,
+                title: "title",
+                description: "description",
+                supervisor_id: "P111111",
+                thesis_level: "level",
+                thesis_type: "type",
+                required_knowledge: "knowledge",
+                notes: "notes",
+                expiration: new Date(),
+                cod_degree: "cod",
+                is_archived: false,
+                is_expired: false,
+                is_deleted: false,
+                keywords: "keywords"
+            },
+            {
+                id: 2,
+                title: "title",
+                description: "description",
+                supervisor_id: "P111111",
+                thesis_level: "level",
+                thesis_type: "type",
+                required_knowledge: "knowledge",
+                notes: "notes",
+                expiration: new Date(),
+                cod_degree: "cod",
+                is_archived: false,
+                is_expired: false,
+                is_deleted: false,
+                keywords: "keywords"
+            }
+        ];
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.getProposalsProfessor(mockInput.professor_id);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT t.* FROM thesis t inner join teacher p on p.id = t.supervisor_id WHERE p.email  = ? and is_deleted = 0 and is_expired= 0 order by t.title",
+            [mockInput.professor_id]
+        );
+        expect(result).toStrictEqual(mockRows);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            professor_id: "P111111"
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getProposalsProfessor(mockInput.professor_id)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT t.* FROM thesis t inner join teacher p on p.id = t.supervisor_id WHERE p.email  = ? and is_deleted = 0 and is_expired= 0 order by t.title",
+            [mockInput.professor_id]
+        );
+    });
+
+});
+
+describe("checkBeforeDeleteProposal", () => {
+
+    test("Should check if a thesis proposal has active applications, is archived or is expired", async () => {
+        const mockInput = {
+            thesis_id: 1,
+            professor_id: "P111111"
+        };
+        const mockRows1 = [
+            {
+                id: 1,
+                title: "title",
+                description: "description",
+                supervisor_id: "P111111",
+                thesis_level: "level",
+                thesis_type: "type",
+                required_knowledge: "knowledge",
+                notes: "notes",
+                expiration: new Date(),
+                cod_degree: "cod",
+                is_archived: false,
+                is_expired: false,
+                is_deleted: false,
+                keywords: "keywords",
+                supervisor_name: "name surname"
+            }
+        ];
+        const mockRows2 = [
+            { supervisor_id: "P111111" }
+        ];
+        const mockRows3 = [];
+
+        mockPool.execute.mockResolvedValueOnce([mockRows1])
+            .mockResolvedValueOnce([mockRows2])
+            .mockResolvedValueOnce([mockRows3]);
+        
+        const result = await dao.checkBeforeDeleteProposal(mockInput.thesis_id, mockInput.professor_id);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(3);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM thesis WHERE id = ? AND is_archived = 0 AND is_deleted = 0 AND is_expired = 0",
+            [mockInput.thesis_id]
+        );
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT supervisor_id FROM thesis WHERE id = ?",
+            [mockInput.thesis_id]
+        );
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            `SELECT * FROM application WHERE thesis_id = ? AND status = "Accepted"`,
+            [mockInput.thesis_id]
+        );
+        expect(result).toStrictEqual("ok"); 
+    });
+
+    test("Should return an error - The thesis proposal is archived, is expired and/or is_deleted", async () => {
+        const mockInput = {
+            thesis_id: 1,
+            professor_id: "P111111"
+        };
+        const mockRows1 = [];
+
+        mockPool.execute.mockResolvedValueOnce([mockRows1]);
+        
+        const result = await dao.checkBeforeDeleteProposal(mockInput.thesis_id, mockInput.professor_id);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM thesis WHERE id = ? AND is_archived = 0 AND is_deleted = 0 AND is_expired = 0",
+            [mockInput.thesis_id]
+        );
+        expect(mockPool.execute).not.toHaveBeenCalledWith(
+            "SELECT supervisor_id FROM thesis WHERE id = ?",
+            [mockInput.thesis_id]
+        );
+        expect(mockPool.execute).not.toHaveBeenCalledWith(
+            `SELECT * FROM application WHERE thesis_id = ? AND status = "Accepted"`,
+            [mockInput.thesis_id]
+        );
+        expect(result).toStrictEqual("The thesis you request to delete is either not available or not removale."); 
+    });
+
+    test("Should return an error - The thesis proposal doesn't belong to the professor who has made the request", async () => {
+        const mockInput = {
+            thesis_id: 1,
+            professor_id: "P111111"
+        };
+        const mockRows1 = [
+            {
+                id: 1,
+                title: "title",
+                description: "description",
+                supervisor_id: "P222222",
+                thesis_level: "level",
+                thesis_type: "type",
+                required_knowledge: "knowledge",
+                notes: "notes",
+                expiration: new Date(),
+                cod_degree: "cod",
+                is_archived: false,
+                is_expired: false,
+                is_deleted: false,
+                keywords: "keywords",
+                supervisor_name: "name surname"
+            }
+        ];
+        const mockRows2 = [
+            { supervisor_id: "P222222" }
+        ];
+
+        mockPool.execute.mockResolvedValueOnce([mockRows1])
+            .mockResolvedValueOnce([mockRows2]);
+        
+        const result = await dao.checkBeforeDeleteProposal(mockInput.thesis_id, mockInput.professor_id);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(2);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM thesis WHERE id = ? AND is_archived = 0 AND is_deleted = 0 AND is_expired = 0",
+            [mockInput.thesis_id]
+        );
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT supervisor_id FROM thesis WHERE id = ?",
+            [mockInput.thesis_id]
+        );
+        expect(mockPool.execute).not.toHaveBeenCalledWith(
+            `SELECT * FROM application WHERE thesis_id = ? AND status = "Accepted"`,
+            [mockInput.thesis_id]
+        );
+        expect(result).toStrictEqual("You can only delete your own proposals."); 
+    });
+
+    test("Should check if a thesis proposal has active applications, is archived or is expired", async () => {
+        const mockInput = {
+            thesis_id: 1,
+            professor_id: "P111111"
+        };
+        const mockRows1 = [
+            {
+                id: 1,
+                title: "title",
+                description: "description",
+                supervisor_id: "P111111",
+                thesis_level: "level",
+                thesis_type: "type",
+                required_knowledge: "knowledge",
+                notes: "notes",
+                expiration: new Date(),
+                cod_degree: "cod",
+                is_archived: false,
+                is_expired: false,
+                is_deleted: false,
+                keywords: "keywords",
+                supervisor_name: "name surname"
+            }
+        ];
+        const mockRows2 = [
+            { supervisor_id: "P111111" }
+        ];
+        const mockRows3 = [
+            {
+                student_id: "S111111",
+                thesis_id: 1,
+                status: "status",
+                application_date: new Date()
+            },
+            {
+                student_id: "S222222",
+                thesis_id: 1,
+                status: "status",
+                application_date: new Date()
+            }
+        ];
+
+        mockPool.execute.mockResolvedValueOnce([mockRows1])
+            .mockResolvedValueOnce([mockRows2])
+            .mockResolvedValueOnce([mockRows3]);
+        
+        const result = await dao.checkBeforeDeleteProposal(mockInput.thesis_id, mockInput.professor_id);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(3);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM thesis WHERE id = ? AND is_archived = 0 AND is_deleted = 0 AND is_expired = 0",
+            [mockInput.thesis_id]
+        );
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT supervisor_id FROM thesis WHERE id = ?",
+            [mockInput.thesis_id]
+        );
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            `SELECT * FROM application WHERE thesis_id = ? AND status = "Accepted"`,
+            [mockInput.thesis_id]
+        );
+        expect(result).toStrictEqual("The thesis you request to delete has an active application. you can't delete it."); 
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            thesis_id: 1,
+            professor_id: "P111111"
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+        
+        await expect(dao.checkBeforeDeleteProposal(mockInput.thesis_id, mockInput.professor_id)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT * FROM thesis WHERE id = ? AND is_archived = 0 AND is_deleted = 0 AND is_expired = 0",
+            [mockInput.thesis_id]
+        );
+        expect(mockPool.execute).not.toHaveBeenCalledWith(
+            "SELECT supervisor_id FROM thesis WHERE id = ?",
+            [mockInput.thesis_id]
+        );
+        expect(mockPool.execute).not.toHaveBeenCalledWith(
+            `SELECT * FROM application WHERE thesis_id = ? AND status = "Accepted"`,
+            [mockInput.thesis_id]
+        ); 
+    });
+
+});
+
+/*
+//check if a proposal 1 has an active application or 2 is_archived or 3 is_expired. in these case we prevent deletion of that thesis
+exports.checkBeforeDeleteProposal = async (thesis_id, professorID) => {
+  try {
+    //first check the specified thesis is_archived and is_expired and is_deleted. if anyone of those is equall to 1, we cant delete that thesis, and we return an error
+    const sql =
+      "SELECT * FROM thesis WHERE id = ? AND is_archived = 0 AND is_deleted = 0 AND is_expired = 0";
+    const [rows] = await pool.execute(sql, [thesis_id]);
+    if (rows.length === 0) {
+      return "The thesis you request to delete is either not available or not removale.";
+    }
+
+    //check if the requested proposal for delete is belongs to the professor whom we receive delete request from
+    const sql2 = "SELECT supervisor_id FROM thesis WHERE id = ?";
+    const [rows2] = await pool.execute(sql2, [thesis_id]);
+    if (rows2[0].supervisor_id !== professorID) {
+      return "You can only delete your own proposals.";
+    }
+
+    //second check if the specified thesis has an accepted application, then throw an error
+    const sql3 = `SELECT * FROM application WHERE thesis_id = ? AND status = "Accepted"`;
+    const [rows3] = await pool.execute(sql3, [thesis_id]);
+    if (rows3.length !== 0) {
+      return "The thesis you request to delete has an active application. you can't delete it.";
+    } else {
+      return "ok";
+    }
+  } catch (error) {
+    console.error("Error in check before delete proposal: ", error);
+    throw error;
+  }
+};
+*/
+
+/*const mockRows3 = [
+            {
+                student_id: "S111111",
+                thesis_id: 1,
+                status: "status",
+                application_date: new Date()
+            },
+            {
+                student_id: "S222222",
+                thesis_id: 1,
+                status: "status",
+                application_date: new Date()
+            }
+        ];*/
+
+
+describe("deleteProposal", () => {
+
+    test("Should set the \"is_deleted\" flag of a specified thesis proposal to true", async () => {
+        const mockInput = {
+            thesis_id: 1
+        };
+        const mockRows = {
+            info: "ok"
+        };
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.deleteProposal(mockInput.thesis_id);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "UPDATE thesis SET is_deleted = 1 WHERE id = ?",
+            [mockInput.thesis_id]
+        );
+        expect(result).toStrictEqual(mockRows.info);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            thesis_id: 1
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.deleteProposal(mockInput.thesis_id)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "UPDATE thesis SET is_deleted = 1 WHERE id = ?",
+            [mockInput.thesis_id]
+        );
+    });
+
+});
+
+describe("updateApplicationsAfterProposalDeletion", () => {
+
+    test("Should cancell all application related to a specific thesis proposal", async () => {
+        const mockInput = {
+            thesis_id: 1
+        };
+        const mockRows = {
+            info: "ok"
+        };
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.updateApplicationsAfterProposalDeletion(mockInput.thesis_id);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            `UPDATE application SET status = "Cancelled" WHERE thesis_id = ?`,
+            [mockInput.thesis_id]
+        );
+        expect(result).toStrictEqual(mockRows.info);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            thesis_id: 1
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.updateApplicationsAfterProposalDeletion(mockInput.thesis_id)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            `UPDATE application SET status = "Cancelled" WHERE thesis_id = ?`,
+            [mockInput.thesis_id]
+        );
+    });
+
+});
+
+describe("getProfessorEmailExpiring", () => {
+
+    test("Should retrieve professor email of each thesis that is expiring a week from now", async () => {
+        const mockInput = {
+            specifiedDate: new Date()
+        };
+        const mockRows = [
+            {
+                professor_email: "email1",
+                thesis_title: "title1",
+                thesis_expiration: new Date()
+            },
+            {
+                professor_email: "email2",
+                thesis_title: "title2",
+                thesis_expiration: new Date()
+            }
+        ];
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.getProfessorEmailExpiring(mockInput.specifiedDate);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            `
+    SELECT DISTINCT
+      u.email AS professor_email,
+      t.title AS thesis_title,
+      t.expiration AS thesis_expiration
+    FROM
+      users u
+    JOIN
+      teacher te ON u.email = te.email
+    JOIN
+      thesis t ON te.id = t.supervisor_id
+    WHERE
+      t.expiration BETWEEN DATE_ADD(?, INTERVAL 7 DAY) AND DATE_ADD(DATE_ADD(?, INTERVAL 7 DAY), INTERVAL 7 HOUR) AND t.is_archived=0 AND t.is_expired=0 AND t.is_deleted=0;
+  `,
+            [mockInput.specifiedDate, mockInput.specifiedDate]
+        );
+        expect(result).toStrictEqual(mockRows);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            specifiedDate: new Date()
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getProfessorEmailExpiring(mockInput.specifiedDate)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            `
+    SELECT DISTINCT
+      u.email AS professor_email,
+      t.title AS thesis_title,
+      t.expiration AS thesis_expiration
+    FROM
+      users u
+    JOIN
+      teacher te ON u.email = te.email
+    JOIN
+      thesis t ON te.id = t.supervisor_id
+    WHERE
+      t.expiration BETWEEN DATE_ADD(?, INTERVAL 7 DAY) AND DATE_ADD(DATE_ADD(?, INTERVAL 7 DAY), INTERVAL 7 HOUR) AND t.is_archived=0 AND t.is_expired=0 AND t.is_deleted=0;
+  `,
+            [mockInput.specifiedDate, mockInput.specifiedDate]
+        );
+    });
+
+});
+
+describe("getThesisForProfessorById", () => {
+
+    test("Should retrieve all the information about a specified thesis proposal and the name and surname of its supervisor", async () => {
+        const mockInput = {
+            id: 1
+        };
+        const mockRows = [
+            {
+                id: 1,
+                title: "title",
+                description: "description",
+                supervisor_id: "P111111",
+                thesis_level: "level",
+                thesis_type: "type",
+                required_knowledge: "knowledge",
+                notes: "notes",
+                expiration: new Date(),
+                cod_degree: "cod",
+                is_archived: false,
+                is_expired: false,
+                is_deleted: false,
+                keywords: "keywords",
+                supervisor_name: "name surname"
+            }
+        ];
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.getThesisForProfessorById(mockInput.id);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "select t.*, CONCAT_WS(' ', te.name, te.surname) AS supervisor_name from thesis t inner join teacher te on t.supervisor_id  = te.id where t.id=?",
+            [mockInput.id]
+        );
+        expect(result).toStrictEqual(mockRows[0]);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            id: 1
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getThesisForProfessorById(mockInput.id)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "select t.*, CONCAT_WS(' ', te.name, te.surname) AS supervisor_name from thesis t inner join teacher te on t.supervisor_id  = te.id where t.id=?",
+            [mockInput.id]
+        );
+    });
+
+});
+
+describe("getThesisExCosupervisorForProfessorById", () => {
+
+    test("Should retrieve all the external cosupervisors of a specified thesis proposal", async () => {
+        const mockInput = {
+            id: 1
+        };
+        const mockRows = [
+            {
+                cosupevisor_id: "E1",
+                ext_supervisor_name: "name surname 1"
+            },
+            {
+                cosupevisor_id: "E2",
+                ext_supervisor_name: "name surname 2"
+            }
+        ];
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.getThesisExCosupervisorForProfessorById(mockInput.id);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "select t.cosupevisor_id, CONCAT_WS(' ', es.name , es.surname) AS ext_supervisor_name from thesis_cosupervisor_external t " +
+            "inner join external_supervisor es on t.cosupevisor_id = es.email where t.thesis_id = ?",
+            [mockInput.id]
+        );
+        expect(result).toStrictEqual(mockRows);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            id: 1
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getThesisExCosupervisorForProfessorById(mockInput.id)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "select t.cosupevisor_id, CONCAT_WS(' ', es.name , es.surname) AS ext_supervisor_name from thesis_cosupervisor_external t " +
+            "inner join external_supervisor es on t.cosupevisor_id = es.email where t.thesis_id = ?",
+            [mockInput.id]
+        );
+    });
+
+});
+
+describe("getThesisIntCosupervisorForProfessor", () => {
+
+    test("Should retrieve all the internal cosupervisors of a specified thesis proposal", async () => {
+        const mockInput = {
+            id: 1
+        };
+        const mockRows = [
+            {
+                cosupevisor_id: "I1",
+                ext_supervisor_name: "name surname 1"
+            },
+            {
+                cosupevisor_id: "I2",
+                ext_supervisor_name: "name surname 2"
+            }
+        ];
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.getThesisIntCosupervisorForProfessor(mockInput.id);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "select t.cosupevisor_id, CONCAT_WS(' ', te.name , te.surname) AS int_supervisor_name from thesis_cosupervisor_teacher t " +
+            "inner join teacher te on t.cosupevisor_id = te.id where t.thesis_id = ?",
+            [mockInput.id]
+        );
+        expect(result).toStrictEqual(mockRows);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            id: 1
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getThesisIntCosupervisorForProfessor(mockInput.id)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "select t.cosupevisor_id, CONCAT_WS(' ', te.name , te.surname) AS int_supervisor_name from thesis_cosupervisor_teacher t " +
+            "inner join teacher te on t.cosupevisor_id = te.id where t.thesis_id = ?",
+            [mockInput.id]
+        );
+    });
+
+});
+
+describe("getThesisGroups", () => {
+
+    test("Should retrieve all groups related to a specified thesis proposal", async () => {
+        const mockInput = {
+            id: 1
+        };
+        const mockRows = [
+            {
+                group_id: "GRP01"
+            },
+            {
+                group_id: "GRP02"
+            }
+        ];
+        const mockOutput = ["GRP01", "GRP02"];
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.getThesisGroups(mockInput.id);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "select group_id from thesis_group where thesis_id = ?",
+            [mockInput.id]
+        );
+        expect(result).toStrictEqual(mockOutput);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            id: 1
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getThesisGroups(mockInput.id)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "select group_id from thesis_group where thesis_id = ?",
+            [mockInput.id]
+        );
+    });
+
+});
+
+describe("createRequest", () => {
+
+    test("Should create a new thesis request", async () => {
+        const mockInput = {
+            thesisRequest: {
+                title: "title",
+                student_id: "S111111",
+                description: "description",
+                supervisor_id: "P111111"
+            }
+        };
+        const mockRows = { insertId: 1 };
+        const mockOutput = {
+            id: 1,
+            title: "title",
+            student_id: "S111111",
+            description: "description",
+            supervisor_id: "P111111"
+        };
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.createRequest(mockInput.thesisRequest);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "INSERT INTO thesis_request (title, student_id, description, supervisor_id, status_code) VALUES (?, ?, ?,?, 0)",
+            [
+                mockInput.thesisRequest.title,
+                mockInput.thesisRequest.student_id,
+                mockInput.thesisRequest.description,
+                mockInput.thesisRequest.supervisor_id
+            ]
+        );
+        expect(result).toStrictEqual(mockOutput);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            thesisRequest: {
+                title: "title",
+                student_id: "S111111",
+                description: "description",
+                supervisor_id: "P111111"
+            }
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.createRequest(mockInput.thesisRequest)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "INSERT INTO thesis_request (title, student_id, description, supervisor_id, status_code) VALUES (?, ?, ?,?, 0)",
+            [
+                mockInput.thesisRequest.title,
+                mockInput.thesisRequest.student_id,
+                mockInput.thesisRequest.description,
+                mockInput.thesisRequest.supervisor_id
+            ]
+        );
+    });
+
+});
+
+describe("secretaryThesisRequest", () => {
+
+    test("Should update the status of a thesis request", async () => {
+        const mockInput = {
+            request_id: 1,
+            change: 0
+        };
+        const mockRows = {
+            info: "ok"
+        };
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.secretaryThesisRequest(mockInput.request_id, mockInput.change);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            `UPDATE thesis_request SET status_code = ? WHERE id = ?`,
+            [mockInput.change, mockInput.request_id]
+        );
+        expect(result).toStrictEqual(mockRows.info);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            request_id: 1,
+            change: 0
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.secretaryThesisRequest(mockInput.request_id, mockInput.change)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            `UPDATE thesis_request SET status_code = ? WHERE id = ?`,
+            [mockInput.change, mockInput.request_id]
+        );
+    });
+
+});
+
+describe("teachersThesisRequest", () => {
+
+    test("Should update a thesis request", async () => {
+        const mockInput = {
+            request_id: 1,
+            change: 0
+        };
+        const mockRows = {
+            info: "ok"
+        };
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.teachersThesisRequest(mockInput.request_id, mockInput.change);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            `UPDATE thesis_request SET status_code = ?, start_date = ? WHERE id = ?`,
+            [mockInput.change, expect.any(Date), mockInput.request_id]
+        );
+
+        expect(result).toStrictEqual(mockRows.info);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            request_id: 1,
+            change: 0
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.teachersThesisRequest(mockInput.request_id, mockInput.change)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            `UPDATE thesis_request SET status_code = ?, start_date = ? WHERE id = ?`,
+            [mockInput.change, expect.any(Date), mockInput.request_id]
+        );
+    });
+
+});
+
+describe("getRequestsForProfessor", () => {
+
+    test("Should retrieve all the thesis request made to a specified professor", async () => {
+        const mockInput = {
+            email: "email"
+        };
+        const mockRows1 = [
+            {
+                id: 1,
+                student_id: "S111111",
+                student_fullname: "name1 surname1",
+                title: "title1",
+                description: "description1",
+                supervisor_id: "P111111",
+                professor_fullname: "name surname"
+            },
+            {
+                id: 2,
+                student_id: "S222222",
+                student_fullname: "name2 surname2",
+                title: "title2",
+                description: "description2",
+                supervisor_id: "P111111",
+                professor_fullname: "name surname"
+            }
+        ];
+        const mockRows2 = [
+            {
+                id: "P222222",
+                cosup_fullname: "name surname 2"
+            }
+        ];
+        const mockRows3 = [
+            {
+                id: "P333333",
+                cosup_fullname: "name surname 3"
+            },
+            {
+                id: "P444444",
+                cosup_fullname: "name surname 4"
+            }
+        ];
+        const mockOutput = [
+            {
+                id: 1,
+                student_id: "S111111",
+                student_fullname: "name1 surname1",
+                title: "title1",
+                description: "description1",
+                supervisor_id: "P111111",
+                professor_fullname: "name surname",
+                cosup_fullname: ["name surname 2"]
+            },
+            {
+                id: 2,
+                student_id: "S222222",
+                student_fullname: "name2 surname2",
+                title: "title2",
+                description: "description2",
+                supervisor_id: "P111111",
+                professor_fullname: "name surname",
+                cosup_fullname: ["name surname 3", "name surname 4"]
+            }
+        ];
+
+        mockPool.execute.mockResolvedValueOnce([mockRows1])
+            .mockResolvedValueOnce([mockRows2])
+            .mockResolvedValueOnce([mockRows3]);
+
+        const result = await dao.getRequestsForProfessor(mockInput.email);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(3);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT " +
+            "tr.id, " +
+            "tr.student_id, " +
+            "CONCAT(s.name, ' ', s.surname) AS student_fullname, " +
+            "tr.title, " +
+            "tr.description, " +
+            "tr.supervisor_id, " +
+            "CONCAT(t.name, ' ', t.surname) AS professor_fullname " +
+            "FROM thesis_request tr " +
+            "INNER JOIN student s ON s.id = tr.student_id " +
+            "INNER JOIN teacher t ON t.id = tr.supervisor_id " +
+            "WHERE tr.status_code = 1 AND t.email = ?",
+            [mockInput.email]
+        );
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT t.id, CONCAT(t.name, ' ', t.surname) AS cosup_fullname FROM teacher t INNER JOIN thesis_cosupervisor_teacher tc ON tc.cosupevisor_id = t.id WHERE tc.thesisrequest_id = ?",
+            [mockRows1[0].id]
+        );
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT t.id, CONCAT(t.name, ' ', t.surname) AS cosup_fullname FROM teacher t INNER JOIN thesis_cosupervisor_teacher tc ON tc.cosupevisor_id = t.id WHERE tc.thesisrequest_id = ?",
+            [mockRows1[1].id]
+        );
+        expect(result).toStrictEqual(mockOutput);
+    });
+
+    test("Should throw an error - MySql error inside first query", async () => {
+        const mockInput = {
+            email: "email"
+        };
+        const mockRows1 = [
+            {
+                id: 1,
+                student_id: "S111111",
+                student_fullname: "name1 surname1",
+                title: "title1",
+                description: "description1",
+                supervisor_id: "P111111",
+                professor_fullname: "name surname"
+            },
+            {
+                id: 2,
+                student_id: "S222222",
+                student_fullname: "name2 surname2",
+                title: "title2",
+                description: "description2",
+                supervisor_id: "P111111",
+                professor_fullname: "name surname"
+            }
+        ];
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getRequestsForProfessor(mockInput.email)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT " +
+            "tr.id, " +
+            "tr.student_id, " +
+            "CONCAT(s.name, ' ', s.surname) AS student_fullname, " +
+            "tr.title, " +
+            "tr.description, " +
+            "tr.supervisor_id, " +
+            "CONCAT(t.name, ' ', t.surname) AS professor_fullname " +
+            "FROM thesis_request tr " +
+            "INNER JOIN student s ON s.id = tr.student_id " +
+            "INNER JOIN teacher t ON t.id = tr.supervisor_id " +
+            "WHERE tr.status_code = 1 AND t.email = ?",
+            [mockInput.email]
+        );
+        expect(mockPool.execute).not.toHaveBeenCalledWith(
+            "SELECT t.id, CONCAT(t.name, ' ', t.surname) AS cosup_fullname FROM teacher t INNER JOIN thesis_cosupervisor_teacher tc ON tc.cosupevisor_id = t.id WHERE tc.thesisrequest_id = ?",
+            [mockRows1[0].id]
+        );
+        expect(mockPool.execute).not.toHaveBeenCalledWith(
+            "SELECT t.id, CONCAT(t.name, ' ', t.surname) AS cosup_fullname FROM teacher t INNER JOIN thesis_cosupervisor_teacher tc ON tc.cosupevisor_id = t.id WHERE tc.thesisrequest_id = ?",
+            [mockRows1[1].id]
+        );
+    });
+
+    test("Should throw an error - MySql error inside second query", async () => {
+        const mockInput = {
+            email: "email"
+        };
+        const mockRows1 = [
+            {
+                id: 1,
+                student_id: "S111111",
+                student_fullname: "name1 surname1",
+                title: "title1",
+                description: "description1",
+                supervisor_id: "P111111",
+                professor_fullname: "name surname"
+            },
+            {
+                id: 2,
+                student_id: "S222222",
+                student_fullname: "name2 surname2",
+                title: "title2",
+                description: "description2",
+                supervisor_id: "P111111",
+                professor_fullname: "name surname"
+            }
+        ];
+        const mockRows2 = [
+            {
+                id: "P222222",
+                cosup_fullname: "name surname 2"
+            }
+        ];
+
+        mockPool.execute.mockResolvedValueOnce([mockRows1])
+            .mockResolvedValueOnce([mockRows2])
+            .mockRejectedValueOnce("Database error");
+
+        await expect(dao.getRequestsForProfessor(mockInput.email)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(3);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT " +
+            "tr.id, " +
+            "tr.student_id, " +
+            "CONCAT(s.name, ' ', s.surname) AS student_fullname, " +
+            "tr.title, " +
+            "tr.description, " +
+            "tr.supervisor_id, " +
+            "CONCAT(t.name, ' ', t.surname) AS professor_fullname " +
+            "FROM thesis_request tr " +
+            "INNER JOIN student s ON s.id = tr.student_id " +
+            "INNER JOIN teacher t ON t.id = tr.supervisor_id " +
+            "WHERE tr.status_code = 1 AND t.email = ?",
+            [mockInput.email]
+        );
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT t.id, CONCAT(t.name, ' ', t.surname) AS cosup_fullname FROM teacher t INNER JOIN thesis_cosupervisor_teacher tc ON tc.cosupevisor_id = t.id WHERE tc.thesisrequest_id = ?",
+            [mockRows1[0].id]
+        );
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT t.id, CONCAT(t.name, ' ', t.surname) AS cosup_fullname FROM teacher t INNER JOIN thesis_cosupervisor_teacher tc ON tc.cosupevisor_id = t.id WHERE tc.thesisrequest_id = ?",
+            [mockRows1[1].id]
+        );
+    });
+
+});
+
+describe("getRequestsForSecretary", () => {
+
+    test("Should retrieve all the thesis request made to a specified professor", async () => {
+        const mockRows1 = [
+            {
+                id: 1,
+                student_id: "S111111",
+                student_fullname: "name1 surname1",
+                title: "title1",
+                description: "description1",
+                supervisor_id: "P111111",
+                professor_fullname: "name surname"
+            },
+            {
+                id: 2,
+                student_id: "S222222",
+                student_fullname: "name2 surname2",
+                title: "title2",
+                description: "description2",
+                supervisor_id: "P111111",
+                professor_fullname: "name surname"
+            }
+        ];
+        const mockRows2 = [
+            {
+                id: "P222222",
+                cosup_fullname: "name surname 2"
+            }
+        ];
+        const mockRows3 = [
+            {
+                id: "P333333",
+                cosup_fullname: "name surname 3"
+            },
+            {
+                id: "P444444",
+                cosup_fullname: "name surname 4"
+            }
+        ];
+        const mockOutput = [
+            {
+                id: 1,
+                student_id: "S111111",
+                student_fullname: "name1 surname1",
+                title: "title1",
+                description: "description1",
+                supervisor_id: "P111111",
+                professor_fullname: "name surname",
+                cosup_fullname: ["name surname 2"]
+            },
+            {
+                id: 2,
+                student_id: "S222222",
+                student_fullname: "name2 surname2",
+                title: "title2",
+                description: "description2",
+                supervisor_id: "P111111",
+                professor_fullname: "name surname",
+                cosup_fullname: ["name surname 3", "name surname 4"]
+            }
+        ];
+
+        mockPool.execute.mockResolvedValueOnce([mockRows1])
+            .mockResolvedValueOnce([mockRows2])
+            .mockResolvedValueOnce([mockRows3]);
+
+        const result = await dao.getRequestsForSecretary();
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(3);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "select " +
+            "tr.id, " +
+            "tr.student_id, " +
+            "concat(s.name,' ', s.surname) as student_fullname, " +
+            "tr.title, " +
+            "tr.description, " +
+            "tr.supervisor_id, " +
+            "concat(t.name, ' ', t.surname) as professor_fullname " +
+            "from thesis_request tr " +
+            "inner join student s on s.id = tr.student_id " +
+            "inner join teacher t on t.id = tr.supervisor_id " +
+            "where tr.status_code = 0"
+        );
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT t.id, CONCAT(t.name, ' ', t.surname) AS cosup_fullname FROM teacher t INNER JOIN thesis_cosupervisor_teacher tc ON tc.cosupevisor_id = t.id WHERE tc.thesisrequest_id = ?",
+            [mockRows1[0].id]
+        );
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT t.id, CONCAT(t.name, ' ', t.surname) AS cosup_fullname FROM teacher t INNER JOIN thesis_cosupervisor_teacher tc ON tc.cosupevisor_id = t.id WHERE tc.thesisrequest_id = ?",
+            [mockRows1[1].id]
+        );
+        expect(result).toStrictEqual(mockOutput);
+    });
+
+    test("Should throw an error - MySql error inside first query", async () => {
+        const mockRows1 = [
+            {
+                id: 1,
+                student_id: "S111111",
+                student_fullname: "name1 surname1",
+                title: "title1",
+                description: "description1",
+                supervisor_id: "P111111",
+                professor_fullname: "name surname"
+            },
+            {
+                id: 2,
+                student_id: "S222222",
+                student_fullname: "name2 surname2",
+                title: "title2",
+                description: "description2",
+                supervisor_id: "P111111",
+                professor_fullname: "name surname"
+            }
+        ];
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getRequestsForSecretary()).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "select " +
+            "tr.id, " +
+            "tr.student_id, " +
+            "concat(s.name,' ', s.surname) as student_fullname, " +
+            "tr.title, " +
+            "tr.description, " +
+            "tr.supervisor_id, " +
+            "concat(t.name, ' ', t.surname) as professor_fullname " +
+            "from thesis_request tr " +
+            "inner join student s on s.id = tr.student_id " +
+            "inner join teacher t on t.id = tr.supervisor_id " +
+            "where tr.status_code = 0"
+        );
+        expect(mockPool.execute).not.toHaveBeenCalledWith(
+            "SELECT t.id, CONCAT(t.name, ' ', t.surname) AS cosup_fullname FROM teacher t INNER JOIN thesis_cosupervisor_teacher tc ON tc.cosupevisor_id = t.id WHERE tc.thesisrequest_id = ?",
+            [mockRows1[0].id]
+        );
+        expect(mockPool.execute).not.toHaveBeenCalledWith(
+            "SELECT t.id, CONCAT(t.name, ' ', t.surname) AS cosup_fullname FROM teacher t INNER JOIN thesis_cosupervisor_teacher tc ON tc.cosupevisor_id = t.id WHERE tc.thesisrequest_id = ?",
+            [mockRows1[1].id]
+        );
+    });
+
+    test("Should throw an error - MySql error inside second query", async () => {
+        const mockRows1 = [
+            {
+                id: 1,
+                student_id: "S111111",
+                student_fullname: "name1 surname1",
+                title: "title1",
+                description: "description1",
+                supervisor_id: "P111111",
+                professor_fullname: "name surname"
+            },
+            {
+                id: 2,
+                student_id: "S222222",
+                student_fullname: "name2 surname2",
+                title: "title2",
+                description: "description2",
+                supervisor_id: "P111111",
+                professor_fullname: "name surname"
+            }
+        ];
+        const mockRows2 = [
+            {
+                id: "P222222",
+                cosup_fullname: "name surname 2"
+            }
+        ];
+
+        mockPool.execute.mockResolvedValueOnce([mockRows1])
+            .mockResolvedValueOnce([mockRows2])
+            .mockRejectedValueOnce("Database error");
+
+        await expect(dao.getRequestsForSecretary()).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(3);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "select " +
+            "tr.id, " +
+            "tr.student_id, " +
+            "concat(s.name,' ', s.surname) as student_fullname, " +
+            "tr.title, " +
+            "tr.description, " +
+            "tr.supervisor_id, " +
+            "concat(t.name, ' ', t.surname) as professor_fullname " +
+            "from thesis_request tr " +
+            "inner join student s on s.id = tr.student_id " +
+            "inner join teacher t on t.id = tr.supervisor_id " +
+            "where tr.status_code = 0"
+        );
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT t.id, CONCAT(t.name, ' ', t.surname) AS cosup_fullname FROM teacher t INNER JOIN thesis_cosupervisor_teacher tc ON tc.cosupevisor_id = t.id WHERE tc.thesisrequest_id = ?",
+            [mockRows1[0].id]
+        );
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT t.id, CONCAT(t.name, ' ', t.surname) AS cosup_fullname FROM teacher t INNER JOIN thesis_cosupervisor_teacher tc ON tc.cosupevisor_id = t.id WHERE tc.thesisrequest_id = ?",
+            [mockRows1[1].id]
+        );
+    });
+
+});
+
+describe("getStudentExams", () => {
+
+    test("Should retrieve the entire career of a specified student", async () => {
+        const mockInput = {
+            studentID: "S111111"
+        };
+        const mockRows = [
+            {
+                id: "S111111",
+                cod_course: "cod_course_1",
+                title_course: "title_course_1",
+                cfu: 10,
+                grade: 30,
+                date: new Date(),
+            },
+            {
+                id: "S111111",
+                cod_course: "cod_course_2",
+                title_course: "title_course_2",
+                cfu: 10,
+                grade: 30,
+                date: new Date(),
+            },
+            {
+                id: "S111111",
+                cod_course: "cod_course_3",
+                title_course: "title_course_3",
+                cfu: 10,
+                grade: 30,
+                date: new Date(),
+            }
+        ];
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.getStudentExams(mockInput.studentID);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "select * FROM career WHERE id=?",
+            [mockInput.studentID]
+        );
+        expect(result).toStrictEqual(mockRows);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            studentID: "S111111"
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getStudentExams(mockInput.studentID)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "select * FROM career WHERE id=?",
+            [mockInput.studentID]
+        );
+    });
+
+});
+
+describe("getStudent", () => {
+
+    test("Should retrieve all the information about a specified student", async () => {
+        const mockInput = {
+            studentID: "S111111"
+        };
+        const mockRows = {
+            id: "S111111",
+            surname: "surname",
+            name: "name",
+            gender: "gender",
+            nationality: "nationality",
+            email: "email",
+            cod_degree: "DEGR01",
+            enrollment_year: 2019
+        };
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.getStudent(mockInput.studentID);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "select * FROM student WHERE id=?",
+            [mockInput.studentID]
+        );
+        expect(result).toStrictEqual(mockRows);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            studentID: "S111111"
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getStudent(mockInput.studentID)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "select * FROM student WHERE id=?",
+            [mockInput.studentID]
+        );
+    })
+
+});
+
+/*
+exports.getStudent = async (studentID)=>{
+  try{
+    const sql = "select * FROM student WHERE id=?"
+    const [rows] = await pool.execute(sql, [studentID]);
+    return rows;
+  }
+  catch (err) {
+    console.error("Error in getStudentExams: ", err);
+    throw err;
+  }
+}
+*/

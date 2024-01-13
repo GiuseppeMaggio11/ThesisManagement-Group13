@@ -356,7 +356,7 @@ async function getThesisForProfessorById(req, res) {
       });
       list_cosupervisors = list_cosupervisors.concat(
         vettIntCosup.map((item) => {
-          return item.ext_supervisor_name;
+          return item.int_supervisor_name;
         })
       );
     } else thesis.cosupervisors_internal = [];
