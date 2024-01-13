@@ -464,13 +464,21 @@ function Proposal(props) {
           >
             {props.proposal.description.length > (props.isMobile ? 80 : 400) ? (
               <>
-                <span>
-                  {props.proposal.description.substring(
-                    0,
-                    props.isMobile ? 80 : 400
-                  ) + "..... "}
-                </span>
-                <span className="description-read-more">Read more</span>
+                <Row>
+                  <Col>
+                    <span>
+                      {props.proposal.description.substring(
+                        0,
+                        props.isMobile ? 80 : 400
+                      ) + "..... "}
+                    </span>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col className="text-end text-muted">
+                    <span className="description-read-more">Read more</span>
+                  </Col>
+                </Row>
               </>
             ) : (
               props.proposal.description

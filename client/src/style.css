@@ -643,14 +643,9 @@ input:checked + .slider::before {
   text-decoration: underline;
 }
 
-.description-read-more {
-  font-style: italic;
-  font-weight: 600;
-}
-
 .description-read-more:hover {
-  cursor: pointer;
   text-decoration: underline;
+  font-weight: 400;
 }
 
 .active-proposal-row-custom:hover {

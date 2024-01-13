@@ -23,7 +23,7 @@ import {
   PlusLg,
 } from "react-bootstrap-icons";
 import Toggle from "react-toggle";
-import "react-toggle/style.css"; 
+import "react-toggle/style.css";
 import randomcolor from "randomcolor";
 import NoFileFound from "./NoFileFound";
 import { motion } from "framer-motion";
@@ -52,7 +52,9 @@ function ProfessorActiveProposals(props) {
     try {
       props.setLoading(true);
       const response = await API.getProposalsProfessor();
-      const active_proposals = response.filter(proposal => proposal.is_archived === 0)
+      const active_proposals = response.filter(
+        (proposal) => proposal.is_archived === 0
+      );
       setActiveProposals(active_proposals);
       props.setLoading(false);
     } catch (err) {
@@ -64,7 +66,9 @@ function ProfessorActiveProposals(props) {
     try {
       props.setLoading(true);
       const response = await API.getProposalsProfessor();
-      const archive_proposals = response.filter(proposal => proposal.is_archived === 1)
+      const archive_proposals = response.filter(
+        (proposal) => proposal.is_archived === 1
+      );
       setActiveProposals(archive_proposals);
       props.setLoading(false);
     } catch (err) {
@@ -74,9 +78,8 @@ function ProfessorActiveProposals(props) {
 
   const handleChange = (e) => {
     setIsArchived(e.target.checked);
-    e.target.checked ? 
-      getArchiveProposals() : getActiveProposals();
-  }
+    e.target.checked ? getArchiveProposals() : getActiveProposals();
+  };
 
   const renderTooltipNew = (props) => (
     <Tooltip id="button-tooltip" {...props}>
@@ -94,7 +97,7 @@ function ProfessorActiveProposals(props) {
     <Container className="p-4">
       <Row className="justify-content-between">
         <Col xs={8} className="fs-2">
-          { isArchived ? "Archived proposals" : "Active thesis proposals" }
+          {isArchived ? "Archived proposals" : "Active thesis proposals"}
         </Col>
         <Col xs={4} className="d-flex justify-content-end align-items-center">
           <OverlayTrigger placement="top" overlay={renderTooltipNew}>
@@ -207,10 +210,18 @@ function ElementProposalLargeScreen(props) {
   );
 
   const handleClick = (event) => {
-    const isDeleteButtonClicked = (event.target.id === 'delete-button' || event.target.id === 'delete-svg' || event.target.id === 'delete-col'|| event.target.id === 'delete-span');
-    const isArchiveButtonClicked = (event.target.id === 'archive-button' || event.target.id === 'archive-svg' || event.target.id === 'archive-col'|| event.target.id === 'archive-span');
-    console.log(event.target.id)
-  
+    const isDeleteButtonClicked =
+      event.target.id === "delete-button" ||
+      event.target.id === "delete-svg" ||
+      event.target.id === "delete-col" ||
+      event.target.id === "delete-span";
+    const isArchiveButtonClicked =
+      event.target.id === "archive-button" ||
+      event.target.id === "archive-svg" ||
+      event.target.id === "archive-col" ||
+      event.target.id === "archive-span";
+    console.log(event.target.id);
+
     // If it's not the delete button, proceed with setting setIsClicked and setCardPosition
     if (!isDeleteButtonClicked && !isArchiveButtonClicked) {
       const rect = event.currentTarget.getBoundingClientRect();
@@ -218,8 +229,6 @@ function ElementProposalLargeScreen(props) {
       setCardPosition({ x: rect.left, y: rect.top });
     }
   };
-  
-  
 
   const handleModalClick = (e) => {
     // If the click occurs outside the expanded card, close it
@@ -303,9 +312,19 @@ function ElementProposalLargeScreen(props) {
                     placement="bottom"
                     overlay={renderTooltipDelete}
                   >
-                    <Button variant="light" id="delete-button" onClick={()=>{setShowDelete(true)}}>
-                      {!props.isMobile && <span  id="delete-span" className="mx-2">Delete</span>}
-                      <Trash3 id="delete-svg"/>
+                    <Button
+                      variant="light"
+                      id="delete-button"
+                      onClick={() => {
+                        setShowDelete(true);
+                      }}
+                    >
+                      {!props.isMobile && (
+                        <span id="delete-span" className="mx-2">
+                          Delete
+                        </span>
+                      )}
+                      <Trash3 id="delete-svg" />
                     </Button>
                   </OverlayTrigger>
                 </Col>
@@ -319,8 +338,12 @@ function ElementProposalLargeScreen(props) {
                       id="archive-button"
                       onClick={() => setShowArchive(true)}
                     >
-                      {!props.isMobile && <span id="archive-span" className="mx-2">Archive</span>}
-                      <Archive id="archive-svg"/>
+                      {!props.isMobile && (
+                        <span id="archive-span" className="mx-2">
+                          Archive
+                        </span>
+                      )}
+                      <Archive id="archive-svg" />
                     </Button>
                   </OverlayTrigger>
                 </Col>
@@ -372,18 +395,22 @@ function ElementProposalLargeScreen(props) {
           >
             {props.proposal.description.length > (props.isMobile ? 80 : 600) ? (
               <>
-                <span>
-                  {props.proposal.description.substring(
-                    0,
-                    props.isMobile ? 80 : 600
-                  ) + "..... "}
-                </span>
-                <span
-                  className="description-read-more"
-                  /* onClick={() => navigate("/viewproposal/" + props.proposal.id)} */
-                >
-                  Read more
-                </span>
+                <Row>
+                  <Col>
+                    <span>
+                      {props.proposal.description.substring(
+                        0,
+                        props.isMobile ? 80 : 600
+                      ) + "..... "}
+                    </span>
+                  </Col>
+                </Row>
+
+                <Row>
+                  <Col className="text-end text-muted">
+                    <span className="description-read-more">Read more</span>
+                  </Col>
+                </Row>
               </>
             ) : (
               props.proposal.description
@@ -459,26 +486,24 @@ function ElementProposalLargeScreen(props) {
           </Row>
         </Card>
       </motion.div>
-      {
-        isClicked && (
-          <ViewProposalMotion
-            proposal={props.proposal}
-            isMobile={props.isMobile}
-            setIsClicked={setIsClicked}
-            handleModalClick={handleModalClick}
-            renderTooltipEdit={renderTooltipEdit}
-            renderTooltipCopy={renderTooltipCopy}
-            renderTooltipDelete={renderTooltipDelete}
-            setShowDelete={setShowDelete}
-            renderTooltipArchive={renderTooltipArchive}
-            setShowArchive={setShowArchive}
-            cardPosition={cardPosition}
-            isTablet={props.isTablet}
-            isTabletHorizonthal={props.isTabletHorizonthal}
-            user={props.user}
-          />
-        )
-      }
+      {isClicked && (
+        <ViewProposalMotion
+          proposal={props.proposal}
+          isMobile={props.isMobile}
+          setIsClicked={setIsClicked}
+          handleModalClick={handleModalClick}
+          renderTooltipEdit={renderTooltipEdit}
+          renderTooltipCopy={renderTooltipCopy}
+          renderTooltipDelete={renderTooltipDelete}
+          setShowDelete={setShowDelete}
+          renderTooltipArchive={renderTooltipArchive}
+          setShowArchive={setShowArchive}
+          cardPosition={cardPosition}
+          isTablet={props.isTablet}
+          isTabletHorizonthal={props.isTabletHorizonthal}
+          user={props.user}
+        />
+      )}
       <ConfirmationModal
         show={showArchive}
         handleClose={() => setShowArchive(false)}

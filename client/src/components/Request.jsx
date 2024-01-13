@@ -7,7 +7,7 @@ import {
   Row,
   Tooltip,
 } from "react-bootstrap";
-import { motion } from "framer-motion";
+import { isMotionComponent, motion } from "framer-motion";
 import { useContext, useEffect, useState } from "react";
 import Loading from "./Loading";
 import randomcolor from "randomcolor";
@@ -25,6 +25,7 @@ function RequestsPage(props) {
   const { handleToast } = useContext(MessageContext);
   const [showCv, setShowCv] = useState(false);
   const [studentID, setStudentID] = useState("");
+
   useEffect(() => {
     async function getRequests() {
       props.setLoading(true);
@@ -153,6 +154,7 @@ function RequestCard(props) {
       Accept
     </Tooltip>
   );
+
   const renderTooltipReject = (props) => (
     <Tooltip id="button-tooltip" {...props}>
       Reject
@@ -394,17 +396,17 @@ function RequestCard(props) {
               height:
                 isMobile || isTablet
                   ? "fit-content"
-                  : expanded
-                  ? "fit-content"
-                  : "150px",
-              WebkitLineClamp: isMobile ? 2 : 3,
+                  : /* expanded
+                  ? "fit-content" 
+                  :*/ "150px",
+              /* WebkitLineClamp: isMobile ? 2 : 3,
               WebkitBoxOrient: "vertical",
-              overflowX: "hidden",
-              overflowY: expanded ? "auto" : "hidden",
+              overflowX: "hidden",*/
+              overflowY: expanded ? "scroll" : "hidden",
             }}
           >
             {getDescriptionDisplay()}
-            {request.description.length > (isMobile ? 100 : 150) && (
+            {/* request.description.length > (isMobile ? 100 : 150) && (
               <span
                 style={{ width: "fit-content" }}
                 className="description-read-more"
@@ -412,61 +414,23 @@ function RequestCard(props) {
               >
                 {!expanded && "Read more"}
               </span>
-            )}
+            ) */}
           </div>
           <Row className="text-end text-muted">
-            <Col className="text-end text-muted">
-              {expanded && (
-                <span onClick={toggleExpanded} style={{ cursor: "pointer" }}>
-                  Reduce
+            <Col>
+              {request.description.length > (isMobile ? 100 : 150) && (
+                <span
+                  onClick={toggleExpanded}
+                  className="description-read-more"
+                >
+                  {expanded ? "Reduce" : "Read More"}
                 </span>
               )}
             </Col>
           </Row>
-          {/*   <Row
-            style={{
-              fontSize: 16,
-              marginTop: 16,
-            }}
-          >
-            <Col xs={6} md={6} lg={6}>
-              <span>Thesis Level</span>
-            </Col>
-            <Col>
-              <span
-                style={{
-                  color: "black",
-                }}
-                className="badge"
-              >
-                {request.thesis_level.toUpperCase()}
-              </span>
-            </Col>
-          </Row> 
           <Row
             style={{
               fontSize: 16,
-              marginTop: 16,
-            }}
-          >
-            <Col xs={6} md={6} lg={6}>
-              <span>Thesis Type</span>
-            </Col>
-            <Col>
-              <span
-                style={{
-                  color: "black",
-                }}
-                className="badge"
-              >
-                {request.thesis_type.toUpperCase()}
-              </span>
-            </Col>
-          </Row>*/}
-          <Row
-            style={{
-              fontSize: 16,
-              marginTop: 16,
             }}
           >
             <Col xs={5} md={3} lg={4} xl={4}>
