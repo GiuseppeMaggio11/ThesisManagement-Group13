@@ -77,34 +77,36 @@ function Cv(props) {
                                 Date
                             </Col>}
                         </Row>
-                        <div style={{ maxHeight: isMobile ? 450 : 620, overflowY: 'auto', overflowX: 'hidden'}} >
-                                {cv.map(((line, index) => {
-                                    return (
-                                        <>
-                                            <Row className="my-2" style={{ backgroundColor: index % 2 == 0 ? '#f5f3f4' : '#ffffff', borderRadius: '20px' }}>
-                                                <Col xs={2}>
-                                                    {line.cod_course}
-                                                </Col>
-                                                <Col xs={6} md={6} lg={4} xl={4} xxl={4}>
-                                                    {line.title_course}
-                                                </Col>
-                                                <Col xs={2}>
-                                                    {line.cfu}
-                                                </Col>
-                                                <Col xs={2}>
-                                                    {line.grade}
-                                                </Col>
-                                                {!isMobile && !isTablet && <Col xs={2}>
-                                                    {dayjs(new Date(line.date)).format('DD-MM-YYYY')}
-                                                </Col>}
-                                            </Row>
+                        <PerfectScrollbar
+                            options={{ wheelPropagation: false, suppressScrollX: true }}
+                            style={{ maxHeight: isMobile ? 450 : 580, overflowY: 'auto'}}
+                        >
+                            {cv.map(((line, index) => {
+                                return (
+                                    <>
+                                        <Row className="my-2" style={{ backgroundColor: index % 2 == 0 ? '#f5f3f4' : '#ffffff', borderRadius: '20px' }}>
+                                            <Col xs={2}>
+                                                {line.cod_course}
+                                            </Col>
+                                            <Col xs={6} md={6} lg={4} xl={4} xxl={4}>
+                                                {line.title_course}
+                                            </Col>
+                                            <Col xs={2}>
+                                                {line.cfu}
+                                            </Col>
+                                            <Col xs={2}>
+                                                {line.grade}
+                                            </Col>
+                                            {!isMobile && !isTablet && <Col xs={2}>
+                                                {dayjs(new Date(line.date)).format('DD-MM-YYYY')}
+                                            </Col>}
+                                        </Row>
 
-                                        </>
-                                    )
+                                    </>
+                                )
 
-                                }))}
-                        </div>
-
+                            }))}
+                        </PerfectScrollbar>
                     </Modal.Body>
                 </Modal>
 
