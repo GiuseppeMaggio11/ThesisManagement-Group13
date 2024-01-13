@@ -62,7 +62,7 @@ function RequestsPage(props) {
           request.id,
           props.user.user_type === "PROF" ? 5 : 4
         );
-        handleToast("Request rejected", "error");
+        handleToast("Request rejected", "success");
       }
     } catch (err) {
       error = true;
@@ -132,6 +132,7 @@ function RequestCard(props) {
 
   const [student, setStudent] = useState();
   const [isLoading, setIsLoading] = useState(true);
+  const [expanded, setExpanded] = useState(false);
   useEffect(() => {
     async function studentDetails() {
       try {
@@ -157,6 +158,22 @@ function RequestCard(props) {
       Reject
     </Tooltip>
   );
+
+  const toggleExpanded = () => {
+    setExpanded((prevExpanded) => !prevExpanded);
+  };
+
+  const getDescriptionDisplay = () => {
+    const maxLength = isMobile ? 100 : 150;
+
+    if (request.description.length > maxLength) {
+      return expanded
+        ? request.description
+        : `${request.description.substring(0, maxLength)}... `;
+    }
+
+    return request.description;
+  };
 
   //console.log(request);
   return isLoading ? (
@@ -295,25 +312,26 @@ function RequestCard(props) {
                   </Col>
                 </Row>
               )}
-             
-                {request.cosup_fullname.length>0 && <Row>
+
+              {request.cosup_fullname.length > 0 && (
+                <Row>
                   <Col style={{ padding: 0 }} xs={12} md={12} lg={12}>
                     <div
                       style={{
                         fontWeight: "medium",
                         fontSize: 15,
                         padding: 0,
-                      }}s
+                      }}
+                      s
                     >
-                      <People style={{marginRight:'0.5rem'}}/>
+                      <People style={{ marginRight: "0.5rem" }} />
                       <span style={{ fontWeight: 500 }}>
                         {request.cosup_fullname.join(", ")}
                       </span>
                     </div>
                   </Col>
-                </Row>}
-        
-
+                </Row>
+              )}
             </Col>
             <Col xs={4} className="text-end px-0">
               <Row
@@ -367,36 +385,40 @@ function RequestCard(props) {
               </Row>
             </Col>
           </Row>
-
           <div
             style={{
               fontSize: 16,
               marginTop: 16,
               minHeight: isMobile || isTablet ? 50 : "",
-              maxHeight: isMobile || isTablet ? 200 : "",
-              height: isMobile || isTablet ? "fit-content" : "150px",
+              maxHeight: isMobile || isTablet ? 250 : "",
+              height:
+                isMobile || isTablet
+                  ? "fit-content"
+                  : expanded
+                  ? "fit-content"
+                  : "150px",
               WebkitLineClamp: isMobile ? 2 : 3,
               WebkitBoxOrient: "vertical",
-              overflow: "hidden",
+              overflowX: "hidden",
+              overflowY: expanded ? "auto" : "hidden",
             }}
           >
-            {request.description.length > (isMobile ? 100 : 150) ? (
-              <>
-                <span>
-                  {request.description.substring(0, isMobile ? 100 : 150) +
-                    "... "}
-                </span>
-                <span
-                  style={{ width: "fit-content" }}
-                  className="description-read-more"
-                >
-                  Read more
-                </span>
-              </>
-            ) : (
-              request.description
+            {getDescriptionDisplay()}
+            {request.description.length > (isMobile ? 100 : 150) && (
+              <span
+                style={{ width: "fit-content" }}
+                className="description-read-more"
+                onClick={toggleExpanded}
+              >
+                {!expanded && "Read more"}
+              </span>
             )}
           </div>
+          <Row className="text-end text-muted">
+            <Col className="text-end text-muted">
+              {expanded && <span onClick={toggleExpanded}>Reduce</span>}
+            </Col>
+          </Row>
           {/*   <Row
             style={{
               fontSize: 16,

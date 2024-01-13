@@ -28,7 +28,6 @@ function ViewProposalMotion(props) {
       let alreadyApply = await API.isApplied();
       setIsAlreadyApplied(alreadyApply);
     }
-    console.log(props.proposal);
     if (type === "STUD" && props.proposal) {
       setCosup(props.proposal?.cosupervisors.join(", "));
       try {
@@ -45,7 +44,6 @@ function ViewProposalMotion(props) {
         return ex.ext_supervisor_name;
       });
       let concatenatedCosup = [...int, ...ext];
-      console.log(concatenatedCosup);
       setCosup(concatenatedCosup.join(", "));
     }
     setIsLoading(false);

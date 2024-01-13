@@ -63,7 +63,7 @@
   border: none;
   padding-left: 5;
   margin-left: 0.5em;
-  background-color: '#21588410';
+  background-color: "#21588410";
 }
 
 .chip-x:hover {
@@ -73,7 +73,7 @@
   border-radius: 15px;
   padding-left: 5;
   margin-left: 0.5em;
-  background-color: #21588443
+  background-color: #21588443;
 }
 
 /* .chip a {
@@ -144,7 +144,7 @@ table.table-rounded {
 }
 
 table.table-rounded thead tr {
-  background-color: #4682B4 !important;
+  background-color: #4682b4 !important;
   text-align: center;
   color: #fff;
   /* Specify your custom text color if needed */
@@ -175,8 +175,8 @@ table.table-rounded thead tr {
 }
 
 .button-style {
-  background-color: #4682B4;
-  border-color: #4682B4;
+  background-color: #4682b4;
+  border-color: #4682b4;
 }
 
 .button-style:hover {
@@ -189,8 +189,6 @@ table.table-rounded thead tr {
   border-color: #e19861;
   margin-right: 0.5em;
 }
-
-
 
 .button-style-trash {
   background-color: transparent;
@@ -268,8 +266,8 @@ table.table-rounded thead tr {
 }
 
 .link-style:active {
-  background-color: #4682B4;
-  border-color: #4682B4;
+  background-color: #4682b4;
+  border-color: #4682b4;
 }
 
 .custom-accordion-item {
@@ -408,7 +406,7 @@ table.table-rounded thead tr {
   margin-right: 0.5em;
 
   &:focus {
-    box-shadow: 0 0 0px 0.5px #4682B4;
+    box-shadow: 0 0 0px 0.5px #4682b4;
   }
 }
 
@@ -418,7 +416,7 @@ table.table-rounded thead tr {
 }
 
 .form-check-input {
-  border-color: black
+  border-color: black;
 }
 
 /* Style for the custom slider */
@@ -445,7 +443,7 @@ table.table-rounded thead tr {
 
 /* Slider knob appearance */
 .slider::before {
-  content: '';
+  content: "";
   position: absolute;
   width: 20px;
   height: 20px;
@@ -454,11 +452,11 @@ table.table-rounded thead tr {
   transition: 0.4s;
 }
 
-input:checked+.slider {
-  background-color: #2196F3;
+input:checked + .slider {
+  background-color: #2196f3;
 }
 
-input:checked+.slider::before {
+input:checked + .slider::before {
   transform: translateX(24px);
 }
 
@@ -537,7 +535,7 @@ input:checked+.slider::before {
   border: none;
   border-radius: 20px;
   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
- /*  padding-left: 1rem;
+  /*  padding-left: 1rem;
   padding-right: 1rem; */
 }
 
@@ -551,11 +549,11 @@ input:checked+.slider::before {
   border: none;
 }
 .list-group-item:hover {
- background-color: #cccccc61;
+  background-color: #cccccc61;
 }
 
-.ps__rail-x:hover>.ps__thumb-x,
-.ps__rail-x:focus>.ps__thumb-x,
+.ps__rail-x:hover > .ps__thumb-x,
+.ps__rail-x:focus > .ps__thumb-x,
 .ps__rail-x.ps--clicking .ps__thumb-x {
   background-color: #999 !important;
   height: 6px !important;
@@ -591,7 +589,6 @@ input:checked+.slider::before {
   cursor: pointer;
 }
 
-
 .custom-card-students-applyed {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   transition: box-shadow 0.5s;
@@ -605,20 +602,19 @@ input:checked+.slider::before {
   height: 350px;
 }
 
-.custom-card-request{
+.custom-card-request {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   transition: box-shadow 0.5s;
   border-radius: 20px;
-  height: 270px;
+  height: 320px;
 }
 
 @media (max-width: 768px) {
-  .custom-card-request{
+  .custom-card-request {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     transition: box-shadow 0.5s;
     border-radius: 20px;
     min-height: 200px;
-    max-height: 280px;
     height: fit-content;
   }
 }
@@ -632,8 +628,6 @@ input:checked+.slider::before {
     height: fit-content;
   }
 }
-
-
 
 .custom-card-proposals-big {
   height: 500px;
@@ -716,7 +710,6 @@ input:checked+.slider::before {
   transition: box-shadow 0.5s;
 }
 
-
 .accept-button-appl:hover {
   border: 1px solid green !important;
   background: white !important;
@@ -758,4 +751,8 @@ input:checked+.slider::before {
   border-radius: 50%;
   text-align: center;
   font-weight: 600;
+}
+
+.read-more-expandend {
+  overflow-y: auto;
 }
