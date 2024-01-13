@@ -19,7 +19,7 @@ const isSecretary = (req, res, next) => {
 };
 const isSecretaryOrProfessor = (req, res, next) => {
   if (req.isAuthenticated() && (req.user.user_type === "PROF" || req.user.user_type === "SECR")) return next();
-  return res.status(401).json({error: "Not professor o secretary"})
+  return res.status(401).json({error: "Not professor or secretary"})
 }
 
 module.exports = { isLoggedIn, isProfessor, isStudent, isSecretary, isSecretaryOrProfessor};

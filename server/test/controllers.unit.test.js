@@ -1,8 +1,8 @@
 "use strict";
 
-const { isStudent, isProfessor, isLoggedIn } = require("../controllers/middleware");
+const { isStudent, isProfessor, isLoggedIn, isSecretary, isSecretaryOrProfessor } = require("../controllers/middleware");
 const { getProposals, getProposal } = require("../controllers/showThesis");
-const { newApplication, updateApplicationStatus, getApplications,getApplicationStudent  } = require("../controllers/manageApplication");
+const { newApplication, updateApplicationStatus, getApplications,getApplicationStudent, isApplied } = require("../controllers/manageApplication");
 const { addFiles, getAllFiles, getStudentFilesList, getFile } = require("../controllers/manageFiles");
 const { newThesis, updateThesesArchivation } = require("../controllers/manageThesis");
 const { listExternalCosupervisors, createExternalCosupervisor } = require("../controllers/others");
@@ -11,10 +11,21 @@ const dao = require("../dao");
 const dayjs = require("dayjs");
 const { validationResult } = require("express-validator");
 const fs = require("fs");
+const nodemailer = require("nodemailer");
 
 jest.mock("../dao");
 jest.mock("express-validator");
 jest.mock("fs");
+jest.mock("nodemailer", () => {
+    const mockTransporter = {
+        sendMail: jest.fn()
+    };
+    return {
+        createTransport: jest.fn(() => mockTransporter)
+    };
+});
+
+const mockTransporter = nodemailer.createTransport();
 
 
 
@@ -316,7 +327,7 @@ describe("getProposal", () => {
 
 describe("newApplication", () => {
 
-    test("Should create a new application if the thesis is valid and the student hasn't already applied for it", async () => {
+    test("Should create a new application if the thesis is valid and the student hasn't already applied for it; then sends an email", async () => {
         const mockReq = {
             user: {
                 username: "username"
@@ -332,19 +343,72 @@ describe("newApplication", () => {
             status: jest.fn().mockReturnThis(),
             json: jest.fn()
         };
+
+        dao.beginTransaction.mockResolvedValue(true);
         dao.getUserID.mockResolvedValue("S123456");
         dao.isThesisValid.mockResolvedValue(true);
         dao.isAlreadyExisting.mockResolvedValue(false);
-        dao.getApplications.mockResolvedValue([]);
         dao.newApply.mockResolvedValue(true);
+        dao.getDataTeacherApplicationEmail.mockResolvedValue(true);
+        mockTransporter.sendMail.mockImplementation((mailOptions, callback) => {
+            callback(null, 'Mocked info');
+        });
+        dao.commit.mockResolvedValue(true);
 
         await newApplication(mockReq, mockRes);
 
+        expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
         expect(dao.getUserID).toHaveBeenCalledTimes(1);
         expect(dao.isThesisValid).toHaveBeenCalledTimes(1);
         expect(dao.isAlreadyExisting).toHaveBeenCalledTimes(1);
-        expect(dao.getApplications).toHaveBeenCalledTimes(1);
         expect(dao.newApply).toHaveBeenCalledTimes(1);
+        expect(dao.getDataTeacherApplicationEmail).toHaveBeenCalledTimes(1);
+        expect(mockTransporter.sendMail).toHaveBeenCalledTimes(1);
+        expect(dao.commit).toHaveBeenCalledTimes(1);
+        expect(dao.rollback).not.toHaveBeenCalled();
+        expect(mockRes.status).toHaveBeenCalledWith(200);
+        expect(mockRes.json).toHaveBeenCalledWith("Application created successfully");
+    });
+
+    test("Should create a new application if the thesis is valid and the student hasn't already applied for it; generates an error while sending the email", async () => {
+        const mockReq = {
+            user: {
+                username: "username"
+            },
+            params: {
+                thesis_id: 1
+            },
+            body: {
+                date: dayjs()
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        dao.beginTransaction.mockResolvedValue(true);
+        dao.getUserID.mockResolvedValue("S123456");
+        dao.isThesisValid.mockResolvedValue(true);
+        dao.isAlreadyExisting.mockResolvedValue(false);
+        dao.newApply.mockResolvedValue(true);
+        dao.getDataTeacherApplicationEmail.mockResolvedValue(true);
+        mockTransporter.sendMail.mockImplementation((mailOptions, callback) => {
+            callback(new Error('Email error'), null);
+        });
+        dao.commit.mockResolvedValue(true);
+
+        await newApplication(mockReq, mockRes);
+
+        expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
+        expect(dao.getUserID).toHaveBeenCalledTimes(1);
+        expect(dao.isThesisValid).toHaveBeenCalledTimes(1);
+        expect(dao.isAlreadyExisting).toHaveBeenCalledTimes(1);
+        expect(dao.newApply).toHaveBeenCalledTimes(1);
+        expect(dao.getDataTeacherApplicationEmail).toHaveBeenCalledTimes(1);
+        expect(mockTransporter.sendMail).toHaveBeenCalledTimes(1);
+        expect(dao.commit).toHaveBeenCalledTimes(1);
+        expect(dao.rollback).not.toHaveBeenCalled();
         expect(mockRes.status).toHaveBeenCalledWith(200);
         expect(mockRes.json).toHaveBeenCalledWith("Application created successfully");
     });
@@ -368,10 +432,15 @@ describe("newApplication", () => {
 
         await newApplication(mockReq, mockRes);
 
+        expect(dao.beginTransaction).not.toHaveBeenCalled();
         expect(dao.getUserID).not.toHaveBeenCalled();
         expect(dao.isThesisValid).not.toHaveBeenCalled();
         expect(dao.isAlreadyExisting).not.toHaveBeenCalled();
         expect(dao.newApply).not.toHaveBeenCalled();
+        expect(dao.getDataTeacherApplicationEmail).not.toHaveBeenCalled();
+        expect(mockTransporter.sendMail).not.toHaveBeenCalled();
+        expect(dao.commit).not.toHaveBeenCalled();
+        expect(dao.rollback).not.toHaveBeenCalled()
         expect(mockRes.status).toHaveBeenCalledWith(422);
         expect(mockRes.json).toHaveBeenCalledWith("Thesis ID must be an integer");
     });
@@ -392,20 +461,27 @@ describe("newApplication", () => {
             status: jest.fn().mockReturnThis(),
             json: jest.fn()
         };
+        dao.beginTransaction.mockResolvedValue(true);
         dao.getUserID.mockResolvedValue("S123456");
         dao.isThesisValid.mockResolvedValue(false);
+        dao.rollback.mockResolvedValue(true);
 
         await newApplication(mockReq, mockRes);
 
+        expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
         expect(dao.getUserID).toHaveBeenCalledTimes(1);
         expect(dao.isThesisValid).toHaveBeenCalledTimes(1);
         expect(dao.isAlreadyExisting).not.toHaveBeenCalled();
         expect(dao.newApply).not.toHaveBeenCalled();
+        expect(dao.getDataTeacherApplicationEmail).not.toHaveBeenCalled();
+        expect(mockTransporter.sendMail).not.toHaveBeenCalled();
+        expect(dao.commit).not.toHaveBeenCalled();
+        expect(dao.rollback).toHaveBeenCalledTimes(1);
         expect(mockRes.status).toHaveBeenCalledWith(422);
         expect(mockRes.json).toHaveBeenCalledWith("This thesis is not valid");
     });
 
-    test("Should return 422 - The student is already applie for the thesis", async () => {
+    test("Should return 422 - The student is already applied for the thesis", async () => {
         const mockReq = {
             user: {
                 username: "username"
@@ -421,18 +497,25 @@ describe("newApplication", () => {
             status: jest.fn().mockReturnThis(),
             json: jest.fn()
         };
+        dao.beginTransaction.mockResolvedValue(true);
         dao.getUserID.mockResolvedValue("S123456");
         dao.isThesisValid.mockResolvedValue(true);
         dao.isAlreadyExisting.mockResolvedValue(true);
+        dao.rollback.mockResolvedValue(true);
 
         await newApplication(mockReq, mockRes);
 
+        expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
         expect(dao.getUserID).toHaveBeenCalledTimes(1);
         expect(dao.isThesisValid).toHaveBeenCalledTimes(1);
         expect(dao.isAlreadyExisting).toHaveBeenCalledTimes(1);
         expect(dao.newApply).not.toHaveBeenCalled();
+        expect(dao.getDataTeacherApplicationEmail).not.toHaveBeenCalled();
+        expect(mockTransporter.sendMail).not.toHaveBeenCalled();
+        expect(dao.commit).not.toHaveBeenCalled();
+        expect(dao.rollback).toHaveBeenCalledTimes(1);
         expect(mockRes.status).toHaveBeenCalledWith(422);
-        expect(mockRes.json).toHaveBeenCalledWith("You are already applied for this thesis");
+        expect(mockRes.json).toHaveBeenCalledWith("You cannot apply");
     });
 
     test("Should return 500 - Internal server error", async () => {
@@ -451,14 +534,21 @@ describe("newApplication", () => {
             status: jest.fn().mockReturnThis(),
             json: jest.fn()
         };
+        dao.beginTransaction.mockResolvedValue(true);
         dao.getUserID.mockRejectedValue("Database error");
+        dao.rollback.mockResolvedValue(true);
 
         await newApplication(mockReq, mockRes);
 
+        expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
         expect(dao.getUserID).toHaveBeenCalledTimes(1);
         expect(dao.isThesisValid).not.toHaveBeenCalled();
         expect(dao.isAlreadyExisting).not.toHaveBeenCalled();
         expect(dao.newApply).not.toHaveBeenCalled();
+        expect(dao.getDataTeacherApplicationEmail).not.toHaveBeenCalled();
+        expect(mockTransporter.sendMail).not.toHaveBeenCalled();
+        expect(dao.commit).not.toHaveBeenCalled();
+        expect(dao.rollback).toHaveBeenCalledTimes(1);
         expect(mockRes.status).toHaveBeenCalledWith(500);
         expect(mockRes.json).toHaveBeenCalledWith("Database error");
     });
@@ -1121,8 +1211,6 @@ describe("createExternalCosupervisor", () => {
 
 });
 
-// SPRINT 2
-
 describe("updateThesesArchivation", () => {
 
     test("Should begin a transaction, update \"isArchived\" for every thesis when the virtual clock date is after their expiration date and commit the transaction", async () => {
@@ -1178,7 +1266,7 @@ describe("updateThesesArchivation", () => {
 
 describe("updateApplicationStatus", () => {
 
-    test("Should accept a student application, cancels all other applications for that student and rejects every other student application for that same thesis", async () => {
+    test("Should accept a student application, cancels all other applications for that student and rejects every other student application for that same thesis; then send an email", async () => {
         const mockReq = {
             body: {
                 student_id: "S222222",
@@ -1214,15 +1302,16 @@ describe("updateApplicationStatus", () => {
                 status: "status"
             }
         ];
-        const dir = `studentFiles/${mockReq.body.student_id}/${mockApplications[2].thesis_id}`;
 
         validationResult.mockReturnValue(mockedValidationResult);
         dao.beginTransaction.mockResolvedValue(true);
         dao.getApplications.mockResolvedValue(mockApplications);
         dao.updateApplicationStatus.mockResolvedValue(mockReq.body);
-        fs.rmSync = jest.fn().mockReturnValue(true);
         dao.rejectApplicationsExcept.mockResolvedValue(mockReq.body);
-        dao.cancelStudentApplications.mockResolvedValue(mockReq.body);
+        dao.getDataStudentApplicationEmail.mockResolvedValue(true);
+        mockTransporter.sendMail.mockImplementation((mailOptions, callback) => {
+            callback(null, 'Mocked info');
+        });
         dao.commit.mockResolvedValue(true);
         
         await updateApplicationStatus(mockReq, mockRes);
@@ -1231,23 +1320,79 @@ describe("updateApplicationStatus", () => {
         expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
         expect(dao.getApplications).toHaveBeenCalledTimes(1);
         expect(dao.updateApplicationStatus).toHaveBeenCalledTimes(1);
-        expect(fs.rmSync).toHaveBeenCalledTimes(1);
-        expect(fs.rmSync).toHaveBeenCalledWith(
-            dir,
-            {
-                recursive: true, 
-                force: true
-            }
-        );
         expect(dao.rejectApplicationsExcept).toHaveBeenCalledTimes(1);
-        expect(dao.cancelStudentApplications).toHaveBeenCalledTimes(1);
+        expect(dao.getDataStudentApplicationEmail).toHaveBeenCalledTimes(1);
+        expect(mockTransporter.sendMail).toHaveBeenCalledTimes(1);
         expect(dao.commit).toHaveBeenCalledTimes(1);
         expect(dao.rollback).not.toHaveBeenCalled();
         expect(mockRes.status).toHaveBeenCalledWith(200);
         expect(mockRes.json).toHaveBeenCalledWith(mockReq.body);
     });
 
-    test("Should just update an application'status if no student has been accepted", async () => {
+    test("Should accept a student application, cancels all other applications for that student and rejects every other student application for that same thesis; generates an error while sending the email", async () => {
+        const mockReq = {
+            body: {
+                student_id: "S222222",
+                thesis_id: 1,
+                status: "Accepted"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        const mockedValidationResult = {
+            isEmpty: jest.fn(() => true),
+        };
+        const mockApplications = [
+            {
+                student_id: "S111111",
+                thesis_id: 1,
+                application_date: dayjs(),
+                status: "status"
+            },
+            {
+                student_id: "S222222",
+                thesis_id: 1,
+                application_date: dayjs(),
+                status: "status"
+            },
+            {
+                student_id: "S222222",
+                thesis_id: 2,
+                application_date: dayjs(),
+                status: "status"
+            }
+        ];
+
+        validationResult.mockReturnValue(mockedValidationResult);
+        dao.beginTransaction.mockResolvedValue(true);
+        dao.getApplications.mockResolvedValue(mockApplications);
+        dao.updateApplicationStatus.mockResolvedValue(mockReq.body);
+        dao.rejectApplicationsExcept.mockResolvedValue(mockReq.body);
+        dao.getDataStudentApplicationEmail.mockResolvedValue(true);
+        mockTransporter.sendMail.mockImplementation((mailOptions, callback) => {
+            callback(new Error('Email error'), null);
+        });
+        dao.commit.mockResolvedValue(true);
+        
+        await updateApplicationStatus(mockReq, mockRes);
+        
+        expect(validationResult).toHaveBeenCalledTimes(1);
+        expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
+        expect(dao.getApplications).toHaveBeenCalledTimes(1);
+        expect(dao.updateApplicationStatus).toHaveBeenCalledTimes(1);
+        expect(dao.rejectApplicationsExcept).toHaveBeenCalledTimes(1);
+        expect(dao.getDataStudentApplicationEmail).toHaveBeenCalledTimes(1);
+        expect(mockTransporter.sendMail).toHaveBeenCalledTimes(1);
+        expect(dao.commit).toHaveBeenCalledTimes(1);
+        expect(dao.rollback).not.toHaveBeenCalled();
+        expect(mockRes.status).toHaveBeenCalledWith(200);
+        expect(mockRes.json).toHaveBeenCalledWith(mockReq.body);
+    });
+
+    test("Should just update an application' status if no student has been accepted", async () => {
         const mockReq = {
             body: {
                 student_id: "S222222",
@@ -1288,6 +1433,8 @@ describe("updateApplicationStatus", () => {
         dao.beginTransaction.mockResolvedValue(true);
         dao.getApplications.mockResolvedValue(mockApplications);
         dao.updateApplicationStatus.mockResolvedValue(mockReq.body);
+        dao.getDataStudentApplicationEmail.mockResolvedValue(true);
+        mockTransporter.sendMail.mockResolvedValue(true);
         dao.commit.mockResolvedValue(true);
 
         await updateApplicationStatus(mockReq, mockRes);
@@ -1296,9 +1443,9 @@ describe("updateApplicationStatus", () => {
         expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
         expect(dao.getApplications).toHaveBeenCalledTimes(1);
         expect(dao.updateApplicationStatus).toHaveBeenCalledTimes(1);
-        expect(fs.rmSync).not.toHaveBeenCalled();
         expect(dao.rejectApplicationsExcept).not.toHaveBeenCalled();
-        expect(dao.cancelStudentApplications).not.toHaveBeenCalled();
+        expect(dao.getDataStudentApplicationEmail).toHaveBeenCalledTimes(1);
+        expect(mockTransporter.sendMail).toHaveBeenCalledTimes(1);
         expect(dao.commit).toHaveBeenCalledTimes(1);
         expect(dao.rollback).not.toHaveBeenCalled();
         expect(mockRes.status).toHaveBeenCalledWith(200);
@@ -1324,9 +1471,9 @@ describe("updateApplicationStatus", () => {
         expect(dao.beginTransaction).not.toHaveBeenCalled();
         expect(dao.getApplications).not.toHaveBeenCalled();
         expect(dao.updateApplicationStatus).not.toHaveBeenCalled();
-        expect(fs.rmSync).not.toHaveBeenCalled();
         expect(dao.rejectApplicationsExcept).not.toHaveBeenCalled();
-        expect(dao.cancelStudentApplications).not.toHaveBeenCalled();
+        expect(dao.getDataStudentApplicationEmail).not.toHaveBeenCalled();
+        expect(mockTransporter.sendMail).not.toHaveBeenCalled();
         expect(dao.commit).not.toHaveBeenCalled();
         expect(dao.rollback).not.toHaveBeenCalled();
         expect(mockRes.status).toHaveBeenCalledWith(422);
@@ -1380,9 +1527,9 @@ describe("updateApplicationStatus", () => {
         expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
         expect(dao.getApplications).toHaveBeenCalledTimes(1);
         expect(dao.updateApplicationStatus).not.toHaveBeenCalled();
-        expect(fs.rmSync).not.toHaveBeenCalled();
         expect(dao.rejectApplicationsExcept).not.toHaveBeenCalled();
-        expect(dao.cancelStudentApplications).not.toHaveBeenCalled();
+        expect(dao.getDataStudentApplicationEmail).not.toHaveBeenCalled();
+        expect(mockTransporter.sendMail).not.toHaveBeenCalled();
         expect(dao.commit).not.toHaveBeenCalled();
         expect(dao.rollback).toHaveBeenCalledTimes(1);
         expect(mockRes.status).toHaveBeenCalledWith(400);
@@ -1418,65 +1565,14 @@ describe("updateApplicationStatus", () => {
         expect(dao.beginTransaction).toHaveBeenCalledTimes(1);
         expect(dao.getApplications).not.toHaveBeenCalled();
         expect(dao.updateApplicationStatus).not.toHaveBeenCalled();
-        expect(fs.rmSync).not.toHaveBeenCalled();
         expect(dao.rejectApplicationsExcept).not.toHaveBeenCalled();
-        expect(dao.cancelStudentApplications).not.toHaveBeenCalled();
+        expect(dao.getDataStudentApplicationEmail).not.toHaveBeenCalled();
+        expect(mockTransporter.sendMail).not.toHaveBeenCalled();
         expect(dao.commit).not.toHaveBeenCalled();
         expect(dao.rollback).toHaveBeenCalledTimes(1);
         expect(mockRes.status).toHaveBeenCalledWith(503);
         expect(mockRes.json).toHaveBeenCalledWith("Database error");
     });
-    /*
-async function updateApplicationStatus(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(422).json({ errors: errors });
-  }
-
-  try {
-    await dao.beginTransaction();
-    let decision = {
-      student_id: req.body.student_id,
-      thesis_id: req.body.thesis_id,
-      status: req.body.status,
-    };
-    const applications = await dao.getApplications();
-    for (const application of applications) {
-      if (
-        application.student_id == req.body.student_id &&
-        application.thesis_id == req.body.thesis_id
-      ) {
-        const updated_application = await dao.updateApplicationStatus(decision);
-        if (decision.status === "Accepted") {
-          for (const a of applications) {
-            if (
-              a.student_id == req.body.student_id &&
-              a.thesis_id !== req.body.thesis_id
-            ) {
-              let dir = `studentFiles/${a.student_id}/${a.thesis_id}`;
-              console.log(dir);
-              fs.rmSync(dir, { recursive: true, force: true });
-            }
-          }
-          //reject every other student applications for that thesis
-          const result_reject = await dao.rejectApplicationsExcept(decision);
-          //cancels every other application of that student
-          const result_cancel = await dao.cancelStudentApplications(decision);
-        }
-        await dao.commit();
-        return res.json(updated_application);
-      }
-    }
-            return res
-      .status(400)
-      .json(
-        ` error: Application of student: ${req.body.student_id} for thesis with id: ${req.body.thesis_id} not found `
-      );
-  } catch (err) {
-    await dao.rollback();
-    return res.status(503).json(` error: ${err} `);
-  }
-} */
 
 });
 
@@ -1669,6 +1765,263 @@ describe("getApplications", () => {
         expect(dao.getApplicationsForProfessor).toHaveBeenCalledTimes(1);
         expect(mockRes.status).toHaveBeenCalledWith(500);
         expect(mockRes.json).toHaveBeenCalledWith("Database error");
+    });
+
+});
+
+describe("isSecretary", () => {
+
+    test("Should grant access to an authenticated secretary", () => {
+        const mockReq = {
+            isAuthenticated: jest.fn().mockReturnValue(true),
+            user: {
+                user_type: "SECR"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        const mockNext = jest.fn();
+
+        isSecretary(mockReq, mockRes, mockNext);
+
+        expect(mockNext).toHaveBeenCalled();
+        expect(mockRes.status).not.toHaveBeenCalled();
+        expect(mockRes.json).not.toHaveBeenCalled();
+    });
+
+    test('Should return 401 if secretary is not authenticated', () => {
+        const mockReq = {
+            isAuthenticated: jest.fn().mockReturnValue(false),
+            user: {
+                user_type: "SECR"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        const mockNext = jest.fn();
+
+        isSecretary(mockReq, mockRes, mockNext);
+
+        expect(mockNext).not.toHaveBeenCalled();
+        expect(mockRes.status).toHaveBeenCalledWith(401);
+        expect(mockRes.json).toHaveBeenCalledWith({ error: 'Not secretary' });
+    });
+
+    test('Should return 401 if the user is not a secretary', () => {
+        const mockReq = {
+            isAuthenticated: jest.fn().mockReturnValue(true),
+            user: {
+                user_type: "NOT_PROF"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        const mockNext = jest.fn();
+
+        isSecretary(mockReq, mockRes, mockNext);
+
+        expect(mockNext).not.toHaveBeenCalled();
+        expect(mockRes.status).toHaveBeenCalledWith(401);
+        expect(mockRes.json).toHaveBeenCalledWith({ error: 'Not secretary' });
+    });
+
+});
+
+describe("isSecretaryOrProfessor", () => {
+
+    test("Should grant access to an authenticated secretary or an authenticated professor - case secretary", () => {
+        const mockReq = {
+            isAuthenticated: jest.fn().mockReturnValue(true),
+            user: {
+                user_type: "SECR"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        const mockNext = jest.fn();
+
+        isSecretaryOrProfessor(mockReq, mockRes, mockNext);
+
+        expect(mockNext).toHaveBeenCalled();
+        expect(mockRes.status).not.toHaveBeenCalled();
+        expect(mockRes.json).not.toHaveBeenCalled();
+    });
+
+    test("Should grant access to an authenticated secretary or an authenticated professor - case professor", () => {
+        const mockReq = {
+            isAuthenticated: jest.fn().mockReturnValue(true),
+            user: {
+                user_type: "PROF"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        const mockNext = jest.fn();
+
+        isSecretaryOrProfessor(mockReq, mockRes, mockNext);
+
+        expect(mockNext).toHaveBeenCalled();
+        expect(mockRes.status).not.toHaveBeenCalled();
+        expect(mockRes.json).not.toHaveBeenCalled();
+    });
+
+    test('Should return 401 if professor or secretary is not authenticated', () => {
+        const mockReq = {
+            isAuthenticated: jest.fn().mockReturnValue(false),
+            user: {
+                user_type: "PROF"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        const mockNext = jest.fn();
+
+        isSecretaryOrProfessor(mockReq, mockRes, mockNext);
+
+        expect(mockNext).not.toHaveBeenCalled();
+        expect(mockRes.status).toHaveBeenCalledWith(401);
+        expect(mockRes.json).toHaveBeenCalledWith({ error: 'Not professor or secretary' });
+    });
+
+    test('Should return 401 if the user is not a secretary or professor', () => {
+        const mockReq = {
+            isAuthenticated: jest.fn().mockReturnValue(true),
+            user: {
+                user_type: "NOT_PROF"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        const mockNext = jest.fn();
+
+        isSecretaryOrProfessor(mockReq, mockRes, mockNext);
+
+        expect(mockNext).not.toHaveBeenCalled();
+        expect(mockRes.status).toHaveBeenCalledWith(401);
+        expect(mockRes.json).toHaveBeenCalledWith({ error: 'Not professor or secretary' });
+    });
+
+});
+
+describe("isApplied", () => {
+
+    test("Should return 200 - The student is applied to some thesis proposal", async () => {
+        const mockReq = {
+            user: {
+                username: "username"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        const mockApplications = [
+            {
+                student_id: "S111111",
+                thesis_id: 1,
+                application_date: dayjs(),
+                status: "status"
+            },
+            {
+                student_id: "S222222",
+                thesis_id: 1,
+                application_date: dayjs(),
+                status: "status"
+            },
+            {
+                student_id: "S222222",
+                thesis_id: 2,
+                application_date: dayjs(),
+                status: "status"
+            }
+        ]; 
+
+        dao.getUserID.mockResolvedValue("S111111");
+        dao.getApplications.mockResolvedValue(mockApplications)
+
+        await isApplied(mockReq, mockRes);
+
+        expect(dao.getUserID).toHaveBeenCalledTimes(1);
+        expect(dao.getApplications).toHaveBeenCalledTimes(1);
+        expect(mockRes.status).toHaveBeenCalledWith(200);
+        expect(mockRes.json).toHaveBeenCalledWith(1);
+    });
+
+    test("Should return 200 - The student is NOT applied to some thesis proposal", async () => {
+        const mockReq = {
+            user: {
+                username: "username"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        const mockApplications = [
+            {
+                student_id: "S111111",
+                thesis_id: 1,
+                application_date: dayjs(),
+                status: "status"
+            },
+            {
+                student_id: "S222222",
+                thesis_id: 1,
+                application_date: dayjs(),
+                status: "status"
+            },
+            {
+                student_id: "S222222",
+                thesis_id: 2,
+                application_date: dayjs(),
+                status: "status"
+            }
+        ]; 
+
+        dao.getUserID.mockResolvedValue("S333333");
+        dao.getApplications.mockResolvedValue(mockApplications)
+
+        await isApplied(mockReq, mockRes);
+
+        expect(dao.getUserID).toHaveBeenCalledTimes(1);
+        expect(dao.getApplications).toHaveBeenCalledTimes(1);
+        expect(mockRes.status).toHaveBeenCalledWith(200);
+        expect(mockRes.json).toHaveBeenCalledWith(0);
+    });
+
+    test("Should return 500 - Internal server error", async () => {
+        const mockReq = {
+            user: {
+                username: "username"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        dao.getUserID.mockRejectedValue("Database error");
+        
+        await isApplied(mockReq, mockRes);
+
+        expect(dao.getUserID).toHaveBeenCalledTimes(1);
+        expect(dao.getApplications).not.toHaveBeenCalled();
+        expect(mockRes.status).toHaveBeenCalledWith(500);
+        expect(mockRes.json).toHaveBeenCalledWith("error: Database error");
     });
 
 });
