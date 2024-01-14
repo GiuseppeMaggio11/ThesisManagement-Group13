@@ -571,7 +571,7 @@ describe("newThesis", () => {
                 cod_degree: "DEGR01",
                 is_archived: false,
                 keywords: "keywords",
-                cod_group: ["GRP001"],
+                cod_group: "GRP001",
                 cosupervisors_internal: [
                     "P222222",
                     "P333333"
@@ -712,7 +712,7 @@ describe("newThesis", () => {
                 cod_degree: "DEGR01",
                 is_archived: false,
                 keywords: "keywords",
-                cod_group: ["GRP001"],
+                cod_group: "GRP001",
                 cosupervisors_internal: [
                     "P222222",
                     "P333333"
@@ -770,7 +770,7 @@ describe("newThesis", () => {
                 cod_degree: "DEGR01",
                 is_archived: false,
                 keywords: "keywords",
-                cod_group: ["GRP001"],
+                cod_group: "GRP001",
                 cosupervisors_internal: [
                     "P222222",
                     "P333333",
@@ -829,7 +829,7 @@ describe("newThesis", () => {
                 cod_degree: "DEGR01",
                 is_archived: false,
                 keywords: "keywords",
-                cod_group: ["GRP001"],
+                cod_group: "GRP001",
                 cosupervisors_internal: [
                     "P222222",
                     "P333333"
@@ -888,7 +888,7 @@ describe("newThesis", () => {
                 cod_degree: "DEGR02",
                 is_archived: false,
                 keywords: "keywords",
-                cod_group: ["GRP001"],
+                cod_group: "GRP001",
                 cosupervisors_internal: [
                     "P222222",
                     "P333333"
@@ -948,7 +948,7 @@ describe("newThesis", () => {
                 cod_degree: "DEGR01",
                 is_archived: false,
                 keywords: "keywords",
-                cod_group: ["GRP002"],
+                cod_group: "GRP002",
                 cosupervisors_internal: [
                     "P222222",
                     "P333333"
@@ -1009,7 +1009,7 @@ describe("newThesis", () => {
                 cod_degree: "DEGR01",
                 is_archived: false,
                 keywords: "keywords",
-                cod_group: ["GRP001"],
+                cod_group: "GRP001",
                 cosupervisors_internal: [
                     "P222222",
                     "P333333"
@@ -2417,7 +2417,7 @@ describe("updateThesis", () => {
                 cod_degree: "DEGR01",
                 is_archived: false,
                 keywords: "keywords",
-                cod_group: ["GRP001"],
+                cod_group: "GRP001",
                 cosupervisors_internal: [
                     "P222222",
                     "P333333"
@@ -2573,7 +2573,7 @@ describe("updateThesis", () => {
                 cod_degree: "DEGR01",
                 is_archived: false,
                 keywords: "keywords",
-                cod_group: ["GRP001"],
+                cod_group: "GRP001",
                 cosupervisors_internal: [
                     "P222222",
                     "P333333"
@@ -2638,7 +2638,7 @@ describe("updateThesis", () => {
                 cod_degree: "DEGR01",
                 is_archived: false,
                 keywords: "keywords",
-                cod_group: ["GRP001"],
+                cod_group: "GRP001",
                 cosupervisors_internal: [
                     "P222222",
                     "P333333"
@@ -2704,7 +2704,7 @@ describe("updateThesis", () => {
                 cod_degree: "DEGR01",
                 is_archived: false,
                 keywords: "keywords",
-                cod_group: ["GRP001"],
+                cod_group: "GRP001",
                 cosupervisors_internal: [
                     "P222222",
                     "P444444"
@@ -2770,7 +2770,7 @@ describe("updateThesis", () => {
                 cod_degree: "DEGR01",
                 is_archived: false,
                 keywords: "keywords",
-                cod_group: ["GRP001"],
+                cod_group: "GRP001",
                 cosupervisors_internal: [
                     "P222222",
                     "P333333"
@@ -2837,7 +2837,7 @@ describe("updateThesis", () => {
                 cod_degree: "DEGR02",
                 is_archived: false,
                 keywords: "keywords",
-                cod_group: ["GRP001"],
+                cod_group: "GRP001",
                 cosupervisors_internal: [
                     "P222222",
                     "P333333"
@@ -2905,7 +2905,7 @@ describe("updateThesis", () => {
                 cod_degree: "DEGR01",
                 is_archived: false,
                 keywords: "keywords",
-                cod_group: ["GRP002"],
+                cod_group: "GRP002",
                 cosupervisors_internal: [
                     "P222222",
                     "P333333"
@@ -2974,7 +2974,7 @@ describe("updateThesis", () => {
                 cod_degree: "DEGR01",
                 is_archived: false,
                 keywords: "keywords",
-                cod_group: ["GRP001"],
+                cod_group: "GRP001",
                 cosupervisors_internal: [
                     "P222222",
                     "P333333"
@@ -3125,15 +3125,7 @@ describe("getThesisForProfessorById", () => {
                     int_supervisor_name: "name surname I1"
                 }
             ];
-        const mockGroup =
-            [
-                {
-                    group_id: "GRP01"
-                },
-                {
-                    group_id: "GRP02"
-                }
-            ];
+        const mockGroup = [{ group_id: "GRP01" }];
         const mockResult =
         {
             id: 1,
@@ -3163,15 +3155,7 @@ describe("getThesisForProfessorById", () => {
                     "name surname I1"
                 ],
             supervisor_name: "name surname",
-            cod_group:
-                [
-                    {
-                        group_id: "GRP01"
-                    },
-                    {
-                        group_id: "GRP02"
-                    }
-                ]
+            cod_group: { group_id: "GRP01" }
         }
 
         dao.getThesisForProfessorById.mockResolvedValue(mockThesis);
@@ -3219,15 +3203,7 @@ describe("getThesisForProfessorById", () => {
         };
         const mockExternalCosupervisor = [];
         const mockInternalCosupervisor = [];
-        const mockGroup =
-            [
-                {
-                    group_id: "GRP01"
-                },
-                {
-                    group_id: "GRP02"
-                }
-            ];
+        const mockGroup = [{ group_id: "GRP01" }];
         const mockResult =
         {
             id: 1,
@@ -3248,15 +3224,7 @@ describe("getThesisForProfessorById", () => {
             cosupervisors_internal: [],
             list_cosupervisors: [],
             supervisor_name: "name surname",
-            cod_group:
-                [
-                    {
-                        group_id: "GRP01"
-                    },
-                    {
-                        group_id: "GRP02"
-                    }
-                ]
+            cod_group:{ group_id: "GRP01" }
         }
 
         dao.getThesisForProfessorById.mockResolvedValue(mockThesis);
