@@ -28,6 +28,7 @@ function NewRequest(props) {
 
   const [errors, setErrors] = useState(null);
 
+  const [supervisors, setSupervisors] = useState([]);
   const [cosupervisors_internal, setCoSupervisorInternal] = useState([]);
   const [cosupervisors_internal_obj, setCoSupervisorInternal_obj] = useState(
     []
@@ -46,6 +47,7 @@ function NewRequest(props) {
         ({ name, surname }) => `${name} ${surname}`
       );
       setCoSupervisorInternal(formatted_in_cosup);
+      setSupervisors(formatted_in_cosup);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -67,6 +69,14 @@ function NewRequest(props) {
       [name]: value,
     });
   };
+
+  useEffect(() => {
+    setCoSupervisorInternal(supervisors.filter(teacher => teacher !== formData.supervisor_id));
+    setFormData({
+      ...formData,
+      "cosupervisors_internal" : formData.cosupervisors_internal.filter(teacher => teacher !== formData.supervisor_id)
+    })
+  }, [formData.supervisor_id]);
 
   const updateChips = (field, value) => {
     setFormData((prevState) => ({
@@ -140,11 +150,11 @@ function NewRequest(props) {
       cosupervisors_internal_obj
     );
 
-    const supervisor = findIDs([formData.supervisor_id], cosupervisors_internal_obj)
+    const supervisor = findIDs([formData.supervisor_id], cosupervisors_internal_obj)[0];
 
     const newProp = {
       ...formData,
-      supervisor_id: supervisor[0],
+      supervisor_id: supervisor,
       cosupervisors_internal: cosupervisorInternalIDs,
     };
 
@@ -271,7 +281,7 @@ function NewRequest(props) {
                       required
                     >
                       <option>Select a thesis supervisor</option>
-                      {cosupervisors_internal.map((teacher, index) => (
+                      {supervisors.map((teacher, index) => (
                         <option key={index} value={teacher}>
                           {teacher}
                         </option>
