@@ -30,7 +30,6 @@ const {
 } = require("./controllers/manageFiles");
 const {
   newThesis,
-  updateThesesArchivation,
   updateThesesArchivationManual,
   getThesisForProfessorById,
   updateThesis,

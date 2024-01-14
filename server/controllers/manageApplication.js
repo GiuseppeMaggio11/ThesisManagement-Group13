@@ -49,6 +49,9 @@ async function updateApplicationStatus(req, res) {
           //cancels every other application of that student
           //const result_cancel = await dao.cancelStudentApplications(decision);
         }
+        
+        await dao.commit();
+
         const emailData = await dao.getDataStudentApplicationEmail(
           decision.thesis_id,
           decision.student_id
@@ -66,7 +69,7 @@ async function updateApplicationStatus(req, res) {
             console.log(error);
           }
         });
-        await dao.commit();
+        
         return res.status(200).json(updated_application);
       }
     }
@@ -90,17 +93,25 @@ async function newApplication(req, res) {
     if (!Number.isInteger(Number(thesis_id))) {
       return res.status(422).json("Thesis ID must be an integer");
     }
+
+    await dao.beginTransaction();
+    
     const userID = await dao.getUserID(req.user.username);
     const isValid = await dao.isThesisValid(thesis_id, date);
     if (!isValid) {
+      await dao.rollback();
       return res.status(422).json("This thesis is not valid");
     }
     const existing = await dao.isAlreadyExisting(userID, thesis_id);
     if (existing) {
+      await dao.rollback();
       return res.status(422).json("You cannot apply");
     }
 
     const result = await dao.newApply(userID, thesis_id, date);
+
+    await dao.commit();
+
     const emailData = await dao.getDataTeacherApplicationEmail(thesis_id);
     const mailOptions = {
       from: "group13.thesismanagement@gmail.com",
@@ -117,9 +128,10 @@ async function newApplication(req, res) {
       }
     });
 
-    res.status(200).json("Application created successfully");
+    return res.status(200).json("Application created successfully");
   } catch (error) {
-    res.status(500).json(error);
+    await dao.rollback();
+    return res.status(500).json(error);
   }
 }
 
@@ -169,7 +181,7 @@ async function isApplied(req, res) {
     }
     return res.status(200).json(0);
   } catch (err) {
-    return res.status(500).json(`error: ${err} `);
+    return res.status(500).json(`error: ${err}`);
   }
 }
 

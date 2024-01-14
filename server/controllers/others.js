@@ -44,7 +44,7 @@ async function listDegrees(req, res) {
 async function createExternalCosupervisor(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    res.status(422).json({ errors: errors });
+    return res.status(422).json({ errors: errors });
   }
 
   try {

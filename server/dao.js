@@ -70,7 +70,7 @@ exports.getUserByEmail = async (email) => {
     const [results] = await pool.execute(sql, [email]);
 
     if (results.length === 0) {
-      return { error: "User not found." };
+      throw { error: "User not found." };
     }
 
     const userRow = results[0];
@@ -130,20 +130,6 @@ exports.getProfID = async (username) => {
   }
 };
 
-exports.getDataTeacherApplicationEmail = async (thesisId) => {
-  try {
-    const sql =
-      "SELECT  email, title FROM thesis TS, teacher TE WHERE TS.id = ? AND TS.supervisor_id = TE.id";
-
-    const [result] = await pool.execute(sql, [thesisId]);
-
-    return result[0];
-  } catch (error) {
-    console.error("Error in getDataApplicationEmail: ", error);
-    throw error;
-  }
-};
-
 exports.getDataStudentApplicationEmail = async (thesisId, studentId) => {
   try {
     const sql =
@@ -152,6 +138,18 @@ exports.getDataStudentApplicationEmail = async (thesisId, studentId) => {
     return result[0];
   } catch (error) {
     console.error("Error in getDataStudentApplicationEmail: ", error);
+    throw error;
+  }
+};
+
+exports.getDataProfessorRequestEmail = async (requestID, professorID) => {
+  try {
+    const sql =
+      "SELECT  email, title FROM thesis_request TR, teacher T WHERE TR.id = ? AND T.id = ?";
+    const [result] = await pool.execute(sql, [requestID, professorID]);
+    return result[0];
+  } catch (error) {
+    console.error("Error in getDataProfessorRequestEmail: ", error);
     throw error;
   }
 };
@@ -425,7 +423,7 @@ exports.isThesisValid = async (thesisID, date) => {
 };
 
 //returns false is the student is not already applied for a thesis,  otherwise true
-exports.isAlreadyExisting = async (studentID, thesisID) => {
+exports.isAlreadyExisting = async (studentID) => {
   try {
     const sql =
       "SELECT COUNT(*) as count FROM application WHERE student_id = ? and (status ='Accepted' or status ='Pending')";
@@ -459,18 +457,6 @@ exports.getDataTeacherApplicationEmail = async (thesisId) => {
   }
 };
 
-exports.getDataStudentApplicationEmail = async (thesisId, studentId) => {
-  try {
-    const sql =
-      "SELECT  email, title FROM thesis TS, student S WHERE TS.id = ? AND S.id = ? ";
-    const [result] = await pool.execute(sql, [thesisId, studentId]);
-    return result[0];
-  } catch (error) {
-    console.error("Error in getDataStudentApplicationEmail: ", error);
-    throw error;
-  }
-};
-
 // Function to create a new application
 exports.newApply = async (studentID, ThesisID, date) => {
   try {
@@ -496,7 +482,7 @@ exports.newApply = async (studentID, ThesisID, date) => {
 exports.createThesis = async (thesis) => {
   try {
     const sql =
-      "INSERT INTO thesis (title, description, supervisor_id, thesis_level, thesis_type, required_knowledge, notes, expiration, cod_degree, is_archived, keywords, is_expired) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,0)";
+      "INSERT INTO thesis (title, description, supervisor_id, thesis_level, thesis_type, required_knowledge, notes, expiration, cod_degree, is_archived, keywords, is_expired) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)";
     const [rows] = await pool.execute(sql, [
       thesis.title,
       thesis.description,
@@ -660,24 +646,6 @@ exports.createRequest_cosupervisor_teacher = async (request_id, professor_id) =>
   }
 };
 
-// Insert new row in thesis_cosupervisor table, must receive thesis id and cosupervisor id
-exports.createRequest_cosupervisor_teacher = async (request_id, professor_id) => {
-  try {
-    const sql =
-      "INSERT INTO thesis_cosupervisor_teacher (thesisrequest_id, cosupevisor_id) VALUES (?,?)";
-    await pool.execute(sql, [request_id, professor_id]);
-
-    const thesis_cosupervisor = {
-      request_id: request_id,
-      thesis_cosupervisor: professor_id,
-    };
-    return thesis_cosupervisor;
-  } catch (error) {
-    console.error("Error in createRequest_cosupervisor_teacher: ", error);
-    throw error;
-  }
-};
-
 // Insert new row in thesis_cosupervisor_external table, must receive thesis id and email
 exports.createThesis_cosupervisor_external = async (thesis_id, email) => {
   try {
@@ -742,7 +710,7 @@ exports.getGroups = async () => {
     const [rows] = await pool.execute(sql);
 
     const groups = [];
-    rows.map((e) => {
+    rows.forEach((e) => {
       const group = {
         name: e.group_name,
         cod: e.cod_group,
@@ -784,7 +752,7 @@ exports.updateThesesArchivationManual = async (thesis_id) => {
     const [rows] = await pool.execute(sql, [thesis_id]);
     return rows.info;
   } catch (err) {
-    console.error("Error in updateThesesArchivation: ", err);
+    console.error("Error in updateThesesArchivationManual: ", err);
     throw err;
   }
 };
@@ -1009,7 +977,8 @@ exports.isThesisProposalValid = async (thesis_id) => {
     const [rows] = await pool.execute(sql, [thesis_id]);
 
     if (rows[0].count == 1) return true;
-    else return false;
+    else if (rows[0].count == 0) return false;
+    else throw new Error ("Internal server error");
   } catch (error) {
     console.error("Error in isThesisProposalValid: ", error);
     throw error;
@@ -1030,11 +999,11 @@ exports.getProposalsProfessor = async (professor_id) => {
 };
 
 //check if a proposal 1 has an active application or 2 is_archived or 3 is_expired. in these case we prevent deletion of that thesis
-exports.checkBeforeDeleteProposal = async (thesis_id, professorID) => {
+exports.checkBeforeDeleteProposal = async (thesis_id, professor_id) => {
   try {
     //first check the specified thesis is_archived and is_expired and is_deleted. if anyone of those is equall to 1, we cant delete that thesis, and we return an error
     const sql =
-      "SELECT * FROM thesis WHERE id = ? AND is_archived = 0 AND is_deleted = 0"; //TODO: also add is_expired when merging with jacopo branch
+      "SELECT * FROM thesis WHERE id = ? AND is_archived = 0 AND is_deleted = 0 AND is_expired = 0";
     const [rows] = await pool.execute(sql, [thesis_id]);
     if (rows.length === 0) {
       return "The thesis you request to delete is either not available or not removale.";
@@ -1043,7 +1012,7 @@ exports.checkBeforeDeleteProposal = async (thesis_id, professorID) => {
     //check if the requested proposal for delete is belongs to the professor whom we receive delete request from
     const sql2 = "SELECT supervisor_id FROM thesis WHERE id = ?";
     const [rows2] = await pool.execute(sql2, [thesis_id]);
-    if (rows2[0].supervisor_id !== professorID) {
+    if (rows2[0].supervisor_id !== professor_id) {
       return "You can only delete your own proposals.";
     }
 
@@ -1200,7 +1169,7 @@ exports.getThesisExCosupervisorForProfessorById = async (id) => {
 exports.getThesisIntCosupervisorForProfessor = async (id) => {
   try {
     const sqlInt =
-      "select t.cosupevisor_id, CONCAT_WS(' ', te.name , te.surname) AS ext_supervisor_name from thesis_cosupervisor_teacher t " +
+      "select t.cosupevisor_id, CONCAT_WS(' ', te.name , te.surname) AS int_supervisor_name from thesis_cosupervisor_teacher t " +
       "inner join teacher te on t.cosupevisor_id = te.id where t.thesis_id = ?";
     const [rowInt] = await pool.execute(sqlInt, [id]);
     /* return rowInt.map((item) => {
