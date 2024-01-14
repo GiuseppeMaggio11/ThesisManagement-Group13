@@ -49,13 +49,6 @@ function ViewProposalMotion(props) {
     setIsLoading(false);
   }, [props.proposal, type]);
 
-  /*  const handleModalClick = (e) => {
-    // If the click occurs outside the expanded card, close it
-    if (e.target === e.currentTarget) {
-      props.setIsClicked(false);
-    }
-  }; */
-
   return isLoading ? (
     <Loading />
   ) : (
@@ -360,7 +353,7 @@ function ViewProposalMotion(props) {
                   ? 500
                   : props.isTabletHorizonthal
                   ? 800
-                  : 1300,
+                  : "30em",
               }}
             >
               {props.proposal.description}

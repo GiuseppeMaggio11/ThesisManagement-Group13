@@ -398,7 +398,7 @@ function RequestCard(props) {
                   ? "fit-content"
                   : /* expanded
                   ? "fit-content" 
-                  :*/ "150px",
+                  :*/ "95px",
               /* WebkitLineClamp: isMobile ? 2 : 3,
               WebkitBoxOrient: "vertical",
               overflowX: "hidden",*/
