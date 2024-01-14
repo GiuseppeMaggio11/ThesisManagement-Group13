@@ -97,9 +97,18 @@ function ProfessorActiveProposals(props) {
     <Container className="p-4">
       <Row className="justify-content-between">
         <Col xs={8} className="fs-2">
-          {isArchived ? "Archived proposals" : "Active thesis proposals"}
+          {isArchived ? "Archived thesis proposals" : "Active thesis proposals"}
         </Col>
         <Col xs={4} className="d-flex justify-content-end align-items-center">
+          <Col className="d-flex align-items-start">
+            <span style={{marginRight:"8px"}}> See archived proposals</span>
+            <Toggle
+              id="archived"
+              name="archived"
+              checked={isArchived}
+              onChange={handleChange}
+            />
+          </Col>
           <OverlayTrigger placement="top" overlay={renderTooltipNew}>
             <Button variant="light" onClick={() => navigate("/newproposal/")}>
               <PlusLg style={{ fontSize: "xx-large" }} />
