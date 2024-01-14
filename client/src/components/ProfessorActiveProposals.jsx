@@ -128,6 +128,7 @@ function ProfessorActiveProposals(props) {
           isTabletHorizonthal={isTabletHorizonthal}
           getActiveProposals={getActiveProposals}
           user={props.user}
+          isArchived={isArchived}
         />
       )}
     </Container>
@@ -150,6 +151,7 @@ function ActiveProposalsLargeScreen(props) {
                 isTablet={props.isTablet}
                 isTabletHorizonthal={props.isTabletHorizonthal}
                 user={props.user}
+                isArchived={props.isArchived}
               />
             );
           })}
@@ -272,7 +274,7 @@ function ElementProposalLargeScreen(props) {
             </Col>
             <Col className="text-end mx-2">
               <Row>
-                <Col xs={6} md={6} lg={3}>
+                <Col xs={6} md={6} lg={props.isArchived ? 4 : 3}>
                   <OverlayTrigger
                     placement="bottom"
                     overlay={renderTooltipEdit}
@@ -288,7 +290,7 @@ function ElementProposalLargeScreen(props) {
                     </Button>
                   </OverlayTrigger>
                 </Col>
-                <Col xs={6} md={6} lg={3}>
+                <Col xs={6} md={6} lg={props.isArchived ? 4 : 3}>
                   <OverlayTrigger
                     placement="bottom"
                     overlay={renderTooltipCopy}
@@ -316,7 +318,7 @@ function ElementProposalLargeScreen(props) {
                     </Button>
                   </OverlayTrigger>
                 </Col>
-                <Col xs={6} md={6} lg={3} id="delete-col">
+                <Col xs={6} md={6} lg={props.isArchived ? 4 : 3} id="delete-col">
                   <OverlayTrigger
                     placement="bottom"
                     overlay={renderTooltipDelete}
@@ -337,25 +339,27 @@ function ElementProposalLargeScreen(props) {
                     </Button>
                   </OverlayTrigger>
                 </Col>
-                <Col xs={6} md={6} lg={3} id="archive-col">
-                  <OverlayTrigger
-                    placement="bottom"
-                    overlay={renderTooltipArchive}
-                  >
-                    <Button
-                      variant="light"
-                      id="archive-button"
-                      onClick={() => setShowArchive(true)}
+                {!props.isArchived && (
+                  <Col xs={6} md={6} lg={3} id="archive-col">
+                    <OverlayTrigger
+                      placement="bottom"
+                      overlay={renderTooltipArchive}
                     >
-                      {!props.isMobile && (
-                        <span id="archive-span" className="mx-2">
-                          Archive
-                        </span>
-                      )}
-                      <Archive id="archive-svg" />
-                    </Button>
-                  </OverlayTrigger>
-                </Col>
+                      <Button
+                        variant="light"
+                        id="archive-button"
+                        onClick={() => setShowArchive(true)}
+                      >
+                        {!props.isMobile && (
+                          <span id="archive-span" className="mx-2">
+                            Archive
+                          </span>
+                        )}
+                        <Archive id="archive-svg" />
+                      </Button>
+                    </OverlayTrigger>
+                  </Col>
+                )}
               </Row>
             </Col>
           </Row>
