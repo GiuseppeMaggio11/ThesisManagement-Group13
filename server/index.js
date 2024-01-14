@@ -241,8 +241,7 @@ app.post(
     check("cosupervisors_internal.*").isString(),
     check("cosupervisors_external").isArray(),
     check("cosupervisors_external.*").isString(),
-    check("cod_group").isArray(),
-    check("cod_group.*").isString(),
+    check("cod_group").isString().isLength({min: 1, max: 6}),
   ],
   newThesis
 );
@@ -330,8 +329,7 @@ app.put(
     check("cosupervisors_internal.*").isString(),
     check("cosupervisors_external").isArray(),
     check("cosupervisors_external.*").isString(),
-    check("cod_group").isArray(),
-    check("cod_group.*").isString(),
+    check("cod_group").isString().isLength({min: 1, max: 6}),
   ],
   updateThesis
 );

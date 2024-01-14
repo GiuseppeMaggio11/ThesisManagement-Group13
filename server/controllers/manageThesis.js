@@ -73,13 +73,11 @@ async function newThesis(req, res) {
     const codes_group = await dao.getCodes_group();
 
     // If given cod_group is not in list  raise error
-    for (let group of req.body.cod_group) {
-      if (!codes_group.includes(group)) {
-        await dao.rollback();
-        return res.status(400).json({
-          error: `Cod_group: ${group} is not a valid research group code`,
-        });
-      }
+    if (!codes_group.includes(req.body.cod_group)) {
+      await dao.rollback();
+      return res.status(400).json({
+        error: `Cod_group: ${req.body.cod_group} is not a valid research group code`,
+      });
     }
 
     //Create thesis object which contains data from front end
@@ -102,9 +100,7 @@ async function newThesis(req, res) {
     const result_thesis = await dao.createThesis(thesis);
 
     //Create a new thesis_group row which links thesis to its research group
-    for (let group of req.body.cod_group) {
-      await dao.createThesis_group(result_thesis.id, group);
-    }
+    await dao.createThesis_group(result_thesis.id, req.body.cod_group);
 
     //Create new rows which link thesis to interal cosupervisor
     if (req.body.cosupervisors_internal != null) {
@@ -213,18 +209,14 @@ async function updateThesis(req, res) {
 
     // --- GROUP COD should be an actual research group id, must be in group_table
     // Get every cod_group from group_table table in db
-    console.log("REQUEST", req.body.cod_group);
     const codes_group = await dao.getCodes_group();
-    console.log("CODES_GROUP", codes_group);
 
     // If given cod_group is not in list  raise error
-    for (group of req.body.cod_group) {
-      if (!codes_group.includes(group)) {
-        await dao.rollback();
-        return res.status(400).json({
-          error: `Cod_group: ${group} is not a valid research group code`,
-        });
-      }
+    if (!codes_group.includes(req.body.cod_group)) {
+      await dao.rollback();
+      return res.status(400).json({
+        error: `Cod_group: ${req.body.cod_group} is not a valid research group code`,
+      });
     }
 
     //Create thesis object which contains data from front end
@@ -248,9 +240,7 @@ async function updateThesis(req, res) {
 
     // Delete previous associations group-thesis, then insert the new associations
     await dao.deleteThesisGroups(thesis.thesis_id);
-    for (group of req.body.cod_group) {
-      await dao.createThesis_group(thesis.thesis_id, group);
-    }
+    await dao.createThesis_group(thesis.thesis_id, req.body.cod_group);
 
     //Delete all entries in thesis_cosupervisor_teacher related to this thesis, then insert the new values
     await dao.deleteThesisCosupervisorTeacherAll(thesis.thesis_id);
@@ -347,7 +337,8 @@ async function getThesisForProfessorById(req, res) {
     } else thesis.cosupervisors_internal = [];
 
     thesis.list_cosupervisors = list_cosupervisors;
-    thesis.cod_group = await dao.getThesisGroups(thesis_id);
+    const thesis_groups = await dao.getThesisGroups(thesis_id);
+    thesis.cod_group = thesis_groups[0];
 
     res.status(200).json(thesis);
   } catch (err) {
