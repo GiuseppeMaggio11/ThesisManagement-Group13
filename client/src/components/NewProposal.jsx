@@ -35,7 +35,7 @@ function NewProposal(props) {
     thesis_level: "",
     keywords: [],
     type_name: "",
-    cod_group: [],
+    cod_group: "",
     required_knowledge: "",
     notes: "",
     expiration: "",
@@ -57,7 +57,6 @@ function NewProposal(props) {
     []
   );
 
-  const [groups, setGroups] = useState([]);
   const [groups_obj, setGroups_obj] = useState([]);
 
   const [keywords, setKeywords] = useState([]);
@@ -86,7 +85,6 @@ function NewProposal(props) {
       let degrees = await API.getDegrees();
       let groups = await API.getGroups();
       let sup = in_cosup.filter(item => item.email === sup_email);
-      console.log(sup)
 
 
       setCoSupervisorExternal_obj(ex_cosup);
@@ -102,8 +100,7 @@ function NewProposal(props) {
         const formatted_in_cosup = in_cosup.map(
           ({ name, surname }) => `${name} ${surname}`
         );
-        const formatted_group = groups.map((e) => e.name);
-        setGroups(formatted_group);
+
         setCoSupervisorExternal(formatted_ex_cosup);
         setCoSupervisorInternal(formatted_in_cosup);
       }
@@ -121,36 +118,6 @@ function NewProposal(props) {
       let in_cosup = await API.getTeachers();
       in_cosup = in_cosup.filter(teacher => teacher.id !== response.supervisor_id);
       let ex_cosup = await API.getListExternalCosupervisors();
-      let groups = await API.getGroups();
-      let gr_notSelected = []
-
-      let gr = groups.filter((g) => {
-        return response.cod_group.some(
-          group => group === g.cod
-        )
-      }
-      )
-
-      if (gr.length) {
-        gr_notSelected = groups?.filter((g) => {
-          return response.cod_group.some(
-            group => group !== g.cod
-          )
-        }
-        )
-      }
-      else {
-        gr_notSelected = groups
-      }
-      console.log(gr)
-      console.log(gr_notSelected)
-
-      gr = gr.map(
-        ({ name }) => `${name}`
-      );
-      gr_notSelected = gr_notSelected?.map(
-        ({ name }) => `${name}`
-      );
 
       const formatted_ex_cosup = ex_cosup.map(
         ({ name, surname }) => `${name} ${surname}`
@@ -183,7 +150,6 @@ function NewProposal(props) {
       if (formatted_in_cosup.length > 0) {
         let c_in = [...formatted_in_cosup]
         c_in = c_in.filter(c => !in_cosup.includes(c))
-        console.log('c_in', c_in)
         setCoSupervisorInternal(c_in)
       }
       else {
@@ -199,15 +165,8 @@ function NewProposal(props) {
         setCoSupervisorExternal([])
       }
 
-      if (gr_notSelected.length) {
-        setGroups(gr_notSelected)
-      }
-      else
-        setGroups([])
-
       response = {
         ...response,
-        cod_group: gr,
         cosupervisors_internal: in_cosup,
         cosupervisors_external: ex_cosup
       }
@@ -380,20 +339,6 @@ function NewProposal(props) {
     return ids;
   }
 
-  function findGroupIDs(groupNames, objList) {
-    const ids = [];
-    groupNames &&
-      groupNames.forEach((name) => {
-        const foundObj = objList.find((obj) => obj.name === name);
-        if (foundObj) {
-          ids.push(foundObj.cod);
-        } else {
-          ids.push(null);
-        }
-      });
-    return ids;
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -405,7 +350,6 @@ function NewProposal(props) {
       formData.cosupervisors_internal,
       cosupervisors_internal_obj
     );
-    const groupIDS = findGroupIDs(formData.cod_group, groups_obj);
 
     const newProp = {
       ...formData,
@@ -413,7 +357,7 @@ function NewProposal(props) {
       cosupervisors_internal: cosupervisorInternalIDs,
       cosupervisors_external: cosupervisorExternalEmails,
       keywords: formData.keywords.join(", "),
-      cod_group: groupIDS,
+      cod_group: teacher.cod_group,
     };
 
     try {
@@ -674,22 +618,14 @@ function NewProposal(props) {
                   </Form.Group>
                   <Form.Group className="mb-3" ref={groupRef}>
                     <Form.Label htmlFor="cod_group">Group</Form.Label>
-                    <Chips2
-                      items={groups}
-                      selectedItems={formData.cod_group}
-                      setItems={setGroups}
-                      setSelectedItems={(value) =>
-                        updateChips("cod_group", value)
-                      }
-                    />
-                    <SearchDropdown
-                      placeholder={""}
-                      items={groups}
-                      setItems={setGroups}
-                      selectedItems={formData.cod_group}
-                      setSelectedItems={(value) =>
-                        updateChips("cod_group", value)
-                      }
+                    <Form.Control
+                      id="cod_group"
+                      type="text"
+                      style={{ marginTop: "0.5em" }}
+                      value={teacher && (
+                        groups_obj.find(obj => obj.cod === teacher.cod_group) ? 
+                        groups_obj.find(obj => obj.cod === teacher.cod_group).name : "")}
+                      disabled
                     />
                   </Form.Group>
                   <Form.Group className="mb-3">
