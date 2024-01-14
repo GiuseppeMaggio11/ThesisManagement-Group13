@@ -163,7 +163,7 @@ function NewRequest(props) {
       console.log(newProp)
       handleToast("New request created", "success");
 
-      navigate("/studentrequests");
+      navigate("/studproposals");
     } catch (error) {
       console.log(error);
       if (error.error) {
