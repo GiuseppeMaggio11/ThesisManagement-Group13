@@ -2438,7 +2438,7 @@ describe("checkBeforeDeleteProposal", () => {
         mockPool.execute.mockResolvedValueOnce([mockRows1])
             .mockResolvedValueOnce([mockRows2])
             .mockResolvedValueOnce([mockRows3]);
-        
+
         const result = await dao.checkBeforeDeleteProposal(mockInput.thesis_id, mockInput.professor_id);
 
         expect(mockPool.execute).toHaveBeenCalledTimes(3);
@@ -2454,7 +2454,7 @@ describe("checkBeforeDeleteProposal", () => {
             `SELECT * FROM application WHERE thesis_id = ? AND status = "Accepted"`,
             [mockInput.thesis_id]
         );
-        expect(result).toStrictEqual("ok"); 
+        expect(result).toStrictEqual("ok");
     });
 
     test("Should return an error - The thesis proposal is archived, is expired and/or is_deleted", async () => {
@@ -2465,7 +2465,7 @@ describe("checkBeforeDeleteProposal", () => {
         const mockRows1 = [];
 
         mockPool.execute.mockResolvedValueOnce([mockRows1]);
-        
+
         const result = await dao.checkBeforeDeleteProposal(mockInput.thesis_id, mockInput.professor_id);
 
         expect(mockPool.execute).toHaveBeenCalledTimes(1);
@@ -2481,7 +2481,7 @@ describe("checkBeforeDeleteProposal", () => {
             `SELECT * FROM application WHERE thesis_id = ? AND status = "Accepted"`,
             [mockInput.thesis_id]
         );
-        expect(result).toStrictEqual("The thesis you request to delete is either not available or not removale."); 
+        expect(result).toStrictEqual("The thesis you request to delete is either not available or not removale.");
     });
 
     test("Should return an error - The thesis proposal doesn't belong to the professor who has made the request", async () => {
@@ -2514,7 +2514,7 @@ describe("checkBeforeDeleteProposal", () => {
 
         mockPool.execute.mockResolvedValueOnce([mockRows1])
             .mockResolvedValueOnce([mockRows2]);
-        
+
         const result = await dao.checkBeforeDeleteProposal(mockInput.thesis_id, mockInput.professor_id);
 
         expect(mockPool.execute).toHaveBeenCalledTimes(2);
@@ -2530,7 +2530,7 @@ describe("checkBeforeDeleteProposal", () => {
             `SELECT * FROM application WHERE thesis_id = ? AND status = "Accepted"`,
             [mockInput.thesis_id]
         );
-        expect(result).toStrictEqual("You can only delete your own proposals."); 
+        expect(result).toStrictEqual("You can only delete your own proposals.");
     });
 
     test("Should check if a thesis proposal has active applications, is archived or is expired", async () => {
@@ -2578,7 +2578,7 @@ describe("checkBeforeDeleteProposal", () => {
         mockPool.execute.mockResolvedValueOnce([mockRows1])
             .mockResolvedValueOnce([mockRows2])
             .mockResolvedValueOnce([mockRows3]);
-        
+
         const result = await dao.checkBeforeDeleteProposal(mockInput.thesis_id, mockInput.professor_id);
 
         expect(mockPool.execute).toHaveBeenCalledTimes(3);
@@ -2594,7 +2594,7 @@ describe("checkBeforeDeleteProposal", () => {
             `SELECT * FROM application WHERE thesis_id = ? AND status = "Accepted"`,
             [mockInput.thesis_id]
         );
-        expect(result).toStrictEqual("The thesis you request to delete has an active application. you can't delete it."); 
+        expect(result).toStrictEqual("The thesis you request to delete has an active application. you can't delete it.");
     });
 
     test("Should throw an error - MySql error", async () => {
@@ -2604,7 +2604,7 @@ describe("checkBeforeDeleteProposal", () => {
         };
 
         mockPool.execute.mockRejectedValue("Database error");
-        
+
         await expect(dao.checkBeforeDeleteProposal(mockInput.thesis_id, mockInput.professor_id)).rejects.toStrictEqual("Database error");
 
         expect(mockPool.execute).toHaveBeenCalledTimes(1);
@@ -2619,60 +2619,10 @@ describe("checkBeforeDeleteProposal", () => {
         expect(mockPool.execute).not.toHaveBeenCalledWith(
             `SELECT * FROM application WHERE thesis_id = ? AND status = "Accepted"`,
             [mockInput.thesis_id]
-        ); 
+        );
     });
 
 });
-
-/*
-//check if a proposal 1 has an active application or 2 is_archived or 3 is_expired. in these case we prevent deletion of that thesis
-exports.checkBeforeDeleteProposal = async (thesis_id, professorID) => {
-  try {
-    //first check the specified thesis is_archived and is_expired and is_deleted. if anyone of those is equall to 1, we cant delete that thesis, and we return an error
-    const sql =
-      "SELECT * FROM thesis WHERE id = ? AND is_archived = 0 AND is_deleted = 0 AND is_expired = 0";
-    const [rows] = await pool.execute(sql, [thesis_id]);
-    if (rows.length === 0) {
-      return "The thesis you request to delete is either not available or not removale.";
-    }
-
-    //check if the requested proposal for delete is belongs to the professor whom we receive delete request from
-    const sql2 = "SELECT supervisor_id FROM thesis WHERE id = ?";
-    const [rows2] = await pool.execute(sql2, [thesis_id]);
-    if (rows2[0].supervisor_id !== professorID) {
-      return "You can only delete your own proposals.";
-    }
-
-    //second check if the specified thesis has an accepted application, then throw an error
-    const sql3 = `SELECT * FROM application WHERE thesis_id = ? AND status = "Accepted"`;
-    const [rows3] = await pool.execute(sql3, [thesis_id]);
-    if (rows3.length !== 0) {
-      return "The thesis you request to delete has an active application. you can't delete it.";
-    } else {
-      return "ok";
-    }
-  } catch (error) {
-    console.error("Error in check before delete proposal: ", error);
-    throw error;
-  }
-};
-*/
-
-/*const mockRows3 = [
-            {
-                student_id: "S111111",
-                thesis_id: 1,
-                status: "status",
-                application_date: new Date()
-            },
-            {
-                student_id: "S222222",
-                thesis_id: 1,
-                status: "status",
-                application_date: new Date()
-            }
-        ];*/
-
 
 describe("deleteProposal", () => {
 
@@ -3146,6 +3096,7 @@ describe("teachersThesisRequest", () => {
         const mockRows = {
             info: "ok"
         };
+        //const start_date = new Date();
 
         mockPool.execute.mockResolvedValue([mockRows]);
 
@@ -3157,6 +3108,14 @@ describe("teachersThesisRequest", () => {
             [mockInput.change, expect.any(Date), mockInput.request_id]
         );
 
+        /* const mockDate = mockPool.execute.mock.calls[0][1][1];
+        expect(mockDate.getFullYear()).toStrictEqual(start_date.getFullYear());
+        expect(mockDate.getMonth()).toStrictEqual(start_date.getMonth());
+        expect(mockDate.getDate()).toStrictEqual(start_date.getDate());
+        expect(mockDate.getHours()).toStrictEqual(start_date.getHours());
+        expect(mockDate.getMinutes()).toStrictEqual(start_date.getMinutes());
+        expect(mockDate.getSeconds()).toStrictEqual(start_date.getSeconds()); */
+        
         expect(result).toStrictEqual(mockRows.info);
     });
 
@@ -3165,6 +3124,7 @@ describe("teachersThesisRequest", () => {
             request_id: 1,
             change: 0
         };
+        const start_date = new Date();
 
         mockPool.execute.mockRejectedValue("Database error");
 
@@ -3175,6 +3135,14 @@ describe("teachersThesisRequest", () => {
             `UPDATE thesis_request SET status_code = ?, start_date = ? WHERE id = ?`,
             [mockInput.change, expect.any(Date), mockInput.request_id]
         );
+
+        /* const mockDate = mockPool.execute.mock.calls[0][1][1];
+        expect(mockDate.getFullYear()).toStrictEqual(start_date.getFullYear());
+        expect(mockDate.getMonth()).toStrictEqual(start_date.getMonth());
+        expect(mockDate.getDate()).toStrictEqual(start_date.getDate());
+        expect(mockDate.getHours()).toStrictEqual(start_date.getHours());
+        expect(mockDate.getMinutes()).toStrictEqual(start_date.getMinutes());
+        expect(mockDate.getSeconds()).toStrictEqual(start_date.getSeconds()); */
     });
 
 });
@@ -3713,16 +3681,46 @@ describe("getStudent", () => {
 
 });
 
-/*
-exports.getStudent = async (studentID)=>{
-  try{
-    const sql = "select * FROM student WHERE id=?"
-    const [rows] = await pool.execute(sql, [studentID]);
-    return rows;
-  }
-  catch (err) {
-    console.error("Error in getStudentExams: ", err);
-    throw err;
-  }
-}
-*/
+describe("getDataProfessorRequestEmail", () => {
+    test("Should retrieve the thesis request title and the supervisor email for an existing thesis request", async () => {
+        const mockInput = {
+            requestID: 1,
+            professorID: "P111111"
+        };
+        const mockRows = [
+            {
+                email: "email",
+                title: "title"
+            }
+        ];
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.getDataProfessorRequestEmail(mockInput.requestID, mockInput.professorID);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT  email, title FROM thesis_request TR, teacher T WHERE TR.id = ? AND T.id = ?",
+            [mockInput.requestID, mockInput.professorID]
+        );
+        expect(result).toStrictEqual(mockRows[0]);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            requestID: 1,
+            professorID: "P111111"
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getDataProfessorRequestEmail(mockInput.requestID, mockInput.professorID)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "SELECT  email, title FROM thesis_request TR, teacher T WHERE TR.id = ? AND T.id = ?",
+            [mockInput.requestID, mockInput.professorID]
+        );
+    });
+
+});

@@ -142,6 +142,18 @@ exports.getDataStudentApplicationEmail = async (thesisId, studentId) => {
   }
 };
 
+exports.getDataProfessorRequestEmail = async (requestID, professorID) => {
+  try {
+    const sql =
+      "SELECT  email, title FROM thesis_request TR, teacher T WHERE TR.id = ? AND T.id = ?";
+    const [result] = await pool.execute(sql, [requestID, professorID]);
+    return result[0];
+  } catch (error) {
+    console.error("Error in getDataProfessorRequestEmail: ", error);
+    throw error;
+  }
+};
+
 //Get proposals
 exports.getProposals = async (user_type, username, date) => {
   try {
@@ -740,7 +752,7 @@ exports.updateThesesArchivationManual = async (thesis_id) => {
     const [rows] = await pool.execute(sql, [thesis_id]);
     return rows.info;
   } catch (err) {
-    console.error("Error in updateThesesArchivation: ", err);
+    console.error("Error in updateThesesArchivationManual: ", err);
     throw err;
   }
 };

@@ -49,6 +49,9 @@ async function updateApplicationStatus(req, res) {
           //cancels every other application of that student
           //const result_cancel = await dao.cancelStudentApplications(decision);
         }
+        
+        await dao.commit();
+
         const emailData = await dao.getDataStudentApplicationEmail(
           decision.thesis_id,
           decision.student_id
@@ -66,7 +69,7 @@ async function updateApplicationStatus(req, res) {
             console.log(error);
           }
         });
-        await dao.commit();
+        
         return res.status(200).json(updated_application);
       }
     }
@@ -106,6 +109,9 @@ async function newApplication(req, res) {
     }
 
     const result = await dao.newApply(userID, thesis_id, date);
+
+    await dao.commit();
+
     const emailData = await dao.getDataTeacherApplicationEmail(thesis_id);
     const mailOptions = {
       from: "group13.thesismanagement@gmail.com",
@@ -122,7 +128,6 @@ async function newApplication(req, res) {
       }
     });
 
-    await dao.commit();
     return res.status(200).json("Application created successfully");
   } catch (error) {
     await dao.rollback();
