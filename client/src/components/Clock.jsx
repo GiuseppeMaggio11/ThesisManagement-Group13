@@ -13,7 +13,7 @@ const FlipClock = ({
   virtualTime,
   setVirtualTime,
   systemTime,
-  setSystemTime
+  setSystemTime,
 }) => {
   const [time, setTime] = useState(new Date());
   const [virtualTimeArray, setVirtualTimeArray] = useState([
@@ -83,7 +83,7 @@ const FlipClock = ({
   }, [handleTraslationToArray]);
 
   useEffect(() => {
-    console.log(systemTime)
+    console.log(systemTime);
     if (!isVirtual && !settingVirtual) {
       const interval = setInterval(() => {
         setTime(new Date());
@@ -91,28 +91,33 @@ const FlipClock = ({
 
       return () => clearInterval(interval);
     }
-     if (settingVirtual && !isVirtual) {
-        handleTraslationToArray();
+    if (settingVirtual && !isVirtual) {
+      handleTraslationToArray();
     }
 
-     if (isVirtual && !settingVirtual) {
+    if (isVirtual && !settingVirtual) {
       const interval = setInterval(() => {
         setVirtualTime((prevVirtualTime) => {
           let updatedVirtualTime;
-          if(prevVirtualTime!==undefined){
+          if (prevVirtualTime !== undefined) {
             updatedVirtualTime = prevVirtualTime.add(1, "second");
+          } else {
+            updatedVirtualTime = localStorage.getItem("virtualclock")
+              ? dayjs(
+                  new Date(JSON.parse(localStorage.getItem("virtualclock")))
+                ).add(1, "second")
+              : dayjs().add(1, "second");
           }
-          else{
-            updatedVirtualTime = localStorage.getItem("virtualclock")? dayjs(new Date(JSON.parse(localStorage.getItem("virtualclock")))).add(1, "second"):dayjs().add(1, "second");
-          }
-          setSystemTime(updatedVirtualTime.toDate())
-          localStorage.setItem("virtualclock", JSON.stringify(updatedVirtualTime.toDate()));
+          setSystemTime(updatedVirtualTime.toDate());
+          localStorage.setItem(
+            "virtualclock",
+            JSON.stringify(updatedVirtualTime.toDate())
+          );
           return updatedVirtualTime;
         });
       }, 1000);
       return () => clearInterval(interval);
     }
-  
   }, [isVirtual, settingVirtual]);
 
   useEffect(() => {
@@ -130,7 +135,11 @@ const FlipClock = ({
       handleDateTimeUpdate(time);
       setIsLoading(false);
     } else {
-      handleDateTimeUpdate(virtualTime?virtualTime.toDate():new Date(JSON.parse(localStorage.getItem("virtualclock"))))
+      handleDateTimeUpdate(
+        virtualTime
+          ? virtualTime.toDate()
+          : new Date(JSON.parse(localStorage.getItem("virtualclock")))
+      );
       setIsLoading(false);
     }
   }, [isLoading, time, virtualTime]);
@@ -189,10 +198,8 @@ const FlipClock = ({
             if (v[3] === 0) v[2] = 1;
             else v[2] = 0;
           } else if (v[2] === 3 && v[3] != 0) v[3] = 0;
-        } else {
-          if (v[2] === 3 && v[3] > 1) {
-            v[3] = 0;
-          }
+        } else if (v[2] === 3 && v[3] > 1) {
+          v[3] = 0;
         }
 
         if (v[3] == 0 && v[2] == 0) {
@@ -221,10 +228,8 @@ const FlipClock = ({
           if (v[2] === 3) {
             v[3] = 0;
           }
-        } else {
-          if (v[2] === 3) {
-            if (v[3] > 1) v[3] = 0;
-          }
+        } else if (v[2] === 3 && v[3] > 1) {
+          v[3] = 0;
         }
 
         if (v[3] == 0 && v[2] == 0) v[3] = 1;
@@ -258,8 +263,7 @@ const FlipClock = ({
 
       case "h1_up":
         v[8] = parseInt((v[8] + 1) % 3);
-        if (v[9] > 3 && v[8] > 1) v[8] = 0;
-        else if (v[8] > 2) v[8] = 0;
+        if ((v[9] > 3 && v[8] > 1) || v[8] > 2) v[8] = 0;
         setVirtualTimeArray(v);
         setVirtual(v);
 
