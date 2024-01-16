@@ -1,6 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import NewProposal from "./components/NewProposal";
 import ThesisPage from "./components/ThesisPage";
@@ -14,7 +14,6 @@ import MessageContext from "./messageCtx";
 import Applications from "./components/Applications";
 import SearchProposalRoute from "./components/SearchProposal";
 import ProfessorActiveProposals from "./components/ProfessorActiveProposals";
-//import Toasts from "./components/Toasts";
 import StudentApplications from "./components/StudentApplications";
 import ViewProposal from "./components/ViewProposal";
 import Home from "./components/Home";
@@ -31,8 +30,6 @@ function App() {
       ? new Date(JSON.parse(localStorage.getItem("virtualclock")))
       : new Date()
   );
-  //const [message, setMessage] = useState("");
-  //const [type, setType] = useState("");
   const [error, setError] = useState("");
   // If an error occurs, the error message will be shown in a toast.
   const handleToast = (err, type) => {
@@ -41,9 +38,6 @@ function App() {
     if (err.error) msg = err.error;
     else if (typeof err === "string") msg = String(err);
     else msg = "Unknown Error";
-    /* if (type === "success") setType(type);
-    else setType("error");
-    setMessage(msg); */
 
     if (type === "success") {
       toast.success(msg, {

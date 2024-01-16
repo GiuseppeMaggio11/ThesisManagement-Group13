@@ -34,7 +34,7 @@ const {
   getThesisForProfessorById,
   updateThesis,
   deleteProposal,
-  newRequest
+  newRequest,
 } = require("./controllers/manageThesis");
 const {
   listExternalCosupervisors,
@@ -47,17 +47,14 @@ const {
   setVirtualClock,
   uninstallVirtualClock,
   create_schedule,
-  getServerDateTime
+  getServerDateTime,
 } = require("./controllers/virtualClock");
 const {
   getRequestsForProfessor,
   getRequestsForSecretary,
-  updateThesisRequest
+  updateThesisRequest,
 } = require("./controllers/thesisRequest");
-const {
-  getStudentCV,
-  getStudent
-} = require("./controllers/student")
+const { getStudentCV, getStudent } = require("./controllers/student");
 
 const express = require("express");
 const morgan = require("morgan");
@@ -73,7 +70,7 @@ const fs = require("fs");
 const zipdir = require("zip-dir");
 const bodyParser = require("body-parser");
 const cron = require("node-cron");
-var FakeTimers = require("@sinonjs/fake-timers");
+let FakeTimers = require("@sinonjs/fake-timers");
 const CronJob = require("cron");
 const nodemailer = require("nodemailer");
 
@@ -241,7 +238,7 @@ app.post(
     check("cosupervisors_internal.*").isString(),
     check("cosupervisors_external").isArray(),
     check("cosupervisors_external.*").isString(),
-    check("cod_group").isString().isLength({min: 1, max: 6}),
+    check("cod_group").isString().isLength({ min: 1, max: 6 }),
   ],
   newThesis
 );
@@ -329,7 +326,7 @@ app.put(
     check("cosupervisors_internal.*").isString(),
     check("cosupervisors_external").isArray(),
     check("cosupervisors_external.*").isString(),
-    check("cod_group").isString().isLength({min: 1, max: 6}),
+    check("cod_group").isString().isLength({ min: 1, max: 6 }),
   ],
   updateThesis
 );
@@ -341,8 +338,7 @@ app.get("/api/getrequestsforsecr", isSecretary, getRequestsForSecretary);
 
 app.get("/api/getrequestsforprof", isProfessor, getRequestsForProfessor);
 
-app.put("/api/updateRequest/:id",isSecretaryOrProfessor, updateThesisRequest );
-
+app.put("/api/updateRequest/:id", isSecretaryOrProfessor, updateThesisRequest);
 
 //RETURN TO REAL DATETIME
 app.put("/api/setRealDateTime", uninstallVirtualClock);
@@ -356,9 +352,7 @@ app.put(
 
 app.get("/api/getServerDateTime", getServerDateTime);
 
-
 app.get("/api/getServerDateTime", getServerDateTime);
-
 
 //CREATES NEW THESIS REQUEST
 app.post(
@@ -373,7 +367,6 @@ app.post(
   ],
   newRequest
 );
-
 
 const now = new Date().toString();
 console.log("Date-time:", now);
