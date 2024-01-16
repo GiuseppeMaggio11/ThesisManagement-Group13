@@ -1,5 +1,14 @@
 const dao = require("../dao");
 const { validationResult } = require("express-validator");
+const nodemailer = require("nodemailer");
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "group13.thesismanagement@gmail.com",
+    pass: "xuzg drbh ezyn zaqg",
+  },
+});
 
 async function newThesis(req, res) {
   const errors = validationResult(req);
@@ -61,18 +70,14 @@ async function newThesis(req, res) {
 
     // --- GROUP COD should be an actual research group id, must be in group_table
     // Get every cod_group from group_table table in db
-    console.log("REQUEST", req.body.cod_group);
     const codes_group = await dao.getCodes_group();
-    console.log("CODES_GROUP", codes_group);
 
     // If given cod_group is not in list  raise error
-    for (let group of req.body.cod_group) {
-      if (!codes_group.includes(group)) {
-        await dao.rollback();
-        return res.status(400).json({
-          error: `Cod_group: ${group} is not a valid research group code`,
-        });
-      }
+    if (!codes_group.includes(req.body.cod_group)) {
+      await dao.rollback();
+      return res.status(400).json({
+        error: `Cod_group: ${req.body.cod_group} is not a valid research group code`,
+      });
     }
 
     //Create thesis object which contains data from front end
@@ -95,9 +100,7 @@ async function newThesis(req, res) {
     const result_thesis = await dao.createThesis(thesis);
 
     //Create a new thesis_group row which links thesis to its research group
-    for (let group of req.body.cod_group) {
-      await dao.createThesis_group(result_thesis.id, group);
-    }
+    await dao.createThesis_group(result_thesis.id, req.body.cod_group);
 
     //Create new rows which link thesis to interal cosupervisor
     if (req.body.cosupervisors_internal != null) {
@@ -135,19 +138,6 @@ async function newThesis(req, res) {
 
     //return error
     return res.status(503).json({ error: `${err}` });
-  }
-}
-
-//updates is_archived value of every thesis based on new virtualclock time
-async function updateThesesArchivation(req, res) {
-  try {
-    await dao.beginTransaction();
-    const response_msg = await dao.updateThesesArchivation(req.body.datetime);
-    await dao.commit();
-    res.status(200).json(response_msg);
-  } catch (err) {
-    await dao.rollback();
-    res.status(500).json(err);
   }
 }
 
@@ -219,18 +209,14 @@ async function updateThesis(req, res) {
 
     // --- GROUP COD should be an actual research group id, must be in group_table
     // Get every cod_group from group_table table in db
-    console.log("REQUEST", req.body.cod_group);
     const codes_group = await dao.getCodes_group();
-    console.log("CODES_GROUP", codes_group);
 
     // If given cod_group is not in list  raise error
-    for (group of req.body.cod_group) {
-      if (!codes_group.includes(group)) {
-        await dao.rollback();
-        return res.status(400).json({
-          error: `Cod_group: ${group} is not a valid research group code`,
-        });
-      }
+    if (!codes_group.includes(req.body.cod_group)) {
+      await dao.rollback();
+      return res.status(400).json({
+        error: `Cod_group: ${req.body.cod_group} is not a valid research group code`,
+      });
     }
 
     //Create thesis object which contains data from front end
@@ -254,9 +240,7 @@ async function updateThesis(req, res) {
 
     // Delete previous associations group-thesis, then insert the new associations
     await dao.deleteThesisGroups(thesis.thesis_id);
-    for (group of req.body.cod_group) {
-      await dao.createThesis_group(thesis.thesis_id, group);
-    }
+    await dao.createThesis_group(thesis.thesis_id, req.body.cod_group);
 
     //Delete all entries in thesis_cosupervisor_teacher related to this thesis, then insert the new values
     await dao.deleteThesisCosupervisorTeacherAll(thesis.thesis_id);
@@ -347,13 +331,14 @@ async function getThesisForProfessorById(req, res) {
       });
       list_cosupervisors = list_cosupervisors.concat(
         vettIntCosup.map((item) => {
-          return item.ext_supervisor_name;
+          return item.int_supervisor_name;
         })
       );
     } else thesis.cosupervisors_internal = [];
 
     thesis.list_cosupervisors = list_cosupervisors;
-    thesis.cod_group = await dao.getThesisGroups(thesis_id);
+    const thesis_groups = await dao.getThesisGroups(thesis_id);
+    thesis.cod_group = thesis_groups[0];
 
     res.status(200).json(thesis);
   } catch (err) {
@@ -386,6 +371,7 @@ async function deleteProposal(req, res) {
       professorID
     );
     if (response_msg !== "ok") {
+      await dao.rollback();
       return res.status(400).json({ error: response_msg });
     }
     await dao.deleteProposal(thesis_id);
@@ -398,15 +384,96 @@ async function deleteProposal(req, res) {
       .json({ result: `The proposal has been deleted successfully` });
   } catch (err) {
     await dao.rollback();
-    return res.status(500).json(err);
+    return res.status(500).json({error: err});
+  }
+}
+// CREATE THESIS REQUEST 
+async function newRequest(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors });
+  }
+
+  try {
+    //start transaction
+    await dao.beginTransaction();
+
+    const userID = await dao.getUserID(req.user.username);
+    
+    // ---MAIN SUPEVISOR is a teacher, check if given supervisor_id is in teacher table, if it isn't raise error
+    //Get every teacher id from teacher table
+    const teachers = await dao.getTeachers();
+    //Check if given teacher id is in list
+    if (!teachers.includes(req.body.supervisor_id)) {
+      await dao.rollback();
+      return res.status(400).json({
+        error: `Supervisor_id: ${req.body.supervisor_id} is not a teacher`,
+      });
+    }
+
+    //Create thesis object which contains data from front end
+    const thesisRequest = {
+      title: req.body.title,
+      description: req.body.description,
+      supervisor_id: req.body.supervisor_id,
+      student_id: userID
+    };
+    //Insert new thesis in db
+    const result_request = await dao.createRequest(thesisRequest);
+
+    //Create new rows which link thesis to interal cosupervisor
+    if (req.body.cosupervisors_internal != null) {
+      const result_cosupervisors_internal = [];
+      for (const internal_cosupervisor of req.body.cosupervisors_internal) {
+        if (!teachers.includes(internal_cosupervisor)) {
+          await dao.rollback();
+          return res.status(400).json({
+            error: `Internal cosupervisor id: ${internal_cosupervisor} is not a teacher`,
+          });
+        }
+
+        result_cosupervisors_internal.push(
+          await dao.createRequest_cosupervisor_teacher(
+            result_request.id,
+            internal_cosupervisor
+          )
+        );
+      }
+    }
+
+    await dao.commit();
+
+    const emailData = await dao.getDataProfessorRequestEmail(result_request.id, req.body.supervisor_id);
+    const mailOptions = {
+      from: "group13.thesismanagement@gmail.com",
+      to: "group13.thesismanagement@gmail.com",
+      subject: `NEW THESIS REQUEST`,
+      text: `New thesis request title:"${emailData.title}", has been sent to you`,
+    };
+    transporter.sendMail(mailOptions, async (error, info) => {
+      if (!error) {
+        console.log("Email mandata");
+      } else {
+        console.log(error);
+      }
+    });
+
+    //Return inserted data
+    return res.status(200).json(result_request);
+  } catch (err) {
+    //rollback if errors occur
+    await dao.rollback();
+
+    //return error
+    return res.status(503).json({ error: `${err}` });
   }
 }
 
 module.exports = {
   newThesis,
-  updateThesesArchivation,
   updateThesesArchivationManual,
   getThesisForProfessorById,
   updateThesis,
   deleteProposal,
+  newRequest
 };

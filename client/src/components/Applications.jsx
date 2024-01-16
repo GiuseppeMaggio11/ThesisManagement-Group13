@@ -1,12 +1,10 @@
 import { useContext, useEffect, useState } from "react";
 import {
-  Accordion,
-  Alert,
   Button,
+  Card,
   Col,
   Container,
   Modal,
-  ModalBody,
   OverlayTrigger,
   Row,
   Table,
@@ -17,19 +15,28 @@ import { useMediaQuery } from "react-responsive";
 import API from "../API";
 import MessageContext from "../messageCtx";
 import {
-  CheckLg,
-  XLg,
   Download,
-  Folder,
   FileEarmarkPdf,
   FileEarmarkPdfFill,
+  FolderFill,
+  CheckCircleFill,
+  XCircleFill,
+  CheckCircle,
+  XCircle,
+  CheckSquareFill,
+  CheckSquare,
+  XSquare,
+  XLg,
+  Check,
+  X,
 } from "react-bootstrap-icons";
 import ConfirmationModal from "./ConfirmationModal";
 import NoFileFound from "./NoFileFound";
+import randomColor from "randomcolor";
 
 function Applications(props) {
-  const [applications, setApplications] = useState(undefined);
-  const [thesisTitles, setThesisTitles] = useState(undefined);
+  const [applications, setApplications] = useState([]);
+  const [thesisTitles, setThesisTitles] = useState([]);
   const { handleToast } = useContext(MessageContext);
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
@@ -54,6 +61,14 @@ function Applications(props) {
       ];
       setApplications(updatedResult);
       setThesisTitles(uniqueThesisTitles);
+      /* setApplications((old) => old.concat(updatedResult));
+      setApplications((old) => old.concat(updatedResult));
+      setApplications((old) => old.concat(updatedResult));
+      setApplications((old) => old.concat(updatedResult));
+      setThesisTitles((old) => old.concat(uniqueThesisTitles));
+      setThesisTitles((old) => old.concat(uniqueThesisTitles));
+      setThesisTitles((old) => old.concat(uniqueThesisTitles));
+      setThesisTitles((old) => old.concat(uniqueThesisTitles)); */
       props.setLoading(false);
     };
     getApplication();
@@ -137,70 +152,156 @@ function Applications(props) {
             <NoFileFound message={"No Applications found"} />
           </>
         ) : (
-          <Accordion>
+          <Row>
             {thesisTitles.map((title, i) => {
               return (
-                <Accordion.Item key={i} eventKey={i}>
-                  <Accordion.Header>
-                    <span style={{ color: "#4682B4", fontSize: 18 }}>
-                      {title}
-                    </span>
-                  </Accordion.Header>
-                  <Accordion.Body>
-                    <Table>
-                      <thead>
-                        <tr>
-                          {!isMobile && <th>Student ID</th>}
-                          <th>Student Name</th>
-                          <th>Application Date</th>
-                          <th></th>
-                          <th></th>
-                          <th></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {applications.map((appl, i) => {
-                          return (
-                            <StudentApplication
-                              application={appl}
-                              key={i}
-                              handleApplication={handleApplication}
-                              handleDownloadZip={handleDownloadZip}
-                              handleDownloadPDF={handleDownloadPDF}
-                              isMobile={isMobile}
-                              title={title}
-                            />
-                          );
-                        })}
-                      </tbody>
-                    </Table>
-                  </Accordion.Body>
-                </Accordion.Item>
+                <ApplicationCard
+                  key={i}
+                  title={title}
+                  isMobile={isMobile}
+                  applications={applications}
+                  handleApplication={handleApplication}
+                  handleDownloadZip={handleDownloadZip}
+                  handleDownloadPDF={handleDownloadPDF}
+                />
               );
             })}
-          </Accordion>
+          </Row>
         )}
       </Container>
     </div>
   );
 }
 
-function StudentApplication(props) {
+function ApplicationCard(props) {
+  const [showStudentApplyed, setShowStudentApplyed] = useState(false);
+
+  const studentApplyed = props.applications.filter(
+    (appl) => props.title === appl.thesis_title
+  ).length;
+
+  const redPalette = ["#FF0000", "#CC0000", "#990000", "#660000", "#330000"];
+
+  return (
+    <>
+      <Col xs={12} md={6} lg={4} className="mt-4">
+        <Card
+          style={{
+            padding: 20,
+            height: props.isMobile ? "fit-content" : "125px",
+          }}
+          className="custom-card-applications"
+          onClick={() => setShowStudentApplyed(true)}
+        >
+          <Row>
+            <Col
+              className="col-8"
+              style={{
+                fontWeight: "400",
+                fontSize: 20,
+              }}
+            >
+              {props.title}
+            </Col>
+            <Col className="text-end">
+              <div
+                className="student-number-applyed"
+                style={{
+                  backgroundColor: randomColor({
+                    seed: studentApplyed,
+                    luminosity: "bright",
+                    format: "rgba",
+                    alpha: 1,
+                    hue: "red",
+                    palette: redPalette,
+                  }).replace(/1(?=\))/, "0.1"),
+                  color: randomColor({
+                    seed: studentApplyed,
+                    luminosity: "bright",
+                    format: "rgba",
+                    alpha: 1,
+                    hue: "red",
+                    palette: redPalette,
+                  }),
+                }}
+              >
+                {studentApplyed}
+              </div>
+            </Col>
+          </Row>
+        </Card>
+      </Col>
+      <ModalStudentsApplyedForThesis
+        show={showStudentApplyed}
+        onHide={() => setShowStudentApplyed(false)}
+        title={props.title}
+        isMobile={props.isMobile}
+        applications={props.applications}
+        handleApplication={props.handleApplication}
+        handleDownloadZip={props.handleDownloadZip}
+        handleDownloadPDF={props.handleDownloadPDF}
+        setShowStudentApplyed={setShowStudentApplyed}
+      />
+    </>
+  );
+}
+
+function ModalStudentsApplyedForThesis(props) {
+  const applicationsFiltered = props.applications.filter(
+    (appl) => props.title === appl.thesis_title
+  );
+  return (
+    <Modal
+      show={props.show}
+      onHide={props.onHide}
+      size="xl"
+      aria-labelledby="contained-modal-title-vcenter"
+      centered
+      contentClassName="modal-custom-student-apply"
+    >
+      <Modal.Header>
+        <Modal.Title id="contained-modal-title-vcenter">
+          <span
+            style={{
+              fontWeight: "400",
+              fontSize: 25,
+            }}
+          >
+            {props.title}
+          </span>
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body style={{ maxHeight: "70vh", overflowY: "auto" }}>
+        <Row>
+          <Col xs={12} md={12} lg={12} xl={12}>
+            {applicationsFiltered.map((application, i) => {
+              return (
+                <StudentApplicationThesis
+                  key={i}
+                  application={application}
+                  isMobile={props.isMobile}
+                  handleApplication={props.handleApplication}
+                  handleDownloadZip={props.handleDownloadZip}
+                  handleDownloadPDF={props.handleDownloadPDF}
+                  setShowStudentApplyed={props.setShowStudentApplyed}
+                  applicationsFiltered={applicationsFiltered}
+                />
+              );
+            })}
+          </Col>
+        </Row>
+      </Modal.Body>
+    </Modal>
+  );
+}
+
+function StudentApplicationThesis(props) {
+  const [show, setShow] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [action, setAction] = useState("");
   const [studentId, setStudentId] = useState("");
   const [thesisId, setThesisId] = useState("");
-
-  const [show, setShow] = useState(false);
   const [hoveredRow, setHoveredRow] = useState(undefined);
-
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-
-  const handleRowHover = (index) => {
-    setHoveredRow(index);
-  };
-
   function formatDate(dateString) {
     let date = new Date(dateString);
     let day = date.getDate();
@@ -212,6 +313,16 @@ function StudentApplication(props) {
       minutes < 10 ? "0" : ""
     }${minutes}`;
   }
+  const handleClose = () => {
+    setShow(false);
+  };
+  const handleShow = () => {
+    setShow(true);
+  };
+
+  const handleRowHover = (index) => {
+    setHoveredRow(index);
+  };
 
   function handleConfirmation(studentId, thesisId, action) {
     setStudentId(studentId);
@@ -223,33 +334,48 @@ function StudentApplication(props) {
   function confirmAction() {
     props.handleApplication(studentId, thesisId, action);
     setShowConfirmation(false);
+    if (props.applicationsFiltered.length === 0)
+      props.setShowStudentApplyed(false);
   }
 
-  return props.title === props.application.thesis_title ? (
+  return (
     <>
-      <tr>
-        {!props.isMobile && <td>{props.application.student_id}</td>}
-        <td>{props.application.student_name}</td>
-        <td>{formatDate(props.application.application_date)}</td>
-        <td>
+      <Row
+        className="m-2 p-2"
+        style={{ borderRadius: "20px", background: "#f3f3f3" }}
+      >
+        <Col style={{ fontWeight: "600" }}>
+          {props.application.student_name}
+        </Col>
+        {!props.isMobile && <Col>{props.application.student_id}</Col>}
+        {!props.isMobile && (
+          <Col>{formatDate(props.application.application_date)}</Col>
+        )}
+        <Col className="text-end">
           {props.application.files && props.application.files.length > 0 && (
             <OverlayTrigger
               overlay={
                 <Tooltip id="tooltip-top">See application files</Tooltip>
               }
             >
-              <Button variant="secondary" onClick={handleShow}>
-                <Folder size={20} />
+              <Button
+                variant="light"
+                onClick={handleShow}
+                className="file-button-appl"
+                color="black"
+              >
+                <FolderFill size={30} />
               </Button>
             </OverlayTrigger>
           )}
-        </td>
-        <td>
+        </Col>
+        <Col className="text-end">
           <OverlayTrigger
             overlay={<Tooltip id="tooltip-top">Accept application</Tooltip>}
           >
             <Button
-              variant="success"
+              variant="light"
+              className="accept-button-appl"
               onClick={() =>
                 handleConfirmation(
                   props.application.student_id,
@@ -258,16 +384,17 @@ function StudentApplication(props) {
                 )
               }
             >
-              <CheckLg size={20} />
+              <Check size={25} />
             </Button>
           </OverlayTrigger>
-        </td>
-        <td>
+        </Col>
+        <Col className="text-end">
           <OverlayTrigger
             overlay={<Tooltip id="tooltip-top">Reject application</Tooltip>}
           >
             <Button
-              variant="danger"
+              variant="light"
+              className="reject-button-appl"
               onClick={() =>
                 handleConfirmation(
                   props.application.student_id,
@@ -276,13 +403,12 @@ function StudentApplication(props) {
                 )
               }
             >
-              <XLg size={20} />
+              <X size={25} />
             </Button>
           </OverlayTrigger>
-        </td>
-      </tr>
-
-      <Modal size="lg" show={show} onHide={handleClose} centered>
+        </Col>
+      </Row>
+      <Modal size="lg" show={show} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>Application files</Modal.Title>
         </Modal.Header>
@@ -307,9 +433,6 @@ function StudentApplication(props) {
                           {element}
                         </td>
                         <td>
-                          {/*<OverlayTrigger overlay={
-                            <Tooltip id="tooltip-top">Download file</Tooltip>
-                          }>*/}
                           <Button
                             className="button-style"
                             onClick={() =>
@@ -322,7 +445,6 @@ function StudentApplication(props) {
                           >
                             <Download size={20} />
                           </Button>
-                          {/*</td></OverlayTrigger>*/}
                         </td>
                       </tr>
                     );
@@ -333,7 +455,7 @@ function StudentApplication(props) {
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button className="button-style-cancel" onClick={handleClose}>
             Close
           </Button>
           <OverlayTrigger
@@ -353,16 +475,17 @@ function StudentApplication(props) {
           </OverlayTrigger>
         </Modal.Footer>
       </Modal>
-
       <ConfirmationModal
         show={showConfirmation}
         handleClose={() => setShowConfirmation(false)}
         handleAction={confirmAction}
         action={action}
-        body={`Are you sure you want to ${action.toLowerCase()} this application?`}
+        body={`Are you sure you want to ${
+          action === "Accepted" ? "accept" : "reject"
+        } this application?`}
       />
     </>
-  ) : null;
+  );
 }
 
 export default Applications;

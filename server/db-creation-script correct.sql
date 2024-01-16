@@ -35,6 +35,13 @@ CREATE TABLE IF NOT EXISTS teacher (
     cod_department VARCHAR(10) NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS secretary(
+    id VARCHAR(7) PRIMARY KEY,
+    surname VARCHAR(50) NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    email VARCHAR(255) NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS degree_table (
     cod_degree VARCHAR(10) PRIMARY KEY,
     title_degree VARCHAR(100) NOT NULL
@@ -91,6 +98,18 @@ CREATE TABLE IF NOT EXISTS thesis(
     FOREIGN KEY (supervisor_id) REFERENCES teacher(id)
 );
 
+CREATE TABLE IF NOT EXISTS thesis_request(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id VARCHAR(7),
+    title VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
+    supervisor_id VARCHAR(7) NOT NULL,
+    start_date DATETIME ,
+    status_code INT NOT NULL DEFAULT 0,
+    FOREIGN KEY (supervisor_id) REFERENCES teacher(id),
+    FOREIGN KEY (student_id) REFERENCES student(id)
+);
+
 CREATE TABLE IF NOT EXISTS thesis_group(
     thesis_id INT NOT NULL,
     group_id VARCHAR(10) NOT NULL,
@@ -100,19 +119,23 @@ CREATE TABLE IF NOT EXISTS thesis_group(
 );
 
 CREATE TABLE IF NOT EXISTS thesis_cosupervisor_teacher(
-    thesis_id INT NOT NULL,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    thesis_id INT,
+    thesisrequest_id INT,
     cosupevisor_id VARCHAR(7) NOT NULL,
-    PRIMARY KEY (thesis_id, cosupevisor_id),
     FOREIGN KEY (thesis_id) REFERENCES thesis(id),
-    FOREIGN KEY (cosupevisor_id) REFERENCES teacher(id)
+    FOREIGN KEY (cosupevisor_id) REFERENCES teacher(id),
+    FOREIGN KEY (thesisrequest_id) REFERENCES thesis_request(id)
 );
 
 CREATE TABLE IF NOT EXISTS thesis_cosupervisor_external(
-    thesis_id INT NOT NULL,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    thesis_id INT,
+    thesisrequest_id INT,
     cosupevisor_id VARCHAR(255) NOT NULL,
-    PRIMARY KEY (thesis_id, cosupevisor_id),
     FOREIGN KEY (thesis_id) REFERENCES thesis(id),
-    FOREIGN KEY (cosupevisor_id) REFERENCES external_supervisor(email)
+    FOREIGN KEY (cosupevisor_id) REFERENCES external_supervisor(email),
+    FOREIGN KEY (thesisrequest_id) REFERENCES thesis_request(id)
 );
 
 CREATE TABLE IF NOT EXISTS application(
@@ -124,7 +147,6 @@ CREATE TABLE IF NOT EXISTS application(
     FOREIGN KEY (student_id) REFERENCES student(id),
     FOREIGN KEY (thesis_id) REFERENCES thesis(id)
 );
-
 
 INSERT INTO user_type (id, user_type)
 VALUES
@@ -148,6 +170,9 @@ INSERT INTO teacher (id, surname, name, email, cod_group, cod_department)
 VALUES
     ('P123456', 'Rossi', 'Mario', 'mario.rossi@polito.it', 'GRP01', 'DEP01'),
     ('P654321', 'Bianchi', 'Sofia', 'sofia.bianchi@polito.it', 'GRP02', 'DEP02');
+INSERT INTO secretary (id, surname, name, email) 
+VALUES
+    ('E123456', 'Giallo', 'Paolo', 'paola.giallo@polito.it');
 INSERT INTO degree_table (cod_degree, title_degree) 
 VALUES
     ('DEGR01', 'Computer engineering Master Degree'),
@@ -190,7 +215,7 @@ VALUES
     ('Cybersecurity Measures in Internet of Things', 'The thesis, "Cybersecurity Measures in Internet of Things (IoT)," focuses on safeguarding the interconnected landscape of IoT devices. Investigating both theoretical foundations and practical implementations, the research explores robust cybersecurity measures to mitigate vulnerabilities and protect sensitive data in the IoT ecosystem. The study encompasses a comprehensive analysis of prevalent threats such as unauthorized access, data breaches, and device manipulation. It delves into encryption protocols, secure communication channels, and access control mechanisms to fortify the security posture of IoT devices. Key aspects include the integration of anomaly detection systems and continuous monitoring to identify and respond to potential cyber threats in real-time. The research also addresses the challenges of device heterogeneity, scalability, and the dynamic nature of IoT environments. Real-world applications include securing smart homes, industrial IoT deployments, and critical infrastructure, showcasing the importance of implementing effective cybersecurity measures to ensure the integrity and reliability of IoT systems. This thesis serves as a vital guide for researchers, developers, and cybersecurity professionals navigating the complex landscape of securing the Internet of Things.', 'P123456', 'Master', 'Sperimental', 'Knowledge of IoT security protocols and cybersecurity best practices.', 'None', '2024-05-31 23:59:59', 'DEGR02', 'CYBERSECURITY, INTERNET OF THINGS, NETWORK SECURITY', 0,1),
     ('Healthcare Data Analytics', 'The thesis, "Healthcare Data Analytics," delves into the transformative impact of data analytics in the healthcare domain. Investigating both theoretical foundations and practical applications, the research explores how advanced analytics techniques can extract valuable insights from vast and complex healthcare datasets. Key aspects include the utilization of data mining, machine learning algorithms, and statistical analysis to uncover patterns, trends, and correlations within medical data. The study addresses the challenges of handling diverse healthcare data sources, ensuring data privacy, and maintaining compliance with regulatory standards. Real-world applications encompass predictive analytics for disease diagnosis, patient outcome forecasting, and resource optimization within healthcare systems. The thesis highlights the potential for data analytics to enhance clinical decision-making, improve patient outcomes, and streamline healthcare operations. This comprehensive guide serves as a valuable resource for healthcare professionals, researchers, and data scientists seeking to harness the power of data analytics to drive innovation and improvements in the healthcare industry.', 'P654321', 'Master', 'Company', 'Proficiency in data analytics and understanding of healthcare systems.', 'The thesis must comply with privacy regulations.', '2023-12-01 23:59:59', 'DEGR03', 'DATA ANALYTICS, HEALTHCARE, PRIVACY', 0,0),
 	('Quantum Computing Algorithms', 'The thesis, "Quantum Computing Algorithms," explores the cutting-edge realm of quantum computing, investigating both theoretical frameworks and practical implementations of algorithms that harness the unique properties of quantum systems. The research delves into quantum parallelism, entanglement, and superposition to design algorithms that outperform classical counterparts in specific computational tasks. Key aspects include an examination of Shor\'s algorithm for factoring large numbers exponentially faster than classical algorithms, and Grover\'s algorithm for unstructured search problems, showcasing the potential for quantum speedup. The study addresses challenges such as quantum error correction, qubit coherence, and the development of quantum gates.Real-world applications span optimization problems, cryptography, and simulations of quantum systems. The thesis serves as a pivotal resource for researchers, mathematicians, and computer scientists navigating the complexities of quantum algorithms, contributing to the ongoing revolution in computing paradigms.', 'P123456', 'Master', 'Sperimental', 'Understanding of quantum computing principles and algorithms.', 'None', '2024-09-15 23:59:59', 'DEGR01', 'QUANTUM COMPUTING, ALGORITHMS, THEORETICAL PHYSICS', 0,0);
-INSERT INTO thesis_group (thesis_id, group_id)
+ INSERT INTO thesis_group (thesis_id, group_id)
 VALUES
     (1, 'GRP01'),
     (2, 'GRP02'),
@@ -207,10 +232,7 @@ VALUES
     ('S123456', 5, 'Pending', '2023-07-10 11:30:00'),
     ('S654321', 6, 'Approved', '2023-02-28 13:15:00')
 ;*/
-INSERT INTO thesis_cosupervisor_teacher (thesis_id, cosupevisor_id)
-VALUES 
-    (1, 'P654321'),
-    (6, 'P123456');
+
 INSERT INTO thesis_cosupervisor_external (thesis_id, cosupevisor_id)
 VALUES 
     (3, 'elena.conti@email.net'),
@@ -218,3 +240,22 @@ VALUES
     (4, 'antonio.bruno@email.org'),
     (6, 'andrea.ferrari@email.com');
 
+    /* id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
+    supervisor_id VARCHAR(7) NOT NULL,
+    start_date DATETIME ,
+    status_code INT NOT NULL DEFAULT 0, */
+
+
+INSERT INTO thesis_request (student_id, title, description, supervisor_id, start_date, status_code)
+VALUES
+('S123456', 'Research Topic 1', 'Description for Research Topic 1', 'P123456', '2023-12-15 10:30:00', 1),
+('S654321', 'Research Topic 4', 'Description for Research Topic 4', 'P123456', '2023-11-15 10:30:00', 0);
+
+INSERT INTO thesis_cosupervisor_teacher (thesis_id, thesisrequest_id ,cosupevisor_id)
+VALUES 
+    (1, NULL, 'P654321'),
+    (6, NULL, 'P123456'),
+    (NULL, 1, 'P654321'),
+    (NULL, 1, 'P123456');

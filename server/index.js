@@ -7,6 +7,8 @@ const {
   isStudent,
   isProfessor,
   isLoggedIn,
+  isSecretary,
+  isSecretaryOrProfessor,
 } = require("./controllers/middleware");
 const {
   getProposals,
@@ -28,11 +30,11 @@ const {
 } = require("./controllers/manageFiles");
 const {
   newThesis,
-  updateThesesArchivation,
   updateThesesArchivationManual,
   getThesisForProfessorById,
   updateThesis,
   deleteProposal,
+  newRequest
 } = require("./controllers/manageThesis");
 const {
   listExternalCosupervisors,
@@ -41,12 +43,21 @@ const {
   listGroups,
   listDegrees,
 } = require("./controllers/others");
-
 const {
   setVirtualClock,
   uninstallVirtualClock,
   create_schedule,
+  getServerDateTime
 } = require("./controllers/virtualClock");
+const {
+  getRequestsForProfessor,
+  getRequestsForSecretary,
+  updateThesisRequest
+} = require("./controllers/thesisRequest");
+const {
+  getStudentCV,
+  getStudent
+} = require("./controllers/student")
 
 const express = require("express");
 const morgan = require("morgan");
@@ -148,6 +159,8 @@ app.post(
       res.redirect("http://localhost:5173/profproposals");
     else if (req.user && req.user.user_type === "STUD")
       res.redirect("http://localhost:5173/studproposals");
+    else if (req.user && req.user.user_type === "SECR")
+      res.redirect("http://localhost:5173/secrrequests");
   }
 );
 
@@ -186,7 +199,13 @@ app.post("/api/newFiles/:thesis_id", isStudent, addFiles);
 app.get("/api/getAllFiles/:student_id/:thesis_id", isProfessor, getAllFiles);
 
 //GET TEACHERS
-app.get("/api/teachersList", isProfessor, getTeachersList);
+app.get("/api/teachersList", isLoggedIn, getTeachersList);
+
+//GET STUDENT CV
+app.get("/api/getStudent/:student_id", isSecretaryOrProfessor, getStudent);
+
+//GET STUDENT CV
+app.get("/api/getStudentCv/:student_id", isSecretaryOrProfessor, getStudentCV);
 
 app.get(
   "/api/getStudentFilesList/:student_id/:thesis_id",
@@ -222,8 +241,7 @@ app.post(
     check("cosupervisors_internal.*").isString(),
     check("cosupervisors_external").isArray(),
     check("cosupervisors_external.*").isString(),
-    check("cod_group").isArray(),
-    check("cod_group.*").isString(),
+    check("cod_group").isString().isLength({min: 1, max: 6}),
   ],
   newThesis
 );
@@ -277,8 +295,6 @@ app.get("/api/groups", isProfessor, listGroups);
 
 app.get("/api/degrees", isProfessor, listDegrees);
 
-app.get("/api/teachersList", isProfessor, getTeachersList);
-
 app.delete("/api/deleteProposal", isProfessor, deleteProposal);
 
 app.get(
@@ -313,13 +329,20 @@ app.put(
     check("cosupervisors_internal.*").isString(),
     check("cosupervisors_external").isArray(),
     check("cosupervisors_external.*").isString(),
-    check("cod_group").isArray(),
-    check("cod_group.*").isString(),
+    check("cod_group").isString().isLength({min: 1, max: 6}),
   ],
   updateThesis
 );
 
 app.get("/api/isApplied", isStudent, isApplied);
+
+//THESIS REQUESTS
+app.get("/api/getrequestsforsecr", isSecretary, getRequestsForSecretary);
+
+app.get("/api/getrequestsforprof", isProfessor, getRequestsForProfessor);
+
+app.put("/api/updateRequest/:id",isSecretaryOrProfessor, updateThesisRequest );
+
 
 //RETURN TO REAL DATETIME
 app.put("/api/setRealDateTime", uninstallVirtualClock);
@@ -331,15 +354,27 @@ app.put(
   setVirtualClock
 );
 
-//UPDATE THESES WITH NEW VIRTUALCLOCK TIME
-/*app.put(
-  "/api/updateThesesArchivation",
+app.get("/api/getServerDateTime", getServerDateTime);
+
+
+app.get("/api/getServerDateTime", getServerDateTime);
+
+
+//CREATES NEW THESIS REQUEST
+app.post(
+  "/api/newRequest",
+  isStudent,
   [
-    // Check if valid date
-    check("expiration").isISO8601().toDate(),
+    // Various checks of syntax of given data
+    check("title").isString().isLength({ min: 1, max: 100 }),
+    check("supervisor_id").isString().isLength({ min: 1, max: 7 }), //Maybe we can try to check if the string is in the format Pxxxxxx
+    check("cosupervisors_internal").isArray(),
+    check("cosupervisors_internal.*").isString(),
   ],
-  setVirtualClock
-);*/
+  newRequest
+);
+
+
 const now = new Date().toString();
 console.log("Date-time:", now);
 create_schedule();

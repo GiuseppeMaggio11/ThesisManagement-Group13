@@ -62,6 +62,19 @@ async function newProposal(thesis) {
   );
 }
 
+async function newRequest(request) {
+  return getJson(
+    fetch(URL + "/newRequest", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(request),
+    })
+  );
+}
+
 async function getListExternalCosupervisors() {
   return getJson(
     fetch(URL + `/listExternalCosupervisors`, {
@@ -141,7 +154,7 @@ async function applicationThesis(thesis_id, date) {
 function sendFiles(formData, thesis_id) {
   try {
     const uploadURL = `${URL}/newFiles/${thesis_id}`;
-    console.log(formData)
+    console.log(formData);
     const response = fetch(uploadURL, {
       method: "POST",
       body: formData, // FormData object containing the files
@@ -278,35 +291,47 @@ async function isApplied() {
 }
 
 async function downloadStudentApplicationAllFiles(student_id, thesis_id) {
-    const response = await fetch(URL + `/getAllFiles/${student_id}/${thesis_id}`, {
+  const response = await fetch(
+    URL + `/getAllFiles/${student_id}/${thesis_id}`,
+    {
       credentials: "include",
       headers: {
-        "Accept": "application/zip"
-      }
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Failed to download zip folder. Status: ${response.status}`);
+        Accept: "application/zip",
+      },
     }
+  );
 
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const downloadLink  = document.createElement('a');
-    downloadLink.href = url;
-    downloadLink.download = `${student_id}_${thesis_id}.zip`;
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-    window.URL.revokeObjectURL(url);
+  if (!response.ok) {
+    throw new Error(
+      `Failed to download zip folder. Status: ${response.status}`
+    );
+  }
+
+  const blob = await response.blob();
+  const url = window.URL.createObjectURL(blob);
+  const downloadLink = document.createElement("a");
+  downloadLink.href = url;
+  downloadLink.download = `${student_id}_${thesis_id}.zip`;
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+  window.URL.revokeObjectURL(url);
 }
 
-async function downloadStudentApplicationFile (student_id, thesis_id, file_name) {
-  const response = await fetch(URL + `/getFile/${student_id}/${thesis_id}/${file_name}`, {
-    credentials: "include",
-    headers: {
-      "Accept": "application/pdf"
+async function downloadStudentApplicationFile(
+  student_id,
+  thesis_id,
+  file_name
+) {
+  const response = await fetch(
+    URL + `/getFile/${student_id}/${thesis_id}/${file_name}`,
+    {
+      credentials: "include",
+      headers: {
+        Accept: "application/pdf",
+      },
     }
-  });
+  );
 
   if (!response.ok) {
     throw new Error(`Failed to download PDF file. Status: ${response.status}`);
@@ -314,7 +339,7 @@ async function downloadStudentApplicationFile (student_id, thesis_id, file_name)
 
   const blob = await response.blob();
   const url = window.URL.createObjectURL(blob);
-  const downloadLink = document.createElement('a');
+  const downloadLink = document.createElement("a");
   downloadLink.href = url;
   downloadLink.download = `${file_name}.pdf`;
   document.body.appendChild(downloadLink);
@@ -323,7 +348,7 @@ async function downloadStudentApplicationFile (student_id, thesis_id, file_name)
   window.URL.revokeObjectURL(url);
 }
 
-async function listApplicationFiles (student_id, thesis_id) {
+async function listApplicationFiles(student_id, thesis_id) {
   return getJson(
     fetch(`${URL}/getStudentFilesList/${student_id}/${thesis_id}`, {
       credentials: "include",
@@ -389,6 +414,60 @@ async function updateProposal(thesis, id) {
   );
 }
 
+async function updateRequest(id, newValue) {
+  return getJson(
+    fetch(URL + `/updateRequest/${id}`, {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({change: newValue}),
+    })
+  );
+}
+
+
+async function getServerDateTime() {
+  return getJson(
+    fetch(`${URL}/getServerDateTime`, {
+      credentials: "include",
+    })
+  );  
+}
+
+async function getRequestsForProfessor() {
+  return getJson(
+    fetch(`${URL}/getrequestsforprof`, {
+      credentials: "include",
+    })
+  );
+}
+
+async function getRequestsForSecretary() {
+  return getJson(
+    fetch(`${URL}/getrequestsforsecr`, {
+      credentials: "include",
+    })
+  );
+}
+
+async function getStudentCv(id) {
+  return getJson(
+    fetch(`${URL}/getStudentCv/${id}`, {
+      credentials: "include",
+    })
+  );
+}
+
+async function getStudent(id) {
+  return getJson(
+    fetch(`${URL}/getStudent/${id}`, {
+      credentials: "include",
+    })
+  );
+}
+
 const API = {
   logOut,
   getUserInfo,
@@ -397,6 +476,7 @@ const API = {
   getThesisProposalsById,
   sendFiles,
   newProposal,
+  newRequest,
   getListExternalCosupervisors,
   newExternalCosupervisor,
   getPendingApplications,
@@ -417,5 +497,11 @@ const API = {
   deleteProposal,
   getThesisForProfessorById,
   updateProposal,
+  getServerDateTime,
+  getRequestsForProfessor,
+  getRequestsForSecretary,
+  updateRequest,
+  getStudentCv,
+  getStudent
 };
 export default API;
