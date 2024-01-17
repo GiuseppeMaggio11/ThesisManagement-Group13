@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import {
   Col,
   Container,
@@ -10,14 +10,15 @@ import {
 } from "react-bootstrap";
 import { PersonCircle } from "react-bootstrap-icons";
 import { useMediaQuery } from "react-responsive";
+import MessageContext from "../messageCtx";
 import { NavLink, useNavigate } from "react-router-dom";
 import API from "../API";
 
 function Header(props) {
   const [expanded, setExpanded] = useState(false);
   const isSmallScreen = useMediaQuery({ query: "(max-width: 768px)" });
-
   const navigate = useNavigate();
+  const { handleToast } = useContext(MessageContext);
 
   const handleLogin = () => {
     API.redirectToLogin();
@@ -28,8 +29,6 @@ function Header(props) {
     props.logout();
     API.redirectToLogin();
   };
-
-
   return (
     <Navbar
       expanded={expanded}
@@ -102,26 +101,42 @@ function Header(props) {
                 ? "Applications"
                 : ""}
             </Nav.Link>
-            <Nav.Link
-              as={NavLink}
-              to={
-                props.user && props.user.user_type === "STUD"
-                  ? "newrequest"
-                  : props.user && props.user.user_type === "PROF"
-                  ? "requests"
-                  : ""
-              }
+            <div
               onClick={() => {
-                if (isSmallScreen) setExpanded((old) => !old);
+                if (
+                  props.user &&
+                  props.user.user_type === "STUD" &&
+                  props.isAlreadyApplied
+                )
+                  handleToast("You can not create a request now", "warning");
               }}
-              className="fs-5"
             >
-              {props.user && props.user.user_type === "STUD"
-                ? "New request"
-                : props.user && props.user.user_type === "PROF"
-                ? "Requests" /* "Student requests" */
-                : ""}
-            </Nav.Link>
+              <Nav.Link
+                disabled={
+                  props.user &&
+                  props.user.user_type === "STUD" &&
+                  props.isAlreadyApplied
+                }
+                as={NavLink}
+                to={
+                  props.user && props.user.user_type === "STUD"
+                    ? "newrequest"
+                    : props.user && props.user.user_type === "PROF"
+                    ? "requests"
+                    : ""
+                }
+                onClick={() => {
+                  if (isSmallScreen) setExpanded((old) => !old);
+                }}
+                className="fs-5"
+              >
+                {props.user && props.user.user_type === "STUD"
+                  ? "New request"
+                  : props.user && props.user.user_type === "PROF"
+                  ? "Requests" /* "Student requests" */
+                  : ""}
+              </Nav.Link>
+            </div>
           </Nav>
           <Nav className="me-0">
             {props.user ? (

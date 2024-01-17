@@ -10,9 +10,10 @@ import {
   People,
   Person,
 } from "react-bootstrap-icons";
+import MessageContext from "../messageCtx";
 import randomcolor from "randomcolor";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import API from "../API";
 import Loading from "./Loading";
 
@@ -20,6 +21,7 @@ function ViewProposalMotion(props) {
   const type = props.user?.user_type;
   const [cosup, setCosup] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const { handleToast } = useContext(MessageContext);
   const [isAlreadyApplied, setIsAlreadyApplied] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
@@ -33,7 +35,7 @@ function ViewProposalMotion(props) {
       try {
         isApplied();
       } catch (err) {
-        console.log(err);
+        handleToast(err, "error");
       }
     }
     if (type === "PROF" && props.proposal) {
@@ -212,22 +214,24 @@ function ViewProposalMotion(props) {
                       </Button>
                     </OverlayTrigger>
                   </Col>
-                  <Col xs={6} md={6} lg={3}>
-                    <OverlayTrigger
-                      placement="bottom"
-                      overlay={props.renderTooltipArchive}
-                    >
-                      <Button
-                        variant="light"
-                        onClick={() => props.setShowArchive(true)}
+                  {!props.proposal.is_archived && (
+                    <Col xs={6} md={6} lg={3}>
+                      <OverlayTrigger
+                        placement="bottom"
+                        overlay={props.renderTooltipArchive}
                       >
-                        {!props.isMobile && (
-                          <span className="mx-2">Archive</span>
-                        )}
-                        <Archive />
-                      </Button>
-                    </OverlayTrigger>
-                  </Col>
+                        <Button
+                          variant="light"
+                          onClick={() => props.setShowArchive(true)}
+                        >
+                          {!props.isMobile && (
+                            <span className="mx-2">Archive</span>
+                          )}
+                          <Archive />
+                        </Button>
+                      </OverlayTrigger>
+                    </Col>
+                  )}
                 </Row>
               </Col>
             )}

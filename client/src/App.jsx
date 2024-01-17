@@ -34,6 +34,8 @@ function App() {
   //const [message, setMessage] = useState("");
   //const [type, setType] = useState("");
   const [error, setError] = useState("");
+  const [isAlreadyApplied, setIsAlreadyApplied] = useState(false);
+
   // If an error occurs, the error message will be shown in a toast.
   const handleToast = (err, type) => {
     console.log(err);
@@ -66,6 +68,16 @@ function App() {
         draggable: true,
         progress: undefined,
       });
+    } else if (type === "warning") {
+      toast.warning(msg, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     }
   };
 
@@ -77,6 +89,10 @@ function App() {
         setLoading(false);
         setLoggedIn(true);
         setUser(user);
+        if (user && user.user_type === "STUD") {
+          let alreadyApply = await API.isApplied();
+          setIsAlreadyApplied(alreadyApply);
+        }
       } catch (err) {
         if (error.response && error.response.status !== 401) {
           console.log(err);
@@ -97,7 +113,11 @@ function App() {
     <BrowserRouter>
       <MessageContext.Provider value={{ handleToast }}>
         <div className="wrapper">
-          <Header user={user} logout={logOut} />
+          <Header
+            user={user}
+            logout={logOut}
+            isAlreadyApplied={isAlreadyApplied}
+          />
           <ToastContainer />
           <Routes>
             <Route exact path="/" element={<Home />} />
@@ -265,6 +285,7 @@ function App() {
                   setLoading={setLoading}
                   loggedIn={loggedIn}
                   user={user}
+                  setIsAlreadyApplied={setIsAlreadyApplied}
                 />
               }
             />

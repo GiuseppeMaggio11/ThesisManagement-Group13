@@ -101,7 +101,7 @@ function ProfessorActiveProposals(props) {
         </Col>
         <Col xs={4} className="d-flex justify-content-end align-items-center">
           <Col className="d-flex align-items-start">
-            <span style={{marginRight:"8px"}}> See archived proposals</span>
+            <span style={{ marginRight: "8px" }}> See archived proposals</span>
             <Toggle
               id="archived"
               name="archived"
@@ -318,7 +318,12 @@ function ElementProposalLargeScreen(props) {
                     </Button>
                   </OverlayTrigger>
                 </Col>
-                <Col xs={6} md={6} lg={props.isArchived ? 4 : 3} id="delete-col">
+                <Col
+                  xs={6}
+                  md={6}
+                  lg={props.isArchived ? 4 : 3}
+                  id="delete-col"
+                >
                   <OverlayTrigger
                     placement="bottom"
                     overlay={renderTooltipDelete}
