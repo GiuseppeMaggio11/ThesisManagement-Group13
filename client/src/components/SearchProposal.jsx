@@ -58,6 +58,8 @@ function SearchProposalRoute(props) {
           virtualClock={props.virtualClock}
           user={props.user}
           setThesisProposals={setThesisProposals}
+          isAlreadyApplied={props.isAlreadyApplied}
+          setIsAlreadyApplied={props.setIsAlreadyApplied}
         />
       )}
     </>
@@ -130,8 +132,9 @@ function SearchProposalComponent(props) {
               className="d-flex justify-content-between align-items-center"
             >
               <h1
-                className={`margin-titles-custom ${props.isMobile ? "smaller-heading" : ""
-                  }`}
+                className={`margin-titles-custom ${
+                  props.isMobile ? "smaller-heading" : ""
+                }`}
                 style={{ paddingLeft: props.isMobile ? "0.5em" : "0" }}
               >
                 Thesis Proposals
@@ -282,6 +285,8 @@ function SearchProposalComponent(props) {
                               user={props.user}
                               thesisProposals={props.thesisProposals}
                               setThesisProposals={props.setThesisProposals}
+                              isAlreadyApplied={props.isAlreadyApplied}
+                              setIsAlreadyApplied={props.setIsAlreadyApplied}
                             />
                           ))}
                         {filteredByTitle.length <= 0 && filter !== "" && (
@@ -298,6 +303,8 @@ function SearchProposalComponent(props) {
                               user={props.user}
                               thesisProposals={props.thesisProposals}
                               setThesisProposals={props.setThesisProposals}
+                              isAlreadyApplied={props.isAlreadyApplied}
+                              setIsAlreadyApplied={props.setIsAlreadyApplied}
                             />
                           ))}
                       </Row>
@@ -339,7 +346,7 @@ function Proposal(props) {
       formData.append(`file`, selectedFiles[i]);
     }
     API.sendFiles(formData, thesis_id)
-      .then(() => { })
+      .then(() => {})
       .catch((err) => {
         handleToast(err, "error");
       });
@@ -367,6 +374,7 @@ function Proposal(props) {
     API.applicationThesis(idThesis, date)
       .then(() => {
         handleToast("Application submitted correctly", "success");
+        props.setIsAlreadyApplied(true);
         props.setThesisProposals((prev) => {
           return prev.filter((p) => p.id != props.proposal.id);
         });
@@ -486,12 +494,14 @@ function Proposal(props) {
           <Row
             style={{
               fontSize: 16,
-              marginTop: '2em',
+              marginTop: "2em",
             }}
           >
-            <Col className={
-              props.isMobile ? "col-5" : props.isTablet ? "col-3" : "col-2"
-            }>
+            <Col
+              className={
+                props.isMobile ? "col-5" : props.isTablet ? "col-3" : "col-2"
+              }
+            >
               <span>Thesis Level</span>
             </Col>
             <Col>
@@ -511,9 +521,11 @@ function Proposal(props) {
               marginTop: 16,
             }}
           >
-            <Col  className={
+            <Col
+              className={
                 props.isMobile ? "col-5" : props.isTablet ? "col-3" : "col-2"
-              }>
+              }
+            >
               <span>Thesis Type</span>
             </Col>
             <Col>
@@ -533,9 +545,11 @@ function Proposal(props) {
               marginTop: 16,
             }}
           >
-            <Col  className={
+            <Col
+              className={
                 props.isMobile ? "col-5" : props.isTablet ? "col-3" : "col-2"
-              }>
+              }
+            >
               <span>Expire at</span>
             </Col>
             <Col>
@@ -564,6 +578,8 @@ function Proposal(props) {
           user={props.user}
           handleModalClick={handleModalClick}
           handleUploadInterface={handleUploadInterface}
+          isAlreadyApplied={props.isAlreadyApplied}
+          setIsAlreadyApplied={props.setIsAlreadyApplied}
         />
       )}
       <FileDropModal

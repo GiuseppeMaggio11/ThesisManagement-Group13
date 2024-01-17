@@ -22,21 +22,21 @@ function ViewProposalMotion(props) {
   const [cosup, setCosup] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const { handleToast } = useContext(MessageContext);
-  const [isAlreadyApplied, setIsAlreadyApplied] = useState(false);
+  //const [isAlreadyApplied, setIsAlreadyApplied] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
     setIsLoading(true);
-    async function isApplied() {
+    /* async function isApplied() {
       let alreadyApply = await API.isApplied();
       setIsAlreadyApplied(alreadyApply);
-    }
+    } */
     if (type === "STUD" && props.proposal) {
       setCosup(props.proposal?.cosupervisors.join(", "));
-      try {
+      /* try {
         isApplied();
       } catch (err) {
         handleToast(err, "error");
-      }
+      } */
     }
     if (type === "PROF" && props.proposal) {
       let ext = props.proposal?.external_cosupervisors?.map((ex) => {
@@ -493,7 +493,7 @@ function ViewProposalMotion(props) {
                 </Col>
               </Row>
             </Col>
-            {type === "STUD" && !isAlreadyApplied && (
+            {type === "STUD" && !props.isAlreadyApplied && (
               <Col
                 className="d-flex flex-column justify-content-end align-items-end"
                 xl={2}
