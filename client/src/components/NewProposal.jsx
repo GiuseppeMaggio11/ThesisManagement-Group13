@@ -73,19 +73,16 @@ function NewProposal(props) {
   const expirationRef = useRef(null);
   const degreeRef = useRef(null);
 
-
-
   const fetchData = async () => {
     try {
-      let sup_email = props.user.username
+      let sup_email = props.user.username;
 
       let ex_cosup = await API.getListExternalCosupervisors();
       let in_cosup = await API.getTeachers();
 
       let degrees = await API.getDegrees();
       let groups = await API.getGroups();
-      let sup = in_cosup.filter(item => item.email === sup_email);
-
+      let sup = in_cosup.filter((item) => item.email === sup_email);
 
       setCoSupervisorExternal_obj(ex_cosup);
       setCoSupervisorInternal_obj(in_cosup);
@@ -93,18 +90,17 @@ function NewProposal(props) {
       setTeacher(sup[0]);
       setDegrees(degrees);
       setGroups_obj(groups);
-      if ((!idUpd && !idCopy)) {
-        const formatted_ex_cosup = ex_cosup.map(
-          ({ name, surname }) => `${name} ${surname}`
-        );
-        const formatted_in_cosup = in_cosup.map(
-          ({ name, surname }) => `${name} ${surname}`
-        );
+      /* if ((!idUpd && !idCopy)) { */
+      const formatted_ex_cosup = ex_cosup.map(
+        ({ name, surname }) => `${name} ${surname}`
+      );
+      const formatted_in_cosup = in_cosup.map(
+        ({ name, surname }) => `${name} ${surname}`
+      );
 
-        setCoSupervisorExternal(formatted_ex_cosup);
-        setCoSupervisorInternal(formatted_in_cosup);
-      }
-
+      setCoSupervisorExternal(formatted_ex_cosup);
+      setCoSupervisorInternal(formatted_in_cosup);
+      /* } */
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -113,10 +109,12 @@ function NewProposal(props) {
   const fetchThesis = async (thesisId) => {
     try {
       let response = await API.getThesisForProfessorById(thesisId);
-      console.log(response)
+      console.log(response);
 
       let in_cosup = await API.getTeachers();
-      in_cosup = in_cosup.filter(teacher => teacher.id !== response.supervisor_id);
+      in_cosup = in_cosup.filter(
+        (teacher) => teacher.id !== response.supervisor_id
+      );
       let ex_cosup = await API.getListExternalCosupervisors();
 
       const formatted_ex_cosup = ex_cosup.map(
@@ -126,50 +124,39 @@ function NewProposal(props) {
         ({ name, surname }) => `${name} ${surname}`
       );
 
-      in_cosup = in_cosup.filter((item => {
-        return response.cosupervisors_internal.some(
-          ci => ci === item.id
-        )
-      }))
+      in_cosup = in_cosup.filter((item) => {
+        return response.cosupervisors_internal.some((ci) => ci === item.id);
+      });
 
-      in_cosup = in_cosup.map(
-        ({ name, surname }) => `${name} ${surname}`
-      );
+      in_cosup = in_cosup.map(({ name, surname }) => `${name} ${surname}`);
 
-      ex_cosup = ex_cosup.filter((item => {
-        return response.cosupervisors_external.some(
-          ci => ci === item.email
-        )
-      }))
+      ex_cosup = ex_cosup.filter((item) => {
+        return response.cosupervisors_external.some((ci) => ci === item.email);
+      });
 
-      ex_cosup = ex_cosup.map(
-        ({ name, surname }) => `${name} ${surname}`
-      );
-
+      ex_cosup = ex_cosup.map(({ name, surname }) => `${name} ${surname}`);
 
       if (formatted_in_cosup.length > 0) {
-        let c_in = [...formatted_in_cosup]
-        c_in = c_in.filter(c => !in_cosup.includes(c))
-        setCoSupervisorInternal(c_in)
-      }
-      else {
-        setCoSupervisorInternal([])
+        let c_in = [...formatted_in_cosup];
+        c_in = c_in.filter((c) => !in_cosup.includes(c));
+        setCoSupervisorInternal(c_in);
+      } else {
+        setCoSupervisorInternal([]);
       }
 
       if (formatted_ex_cosup.length) {
-        let c_out = [...formatted_ex_cosup]
-        c_out = c_out.filter(c => !ex_cosup.includes(c))
-        setCoSupervisorExternal(c_out)
-      }
-      else {
-        setCoSupervisorExternal([])
+        let c_out = [...formatted_ex_cosup];
+        c_out = c_out.filter((c) => !ex_cosup.includes(c));
+        setCoSupervisorExternal(c_out);
+      } else {
+        setCoSupervisorExternal([]);
       }
 
       response = {
         ...response,
         cosupervisors_internal: in_cosup,
-        cosupervisors_external: ex_cosup
-      }
+        cosupervisors_external: ex_cosup,
+      };
 
       setFormData(response);
     } catch (err) {
@@ -178,8 +165,9 @@ function NewProposal(props) {
   };
 
   useEffect(() => {
-    if (!props.loggedIn || props.user.user_type !== "PROF"){
-      return API.redirectToLogin();}
+    if (!props.loggedIn || props.user.user_type !== "PROF") {
+      return API.redirectToLogin();
+    }
     const fetchDataAndThesis = async () => {
       props.setLoading(true);
       await fetchData();
@@ -446,7 +434,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some((error) => error?.path?.includes("title"))
+                        errors.some((error) => error?.path?.includes("title"))
                           ? { borderColor: "red" }
                           : {}
                       }
@@ -464,9 +452,9 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some((error) =>
-                            error?.path?.includes("description")
-                          )
+                        errors.some((error) =>
+                          error?.path?.includes("description")
+                        )
                           ? { borderColor: "red" }
                           : {}
                       }
@@ -561,7 +549,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some((error) => error?.path?.includes("level"))
+                        errors.some((error) => error?.path?.includes("level"))
                           ? { borderColor: "red" }
                           : {}
                       }
@@ -609,7 +597,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some((error) => error?.path?.includes("type"))
+                        errors.some((error) => error?.path?.includes("type"))
                           ? { borderColor: "red" }
                           : {}
                       }
@@ -622,9 +610,14 @@ function NewProposal(props) {
                       id="cod_group"
                       type="text"
                       style={{ marginTop: "0.5em" }}
-                      value={teacher && (
-                        groups_obj.find(obj => obj.cod === teacher.cod_group) ? 
-                        groups_obj.find(obj => obj.cod === teacher.cod_group).name : "")}
+                      value={
+                        teacher &&
+                        (groups_obj.find((obj) => obj.cod === teacher.cod_group)
+                          ? groups_obj.find(
+                              (obj) => obj.cod === teacher.cod_group
+                            ).name
+                          : "")
+                      }
                       disabled
                     />
                   </Form.Group>
@@ -641,9 +634,9 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some((error) =>
-                            error?.path?.includes("required_knowledge")
-                          )
+                        errors.some((error) =>
+                          error?.path?.includes("required_knowledge")
+                        )
                           ? { borderColor: "red" }
                           : {}
                       }
@@ -661,7 +654,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some((error) => error?.path?.includes("notes"))
+                        errors.some((error) => error?.path?.includes("notes"))
                           ? { borderColor: "red" }
                           : {}
                       }
@@ -682,9 +675,9 @@ function NewProposal(props) {
                       onChange={handleChangeDate}
                       style={
                         errors &&
-                          errors.some((error) =>
-                            error?.path?.includes("expiration")
-                          )
+                        errors.some((error) =>
+                          error?.path?.includes("expiration")
+                        )
                           ? { borderColor: "red" }
                           : {}
                       }
@@ -701,7 +694,7 @@ function NewProposal(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some((error) => error?.path?.includes("degree"))
+                        errors.some((error) => error?.path?.includes("degree"))
                           ? { borderColor: "red" }
                           : {}
                       }
@@ -709,7 +702,11 @@ function NewProposal(props) {
                     >
                       <option>Select a degree</option>
                       {degrees.map((degree, index) => (
-                        <option key={index} value={degree.cod} className="list-group-item">
+                        <option
+                          key={index}
+                          value={degree.cod}
+                          className="list-group-item"
+                        >
                           {degree.name}
                         </option>
                       ))}
