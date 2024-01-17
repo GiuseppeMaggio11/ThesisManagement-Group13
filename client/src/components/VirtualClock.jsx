@@ -68,7 +68,7 @@ const VirtualClock = (props) => {
   };
 
   return (
-    <Container className="d-flex flex-column" style={{ marginTop: "1em" }}>
+    <Container className="d-flex flex-column" style={{marginTop: "1em" }}>
       <div className="d-flex justify-content-center">
         <h2>SYSTEM CLOCK</h2>
       </div>

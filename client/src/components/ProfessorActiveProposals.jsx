@@ -492,7 +492,7 @@ function ElementProposalLargeScreen(props) {
             </Col>
             <Col>
               <span className="badge" style={{ color: "black" }}>
-                {dayjs(props.proposal.expiration).format("MM/DD/YYYY")}
+                {dayjs(props.proposal.expiration).format("DD/MM/YYYY")}
               </span>
               <Calendar />
             </Col>

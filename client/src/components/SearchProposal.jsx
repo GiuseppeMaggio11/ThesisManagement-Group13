@@ -130,9 +130,8 @@ function SearchProposalComponent(props) {
               className="d-flex justify-content-between align-items-center"
             >
               <h1
-                className={`margin-titles-custom ${
-                  props.isMobile ? "smaller-heading" : ""
-                }`}
+                className={`margin-titles-custom ${props.isMobile ? "smaller-heading" : ""
+                  }`}
                 style={{ paddingLeft: props.isMobile ? "0.5em" : "0" }}
               >
                 Thesis Proposals
@@ -340,7 +339,7 @@ function Proposal(props) {
       formData.append(`file`, selectedFiles[i]);
     }
     API.sendFiles(formData, thesis_id)
-      .then(() => {})
+      .then(() => { })
       .catch((err) => {
         handleToast(err, "error");
       });
@@ -487,10 +486,12 @@ function Proposal(props) {
           <Row
             style={{
               fontSize: 16,
-              marginTop: 16,
+              marginTop: '2em',
             }}
           >
-            <Col style={{ maxWidth: "110px" }}>
+            <Col className={
+              props.isMobile ? "col-5" : props.isTablet ? "col-3" : "col-2"
+            }>
               <span>Thesis Level</span>
             </Col>
             <Col>
@@ -510,7 +511,9 @@ function Proposal(props) {
               marginTop: 16,
             }}
           >
-            <Col style={{ maxWidth: "110px" }}>
+            <Col  className={
+                props.isMobile ? "col-5" : props.isTablet ? "col-3" : "col-2"
+              }>
               <span>Thesis Type</span>
             </Col>
             <Col>
@@ -530,12 +533,14 @@ function Proposal(props) {
               marginTop: 16,
             }}
           >
-            <Col style={{ maxWidth: "110px" }}>
+            <Col  className={
+                props.isMobile ? "col-5" : props.isTablet ? "col-3" : "col-2"
+              }>
               <span>Expire at</span>
             </Col>
             <Col>
               <span className="badge" style={{ color: "black" }}>
-                {dayjs(props.proposal.expiration).format("MM/DD/YYYY")}
+                {dayjs(props.proposal.expiration).format("DD/MM/YYYY")}
               </span>
               <Calendar />
             </Col>

@@ -481,7 +481,7 @@ function ViewProposalMotion(props) {
                 </Col>
                 <Col>
                   <span style={{ color: "black" }}>
-                    {dayjs(props.proposal.expiration).format("MM/DD/YYYY")}
+                    {dayjs(props.proposal.expiration).format("DD/MM/YYYY")}
                   </span>
                   <Calendar
                     style={{ marginLeft: "0.4rem", marginBottom: "0.2rem" }}
