@@ -33,6 +33,7 @@ import {
 import ConfirmationModal from "./ConfirmationModal";
 import NoFileFound from "./NoFileFound";
 import randomColor from "randomcolor";
+import Cv from "./Cv";
 
 function Applications(props) {
   const [applications, setApplications] = useState([]);
@@ -302,6 +303,8 @@ function StudentApplicationThesis(props) {
   const [studentId, setStudentId] = useState("");
   const [thesisId, setThesisId] = useState("");
   const [hoveredRow, setHoveredRow] = useState(undefined);
+  const [showCv, setShowCv] = useState(false);
+
   function formatDate(dateString) {
     let date = new Date(dateString);
     let day = date.getDate();
@@ -345,7 +348,15 @@ function StudentApplicationThesis(props) {
         style={{ borderRadius: "20px", background: "#f3f3f3" }}
       >
         <Col style={{ fontWeight: "600" }}>
-          {props.application.student_name}
+          <span
+            className="title-custom-proposals"
+            style={{ cursor: "pointer" }}
+            onClick={() => {
+              setShowCv(true);
+            }}
+          >
+            {props.application.student_name}
+          </span>
         </Col>
         {!props.isMobile && <Col>{props.application.student_id}</Col>}
         {!props.isMobile && (
@@ -483,6 +494,11 @@ function StudentApplicationThesis(props) {
         body={`Are you sure you want to ${
           action === "Accepted" ? "accept" : "reject"
         } this application?`}
+      />
+      <Cv
+        show={showCv}
+        onHide={() => setShowCv(false)}
+        studentID={props.application.student_id}
       />
     </>
   );
