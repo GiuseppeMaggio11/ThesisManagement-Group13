@@ -33,6 +33,13 @@
   align-items: center;
 }
 
+.dmy {
+  font-family: 'LiquidCrystal';
+  font-size: 20px;
+  margin-bottom:4em;
+  width: 0.5em;
+}
+
 .upper,
 .lower {
   display: flex;

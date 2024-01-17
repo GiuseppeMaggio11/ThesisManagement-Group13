@@ -472,58 +472,7 @@ const FlipClock = ({
             </OverlayTrigger>
           )}
           <div className="flip-clock">
-            {/* Month 1 */}
-            <div className="digit">
-              {settingVirtual && (
-                <div
-                  className="chevron-up"
-                  onClick={() => handleChange("m1_up")}
-                >
-                  <ChevronUp color="black" id="m1_up" />
-                </div>
-              )}
-              <div className="card-custom">
-                <div className="front">
-                  {" "}
-                  {settingVirtual ? virtualTimeArray[0] : month[0]}
-                </div>
-              </div>
-              {settingVirtual && (
-                <div
-                  className="chevron-down"
-                  onClick={() => handleChange("m1_down")}
-                >
-                  <ChevronDown color="black" id="m1_down" />
-                </div>
-              )}
-            </div>
-            {/* Month 2 */}
-            <div className="digit">
-              {settingVirtual && (
-                <div
-                  className="chevron-up"
-                  onClick={() => handleChange("m2_up")}
-                >
-                  <ChevronUp color="black" id="m2_up" />
-                </div>
-              )}
-              <div className="card-custom">
-                <div className="front">
-                  {" "}
-                  {settingVirtual ? virtualTimeArray[1] : month[1]}
-                </div>
-              </div>
-              {settingVirtual && (
-                <div
-                  className="chevron-down"
-                  onClick={() => handleChange("m2_down")}
-                >
-                  <ChevronDown color="black" id="m2_down" />
-                </div>
-              )}
-            </div>
-            <span className="dash">-</span>
-            <span className="date-separator"></span>
+          <span className="dmy">d</span>
             {/* Day 1 */}
             <div className="digit">
               {settingVirtual && (
@@ -574,8 +523,62 @@ const FlipClock = ({
                 </div>
               )}
             </div>
-            <span className="dash">-</span>
             <span className="date-separator"></span>
+            <span className="dash">-</span>
+            <span className="dmy">m</span>
+             {/* Month 1 */}
+             <div className="digit">
+              {settingVirtual && (
+                <div
+                  className="chevron-up"
+                  onClick={() => handleChange("m1_up")}
+                >
+                  <ChevronUp color="black" id="m1_up" />
+                </div>
+              )}
+              <div className="card-custom">
+                <div className="front">
+                  {" "}
+                  {settingVirtual ? virtualTimeArray[0] : month[0]}
+                </div>
+              </div>
+              {settingVirtual && (
+                <div
+                  className="chevron-down"
+                  onClick={() => handleChange("m1_down")}
+                >
+                  <ChevronDown color="black" id="m1_down" />
+                </div>
+              )}
+            </div>
+            {/* Month 2 */}
+            <div className="digit">
+              {settingVirtual && (
+                <div
+                  className="chevron-up"
+                  onClick={() => handleChange("m2_up")}
+                >
+                  <ChevronUp color="black" id="m2_up" />
+                </div>
+              )}
+              <div className="card-custom">
+                <div className="front">
+                  {" "}
+                  {settingVirtual ? virtualTimeArray[1] : month[1]}
+                </div>
+              </div>
+              {settingVirtual && (
+                <div
+                  className="chevron-down"
+                  onClick={() => handleChange("m2_down")}
+                >
+                  <ChevronDown color="black" id="m2_down" />
+                </div>
+              )}
+            </div>
+            <span className="date-separator"></span>
+            <span className="dash">-</span>
+            <span className="dmy">y</span>
             {/* year 1 */}
             <div className="digit">
               {settingVirtual && (
