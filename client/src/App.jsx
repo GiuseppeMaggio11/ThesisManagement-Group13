@@ -239,6 +239,8 @@ function App() {
                   virtualClock={virtualClock}
                   loggedIn={loggedIn}
                   user={user}
+                  isAlreadyApplied={isAlreadyApplied}
+                  setIsAlreadyApplied={setIsAlreadyApplied}
                 />
               }
             />

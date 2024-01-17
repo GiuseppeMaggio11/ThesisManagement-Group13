@@ -43,7 +43,7 @@ function ViewProposalMotion(props) {
         return ex.ext_supervisor_name;
       });
       let int = props.proposal?.internal_cosupervisors?.map((ex) => {
-        return ex.ext_supervisor_name;
+        return ex.int_supervisor_name;
       });
       let concatenatedCosup = [...int, ...ext];
       setCosup(concatenatedCosup.join(", "));
@@ -493,21 +493,23 @@ function ViewProposalMotion(props) {
                 </Col>
               </Row>
             </Col>
-            {type === "STUD" && !props.isAlreadyApplied && (
-              <Col
-                className="d-flex flex-column justify-content-end align-items-end"
-                xl={2}
-              >
-                <div className="m-2">
-                  <Button
-                    className="button-style"
-                    onClick={props.handleUploadInterface}
-                  >
-                    <span className="mx-2">Apply</span>
-                  </Button>
-                </div>
-              </Col>
-            )}
+            {type === "STUD" &&
+              !props.isAlreadyApplied &&
+              !props.fromApplications && (
+                <Col
+                  className="d-flex flex-column justify-content-end align-items-end"
+                  xl={2}
+                >
+                  <div className="m-2">
+                    <Button
+                      className="button-style"
+                      onClick={props.handleUploadInterface}
+                    >
+                      <span className="mx-2">Apply</span>
+                    </Button>
+                  </div>
+                </Col>
+              )}
           </Row>
         </Card>
       </motion.div>

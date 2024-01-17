@@ -84,6 +84,8 @@ function StudentApplications(props) {
                   isTablet={isTablet}
                   isTabletHorizonthal={isTabletHorizonthal}
                   user={props.user}
+                  isAlreadyApplied={props.isAlreadyApplied}
+                  setIsAlreadyApplied={props.setIsAlreadyApplied}
                 />
               );
             })}
@@ -119,6 +121,8 @@ function StudentApplications(props) {
                       isTablet={isTablet}
                       isTabletHorizonthal={isTabletHorizonthal}
                       user={props.user}
+                      isAlreadyApplied={props.isAlreadyApplied}
+                      setIsAlreadyApplied={props.setIsAlreadyApplied}
                     />
                   );
                 })}
@@ -193,6 +197,9 @@ function ApplicationRow(props) {
           user={props.user}
           handleModalClick={handleModalClick}
           handleUploadInterface={() => console.err("Non stampare")}
+          isAlreadyApplied={props.isAlreadyApplied}
+          setIsAlreadyApplied={props.setIsAlreadyApplied}
+          fromApplications={true}
         />
       )}
     </>
@@ -263,6 +270,9 @@ function MobileApplication(props) {
           user={props.user}
           handleModalClick={handleModalClick}
           handleUploadInterface={() => console.err("Non stampare")}
+          isAlreadyApplied={props.isAlreadyApplied}
+          setIsAlreadyApplied={props.setIsAlreadyApplied}
+          fromApplications={true}
         />
       )}
     </>

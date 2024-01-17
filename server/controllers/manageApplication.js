@@ -48,11 +48,10 @@ async function updateApplicationStatus(req, res) {
           const result_reject = await dao.rejectApplicationsExcept(decision);
           //cancels every other application of that student
           //const result_cancel = await dao.cancelStudentApplications(decision);
+          const result = await dao.updateThesesArchivationManual(
+            application.thesis_id
+          );
         }
-
-        const result = await dao.updateThesesArchivationManual(
-          application.thesis_id
-        );
 
         await dao.commit();
 
