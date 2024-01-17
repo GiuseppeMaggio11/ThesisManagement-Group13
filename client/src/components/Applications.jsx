@@ -129,9 +129,10 @@ function Applications(props) {
     }
   };
 
-  return (
+  return props.loading ? (
+    <Loading />
+  ) : (
     <div className="d-flex justify-content-center">
-      {props.loading && <Loading />}
       <Container className="width-80 margin-custom">
         <Row className="d-flex align-items-center">
           <Col

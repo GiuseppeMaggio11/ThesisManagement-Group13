@@ -177,7 +177,8 @@ async function isApplied(req, res) {
     for (const application of applications) {
       if (
         userID == application.student_id &&
-        application.status !== "Rejected"
+        application.status !== "Rejected" &&
+        application.status !== "Cancelled"
       ) {
         returnValue = 1;
       }
