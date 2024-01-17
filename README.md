@@ -842,3 +842,14 @@ This table contains all the student applications and their status.
 - `TeacherPage` (inside `TeacherPage.jsx`): It's a component that appears in the `/teacher` route, only accessible by authenticated professors. It contains a button redirecting to the `NewProposal`component.
 
 ## Users Credentials
+
+| Role  | Email | Password |
+|--------|---------|--------|
+| teacher |   mario.rossi@polito.it                |   P123456   	|
+| teacher |   sofia.bianchi@polito.it              |   P654321   	|
+| student |   luca.esposito@studenti.polito.it     |   S123456   	|
+| student |   alessandra.moretti@studenti.polito.it|   S654321   	|
+|secretary clerk |   paola.giallo@polito.it        |   E123456   	|
+
+## LICENSE
+![Apache License](LICENSE)
