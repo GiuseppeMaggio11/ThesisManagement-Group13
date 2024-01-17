@@ -629,7 +629,10 @@ exports.createThesis_cosupervisor_teacher = async (thesis_id, professor_id) => {
   }
 };
 // Insert new row in thesis_cosupervisor table, must receive thesis id and cosupervisor id
-exports.createRequest_cosupervisor_teacher = async (request_id, professor_id) => {
+exports.createRequest_cosupervisor_teacher = async (
+  request_id,
+  professor_id
+) => {
   try {
     const sql =
       "INSERT INTO thesis_cosupervisor_teacher (thesisrequest_id, cosupevisor_id) VALUES (?,?)";
@@ -978,7 +981,7 @@ exports.isThesisProposalValid = async (thesis_id) => {
 
     if (rows[0].count == 1) return true;
     else if (rows[0].count == 0) return false;
-    else throw new Error ("Internal server error");
+    else throw new Error("Internal server error");
   } catch (error) {
     console.error("Error in isThesisProposalValid: ", error);
     throw error;
@@ -1214,7 +1217,7 @@ exports.createRequest = async (thesisRequest) => {
   }
 };
 
-//status => 
+//status =>
 //0: secretary have to accept
 //1: accepted by the secretary
 //2: professor have to accepts
@@ -1229,17 +1232,17 @@ exports.secretaryThesisRequest = async (request_id, change) => {
   } catch (error) {
     throw error;
   }
-}
+};
 exports.teachersThesisRequest = async (request_id, change) => {
   try {
-    let start_date = new Date()
+    let start_date = new Date();
     const sql = `UPDATE thesis_request SET status_code = ?, start_date = ? WHERE id = ?`;
     const [rows] = await pool.execute(sql, [change, start_date, request_id]);
     return rows.info;
   } catch (error) {
     throw error;
   }
-}
+};
 exports.getRequestsForProfessor = async (email) => {
   try {
     const sql =
@@ -1259,7 +1262,8 @@ exports.getRequestsForProfessor = async (email) => {
     const [rows] = await pool.execute(sql, [email]);
 
     for (const r of rows) {
-      const sql2 = "SELECT t.id, CONCAT(t.name, ' ', t.surname) AS cosup_fullname FROM teacher t INNER JOIN thesis_cosupervisor_teacher tc ON tc.cosupevisor_id = t.id WHERE tc.thesisrequest_id = ?";
+      const sql2 =
+        "SELECT t.id, CONCAT(t.name, ' ', t.surname) AS cosup_fullname FROM teacher t INNER JOIN thesis_cosupervisor_teacher tc ON tc.cosupevisor_id = t.id WHERE tc.thesisrequest_id = ?";
       const [rows2] = await pool.execute(sql2, [r.id]);
 
       let cosup = rows2.map((row) => row.cosup_fullname);
@@ -1291,15 +1295,15 @@ exports.getRequestsForSecretary = async () => {
 
     const [rows] = await pool.execute(sql);
 
-    
     for (const r of rows) {
-      const sql2 = "SELECT t.id, CONCAT(t.name, ' ', t.surname) AS cosup_fullname FROM teacher t INNER JOIN thesis_cosupervisor_teacher tc ON tc.cosupevisor_id = t.id WHERE tc.thesisrequest_id = ?";
+      const sql2 =
+        "SELECT t.id, CONCAT(t.name, ' ', t.surname) AS cosup_fullname FROM teacher t INNER JOIN thesis_cosupervisor_teacher tc ON tc.cosupevisor_id = t.id WHERE tc.thesisrequest_id = ?";
       const [rows2] = await pool.execute(sql2, [r.id]);
 
       let cosup = rows2.map((row) => row.cosup_fullname);
       r.cosup_fullname = cosup;
     }
-    
+
     return rows;
   } catch (err) {
     console.error("Error in getRequestsForSecretary: ", err);
@@ -1307,27 +1311,36 @@ exports.getRequestsForSecretary = async () => {
   }
 };
 
-
-exports.getStudentExams = async (studentID)=>{
-  try{
-    const sql = "select * FROM career WHERE id=?"
+exports.getStudentExams = async (studentID) => {
+  try {
+    const sql = "select * FROM career WHERE id=?";
     const [rows] = await pool.execute(sql, [studentID]);
     return rows;
-  }
-  catch (err) {
+  } catch (err) {
     console.error("Error in getStudentExams: ", err);
     throw err;
   }
-}
+};
 
-exports.getStudent = async (studentID)=>{
-  try{
-    const sql = "select * FROM student WHERE id=?"
+exports.getStudent = async (studentID) => {
+  try {
+    const sql = "select * FROM student WHERE id=?";
     const [rows] = await pool.execute(sql, [studentID]);
     return rows;
-  }
-  catch (err) {
+  } catch (err) {
     console.error("Error in getStudentExams: ", err);
     throw err;
   }
-}
+};
+
+exports.getCountStudentRequestNotRejected = async (studentID) => {
+  try {
+    const sql =
+      "select count(*) as tot from thesis_request r where r.student_id = ? and status_code <> 4 and status_code <> 5";
+    const [rows] = await pool.execute(sql, [studentID]);
+    return rows[0].tot;
+  } catch (err) {
+    console.error("Error in getCountStudentRequestNotRejected: ", err);
+    throw err;
+  }
+};
