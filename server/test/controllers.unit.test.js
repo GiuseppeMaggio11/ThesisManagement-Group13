@@ -1911,12 +1911,14 @@ describe("isApplied", () => {
         ];
 
         dao.getUserID.mockResolvedValue("S111111");
-        dao.getApplications.mockResolvedValue(mockApplications)
+        dao.getApplications.mockResolvedValue(mockApplications);
+        dao.getCountStudentRequestNotRejected.mockResolvedValue(0);
 
         await isApplied(mockReq, mockRes);
 
         expect(dao.getUserID).toHaveBeenCalledTimes(1);
         expect(dao.getApplications).toHaveBeenCalledTimes(1);
+        expect(dao.getCountStudentRequestNotRejected).toHaveBeenCalledTimes(1);
         expect(mockRes.status).toHaveBeenCalledWith(200);
         expect(mockRes.json).toHaveBeenCalledWith(1);
     });
@@ -1953,14 +1955,16 @@ describe("isApplied", () => {
         ];
 
         dao.getUserID.mockResolvedValue("S333333");
-        dao.getApplications.mockResolvedValue(mockApplications)
+        dao.getApplications.mockResolvedValue(mockApplications);
+        dao.getCountStudentRequestNotRejected.mockResolvedValue(1);
 
         await isApplied(mockReq, mockRes);
 
         expect(dao.getUserID).toHaveBeenCalledTimes(1);
         expect(dao.getApplications).toHaveBeenCalledTimes(1);
+        expect(dao.getCountStudentRequestNotRejected).toHaveBeenCalledTimes(1);
         expect(mockRes.status).toHaveBeenCalledWith(200);
-        expect(mockRes.json).toHaveBeenCalledWith(0);
+        expect(mockRes.json).toHaveBeenCalledWith(1);
     });
 
     test("Should return 500 - Internal server error", async () => {
