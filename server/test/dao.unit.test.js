@@ -3724,3 +3724,41 @@ describe("getDataProfessorRequestEmail", () => {
     });
 
 });
+
+describe("getCountStudentRequestNotRejected", () => {
+
+    test("Should return the number of requests not rejected of a specified student", async () => {
+        const mockInput = {
+            studentID: "S111111"
+        };
+        const mockRows = [{ tot: 1 }];
+
+        mockPool.execute.mockResolvedValue([mockRows]);
+
+        const result = await dao.getCountStudentRequestNotRejected(mockInput.studentID);
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "select count(*) as tot from thesis_request r where r.student_id = ? and status_code <> 4 and status_code <> 5",
+            [mockInput.studentID]
+        );
+        expect(result).toStrictEqual(mockRows[0].tot);
+    });
+
+    test("Should throw an error - MySql error", async () => {
+        const mockInput = {
+            studentID: "S111111"
+        };
+
+        mockPool.execute.mockRejectedValue("Database error");
+
+        await expect(dao.getCountStudentRequestNotRejected(mockInput.studentID)).rejects.toStrictEqual("Database error");
+
+        expect(mockPool.execute).toHaveBeenCalledTimes(1);
+        expect(mockPool.execute).toHaveBeenCalledWith(
+            "select count(*) as tot from thesis_request r where r.student_id = ? and status_code <> 4 and status_code <> 5",
+            [mockInput.studentID]
+        );
+    });
+
+});
