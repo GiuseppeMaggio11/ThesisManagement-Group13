@@ -214,7 +214,31 @@ VALUES
     ('S111111','COU05','Programmazione di sistema' ,8,28, '2023-01-15'),
     ('S111111','COU06', 'Applicazioni web' ,12,29, '2023-09-23'),
     ('S111111','COU07','Applicazioni web 2' ,6,30, '2023-01-15'),
-    ('S111111','COU08', 'Mobile application' ,12,30, '2023-06-12');
+    ('S111111','COU08', 'Mobile application' ,12,30, '2023-06-12'),
+    ('S222222','COU01','Data science',9,30, '2023-01-15'),
+    ('S222222','COU02', 'Software Engineering 1',9,27, '2023-02-20'),
+    ('S222222','COU03','Cloud computing' ,12,30, '2023-04-15'),
+    ('S222222','COU04', 'Computational intelligence' ,12,30, '2021-02-20'),
+    ('S222222','COU05','Programmazione di sistema' ,8,28, '2023-01-15'),
+    ('S222222','COU06', 'Applicazioni web' ,12,29, '2023-09-23'),
+    ('S222222','COU07','Applicazioni web 2' ,6,30, '2023-01-15'),
+    ('S222222','COU08', 'Mobile application' ,12,30, '2023-06-12'),
+    ('S333333','COU01','Data science',9,30, '2023-01-15'),
+    ('S333333','COU02', 'Software Engineering 1',9,27, '2023-02-20'),
+    ('S333333','COU03','Cloud computing' ,12,30, '2023-04-15'),
+    ('S333333','COU04', 'Computational intelligence' ,12,30, '2021-02-20'),
+    ('S333333','COU05','Programmazione di sistema' ,8,28, '2023-01-15'),
+    ('S333333','COU06', 'Applicazioni web' ,12,29, '2023-09-23'),
+    ('S333333','COU07','Applicazioni web 2' ,6,30, '2023-01-15'),
+    ('S333333','COU08', 'Mobile application' ,12,30, '2023-06-12'),
+    ('S444444','COU01','Data science',9,30, '2023-01-15'),
+    ('S444444','COU02', 'Software Engineering 1',9,27, '2023-02-20'),
+    ('S444444','COU03','Cloud computing' ,12,30, '2023-04-15'),
+    ('S444444','COU04', 'Computational intelligence' ,12,30, '2021-02-20'),
+    ('S444444','COU05','Programmazione di sistema' ,8,28, '2023-01-15'),
+    ('S444444','COU06', 'Applicazioni web' ,12,29, '2023-09-23'),
+    ('S444444','COU07','Applicazioni web 2' ,6,30, '2023-01-15'),
+    ('S444444','COU08', 'Mobile application' ,12,30, '2023-06-12');
     
 INSERT INTO group_table (cod_group, group_name)
 VALUES
@@ -273,9 +297,8 @@ VALUES
 
 INSERT INTO application (student_id, thesis_id, status, application_date)
 VALUES
-    ('S123456', 1, 'Pending', '2023-12-15 10:30:00'),
+    ('S123456', 1, 'Rejected', '2023-12-15 10:30:00'),
     ('S123456', 2, 'Cancelled', '2023-11-20 14:45:00'),
-    ('S654321', 3, 'Pending', '2023-12-02 16:15:00'),
     ('S654321', 4, 'Rejected', '2023-03-12 09:00:00'),
     ('S123456', 5, 'Rejected', '2023-07-10 11:30:00'),
     ('S654321', 6, 'Cancelled', '2023-02-28 13:15:00')
@@ -283,7 +306,6 @@ VALUES
 
 INSERT INTO thesis_cosupervisor_external (thesis_id, cosupevisor_id)
 VALUES 
-    (3, 'elena.conti@email.net'),
     (4, 'maria.gentile@email.net'),
     (4, 'antonio.bruno@email.org'),
     (6, 'andrea.ferrari@email.com');
@@ -297,7 +319,6 @@ VALUES
 
 INSERT INTO thesis_request (student_id, title, description, supervisor_id, start_date, status_code)
 VALUES
-    ('S123456', 'Exploring the Impact of Virtual Reality on Learning Environments', 'This comprehensive thesis endeavor seeks to delve deeply into the multifaceted realm of virtual reality s profound influence on contemporary educational environments. Through an intricate examination of the synergies between immersive virtual reality technologies and pedagogical practices, this research aims to elucidate the transformative effects on student engagement, knowledge acquisition, and overall learning outcomes.', 'P123456', '2023-10-15 10:30:00', 0),
     ('S654321', 'Analyzing the Role of Artificial Intelligence in Predictive Maintenance', 'This thesis aims to examine the application of artificial intelligence in predictive maintenance for industrial machinery. The study will investigate how machine learning algorithms can optimize maintenance schedules, reduce downtime, and enhance overall equipment reliability.', 'P654321', '2023-09-11 10:58:00', 0),
     ('S111111', 'Exploring Ethical Considerations in Autonomous Vehicles', 'Investigating ethics in autonomous vehicles, focusing on decision algorithms, safety, and societal impacts for developing ethical guidelines.', 'P654321', '2023-04-11 10:58:00', 1),
     ('S222222', 'The Integration of Blockchain in Supply Chain Management', 'This thesis explores the integration of blockchain technology in supply chain management.', 'P123456', '2023-06-10 18:18:00', 1),
@@ -308,7 +329,6 @@ INSERT INTO thesis_cosupervisor_teacher (thesis_id, thesisrequest_id ,cosupeviso
 VALUES 
     (1, NULL, 'P654321'),
     (6, NULL, 'P123456'),
-    (NULL, 1, 'P654321'),
     (NULL, 2, 'P123456'),
     (NULL, 4, 'P654321'),
     (NULL, 3, 'P123456'),
