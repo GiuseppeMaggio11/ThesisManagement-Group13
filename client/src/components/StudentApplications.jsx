@@ -136,6 +136,7 @@ function StudentApplications(props) {
 }
 
 function ApplicationRow(props) {
+ 
   const handleModalClick = (e) => {
     /*  console.log("e.target", e.target);
     console.log("e.currentTarget", e.currentTarget); */
@@ -154,6 +155,7 @@ function ApplicationRow(props) {
           padding: "0.2rem",
         }}
         className="mt-3"
+        key={props.key}
       >
         <Row>
           <Col className="col-4">
