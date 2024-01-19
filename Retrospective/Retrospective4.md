@@ -13,7 +13,7 @@ sections:
 
 - Number of stories committed: 6 done: 6
 - Total points committed: 19 done: 19
-- Nr of hours planned: 112 spent:
+- Nr of hours planned: 112 spent: 111:35
 
 **Remember** a story is done ONLY if it fits the Definition of Done:
 
