@@ -72,6 +72,7 @@ sections:
 ## ASSESSMENT
 
 - What caused your errors in estimation (if any)?
+  + In this sprint we didn't make significant errors in estimation. In fact, we worked only 25 minutes less than planned: 111h 35m instead of 112h. However, this is the result of a compensatory effort, albeit minimal. Some User Stories required more work than estimated, while others required less. The main reason is attributed to estimation errors in tasks related to writing unit tests: in some stories, it took less time than expected because some backend functions reused code pieces developed for other stories and therefore were already tested; in others, it was necessary to mock new libraries from scratch, especially the email management library, which required additional time.
 
 - What lessons did you learn (both positive and negative) in this sprint?
 
