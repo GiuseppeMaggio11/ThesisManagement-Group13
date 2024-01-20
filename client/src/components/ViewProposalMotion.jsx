@@ -25,6 +25,7 @@ function ViewProposalMotion(props) {
   //const [isAlreadyApplied, setIsAlreadyApplied] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
+    console.log(props.proposal);
     setIsLoading(true);
     /* async function isApplied() {
       let alreadyApply = await API.isApplied();

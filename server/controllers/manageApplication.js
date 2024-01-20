@@ -182,10 +182,10 @@ async function isApplied(req, res) {
         returnValue = 1;
       }
     }
-    const rowStudentRequest = await dao.getCountStudentRequestNotRejected(
+    /* const rowStudentRequest = await dao.getCountStudentRequestNotRejected(
       userID
     );
-    if (rowStudentRequest > 0) returnValue = 1;
+    if (rowStudentRequest > 0) returnValue = 1; */
 
     return res.status(200).json(returnValue);
   } catch (err) {

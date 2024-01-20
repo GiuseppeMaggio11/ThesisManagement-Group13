@@ -14,8 +14,6 @@ function StudentApplications(props) {
   const [applications, setApplications] = useState(undefined);
   const isMobile = useMediaQuery({ maxWidth: 767 });
   const { handleToast } = useContext(MessageContext);
-  const [isClicked, setIsClicked] = useState(false);
-  const [cardPosition, setCardPosition] = useState({ x: 0, y: 0 });
   const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 1025 });
   const isTabletHorizonthal = useMediaQuery({ minWidth: 1026, maxWidth: 1367 });
   useEffect(() => {
@@ -76,10 +74,6 @@ function StudentApplications(props) {
                 <ApplicationRow
                   element={element}
                   key={index}
-                  setIsClicked={setIsClicked}
-                  isClicked={isClicked}
-                  cardPosition={cardPosition}
-                  setCardPosition={setCardPosition}
                   isMobile={isMobile}
                   isTablet={isTablet}
                   isTabletHorizonthal={isTabletHorizonthal}
@@ -113,10 +107,6 @@ function StudentApplications(props) {
                       element={element}
                       index={index}
                       key={index}
-                      setIsClicked={setIsClicked}
-                      isClicked={isClicked}
-                      cardPosition={cardPosition}
-                      setCardPosition={setCardPosition}
                       isMobile={isMobile}
                       isTablet={isTablet}
                       isTabletHorizonthal={isTabletHorizonthal}
@@ -136,14 +126,15 @@ function StudentApplications(props) {
 }
 
 function ApplicationRow(props) {
- 
+  const [isClicked, setIsClicked] = useState(false);
+  const [cardPosition, setCardPosition] = useState({ x: 0, y: 0 });
   const handleModalClick = (e) => {
     /*  console.log("e.target", e.target);
     console.log("e.currentTarget", e.currentTarget); */
 
     // If the click occurs outside the expanded card, close it
     if (!e || e.target === e.currentTarget) {
-      props.setIsClicked(false);
+      /* props. */ setIsClicked(false);
     }
   };
   return (
@@ -155,7 +146,7 @@ function ApplicationRow(props) {
           padding: "0.2rem",
         }}
         className="mt-3"
-        key={props.key}
+        /*  key={props.key} */
       >
         <Row>
           <Col className="col-4">
@@ -166,7 +157,7 @@ function ApplicationRow(props) {
                 cursor: "pointer",
               }}
               onClick={() => {
-                props.setIsClicked(true);
+                /* props. */ setIsClicked(true);
               }}
             >
               {props.element.title}
@@ -183,39 +174,43 @@ function ApplicationRow(props) {
           </Col>
         </Row>
       </motion.div>
-      {props.isClicked && (
-        <ViewProposalMotion
-          proposal={{
-            ...props.element,
-            keywords:
-              props.element.keywords && props.element.keywords.join(","),
-            supervisor: props.element.name + " " + props.element.surname,
-          }}
-          isMobile={props.isMobile}
-          setIsClicked={props.setIsClicked}
-          cardPosition={props.cardPosition}
-          isTablet={props.isTablet}
-          isTabletHorizonthal={props.isTabletHorizonthal}
-          user={props.user}
-          handleModalClick={handleModalClick}
-          handleUploadInterface={() => console.err("Non stampare")}
-          isAlreadyApplied={props.isAlreadyApplied}
-          setIsAlreadyApplied={props.setIsAlreadyApplied}
-          fromApplications={true}
-        />
-      )}
+      {
+        /* props. */ isClicked && (
+          <ViewProposalMotion
+            proposal={{
+              ...props.element,
+              keywords:
+                props.element.keywords && props.element.keywords.join(","),
+              supervisor: props.element.name + " " + props.element.surname,
+            }}
+            isMobile={props.isMobile}
+            setIsClicked={/* props. */ setIsClicked}
+            cardPosition={/* props. */ cardPosition}
+            isTablet={props.isTablet}
+            isTabletHorizonthal={props.isTabletHorizonthal}
+            user={props.user}
+            handleModalClick={handleModalClick}
+            handleUploadInterface={() => console.err("Non stampare")}
+            isAlreadyApplied={props.isAlreadyApplied}
+            setIsAlreadyApplied={props.setIsAlreadyApplied}
+            fromApplications={true}
+          />
+        )
+      }
     </>
   );
 }
 
 function MobileApplication(props) {
+  const [isClicked, setIsClicked] = useState(false);
+  const [cardPosition, setCardPosition] = useState({ x: 0, y: 0 });
   const handleModalClick = (e) => {
     /*  console.log("e.target", e.target);
     console.log("e.currentTarget", e.currentTarget); */
 
     // If the click occurs outside the expanded card, close it
     if (!e || e.target === e.currentTarget) {
-      props.setIsClicked(false);
+      setIsClicked(false);
     }
   };
   return (
@@ -230,7 +225,7 @@ function MobileApplication(props) {
                   cursor: "pointer",
                 }}
                 onClick={() => {
-                  props.setIsClicked(true);
+                  setIsClicked(true);
                 }}
               >
                 {props.element.title}
@@ -256,7 +251,7 @@ function MobileApplication(props) {
           </p>
         </Accordion.Body>
       </Accordion.Item>
-      {props.isClicked && (
+      {isClicked && (
         <ViewProposalMotion
           proposal={{
             ...props.element,
@@ -265,8 +260,8 @@ function MobileApplication(props) {
             supervisor: props.element.name + " " + props.element.surname,
           }}
           isMobile={props.isMobile}
-          setIsClicked={props.setIsClicked}
-          cardPosition={props.cardPosition}
+          setIsClicked={setIsClicked}
+          cardPosition={cardPosition}
           isTablet={props.isTablet}
           isTabletHorizonthal={props.isTabletHorizonthal}
           user={props.user}
