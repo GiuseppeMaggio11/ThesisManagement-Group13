@@ -2,7 +2,7 @@
 
 const { isStudent, isProfessor, isLoggedIn, isSecretary, isSecretaryOrProfessor } = require("../controllers/middleware");
 const { getProposals, getProposal, getProposalsProfessor } = require("../controllers/showThesis");
-const { newApplication, updateApplicationStatus, getApplications, getApplicationStudent, isApplied } = require("../controllers/manageApplication");
+const { newApplication, updateApplicationStatus, getApplications, getApplicationStudent, isApplied, hasAlreadyRequest } = require("../controllers/manageApplication");
 const { addFiles, getAllFiles, getStudentFilesList, getFile } = require("../controllers/manageFiles");
 const { newThesis, updateThesis, updateThesesArchivationManual, getThesisForProfessorById, deleteProposal, newRequest } = require("../controllers/manageThesis");
 const { listExternalCosupervisors, createExternalCosupervisor, getTeachersList, listGroups, listDegrees } = require("../controllers/others");
@@ -1912,13 +1912,11 @@ describe("isApplied", () => {
 
         dao.getUserID.mockResolvedValue("S111111");
         dao.getApplications.mockResolvedValue(mockApplications);
-        dao.getCountStudentRequestNotRejected.mockResolvedValue(0);
 
         await isApplied(mockReq, mockRes);
 
         expect(dao.getUserID).toHaveBeenCalledTimes(1);
         expect(dao.getApplications).toHaveBeenCalledTimes(1);
-        expect(dao.getCountStudentRequestNotRejected).toHaveBeenCalledTimes(1);
         expect(mockRes.status).toHaveBeenCalledWith(200);
         expect(mockRes.json).toHaveBeenCalledWith(1);
     });
@@ -1956,15 +1954,13 @@ describe("isApplied", () => {
 
         dao.getUserID.mockResolvedValue("S333333");
         dao.getApplications.mockResolvedValue(mockApplications);
-        dao.getCountStudentRequestNotRejected.mockResolvedValue(1);
 
         await isApplied(mockReq, mockRes);
 
         expect(dao.getUserID).toHaveBeenCalledTimes(1);
         expect(dao.getApplications).toHaveBeenCalledTimes(1);
-        expect(dao.getCountStudentRequestNotRejected).toHaveBeenCalledTimes(1);
         expect(mockRes.status).toHaveBeenCalledWith(200);
-        expect(mockRes.json).toHaveBeenCalledWith(1);
+        expect(mockRes.json).toHaveBeenCalledWith(0);
     });
 
     test("Should return 500 - Internal server error", async () => {
@@ -3767,6 +3763,75 @@ describe("newRequest", () => {
         expect(dao.rollback).toHaveBeenCalledTimes(1);
         expect(mockRes.status).toHaveBeenCalledWith(503);
         expect(mockRes.json).toHaveBeenCalledWith({ error: "Database error" });
+    });
+
+});
+
+describe("hasAlreadyRequest", () => {
+
+    test("Should return 200 - The student has already a request", async () => {
+        const mockReq = {
+            user: {
+                username: "username"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        dao.getUserID.mockResolvedValue(true);
+        dao.getCountStudentRequestNotRejected.mockResolvedValue(1);
+
+        await hasAlreadyRequest(mockReq, mockRes);
+
+        expect(dao.getUserID).toHaveBeenCalledTimes(1);
+        expect(dao.getCountStudentRequestNotRejected).toHaveBeenCalledTimes(1);
+        expect(mockRes.status).toHaveBeenCalledWith(200);
+        expect(mockRes.json).toHaveBeenCalledWith(1);
+    });
+
+    test("Should return 200 - The student hasn't a request", async () => {
+        const mockReq = {
+            user: {
+                username: "username"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        dao.getUserID.mockResolvedValue(true);
+        dao.getCountStudentRequestNotRejected.mockResolvedValue(0);
+
+        await hasAlreadyRequest(mockReq, mockRes);
+
+        expect(dao.getUserID).toHaveBeenCalledTimes(1);
+        expect(dao.getCountStudentRequestNotRejected).toHaveBeenCalledTimes(1);
+        expect(mockRes.status).toHaveBeenCalledWith(200);
+        expect(mockRes.json).toHaveBeenCalledWith(0);
+    });
+
+    test("Should return 200 - The student hasn't a request", async () => {
+        const mockReq = {
+            user: {
+                username: "username"
+            }
+        };
+        const mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+
+        dao.getUserID.mockRejectedValue("Database error");
+
+        await hasAlreadyRequest(mockReq, mockRes);
+
+        expect(dao.getUserID).toHaveBeenCalledTimes(1);
+        expect(dao.getCountStudentRequestNotRejected).not.toHaveBeenCalled();
+        expect(mockRes.status).toHaveBeenCalledWith(500);
+        expect(mockRes.json).toHaveBeenCalledWith("error: Database error");
     });
 
 });
