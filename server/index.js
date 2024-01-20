@@ -71,7 +71,7 @@ const fs = require("fs");
 const zipdir = require("zip-dir");
 const bodyParser = require("body-parser");
 const cron = require("node-cron");
-var FakeTimers = require("@sinonjs/fake-timers");
+let FakeTimers = require("@sinonjs/fake-timers");
 const CronJob = require("cron");
 const nodemailer = require("nodemailer");
 

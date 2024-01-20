@@ -7,7 +7,8 @@ import dayjs from "dayjs";
 const VirtualClock = (props) => {
   const [tempTime, setTempTime] = useState(props.virtualClock);
   const [isVirtual, setIsVirtual] = useState(
-    JSON.parse(localStorage.getItem("virtualclock"))? true: false);
+    JSON.parse(localStorage.getItem("virtualclock")) ? true : false
+  );
   const [settingVirtual, setSettingVirtual] = useState(false);
   const [isAmPm, setIsAmPm] = useState("");
   const [virtualTime, setVirtualTime] = useState();
@@ -34,8 +35,8 @@ const VirtualClock = (props) => {
     props.setVirtualClock(virtualTime.toDate());
     localStorage.setItem("virtualclock", JSON.stringify(virtualTime.toDate()));
     console.log(virtualTime);
-    await API.setVirtualTime(virtualTime.toDate())
-      .then((response) => {
+    await API.setVirtualTime(virtualTime.toDate());
+    /*.then((response) => {
         if (response && "errors" in response) {
           //setErrors(response.errors);
         } else {
@@ -45,7 +46,7 @@ const VirtualClock = (props) => {
       })
       .catch((error) => {
         //setErrors([{ msg: error.message }]);
-      });
+      });*/
   };
 
   const handleRealTime = async () => {
@@ -82,7 +83,7 @@ const VirtualClock = (props) => {
           setSettingVirtual={setSettingVirtual}
           virtualTime={virtualTime}
           setVirtualTime={setVirtualTime}
-          systemTime={props.virtualClock? props.virtualClock : new Date()}
+          systemTime={props.virtualClock ? props.virtualClock : new Date()}
           setSystemTime={props.setVirtualClock}
         />
       </div>

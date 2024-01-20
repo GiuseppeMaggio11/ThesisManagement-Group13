@@ -504,6 +504,136 @@ docker compose down
   - `200` with a list of strings representing files' name
   - `500` if an unexpected error occurs
 
+#### **Sets the datetime to real datetime**: `PUT /api/setRealDateTime`
+
+- **Description**: Sets the datetime to real datetime
+- **Middleware**: 
+- **Request Body**: None,
+- **Response**:
+  - `200` with number of updated rows and current datetime
+  - `500` if an unexpected error occurs
+  - `422` if some inputs are wrong
+
+#### **Sets the datetime to fake datetime**: `PUT /api/setVirtualDateTime`
+
+- **Description**: Sets the datetime to fake datetime selected
+- **Middleware**: 
+- **Request Body**: {
+      datetime: virtualTime,
+    },
+- **Response**:
+  - `200` with number of updated rows and current datetime
+  - `500` if an unexpected error occurs
+  - `422` if some inputs are wrong
+
+#### **Gets professor's proposals**: `GET /api/getProposalsProfessor`
+
+- **Description**:Get list of proposals of professor
+- **Middleware**: isProfessor
+- **Request Body**:
+- **Response**:
+  - `200` with number of updated rows and current datetime
+  - `500` if an unexpected error occurs
+
+#### **Update the archiviation sattus of  a thesis**: `PUT /api/archiveProposalManual`
+
+- **Description**: Sets the archiviation status of a thesis to the one provided
+- **Middleware**: isProfessor
+- **Request Body**:
+- **Response**:
+  - `200` thesis id of updated thesis
+  - `500` if an unexpected error occurs
+
+#### **Gets the list of teachers**: `GET /api/teachersList`
+
+- **Description**: Gets the list of teachers
+- **Middleware**: isLoggedIn
+- **Request Body**:
+- **Response**:
+  - `200` list of teachers
+  - `500` if an unexpected error occurs
+
+#### **Gets the list of groups**: `GET /api/groups`
+
+- **Description**: Gets the list of groups
+- **Middleware**: isProfessor
+- **Request Body**:
+- **Response**:
+  - `200` list of groups
+  - `500` if an unexpected error occurs
+
+#### **Gets the list of degrees**: `GET /api/degrees`
+
+- **Description**: Gets the list of degrees
+- **Middleware**: isProfessor
+- **Request Body**:
+- **Response**:
+  - `200` list of degrees
+  - `500` if an unexpected error occurs
+
+#### **Deletes a proposal**: `DELETE /api/deleteproposal`
+
+- **Description**: Deletes a proposal
+- **Middleware**: isProfessor
+- **Request Body**: { thesis_id: thesisID }
+- **Response**:
+  - `200` success message
+  - `500` if an unexpected error occurs
+
+#### **Gets thesis of professor with  id**: `GET /api/getThesisForProfessorById/:id`
+
+- **Description**: Gets thesis of professor, with a certain thesis id
+- **Middleware**: isProfessor
+- **Request Body**: 
+- **Response**:
+  - `200` thesis object
+  - `500` if an unexpected error occurs
+
+#### **Gets the list of requests of a professor**: `GET /api/getrequestsforprof`
+
+- **Description**: Gets the list of requests of a professor
+- **Middleware**: isProfessor
+- **Request Body**: 
+- **Response**:
+  - `200` list of requests
+  - `500` if an unexpected error occurs
+
+#### **Gets the list of requests for a secretary**: `GET /api/getrequestsforsecr`
+
+- **Description**: Gets the list of requests for a secretary
+- **Middleware**: isSecretary
+- **Request Body**: 
+- **Response**:
+  - `200` list of requests
+  - `500` if an unexpected error occurs
+
+#### **Updates a request**: `PUT /api/updateRequest/:id`
+
+- **Description**: Updates a request
+- **Middleware**: isSecretaryOrProfessor
+- **Request Body**: {change: newValue}
+- **Response**:
+  - `200` message: "updated"
+  - `500` if an unexpected error occurs
+
+#### **Gets cv of a student**: `GET api/getStudentCv/:student_id`
+
+- **Description**:  Gets cv of a student
+- **Middleware**: isSecretaryOrProfessor
+- **Request Body**: 
+- **Response**:
+  - `200` cv 
+  - `500` if an unexpected error occurs
+
+#### **Gets data of a student with id**: `GET api/api/getStudent/:student_id`
+
+- **Description**:  Gets data of a student with id
+- **Middleware**: isSecretaryOrProfessor
+- **Request Body**: 
+- **Response**:
+  - `200` student data
+  - `500` if an unexpected error occurs
+
 #### OTHER 1 Server
 
 #### OTHER 2 Server
@@ -673,6 +803,18 @@ docker compose down
   ...
 ]
 ```
+#### setRealTime
+
+- Description: Sets the 
+- API server called: GET `/api/setRealDateTime`
+- Input: None
+- Output: A vector of strings, each representing the name of one of the files associated with the application
+- Example:
+
+
+
+
+
 
 #### OTHER 2 Client
 
@@ -842,3 +984,14 @@ This table contains all the student applications and their status.
 - `TeacherPage` (inside `TeacherPage.jsx`): It's a component that appears in the `/teacher` route, only accessible by authenticated professors. It contains a button redirecting to the `NewProposal`component.
 
 ## Users Credentials
+
+| Role  | Email | Password |
+|--------|---------|--------|
+| teacher |   mario.rossi@polito.it                |   P123456   	|
+| teacher |   sofia.bianchi@polito.it              |   P654321   	|
+| student |   luca.esposito@studenti.polito.it     |   S123456   	|
+| student |   alessandra.moretti@studenti.polito.it|   S654321   	|
+|secretary clerk |   paola.giallo@polito.it        |   E123456   	|
+
+## LICENSE
+![Apache License](LICENSE)

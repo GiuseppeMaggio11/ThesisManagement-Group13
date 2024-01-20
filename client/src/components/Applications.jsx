@@ -19,14 +19,6 @@ import {
   FileEarmarkPdf,
   FileEarmarkPdfFill,
   FolderFill,
-  CheckCircleFill,
-  XCircleFill,
-  CheckCircle,
-  XCircle,
-  CheckSquareFill,
-  CheckSquare,
-  XSquare,
-  XLg,
   Check,
   X,
 } from "react-bootstrap-icons";
@@ -62,14 +54,6 @@ function Applications(props) {
       ];
       setApplications(updatedResult);
       setThesisTitles(uniqueThesisTitles);
-      /* setApplications((old) => old.concat(updatedResult));
-      setApplications((old) => old.concat(updatedResult));
-      setApplications((old) => old.concat(updatedResult));
-      setApplications((old) => old.concat(updatedResult));
-      setThesisTitles((old) => old.concat(uniqueThesisTitles));
-      setThesisTitles((old) => old.concat(uniqueThesisTitles));
-      setThesisTitles((old) => old.concat(uniqueThesisTitles));
-      setThesisTitles((old) => old.concat(uniqueThesisTitles)); */
       props.setLoading(false);
     };
     getApplication();
@@ -78,11 +62,7 @@ function Applications(props) {
   const handleApplication = async (student_id, thesis_id, status) => {
     props.setLoading(true);
     try {
-      const response = await API.updateApplictionStatus(
-        thesis_id,
-        student_id,
-        status
-      );
+      await API.updateApplictionStatus(thesis_id, student_id, status);
       handleToast(
         "Student application " +
           (status === "Accepted" ? " accepted " : " rejected ") +
@@ -150,9 +130,7 @@ function Applications(props) {
         </Row>
 
         {!applications || applications.length === 0 ? (
-          <>
-            <NoFileFound message={"No Applications found"} />
-          </>
+          <NoFileFound message={"No Applications found"} />
         ) : (
           <Row>
             {thesisTitles.map((title, i) => {
