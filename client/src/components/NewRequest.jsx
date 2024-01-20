@@ -163,7 +163,7 @@ function NewRequest(props) {
       const response = await API.newRequest(newProp);
       console.log(newProp);
       handleToast("New request created", "success");
-      props.setIsAlreadyApplied(true);
+      props.setHasAlreadyRequests(true);
       navigate("/studproposals");
     } catch (error) {
       console.log(error);

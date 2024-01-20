@@ -35,6 +35,7 @@ function App() {
   //const [type, setType] = useState("");
   const [error, setError] = useState("");
   const [isAlreadyApplied, setIsAlreadyApplied] = useState(false);
+  const [hasAlreadyRequests, setHasAlreadyRequests] = useState(false);
 
   // If an error occurs, the error message will be shown in a toast.
   const handleToast = (err, type) => {
@@ -92,6 +93,9 @@ function App() {
         if (user && user.user_type === "STUD") {
           let alreadyApply = await API.isApplied();
           setIsAlreadyApplied(alreadyApply);
+
+          let alreadyRequest = await API.hasAlreadyReuests();
+          setHasAlreadyRequests(alreadyRequest);
         }
       } catch (err) {
         if (error.response && error.response.status !== 401) {
@@ -116,7 +120,7 @@ function App() {
           <Header
             user={user}
             logout={logOut}
-            isAlreadyApplied={isAlreadyApplied}
+            hasAlreadyRequests={hasAlreadyRequests}
           />
           <ToastContainer />
           <Routes>
@@ -289,7 +293,7 @@ function App() {
                   setLoading={setLoading}
                   loggedIn={loggedIn}
                   user={user}
-                  setIsAlreadyApplied={setIsAlreadyApplied}
+                  setHasAlreadyRequests={setHasAlreadyRequests}
                 />
               }
             />

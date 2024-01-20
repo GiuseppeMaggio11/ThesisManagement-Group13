@@ -193,10 +193,26 @@ async function isApplied(req, res) {
   }
 }
 
+async function hasAlreadyRequest(req, res) {
+  try {
+    const userID = await dao.getUserID(req.user.username);
+    let returnValue = 0;
+    const rowStudentRequest = await dao.getCountStudentRequestNotRejected(
+      userID
+    );
+    if (rowStudentRequest > 0) returnValue = 1;
+
+    return res.status(200).json(returnValue);
+  } catch (err) {
+    return res.status(500).json(`error: ${err}`);
+  }
+}
+
 module.exports = {
   newApplication,
   updateApplicationStatus,
   getApplications,
   getApplicationStudent,
   isApplied,
+  hasAlreadyRequest,
 };

@@ -106,7 +106,7 @@ function Header(props) {
                 if (
                   props.user &&
                   props.user.user_type === "STUD" &&
-                  props.isAlreadyApplied
+                  props.hasAlreadyRequests
                 )
                   handleToast("You can not create a request now", "warning");
               }}
@@ -115,7 +115,7 @@ function Header(props) {
                 disabled={
                   props.user &&
                   props.user.user_type === "STUD" &&
-                  props.isAlreadyApplied
+                  props.hasAlreadyRequests
                 }
                 as={NavLink}
                 to={
