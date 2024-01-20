@@ -1,12 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import {
-  Button,
-  Card,
-  Col,
-  Container,
-  Form,
-  Row,
-} from "react-bootstrap";
+import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import API from "../API";
 import Loading from "./Loading";
 import { Chips2 } from "./ChipsInput";
@@ -23,7 +16,7 @@ function NewRequest(props) {
     title: "",
     description: "",
     supervisor_id: "",
-    cosupervisors_internal: []
+    cosupervisors_internal: [],
   });
 
   const [errors, setErrors] = useState(null);
@@ -54,8 +47,9 @@ function NewRequest(props) {
   };
 
   useEffect(() => {
-    if (!props.loggedIn || props.user.user_type !== "STUD"){
-      return API.redirectToLogin();}
+    if (!props.loggedIn || props.user.user_type !== "STUD") {
+      return API.redirectToLogin();
+    }
 
     props.setLoading(true);
     fetchData();
@@ -71,11 +65,15 @@ function NewRequest(props) {
   };
 
   useEffect(() => {
-    setCoSupervisorInternal(supervisors.filter(teacher => teacher !== formData.supervisor_id));
+    setCoSupervisorInternal(
+      supervisors.filter((teacher) => teacher !== formData.supervisor_id)
+    );
     setFormData({
       ...formData,
-      "cosupervisors_internal" : formData.cosupervisors_internal.filter(teacher => teacher !== formData.supervisor_id)
-    })
+      cosupervisors_internal: formData.cosupervisors_internal.filter(
+        (teacher) => teacher !== formData.supervisor_id
+      ),
+    });
   }, [formData.supervisor_id]);
 
   const updateChips = (field, value) => {
@@ -150,7 +148,10 @@ function NewRequest(props) {
       cosupervisors_internal_obj
     );
 
-    const supervisor = findIDs([formData.supervisor_id], cosupervisors_internal_obj)[0];
+    const supervisor = findIDs(
+      [formData.supervisor_id],
+      cosupervisors_internal_obj
+    )[0];
 
     const newProp = {
       ...formData,
@@ -160,9 +161,9 @@ function NewRequest(props) {
 
     try {
       const response = await API.newRequest(newProp);
-      console.log(newProp)
+      console.log(newProp);
       handleToast("New request created", "success");
-
+      props.setHasAlreadyRequests(true);
       navigate("/studproposals");
     } catch (error) {
       console.log(error);
@@ -238,7 +239,7 @@ function NewRequest(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some((error) => error?.path?.includes("title"))
+                        errors.some((error) => error?.path?.includes("title"))
                           ? { borderColor: "red" }
                           : {}
                       }
@@ -256,9 +257,9 @@ function NewRequest(props) {
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some((error) =>
-                            error?.path?.includes("description")
-                          )
+                        errors.some((error) =>
+                          error?.path?.includes("description")
+                        )
                           ? { borderColor: "red" }
                           : {}
                       }
@@ -267,14 +268,16 @@ function NewRequest(props) {
                   </Form.Group>
                   <Form.Label htmlFor="supervisor">Supervisor</Form.Label>
                   <Form.Group className="mb-3">
-                  <Form.Select
+                    <Form.Select
                       id="supervisor_id"
                       name="supervisor_id"
                       value={formData.supervisor_id}
                       onChange={handleChange}
                       style={
                         errors &&
-                          errors.some((error) => error?.path?.includes("supervisor"))
+                        errors.some((error) =>
+                          error?.path?.includes("supervisor")
+                        )
                           ? { borderColor: "red" }
                           : {}
                       }
@@ -333,4 +336,3 @@ function NewRequest(props) {
 }
 
 export default NewRequest;
-

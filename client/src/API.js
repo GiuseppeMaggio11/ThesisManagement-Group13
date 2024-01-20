@@ -422,18 +422,17 @@ async function updateRequest(id, newValue) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({change: newValue}),
+      body: JSON.stringify({ change: newValue }),
     })
   );
 }
-
 
 async function getServerDateTime() {
   return getJson(
     fetch(`${URL}/getServerDateTime`, {
       credentials: "include",
     })
-  );  
+  );
 }
 
 async function getRequestsForProfessor() {
@@ -463,6 +462,14 @@ async function getStudentCv(id) {
 async function getStudent(id) {
   return getJson(
     fetch(`${URL}/getStudent/${id}`, {
+      credentials: "include",
+    })
+  );
+}
+
+async function hasAlreadyReuests() {
+  return getJson(
+    fetch(`${URL}/hasAlreadyReuests`, {
       credentials: "include",
     })
   );
@@ -502,6 +509,7 @@ const API = {
   getRequestsForSecretary,
   updateRequest,
   getStudentCv,
-  getStudent
+  getStudent,
+  hasAlreadyReuests,
 };
 export default API;

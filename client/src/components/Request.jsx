@@ -335,7 +335,7 @@ function RequestCard(props) {
                 </Row>
               )}
             </Col>
-            <Col xs={4} className="text-end px-0">
+            <Col xs={4} className="text-end px-4">
               <Row
                 className={isMobile ? "d-flex justify-content-end" : ""}
                 style={{ marginTop: "1em", marginRight: "1em" }}
@@ -416,16 +416,16 @@ function RequestCard(props) {
               </span>
             ) */}
           </div>
-          <Row className="text-end text-muted">
+          <Row className="text-end">
             <Col>
-              {request.description.length > (isMobile ? 100 : 150) && (
+              
                 <span
-                  onClick={toggleExpanded}
-                  className="description-read-more"
+                  onClick={request.description.length > (isMobile ? 100 : 150) && toggleExpanded}
+                  className={request.description.length > (isMobile ? 100 : 150) ? "description-read-more text-muted" : 'description-read-more-white'}
                 >
-                  {expanded ? "Reduce" : "Read More"}
+                  {request.description.length > (isMobile ? 100 : 150) ? expanded ? "Reduce" : "Read More" : ' .'}
                 </span>
-              )}
+              
             </Col>
           </Row>
           <Row

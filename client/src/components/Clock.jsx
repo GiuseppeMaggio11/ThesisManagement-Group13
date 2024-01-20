@@ -3,7 +3,8 @@ import { Calendar, ChevronDown, ChevronUp, Clock } from "react-bootstrap-icons";
 import "../Clock.css";
 import dayjs from "dayjs";
 import { DatePickerModal, TimePickerModal } from "./PickerModal";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Button, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
+import { useMediaQuery } from "react-responsive";
 
 const FlipClock = ({
   isVirtual,
@@ -29,7 +30,7 @@ const FlipClock = ({
   const [minutes, setMinutes] = useState("");
   const [seconds, setSeconds] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-
+  const isMobile = useMediaQuery({ maxWidth: 767 });
   const calendarTooltip = (
     <Tooltip id="calendar-tooltip">Open calendar</Tooltip>
   );
@@ -108,16 +109,18 @@ const FlipClock = ({
                 ).add(1, "second")
               : dayjs().add(1, "second");
           }
-          setSystemTime(updatedVirtualTime.toDate());
-          localStorage.setItem(
-            "virtualclock",
-            JSON.stringify(updatedVirtualTime.toDate())
-          );
+          else {
+            updatedVirtualTime = localStorage.getItem("virtualclock") ? dayjs(new Date(JSON.parse(localStorage.getItem("virtualclock")))).add(1, "second") : dayjs().add(1, "second");
+          }
+          setSystemTime(updatedVirtualTime.toDate())
+          localStorage.setItem("virtualclock", JSON.stringify(updatedVirtualTime.toDate()));
+
           return updatedVirtualTime;
         });
       }, 1000);
       return () => clearInterval(interval);
     }
+
   }, [isVirtual, settingVirtual]);
 
   useEffect(() => {
@@ -135,11 +138,8 @@ const FlipClock = ({
       handleDateTimeUpdate(time);
       setIsLoading(false);
     } else {
-      handleDateTimeUpdate(
-        virtualTime
-          ? virtualTime.toDate()
-          : new Date(JSON.parse(localStorage.getItem("virtualclock")))
-      );
+      handleDateTimeUpdate(virtualTime ? virtualTime.toDate() : new Date(JSON.parse(localStorage.getItem("virtualclock"))))
+
       setIsLoading(false);
     }
   }, [isLoading, time, virtualTime]);
@@ -467,7 +467,7 @@ const FlipClock = ({
     <>
       <div className="flip-clock-container no-highlight">
         <div className="calendar-container">
-          {settingVirtual && (
+          {settingVirtual && !isMobile && (
             <OverlayTrigger placement="top" overlay={calendarTooltip}>
               <Calendar
                 style={{ marginRight: "1em" }}
@@ -476,61 +476,10 @@ const FlipClock = ({
             </OverlayTrigger>
           )}
           <div className="flip-clock">
-            {/* Month 1 */}
-            <div className="digit">
-              {settingVirtual && (
-                <div
-                  className="chevron-up"
-                  onClick={() => handleChange("m1_up")}
-                >
-                  <ChevronUp color="black" id="m1_up" />
-                </div>
-              )}
-              <div className="card-custom">
-                <div className="front">
-                  {" "}
-                  {settingVirtual ? virtualTimeArray[0] : month[0]}
-                </div>
-              </div>
-              {settingVirtual && (
-                <div
-                  className="chevron-down"
-                  onClick={() => handleChange("m1_down")}
-                >
-                  <ChevronDown color="black" id="m1_down" />
-                </div>
-              )}
-            </div>
-            {/* Month 2 */}
-            <div className="digit">
-              {settingVirtual && (
-                <div
-                  className="chevron-up"
-                  onClick={() => handleChange("m2_up")}
-                >
-                  <ChevronUp color="black" id="m2_up" />
-                </div>
-              )}
-              <div className="card-custom">
-                <div className="front">
-                  {" "}
-                  {settingVirtual ? virtualTimeArray[1] : month[1]}
-                </div>
-              </div>
-              {settingVirtual && (
-                <div
-                  className="chevron-down"
-                  onClick={() => handleChange("m2_down")}
-                >
-                  <ChevronDown color="black" id="m2_down" />
-                </div>
-              )}
-            </div>
-            <span className="dash">-</span>
-            <span className="date-separator"></span>
+            <span className="dmy">d</span>
             {/* Day 1 */}
             <div className="digit">
-              {settingVirtual && (
+              {settingVirtual && !isMobile && (
                 <div
                   className="chevron-up"
                   onClick={() => handleChange("d1_up")}
@@ -544,7 +493,7 @@ const FlipClock = ({
                   {settingVirtual ? virtualTimeArray[2] : day[0]}
                 </div>
               </div>
-              {settingVirtual && (
+              {settingVirtual && !isMobile && (
                 <div
                   className="chevron-down"
                   onClick={() => handleChange("d1_down")}
@@ -555,7 +504,7 @@ const FlipClock = ({
             </div>
             {/* Day 2 */}
             <div className="digit">
-              {settingVirtual && (
+              {settingVirtual && !isMobile && (
                 <div
                   className="chevron-up"
                   onClick={() => handleChange("d2_up")}
@@ -569,7 +518,7 @@ const FlipClock = ({
                   {settingVirtual ? virtualTimeArray[3] : day[1]}
                 </div>
               </div>
-              {settingVirtual && (
+              {settingVirtual && !isMobile && (
                 <div
                   className="chevron-down"
                   onClick={() => handleChange("d2_down")}
@@ -578,11 +527,65 @@ const FlipClock = ({
                 </div>
               )}
             </div>
-            <span className="dash">-</span>
             <span className="date-separator"></span>
+            <span className="dash">-</span>
+            <span className="dmy">m</span>
+            {/* Month 1 */}
+            <div className="digit">
+              {settingVirtual && !isMobile && (
+                <div
+                  className="chevron-up"
+                  onClick={() => handleChange("m1_up")}
+                >
+                  <ChevronUp color="black" id="m1_up" />
+                </div>
+              )}
+              <div className="card-custom">
+                <div className="front">
+                  {" "}
+                  {settingVirtual ? virtualTimeArray[0] : month[0]}
+                </div>
+              </div>
+              {settingVirtual && !isMobile && (
+                <div
+                  className="chevron-down"
+                  onClick={() => handleChange("m1_down")}
+                >
+                  <ChevronDown color="black" id="m1_down" />
+                </div>
+              )}
+            </div>
+            {/* Month 2 */}
+            <div className="digit">
+              {settingVirtual && !isMobile && (
+                <div
+                  className="chevron-up"
+                  onClick={() => handleChange("m2_up")}
+                >
+                  <ChevronUp color="black" id="m2_up" />
+                </div>
+              )}
+              <div className="card-custom">
+                <div className="front">
+                  {" "}
+                  {settingVirtual ? virtualTimeArray[1] : month[1]}
+                </div>
+              </div>
+              {settingVirtual && !isMobile && (
+                <div
+                  className="chevron-down"
+                  onClick={() => handleChange("m2_down")}
+                >
+                  <ChevronDown color="black" id="m2_down" />
+                </div>
+              )}
+            </div>
+            <span className="date-separator"></span>
+            <span className="dash">-</span>
+            <span className="dmy">y</span>
             {/* year 1 */}
             <div className="digit">
-              {settingVirtual && (
+              {settingVirtual && !isMobile && (
                 <div
                   className="chevron-up"
                   onClick={() => handleChange("y1_up")}
@@ -596,7 +599,7 @@ const FlipClock = ({
                   {settingVirtual ? virtualTimeArray[4] : year[0]}
                 </div>
               </div>
-              {settingVirtual && (
+              {settingVirtual && !isMobile && (
                 <div
                   className="chevron-down"
                   onClick={() => handleChange("y1_down")}
@@ -607,7 +610,7 @@ const FlipClock = ({
             </div>
             {/* year 2 */}
             <div className="digit">
-              {settingVirtual && (
+              {settingVirtual && !isMobile && (
                 <div
                   className="chevron-up"
                   onClick={() => handleChange("y2_up")}
@@ -621,7 +624,7 @@ const FlipClock = ({
                   {settingVirtual ? virtualTimeArray[5] : year[1]}
                 </div>
               </div>
-              {settingVirtual && (
+              {settingVirtual && !isMobile && (
                 <div
                   className="chevron-down"
                   onClick={() => handleChange("y2_down")}
@@ -632,7 +635,7 @@ const FlipClock = ({
             </div>
             {/* year 3 */}
             <div className="digit">
-              {settingVirtual && (
+              {settingVirtual && !isMobile && (
                 <div
                   className="chevron-up"
                   onClick={() => handleChange("y3_up")}
@@ -646,7 +649,7 @@ const FlipClock = ({
                   {settingVirtual ? virtualTimeArray[6] : year[2]}
                 </div>
               </div>
-              {settingVirtual && (
+              {settingVirtual && !isMobile && (
                 <div
                   className="chevron-down"
                   onClick={() => handleChange("y3_down")}
@@ -657,7 +660,7 @@ const FlipClock = ({
             </div>
             {/* year 4 */}
             <div className="digit">
-              {settingVirtual && (
+              {settingVirtual && !isMobile && (
                 <div
                   className="chevron-up"
                   onClick={() => handleChange("y4_up")}
@@ -671,7 +674,7 @@ const FlipClock = ({
                   {settingVirtual ? virtualTimeArray[7] : year[3]}
                 </div>
               </div>
-              {settingVirtual && (
+              {settingVirtual && !isMobile && (
                 <div
                   className="chevron-down"
                   onClick={() => handleChange("y4_down")}
@@ -682,9 +685,8 @@ const FlipClock = ({
             </div>
           </div>
         </div>
-
         <div className="calendar-container">
-          {settingVirtual && (
+          {settingVirtual && !isMobile && (
             <OverlayTrigger placement="top" overlay={clockTooltip}>
               <Clock
                 style={{ marginRight: "1em" }}
@@ -697,7 +699,7 @@ const FlipClock = ({
           <div className="flip-clock">
             {/* Hour 1 */}
             <div className="digit">
-              {settingVirtual && (
+              {settingVirtual && !isMobile && (
                 <div
                   className="chevron-up"
                   onClick={() => handleChange("h1_up")}
@@ -711,7 +713,7 @@ const FlipClock = ({
                   {settingVirtual ? virtualTimeArray[8] : hours[0]}
                 </div>
               </div>
-              {settingVirtual && (
+              {settingVirtual && !isMobile && (
                 <div
                   className="chevron-down"
                   onClick={() => handleChange("h1_down")}
@@ -722,7 +724,7 @@ const FlipClock = ({
             </div>
             {/* Hour 2 */}
             <div className="digit">
-              {settingVirtual && (
+              {settingVirtual && !isMobile && (
                 <div
                   className="chevron-up"
                   onClick={() => handleChange("h2_up")}
@@ -736,7 +738,7 @@ const FlipClock = ({
                   {settingVirtual ? virtualTimeArray[9] : hours[1]}
                 </div>
               </div>
-              {settingVirtual && (
+              {settingVirtual && !isMobile && (
                 <div
                   className="chevron-down"
                   onClick={() => handleChange("h2_down")}
@@ -750,7 +752,7 @@ const FlipClock = ({
 
             {/* Minute 1 */}
             <div className="digit">
-              {settingVirtual && (
+              {settingVirtual && !isMobile && (
                 <div
                   className="chevron-up"
                   onClick={() => handleChange("min1_up")}
@@ -764,7 +766,7 @@ const FlipClock = ({
                   {settingVirtual ? virtualTimeArray[10] : minutes[0]}
                 </div>
               </div>
-              {settingVirtual && (
+              {settingVirtual && !isMobile && (
                 <div
                   className="chevron-down"
                   onClick={() => handleChange("min1_down")}
@@ -775,7 +777,7 @@ const FlipClock = ({
             </div>
             {/* Minute 2 */}
             <div className="digit">
-              {settingVirtual && (
+              {settingVirtual && !isMobile && (
                 <div
                   className="chevron-up"
                   onClick={() => handleChange("min2_up")}
@@ -789,7 +791,7 @@ const FlipClock = ({
                   {settingVirtual ? virtualTimeArray[11] : minutes[1]}
                 </div>
               </div>
-              {settingVirtual && (
+              {settingVirtual && !isMobile && (
                 <div
                   className="chevron-down"
                   onClick={() => handleChange("min2_down")}
@@ -803,7 +805,7 @@ const FlipClock = ({
 
             {/* seconds 1 */}
             <div className="digit">
-              {settingVirtual && (
+              {settingVirtual && !isMobile && (
                 <div
                   className="chevron-up"
                   onClick={() => handleChange("s1_up")}
@@ -817,7 +819,7 @@ const FlipClock = ({
                   {settingVirtual ? virtualTimeArray[12] : seconds[0]}
                 </div>
               </div>
-              {settingVirtual && (
+              {settingVirtual && !isMobile && (
                 <div
                   className="chevron-down"
                   onClick={() => handleChange("s1_down")}
@@ -828,7 +830,7 @@ const FlipClock = ({
             </div>
             {/* seoconds 2 */}
             <div className="digit">
-              {settingVirtual && (
+              {settingVirtual && !isMobile && (
                 <div
                   className="chevron-up"
                   onClick={() => handleChange("s2_up")}
@@ -842,7 +844,7 @@ const FlipClock = ({
                   {settingVirtual ? virtualTimeArray[13] : seconds[1]}
                 </div>
               </div>
-              {settingVirtual && (
+              {settingVirtual && !isMobile && (
                 <div
                   className="chevron-down"
                   onClick={() => handleChange("s2_down")}
@@ -852,6 +854,9 @@ const FlipClock = ({
               )}
             </div>
           </div>
+
+        
+
 
           <DatePickerModal
             show={modalDate}
@@ -864,6 +869,20 @@ const FlipClock = ({
             handleSave={handlePickTime}
           />
         </div>
+
+        {settingVirtual && isMobile &&
+              <div className="calendar-container">
+                <Button onClick={() => setModalDate(true)} style={{marginRight:'0.3em'}}>
+                  <Calendar style={{ marginRight: "1em" }} />
+                  <span> choose date</span>
+                </Button>
+
+                <Button onClick={() => setModalTime(true)} style={{marginLeft:'0.3em'}}>
+                  <Clock style={{ marginRight: "1em" }} />
+                  <span> choose hour </span>
+                </Button>
+              </div>}
+
       </div>
     </>
   );

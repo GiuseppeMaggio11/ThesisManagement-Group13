@@ -253,7 +253,7 @@ const FilterCard = ({
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-            gridGap: "10px",
+            gridGap: "1.1em",
           }}
         >
           {/* title */}

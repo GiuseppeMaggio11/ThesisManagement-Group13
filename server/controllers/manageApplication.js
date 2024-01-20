@@ -48,8 +48,11 @@ async function updateApplicationStatus(req, res) {
           const result_reject = await dao.rejectApplicationsExcept(decision);
           //cancels every other application of that student
           //const result_cancel = await dao.cancelStudentApplications(decision);
+          const result = await dao.updateThesesArchivationManual(
+            application.thesis_id
+          );
         }
-        
+
         await dao.commit();
 
         const emailData = await dao.getDataStudentApplicationEmail(
@@ -69,11 +72,9 @@ async function updateApplicationStatus(req, res) {
             console.log(error);
           }
         });
-        
         return res.status(200).json(updated_application);
       }
     }
-
     await dao.rollback();
     return res
       .status(400)
@@ -95,7 +96,7 @@ async function newApplication(req, res) {
     }
 
     await dao.beginTransaction();
-    
+
     const userID = await dao.getUserID(req.user.username);
     const isValid = await dao.isThesisValid(thesis_id, date);
     if (!isValid) {
@@ -171,15 +172,37 @@ async function isApplied(req, res) {
   try {
     const userID = await dao.getUserID(req.user.username);
     const applications = await dao.getApplications();
+    let returnValue = 0;
     for (const application of applications) {
       if (
         userID == application.student_id &&
-        application.status !== "Rejected"
+        application.status !== "Rejected" &&
+        application.status !== "Cancelled"
       ) {
-        return res.status(200).json(1);
+        returnValue = 1;
       }
     }
-    return res.status(200).json(0);
+    /* const rowStudentRequest = await dao.getCountStudentRequestNotRejected(
+      userID
+    );
+    if (rowStudentRequest > 0) returnValue = 1; */
+
+    return res.status(200).json(returnValue);
+  } catch (err) {
+    return res.status(500).json(`error: ${err}`);
+  }
+}
+
+async function hasAlreadyRequest(req, res) {
+  try {
+    const userID = await dao.getUserID(req.user.username);
+    let returnValue = 0;
+    const rowStudentRequest = await dao.getCountStudentRequestNotRejected(
+      userID
+    );
+    if (rowStudentRequest > 0) returnValue = 1;
+
+    return res.status(200).json(returnValue);
   } catch (err) {
     return res.status(500).json(`error: ${err}`);
   }
@@ -191,4 +214,5 @@ module.exports = {
   getApplications,
   getApplicationStudent,
   isApplied,
+  hasAlreadyRequest,
 };

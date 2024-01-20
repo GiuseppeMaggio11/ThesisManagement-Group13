@@ -606,7 +606,7 @@ input:checked + .slider::before {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   transition: box-shadow 0.5s;
   border-radius: 20px;
-  height: 320px;
+  height: fit-content;
 }
 
 @media (max-width: 768px) {
@@ -642,6 +642,11 @@ input:checked + .slider::before {
 .title-custom-proposals:hover {
   text-decoration: underline;
 }
+
+.description-read-more-white {
+  color: white;
+}
+
 
 .description-read-more:hover {
   text-decoration: underline;

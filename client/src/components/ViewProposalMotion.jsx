@@ -10,9 +10,10 @@ import {
   People,
   Person,
 } from "react-bootstrap-icons";
+import MessageContext from "../messageCtx";
 import randomcolor from "randomcolor";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import API from "../API";
 import Loading from "./Loading";
 
@@ -20,28 +21,30 @@ function ViewProposalMotion(props) {
   const type = props.user?.user_type;
   const [cosup, setCosup] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [isAlreadyApplied, setIsAlreadyApplied] = useState(false);
+  const { handleToast } = useContext(MessageContext);
+  //const [isAlreadyApplied, setIsAlreadyApplied] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
+    console.log(props.proposal);
     setIsLoading(true);
-    async function isApplied() {
+    /* async function isApplied() {
       let alreadyApply = await API.isApplied();
       setIsAlreadyApplied(alreadyApply);
-    }
+    } */
     if (type === "STUD" && props.proposal) {
       setCosup(props.proposal?.cosupervisors.join(", "));
-      try {
+      /* try {
         isApplied();
       } catch (err) {
-        console.log(err);
-      }
+        handleToast(err, "error");
+      } */
     }
     if (type === "PROF" && props.proposal) {
       let ext = props.proposal?.external_cosupervisors?.map((ex) => {
         return ex.ext_supervisor_name;
       });
       let int = props.proposal?.internal_cosupervisors?.map((ex) => {
-        return ex.ext_supervisor_name;
+        return ex.int_supervisor_name;
       });
       let concatenatedCosup = [...int, ...ext];
       setCosup(concatenatedCosup.join(", "));
@@ -212,22 +215,24 @@ function ViewProposalMotion(props) {
                       </Button>
                     </OverlayTrigger>
                   </Col>
-                  <Col xs={6} md={6} lg={3}>
-                    <OverlayTrigger
-                      placement="bottom"
-                      overlay={props.renderTooltipArchive}
-                    >
-                      <Button
-                        variant="light"
-                        onClick={() => props.setShowArchive(true)}
+                  {!props.proposal.is_archived && (
+                    <Col xs={6} md={6} lg={3}>
+                      <OverlayTrigger
+                        placement="bottom"
+                        overlay={props.renderTooltipArchive}
                       >
-                        {!props.isMobile && (
-                          <span className="mx-2">Archive</span>
-                        )}
-                        <Archive />
-                      </Button>
-                    </OverlayTrigger>
-                  </Col>
+                        <Button
+                          variant="light"
+                          onClick={() => props.setShowArchive(true)}
+                        >
+                          {!props.isMobile && (
+                            <span className="mx-2">Archive</span>
+                          )}
+                          <Archive />
+                        </Button>
+                      </OverlayTrigger>
+                    </Col>
+                  )}
                 </Row>
               </Col>
             )}
@@ -481,7 +486,7 @@ function ViewProposalMotion(props) {
                 </Col>
                 <Col>
                   <span style={{ color: "black" }}>
-                    {dayjs(props.proposal.expiration).format("MM/DD/YYYY")}
+                    {dayjs(props.proposal.expiration).format("DD/MM/YYYY")}
                   </span>
                   <Calendar
                     style={{ marginLeft: "0.4rem", marginBottom: "0.2rem" }}
@@ -489,21 +494,23 @@ function ViewProposalMotion(props) {
                 </Col>
               </Row>
             </Col>
-            {type === "STUD" && !isAlreadyApplied && (
-              <Col
-                className="d-flex flex-column justify-content-end align-items-end"
-                xl={2}
-              >
-                <div className="m-2">
-                  <Button
-                    className="button-style"
-                    onClick={props.handleUploadInterface}
-                  >
-                    <span className="mx-2">Apply</span>
-                  </Button>
-                </div>
-              </Col>
-            )}
+            {type === "STUD" &&
+              !props.isAlreadyApplied &&
+              !props.fromApplications && (
+                <Col
+                  className="d-flex flex-column justify-content-end align-items-end"
+                  xl={2}
+                >
+                  <div className="m-2">
+                    <Button
+                      className="button-style"
+                      onClick={props.handleUploadInterface}
+                    >
+                      <span className="mx-2">Apply</span>
+                    </Button>
+                  </div>
+                </Col>
+              )}
           </Row>
         </Card>
       </motion.div>

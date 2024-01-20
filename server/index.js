@@ -21,6 +21,7 @@ const {
   updateApplicationStatus,
   getApplications,
   isApplied,
+  hasAlreadyRequest,
 } = require("./controllers/manageApplication");
 const {
   addFiles,
@@ -332,6 +333,8 @@ app.put(
 );
 
 app.get("/api/isApplied", isStudent, isApplied);
+
+app.get("/api/hasAlreadyReuests", isStudent, hasAlreadyRequest);
 
 //THESIS REQUESTS
 app.get("/api/getrequestsforsecr", isSecretary, getRequestsForSecretary);

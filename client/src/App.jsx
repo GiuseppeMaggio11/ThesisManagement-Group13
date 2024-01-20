@@ -31,6 +31,9 @@ function App() {
       : new Date()
   );
   const [error, setError] = useState("");
+  const [isAlreadyApplied, setIsAlreadyApplied] = useState(false);
+  const [hasAlreadyRequests, setHasAlreadyRequests] = useState(false);
+
   // If an error occurs, the error message will be shown in a toast.
   const handleToast = (err, type) => {
     console.log(err);
@@ -60,6 +63,16 @@ function App() {
         draggable: true,
         progress: undefined,
       });
+    } else if (type === "warning") {
+      toast.warning(msg, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     }
   };
 
@@ -71,6 +84,13 @@ function App() {
         setLoading(false);
         setLoggedIn(true);
         setUser(user);
+        if (user && user.user_type === "STUD") {
+          let alreadyApply = await API.isApplied();
+          setIsAlreadyApplied(alreadyApply);
+
+          let alreadyRequest = await API.hasAlreadyReuests();
+          setHasAlreadyRequests(alreadyRequest);
+        }
       } catch (err) {
         if (error.response && error.response.status !== 401) {
           console.log(err);
@@ -91,7 +111,11 @@ function App() {
     <BrowserRouter>
       <MessageContext.Provider value={{ handleToast }}>
         <div className="wrapper">
-          <Header user={user} logout={logOut} />
+          <Header
+            user={user}
+            logout={logOut}
+            hasAlreadyRequests={hasAlreadyRequests}
+          />
           <ToastContainer />
           <Routes>
             <Route exact path="/" element={<Home />} />
@@ -129,6 +153,8 @@ function App() {
                   virtualClock={virtualClock}
                   loggedIn={loggedIn}
                   user={user}
+                  isAlreadyApplied={isAlreadyApplied}
+                  setIsAlreadyApplied={setIsAlreadyApplied}
                 />
               }
             />
@@ -211,6 +237,8 @@ function App() {
                   virtualClock={virtualClock}
                   loggedIn={loggedIn}
                   user={user}
+                  isAlreadyApplied={isAlreadyApplied}
+                  setIsAlreadyApplied={setIsAlreadyApplied}
                 />
               }
             />
@@ -259,6 +287,7 @@ function App() {
                   setLoading={setLoading}
                   loggedIn={loggedIn}
                   user={user}
+                  setHasAlreadyRequests={setHasAlreadyRequests}
                 />
               }
             />
