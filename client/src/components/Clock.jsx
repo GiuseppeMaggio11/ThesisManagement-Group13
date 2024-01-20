@@ -109,18 +109,16 @@ const FlipClock = ({
                 ).add(1, "second")
               : dayjs().add(1, "second");
           }
-          else {
-            updatedVirtualTime = localStorage.getItem("virtualclock") ? dayjs(new Date(JSON.parse(localStorage.getItem("virtualclock")))).add(1, "second") : dayjs().add(1, "second");
-          }
-          setSystemTime(updatedVirtualTime.toDate())
-          localStorage.setItem("virtualclock", JSON.stringify(updatedVirtualTime.toDate()));
-
+          setSystemTime(updatedVirtualTime.toDate());
+          localStorage.setItem(
+            "virtualclock",
+            JSON.stringify(updatedVirtualTime.toDate())
+          );
           return updatedVirtualTime;
         });
       }, 1000);
       return () => clearInterval(interval);
     }
-
   }, [isVirtual, settingVirtual]);
 
   useEffect(() => {
@@ -138,7 +136,11 @@ const FlipClock = ({
       handleDateTimeUpdate(time);
       setIsLoading(false);
     } else {
-      handleDateTimeUpdate(virtualTime ? virtualTime.toDate() : new Date(JSON.parse(localStorage.getItem("virtualclock"))))
+      handleDateTimeUpdate(
+        virtualTime
+          ? virtualTime.toDate()
+          : new Date(JSON.parse(localStorage.getItem("virtualclock")))
+      );
 
       setIsLoading(false);
     }
@@ -855,9 +857,6 @@ const FlipClock = ({
             </div>
           </div>
 
-        
-
-
           <DatePickerModal
             show={modalDate}
             handleClose={() => setModalDate(false)}
@@ -870,19 +869,25 @@ const FlipClock = ({
           />
         </div>
 
-        {settingVirtual && isMobile &&
-              <div className="calendar-container">
-                <Button onClick={() => setModalDate(true)} style={{marginRight:'0.3em'}}>
-                  <Calendar style={{ marginRight: "1em" }} />
-                  <span> choose date</span>
-                </Button>
+        {settingVirtual && isMobile && (
+          <div className="calendar-container">
+            <Button
+              onClick={() => setModalDate(true)}
+              style={{ marginRight: "0.3em" }}
+            >
+              <Calendar style={{ marginRight: "1em" }} />
+              <span> choose date</span>
+            </Button>
 
-                <Button onClick={() => setModalTime(true)} style={{marginLeft:'0.3em'}}>
-                  <Clock style={{ marginRight: "1em" }} />
-                  <span> choose hour </span>
-                </Button>
-              </div>}
-
+            <Button
+              onClick={() => setModalTime(true)}
+              style={{ marginLeft: "0.3em" }}
+            >
+              <Clock style={{ marginRight: "1em" }} />
+              <span> choose hour </span>
+            </Button>
+          </div>
+        )}
       </div>
     </>
   );
