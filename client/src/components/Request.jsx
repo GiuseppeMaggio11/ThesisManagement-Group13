@@ -281,6 +281,7 @@ function RequestCard(props) {
                       fontSize: 15,
                       cursor: "pointer",
                       padding: 0,
+                      marginBottom: request.cosup_fullname.length > 0? 0: '1.5em'
                     }}
                   >
                     <span>{"by "}</span>
@@ -324,7 +325,7 @@ function RequestCard(props) {
                         fontSize: 15,
                         padding: 0,
                       }}
-                      s
+                      
                     >
                       <People style={{ marginRight: "0.5rem" }} />
                       <span style={{ fontWeight: 500 }}>
@@ -403,6 +404,7 @@ function RequestCard(props) {
               WebkitBoxOrient: "vertical",
               overflowX: "hidden",*/
               overflowY: expanded ? "scroll" : "hidden",
+              marginBottom: (!expanded && request.description.length < (isMobile ? 100 : 150)) ? '1.5em' : 0
             }}
           >
             {getDescriptionDisplay()}
@@ -421,9 +423,9 @@ function RequestCard(props) {
               
                 <span
                   onClick={request.description.length > (isMobile ? 100 : 150) && toggleExpanded}
-                  className={request.description.length > (isMobile ? 100 : 150) ? "description-read-more text-muted" : 'description-read-more-white'}
+                  className={"description-read-more text-muted"}
                 >
-                  {request.description.length > (isMobile ? 100 : 150) ? expanded ? "Reduce" : "Read More" : ' .'}
+                  {request.description.length > (isMobile ? 100 : 150) ? expanded ? "Reduce" : "Read More" : ''}
                 </span>
               
             </Col>

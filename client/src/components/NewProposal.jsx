@@ -83,7 +83,7 @@ function NewProposal(props) {
       let degrees = await API.getDegrees();
       let groups = await API.getGroups();
       let sup = in_cosup.filter((item) => item.email === sup_email);
-
+      in_cosup = in_cosup.filter((item) => item.email !== sup_email)
       setCoSupervisorExternal_obj(ex_cosup);
       setCoSupervisorInternal_obj(in_cosup);
 

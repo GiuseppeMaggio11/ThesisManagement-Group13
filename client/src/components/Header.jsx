@@ -37,7 +37,7 @@ function Header(props) {
       style={{ background: "#215884" }}
     >
       <Container>
-        <Navbar.Brand as={NavLink} to="/" className="fs-1">
+        <Navbar.Brand as={NavLink}  to={props.user?.user_type==='SECR'?"/secrrequests": (props.user?.user_type==='PROF'? "/profproposals": (props.user?.user_type==='STUD'? "/studproposals":'/')) }  className="fs-1">
           <Image
             src="https://upload.wikimedia.org/wikipedia/it/archive/4/47/20210407201938%21Logo_PoliTo_dal_2021_blu.png"
             alt="logo polito"
