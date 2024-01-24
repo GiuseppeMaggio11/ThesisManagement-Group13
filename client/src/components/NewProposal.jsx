@@ -27,19 +27,22 @@ function NewProposal(props) {
   const { idCopy, idUpd } = useParams();
 
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
+    title: "Data Analysis of Rector Elections",
+    description:
+      "The thesis aims to investigate and analyze the patterns, trends, and influential factors surrounding the process of electing university rectors. This study employs advanced data analysis techniques to examine voting behaviors, candidate profiles, and electoral outcomes. By delving into historical election data, the research seeks to identify any correlations between candidate characteristics, campaign strategies, and electoral success. Additionally, the study explores the impact of external factors, such as socio-economic conditions and institutional dynamics, on the election results. The findings of this research endeavor to provide valuable insights for university administrations, policymakers, and stakeholders, contributing to a deeper understanding of the complexities inherent in rector elections and potentially informing strategies for enhancing the democratic processes within academic institutions.",
     supervisor_id: "",
     cosupervisors_internal: [],
     cosupervisors_external: [],
-    thesis_level: "",
-    keywords: [],
-    type_name: "",
+    thesis_level: "Master",
+    keywords: ["DATA ANALYSIS", "ELECTIONS"],
+    type_name: "Sperimental",
     cod_group: "",
-    required_knowledge: "",
-    notes: "",
+    required_knowledge:
+      "The ideal candidate should possess a strong foundation in statistical analysis and data science, proficiency in programming languages like Python or R, and a deep understanding of election dynamics. Familiarity with database management, survey methodologies, and academic governance structures is crucial.",
+    notes:
+      "Candidates with prior experience in analyzing electoral data, especially in the context of academic institutions, will be prioritized. Strong communication skills and the ability to present complex findings in a comprehensible manner are essential. The research may involve collaboration with election committees, requiring a diplomatic and cooperative approach.",
     expiration: "",
-    cod_degree: "",
+    cod_degree: "DEGR01",
     is_archived: 0,
   });
 
@@ -83,7 +86,7 @@ function NewProposal(props) {
       let degrees = await API.getDegrees();
       let groups = await API.getGroups();
       let sup = in_cosup.filter((item) => item.email === sup_email);
-      in_cosup = in_cosup.filter((item) => item.email !== sup_email)
+      in_cosup = in_cosup.filter((item) => item.email !== sup_email);
       setCoSupervisorExternal_obj(ex_cosup);
       setCoSupervisorInternal_obj(in_cosup);
 

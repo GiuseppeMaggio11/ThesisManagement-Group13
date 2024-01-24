@@ -281,7 +281,12 @@ function RequestCard(props) {
                       fontSize: 15,
                       cursor: "pointer",
                       padding: 0,
-                      marginBottom: request.cosup_fullname.length > 0? 0: '1.5em'
+                      marginBottom:
+                        request.cosup_fullname.length > 0
+                          ? 0
+                          : !isSecretary
+                          ? "1.5em"
+                          : 0,
                     }}
                   >
                     <span>{"by "}</span>
@@ -302,6 +307,8 @@ function RequestCard(props) {
                   <Col style={{ padding: 0 }} xs={12} md={12} lg={12}>
                     <div
                       style={{
+                        marginBottom:
+                          request.cosup_fullname.length > 0 ? 0 : "1.5em",
                         fontWeight: "medium",
                         fontSize: 15,
                         padding: 0,
@@ -325,7 +332,6 @@ function RequestCard(props) {
                         fontSize: 15,
                         padding: 0,
                       }}
-                      
                     >
                       <People style={{ marginRight: "0.5rem" }} />
                       <span style={{ fontWeight: 500 }}>
@@ -404,7 +410,10 @@ function RequestCard(props) {
               WebkitBoxOrient: "vertical",
               overflowX: "hidden",*/
               overflowY: expanded ? "scroll" : "hidden",
-              marginBottom: (!expanded && request.description.length < (isMobile ? 100 : 150)) ? '1.5em' : 0
+              marginBottom:
+                !expanded && request.description.length < (isMobile ? 100 : 150)
+                  ? "1.5em"
+                  : 0,
             }}
           >
             {getDescriptionDisplay()}
@@ -420,14 +429,19 @@ function RequestCard(props) {
           </div>
           <Row className="text-end">
             <Col>
-              
-                <span
-                  onClick={request.description.length > (isMobile ? 100 : 150) && toggleExpanded}
-                  className={"description-read-more text-muted"}
-                >
-                  {request.description.length > (isMobile ? 100 : 150) ? expanded ? "Reduce" : "Read More" : ''}
-                </span>
-              
+              <span
+                onClick={
+                  request.description.length > (isMobile ? 100 : 150) &&
+                  toggleExpanded
+                }
+                className={"description-read-more text-muted"}
+              >
+                {request.description.length > (isMobile ? 100 : 150)
+                  ? expanded
+                    ? "Reduce"
+                    : "Read More"
+                  : ""}
+              </span>
             </Col>
           </Row>
           <Row

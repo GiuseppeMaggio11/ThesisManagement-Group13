@@ -13,8 +13,9 @@ function NewRequest(props) {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
+    title: "Next-Gen Embedded Systems Design",
+    description:
+      "This research will explore innovative strategies at the intersection of computer science and electronic engineering, with a focus on optimizing hardware-software integration, real-time processing, and energy efficiency. I believe this project presents a unique opportunity to contribute to advancements in embedded systems, and I'm enthusiastic about the prospect of delving into contemporary challenges and contributing to technological innovation in engineering.",
     supervisor_id: "",
     cosupervisors_internal: [],
   });
@@ -127,7 +128,10 @@ function NewRequest(props) {
     const ids = [];
     externalNames &&
       externalNames.forEach((name) => {
-        const [firstName, lastName] = name.split(" ");
+        let separatedStrings = name.split(" ");
+        let firstName = separatedStrings.slice(0, -1).join(" ");
+        let lastName = separatedStrings[separatedStrings.length - 1];
+
         const foundObj = objList.find(
           (obj) => obj.name === firstName && obj.surname === lastName
         );
@@ -152,13 +156,13 @@ function NewRequest(props) {
       [formData.supervisor_id],
       cosupervisors_internal_obj
     )[0];
-
+    console.log("supervisor", supervisor);
     const newProp = {
       ...formData,
       supervisor_id: supervisor,
       cosupervisors_internal: cosupervisorInternalIDs,
     };
-
+    debugger;
     try {
       const response = await API.newRequest(newProp);
       console.log(newProp);

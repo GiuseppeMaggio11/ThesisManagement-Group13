@@ -307,5 +307,4 @@ INSERT INTO thesis_cosupervisor_teacher (thesis_id, thesisrequest_id ,cosupeviso
 VALUES 
 	(NULL, 1, 'P123456'),
     (NULL, 2, 'P654321'),
-    (NULL, 2, 'P654321'),
     (NULL, 3, 'P654321');
