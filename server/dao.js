@@ -133,7 +133,7 @@ exports.getProfID = async (username) => {
 exports.getDataStudentApplicationEmail = async (thesisId, studentId) => {
   try {
     const sql =
-      "SELECT  email, title FROM thesis TS, student S WHERE TS.id = ? AND S.id = ? ";
+      "SELECT  S.email, TS.title, S.name, S.surname FROM thesis TS, student S WHERE TS.id = ? AND S.id = ? ";
     const [result] = await pool.execute(sql, [thesisId, studentId]);
     return result[0];
   } catch (error) {
@@ -794,6 +794,22 @@ exports.rejectApplicationsExcept = async (accepted) => {
     return accepted;
   } catch (err) {
     console.error("Error in rejectApplicationsExcept: ", err);
+    throw err;
+  }
+};
+
+exports.getNamerejectApplicationsExcept = async (accepted) => {
+  try {
+    const sql = ` 
+    SELECT s.name as name, s.surname as surname FROM application a INNER JOIN student s  ON s.id = a.student_id  WHERE  a.thesis_id = ? AND a.student_id <> ?
+                `;
+    const [rows] = await pool.execute(sql, [
+      accepted.thesis_id,
+      accepted.student_id,
+    ]);
+    return rows;
+  } catch (err) {
+    console.error("Error in getNamerejectApplicationsExcept: ", err);
     throw err;
   }
 };

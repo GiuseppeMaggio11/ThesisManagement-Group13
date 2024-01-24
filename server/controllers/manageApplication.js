@@ -46,24 +46,46 @@ async function updateApplicationStatus(req, res) {
           }
           //cancel every other student applications for that thesis
           const result_reject = await dao.rejectApplicationsExcept(decision);
+
+         
           //cancels every other application of that student
           //const result_cancel = await dao.cancelStudentApplications(decision);
           const result = await dao.updateThesesArchivationManual(
             application.thesis_id
           );
+          
         }
 
         await dao.commit();
 
+        const names = await dao.getNamerejectApplicationsExcept(decision);
         const emailData = await dao.getDataStudentApplicationEmail(
           decision.thesis_id,
           decision.student_id
         );
+
+        for(let name of names){
+          console.log(name)
+          const mailOptions = {
+            from: "group13.thesismanagement@gmail.com",
+            to: `group13.thesismanagement@gmail.com`,
+            subject: `Status for thesis ${emailData.title}`,
+            text: `Mr/Miss ${name.name} ${name.surname} Your application for thesis ${emailData.title} was rejected`,
+          };
+          transporter.sendMail(mailOptions, async (error, info) => {
+            if (!error) {
+              console.log("Email mandata");
+            } else {
+              console.log(error);
+            }
+          });
+        }
+
         const mailOptions = {
           from: "group13.thesismanagement@gmail.com",
           to: `group13.thesismanagement@gmail.com`,
           subject: `Status for thesis ${emailData.title}`,
-          text: `Your application for thesis ${emailData.title} was ${decision.status}`,
+          text: `Mr/Miss ${emailData.name} ${emailData.surname} Your application for thesis ${emailData.title} was ${decision.status}`,
         };
         transporter.sendMail(mailOptions, async (error, info) => {
           if (!error) {
